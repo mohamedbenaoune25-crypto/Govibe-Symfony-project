@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register on GoVibe{% endblock %}
+
+{% block body %}
+<div class="row pt-5 pb-5 justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow rounded-4 p-5 bg-white">
+            <div class="text-center mb-5">
+                <div class="avatar-circle rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold mb-3" 
+                     style="width: 80px; height: 80px; background-color: #52BE80; font-size: 2rem;">
+                    GV
+                </div>
+                <h1 class="h3 mb-3 fw-bold">Create an account</h1>
+                <p class="text-muted">Start creating your own story today.</p>
+            </div>
+
+            {{ form_start(registrationForm, {'attr': {'class': 'signup-form'}}) }}
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-uppercase small opacity-75">Prenom</label>
+                        {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control border-2 p-3 rounded-3'}}) }}
+                        {{ form_errors(registrationForm.prenom) }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-uppercase small opacity-75">Nom</label>
+                        {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control border-2 p-3 rounded-3'}}) }}
+                        {{ form_errors(registrationForm.nom) }}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-uppercase small opacity-75">Email Address</label>
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control border-2 p-3 rounded-3', 'placeholder': 'name@example.com'}}) }}
+                    {{ form_errors(registrationForm.email) }}
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-uppercase small opacity-75">Password</label>
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control border-2 p-3 rounded-3', 'placeholder': 'Minimum 6 characters'}}) }}
+                    {{ form_errors(registrationForm.plainPassword) }}
+                </div>
+
+                <div class="mb-5">
+                    {{ form_label(registrationForm.role, 'Inscrire en tant que:', {'label_attr': {'class': 'form-label fw-bold text-uppercase small opacity-75'}}) }}
+                    {{ form_widget(registrationForm.role, {'attr': {'class': 'form-select border-2 p-3 rounded-3'}}) }}
+                    {{ form_errors(registrationForm.role) }}
+                    <div class="form-text mt-2 opacity-50">Choose 'Administrateur' for full privileges or 'Utilisateur' to contribute.</div>
+                </div>
+
+                <button type="submit" class="btn btn-publier w-100 py-3 text-white fw-bold shadow-sm rounded-3 mt-2" style="background-color: #52BE80;">
+                    Register Now
+                </button>
+
+                <div class="text-center mt-5 pt-4 border-top">
+                    <p class="text-muted">Already a member? <a href="{{ path('app_login') }}" class="text-decoration-none fw-bold" style="color: #52BE80;">Sign in instead</a></p>
+                </div>
+
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

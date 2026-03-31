@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+<div class="row pt-5 justify-content-center">
+    <div class="col-lg-5">
+        <form method="post" class="card border-0 shadow rounded-4 p-5 bg-white">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+
+            {% if app.user %}
+                <div class="mb-3 text-center">
+                    You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                </div>
+            {% endif %}
+
+            <div class="text-center mb-5">
+                <div class="avatar-circle rounded-circle d-inline-flex align-items-center justify-content-center text-white fw-bold mb-3" 
+                     style="width: 80px; height: 80px; background-color: #52BE80; font-size: 2rem;">
+                    GV
+                </div>
+                <h1 class="h3 mb-3 fw-bold">Sign in to GoVibe</h1>
+                <p class="text-muted">Welcome back! Please enter your details.</p>
+            </div>
+
+            <div class="mb-4">
+                <label for="inputEmail" class="form-label fw-bold text-uppercase small opacity-75">Email Address</label>
+                <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control border-2 p-3 rounded-3" autocomplete="email" required autofocus>
+            </div>
+            
+            <div class="mb-4">
+                <label for="inputPassword" class="form-label fw-bold text-uppercase small opacity-75">Password</label>
+                <input type="password" name="_password" id="inputPassword" class="form-control border-2 p-3 rounded-3" autocomplete="current-password" required>
+            </div>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            {#
+                Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                See https://symfony.com/doc/current/security/remember_me.html
+
+                <div class="checkbox mb-3">
+                    <label>
+                        <input type="checkbox" name="_remember_me"> Remember me
+                    </label>
+                </div>
+            #}
+
+            <button class="btn btn-publier w-100 py-3 mt-4 text-white fw-bold shadow-sm rounded-3" type="submit" style="background-color: #52BE80;">
+                Sign in
+            </button>
+
+            <div class="text-center mt-5 pt-4 border-top">
+                <p class="text-muted">Don't have an account? <a href="{{ path('app_register') }}" class="text-decoration-none fw-bold" style="color: #52BE80;">Create Account</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

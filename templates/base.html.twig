@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}GoVibe - Gestion des Publications{% endblock %}</title>
+        
+        <!-- Google Fonts: Outift & Inter -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+        
+        <!-- Bootstrap 5 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        
+        <!-- Bootstrap Icons -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+        
+        <style>
+            :root {
+                --primary-mint: #52BE80;
+                --bg-light: #E9F7EF;
+                --text-dark: #2C3E50;
+            }
+
+            body {
+                background-color: var(--bg-light);
+                font-family: 'Inter', sans-serif;
+                color: var(--text-dark);
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-family: 'Outfit', sans-serif;
+            }
+
+            .navbar {
+                background-color: #ffffff;
+                border-bottom: 3px solid #EBEDEF;
+                padding: 1rem 3rem;
+            }
+
+            .navbar-brand {
+                font-family: 'Outfit', sans-serif;
+                font-weight: 700;
+                font-size: 2.2rem;
+                color: #2D3E50 !important;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                color: #2D3E50 !important;
+                font-weight: 500;
+                font-size: 1.1rem;
+                padding: 0.5rem 1.5rem !important;
+            }
+
+            .nav-link:hover, .nav-link.active {
+                color: var(--primary-mint) !important;
+            }
+
+            .btn-deconnexion {
+                background-color: #52BE80;
+                border-color: #52BE80;
+                color: #ffffff;
+                font-weight: 700;
+                padding: 0.6rem 1.8rem;
+                border-radius: 0.8rem;
+            }
+
+            .btn-deconnexion:hover {
+                background-color: #48C9B0;
+                opacity: 0.9;
+            }
+
+            .gestion-title {
+                margin: 2rem 0;
+            }
+
+            .search-input {
+                border-radius: 0.8rem;
+                border: 2px solid #EBEDEF;
+                padding: 0.8rem 1.5rem;
+            }
+
+            .btn-new-post {
+                background-color: #52BE80;
+                color: white;
+                font-weight: 700;
+                padding: 0.8rem 2rem;
+                border-radius: 0.8rem;
+                border: 0;
+            }
+        </style>
+
+        {% block stylesheets %}{% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        {% endblock %}
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+        <nav class="navbar navbar-expand-lg sticky-top">
+            <div class="container-fluid px-5">
+                <a class="navbar-brand" href="{{ path('app_poste_index') }}">
+                    <img src="https://ui-avatars.com/api/?name=GV&background=52BE80&color=fff&rounded=true" style="width: 45px; height: 45px; margin-right: 15px;" />
+                    GoVibe
+                </a>
+                
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav gap-3">
+                        <li class="nav-item"><a class="nav-link active" href="{{ path('app_poste_index') }}">Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_forum_index') }}">Forums</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Événements</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">À propos</a></li>
+                    </ul>
+                </div>
+                
+                <div class="d-flex align-items-center gap-4">
+                    {% if app.user %}
+                        <div class="user-greeting d-flex align-items-center gap-2">
+                            <span class="fw-bold fs-5 text-dark">Bonjour, {{ app.user.prenom }} !</span>
+                            <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" 
+                                 style="width: 35px; height: 35px; background-color: #52BE80; font-size: 0.9rem;">
+                                {{ (app.user.prenom|first ~ app.user.nom|first)|upper }}
+                            </div>
+                        </div>
+                        <a href="{{ path('app_logout') }}" class="btn btn-deconnexion shadow-sm" style="background-color: #E74C3C; border-color: #E74C3C;">Déconnexion</a>
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="btn btn-deconnexion shadow-sm" style="background-color: #52BE80; border-color: #52BE80;">Connexion</a>
+                        <a href="{{ path('app_register') }}" class="btn btn-outline-success shadow-sm px-4 fw-bold rounded-3">S'inscrire</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <main class="container px-5 pb-5">
+            {% block body %}{% endblock %}
+        </main>
+    </body>
+</html>
+
+
