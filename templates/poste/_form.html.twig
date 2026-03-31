@@ -1,0 +1,189 @@
+{# templates/poste/_form.html.twig #}
+{{ form_start(form, {'attr': {'id': 'publication-form'}}) }}
+        
+        <!-- FORMAT DE PUBLICATION -->
+        <div class="mb-5">
+            <label class="fw-bold mb-3 d-block text-uppercase letter-spacing-1" style="color: #2D3E50; font-size: 1.1rem;">Format de Publication</label>
+            <div class="d-flex gap-3">
+                <button type="button" id="btn-status-texte" class="btn btn-format active d-flex align-items-center gap-2 px-4 py-2 border rounded-3">
+                    <i class="bi bi-chat-fill"></i> Statut Texte
+                </button>
+                <button type="button" id="btn-photo-video" class="btn btn-format d-flex align-items-center gap-2 px-4 py-2 border rounded-3">
+                    <i class="bi bi-camera-reels-fill"></i> Photo / Vidéo
+                </button>
+            </div>
+        </div>
+
+        <!-- VOTRE MESSAGE -->
+        <div class="mb-5">
+            <label class="fw-bold mb-3 d-block text-uppercase letter-spacing-1" style="color: #2D3E50; font-size: 1.1rem;">Votre Message</label>
+            <div class="textarea-container position-relative">
+                {{ form_widget(form.contenu, {
+                    'attr': {
+                        'class': 'form-control border-secondary-subtle rounded-4 p-4 fs-5',
+                        'style': 'height: 200px; resize: none;',
+                        'placeholder': 'Exprimez-vous...',
+                        'maxlength': '500'
+                    }
+                }) }}
+                <div class="char-counter text-muted position-absolute bottom-0 end-0 m-3 small" style="opacity: 0.6;">
+                    <span id="char-count">0</span> / 500
+                </div>
+            </div>
+            {{ form_errors(form.contenu) }}
+        </div>
+
+        <!-- SÉLECTION MÉDIA (Conditional) -->
+        <div id="media-section" class="mb-5" style="display: none;">
+            <label class="fw-bold mb-3 d-block text-uppercase letter-spacing-1" style="color: #2D3E50; font-size: 1.1rem;">Sélection Média</label>
+            <div class="d-flex gap-2">
+                <input type="text" id="fake-file-input" class="form-control border-secondary-subtle rounded-3 bg-light opacity-75" readonly placeholder="Aucun fichier sélectionné">
+                {{ form_widget(form.imageFile, {'attr': {'class': 'd-none', 'id': 'poste_imageFile'}}) }}
+                <button type="button" onclick="document.getElementById('poste_imageFile').click()" class="btn btn-parcourir px-4 fw-bold text-white rounded-3 shadow-sm" style="background-color: #52BE80; min-width: 140px;">
+                    Parcourir...
+                </button>
+
+            </div>
+            
+            <!-- Aperçu du média -->
+            <div class="media-preview-area mt-4 border border-dashed rounded-4 p-4 text-center bg-light bg-opacity-10 position-relative" style="border-width: 2px !important; border-style: dashed !important; border-color: #D5DBDB !important;">
+                <span class="text-muted opacity-50 small mb-3 d-block">Aperçu du média</span>
+                <div id="preview-image-container" style="display: none;">
+                    <img id="image-preview" src="" class="img-fluid rounded-3 shadow-sm mx-auto" style="max-height: 350px;">
+                </div>
+                <div id="no-preview" class="py-4">
+                    <i class="bi bi-image text-muted opacity-25" style="font-size: 3rem;"></i>
+                </div>
+            </div>
+        </div>
+
+        {% if poste.forum %}
+            {{ form_widget(form.forum, {'attr': {'class': 'd-none'}}) }}
+        {% else %}
+            <div class="mb-5">
+                <label class="fw-bold mb-3 d-block text-uppercase letter-spacing-1" style="color: #2D3E50; font-size: 1.1rem;">Choisir un Forum (Optionnel)</label>
+                {{ form_widget(form.forum, {
+                    'attr': {
+                        'class': 'form-select border-secondary-subtle rounded-4 p-3',
+                    }
+                }) }}
+                <div class="form-text mt-2 small text-muted">Laissez vide pour publier sur le fil général.</div>
+            </div>
+        {% endif %}
+
+        <!-- Hidden but necessary fields -->
+        <div class="d-none">
+            {{ form_widget(form.type, {'id': 'poste_type'}) }}
+            {{ form_rest(form) }}
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="mt-5 pt-4 border-top d-flex justify-content-end align-items-center gap-4">
+            <button type="button" class="btn btn-link link-danger fw-bold text-decoration-none" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-publier px-5 py-3 fw-bold text-white rounded-4 shadow-sm" style="background-color: #52BE80; font-size: 1.1rem;">
+                {{ poste.postId ? 'Modifier' : 'Publier maintenant' }}
+            </button>
+        </div>
+
+{{ form_end(form) }}
+
+<style>
+    .btn-format {
+        background-color: #ffffff;
+        color: #717D7E;
+        font-weight: 500;
+        border-color: #EBEDEF !important;
+        transition: 0.2s;
+    }
+    .btn-format.active {
+        background-color: #E9F7EF !important;
+        color: #1E8449 !important;
+        border-color: #52BE80 !important;
+        font-weight: 700;
+    }
+    .btn-format:hover:not(.active) {
+        background-color: #F4F6F7;
+    }
+    .letter-spacing-1 { letter-spacing: 0.5px; }
+    .btn-publier:hover { background-color: #48C9B0 !important; cursor: pointer; }
+    
+    /* Character counter logic positioning adjustments */
+    .textarea-container textarea { padding-bottom: 40px !important; }
+</style>
+
+<script>
+    window.initPosteForm = function() {
+        const modal = document.getElementById('postModal');
+        const container = modal || document;
+        const btnText = container.querySelector('#btn-status-texte');
+        const btnPhoto = container.querySelector('#btn-photo-video');
+        const mediaSection = container.querySelector('#media-section');
+        const textarea = container.querySelector('textarea');
+        const charCount = container.querySelector('#char-count');
+        const realInput = container.querySelector('#poste_imageFile');
+
+        const fakeInput = container.querySelector('#fake-file-input');
+        const imgPreview = container.querySelector('#image-preview');
+        const previewContainer = container.querySelector('#preview-image-container');
+        const noPreview = container.querySelector('#no-preview');
+
+        const typeInput = container.querySelector('#poste_type');
+
+        if (!btnText || !btnPhoto) return;
+
+        // Reset listeners if any (though here we just re-run)
+        btnText.onclick = () => {
+            btnText.classList.add('active');
+            btnPhoto.classList.remove('active');
+            mediaSection.style.display = 'none';
+            typeInput.value = 'STATUS';
+        };
+
+        btnPhoto.onclick = () => {
+            btnPhoto.classList.add('active');
+            btnText.classList.remove('active');
+            mediaSection.style.display = 'block';
+            typeInput.value = 'MEDIA';
+        };
+
+        // Initial state logic
+        {% if poste.postId and (poste.type == 'MEDIA' or poste.url) %}
+            btnPhoto.click();
+        {% else %}
+            btnText.click();
+        {% endif %}
+
+        // Char Counter
+        textarea.oninput = () => {
+            charCount.textContent = textarea.value.length;
+        };
+        charCount.textContent = textarea.value.length; // Initial
+
+        {% if poste.url %}
+            imgPreview.src = '{{ poste.url }}';
+            previewContainer.style.display = 'block';
+            noPreview.style.display = 'none';
+        {% endif %}
+
+        // Real File Upload Logic
+        realInput.onchange = function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                fakeInput.value = this.files[0].name;
+                
+                reader.onload = function(e) {
+                    imgPreview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    noPreview.style.display = 'none';
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        };
+    }
+
+    // Auto-run if NOT using AJAX (direct page access)
+    if (typeof isAjax === 'undefined') {
+        initPosteForm();
+    }
+</script>

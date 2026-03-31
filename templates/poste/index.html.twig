@@ -1,0 +1,98 @@
+{# templates/poste/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <!-- Hero Section -->
+    <div class="row pt-5 pb-3">
+        <div class="col-lg-8 px-4">
+            <h1 class="display-5 fw-bold text-dark mb-0">Gestion des Publications</h1>
+            <p class="text-secondary fs-5 mt-2 opacity-75">Consultez, modifiez ou supprimez les publications du forum</p>
+        </div>
+        <div class="col-lg-4 d-flex justify-content-end align-items-center gap-3 mt-4 mt-lg-0 px-4">
+            <button type="button" class="btn btn-new-post shadow-sm px-4 fw-bold" onclick="openPostModal('{{ path('app_poste_new') }}')">
+                <i class="bi bi-plus-lg me-2"></i>Nouvelle Publication
+            </button>
+        </div>
+    </div>
+
+    <!-- Posts Feed -->
+    <div class="posts-container mt-5 px-4">
+        {% for poste in postes %}
+            {{ include('poste/postitem.html.twig', {'poste': poste}) }}
+        {% else %}
+            <!-- Same empty state but with modal trigger -->
+            <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white mx-auto" style="max-width: 900px;">
+                <div class="display-3 text-muted opacity-25 mb-4"><i class="bi bi-box2"></i></div>
+                <h3 class="fw-bold">Aucune publication</h3>
+                <p class="text-secondary opacity-75">Prêt à partager quelque chose avec la communauté ?</p>
+                <button type="button" class="btn btn-new-post mt-3 shadow-sm" onclick="openPostModal('{{ path('app_poste_new') }}')">
+                    Commencer
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Global Post Modal -->
+    <div class="modal fade" id="postModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-5 shadow-lg p-4">
+                <div id="modalBody">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <p class="mt-3 text-muted small">Chargement du formulaire...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    let postModal;
+    let modalEl;
+    let modalBody;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        modalEl = document.getElementById('postModal');
+        modalBody = document.getElementById('modalBody');
+        postModal = new bootstrap.Modal(modalEl);
+    });
+
+    function openPostModal(url) {
+        if (!postModal) {
+            const el = document.getElementById('postModal');
+            postModal = new bootstrap.Modal(el);
+            modalBody = document.getElementById('modalBody');
+        }
+
+        // Reset body to loading state
+        modalBody.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="mt-3 text-muted small">Connexion au serveur...</p>
+            </div>
+        `;
+        postModal.show();
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(response => response.text())
+            .then(html => {
+                const range = document.createRange();
+                const fragment = range.createContextualFragment(html);
+                modalBody.innerHTML = '';
+                modalBody.appendChild(fragment);
+                
+                setTimeout(() => {
+                    if (window.initPosteForm) {
+                        window.initPosteForm();
+                    }
+                }, 20);
+            })
+            .catch(error => {
+                modalBody.innerHTML = '<div class="alert alert-danger m-4">Erreur de chargement.</div>';
+            });
+    }
+</script>
+{% endblock %}
