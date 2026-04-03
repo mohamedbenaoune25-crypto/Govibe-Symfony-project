@@ -7,6 +7,15 @@
 {% endblock %}
 
 {% block body %}
+<style>
+    .form-group label {
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        color: #6c757d !important;
+        margin-bottom: 0.5rem;
+    }
+</style>
 {% if app.request.isXmlHttpRequest %}
 <div class="p-4 p-md-5">
     <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
@@ -85,8 +94,8 @@
                 {{ form_errors(form.description) }}
             </div>
 
-            <div class="text-end">
-                <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-semibold shadow-sm">{{ button_label|default('Enregistrer le vol') }}</button>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary-pro w-100">{{ button_label|default('Enregistrer le vol') }}</button>
             </div>
     {{ form_end(form) }}
 </div>
@@ -166,8 +175,8 @@
                 {{ form_errors(form.description) }}
             </div>
 
-            <div class="text-end">
-                <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-semibold shadow-sm">{{ button_label|default('Enregistrer le vol') }}</button>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary-pro w-100">{{ button_label|default('Enregistrer le vol') }}</button>
             </div>
         {{ form_end(form) }}
     </div>
