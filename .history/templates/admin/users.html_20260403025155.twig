@@ -1,0 +1,104 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block page_title %}Gestion des Utilisateurs{% endblock %}
+
+{% block body %}
+<div class="admin-card">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-people-fill me-2" style="color:var(--admin-accent);"></i> Annuaire des Comptes</span>
+    </div>
+    <div class="admin-card-body p-0 table-responsive">
+        <table class="table admin-table mb-0">
+            <thead>
+                <tr>
+                    <th style="padding-left: 25px;"># Réf</th>
+                    <th>Identité</th>
+                    <th>Contact</th>
+                    <th>Niveau d'Accès</th>
+                    <th class="text-end" style="padding-right: 25px;">Contrôles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td style="padding-left: 25px; font-family: monospace; color: var(--text-muted);">{{ "%04d"|format(u.id) }}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="width:38px;height:38px;border-radius:10px;background:#F3F4F6;color:var(--admin-primary);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:15px;border:1px solid var(--border-color);">
+                                {{ u.prenom|first|upper }}
+                            </div>
+                            <span class="fw-bold" style="color:var(--admin-primary);">{{ u.prenom }} {{ u.nom }}</span>
+                        </div>
+                    </td>
+                    <td style="color: var(--text-main); font-size:14px;">{{ u.email }}</td>
+                    <td>
+                        {% if 'ROLE_ADMIN' in u.role %}
+                            <span class="badge" style="background:rgba(37, 99, 235, 0.1);color:#2563EB;border:1px solid rgba(37, 99, 235, 0.2);padding:6px 12px;">Administrateur</span>
+                        {% else %}
+                            <span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E7EB;padding:6px 12px;">Utilisateur</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end" style="padding-right: 25px;">
+                        <div class="d-flex justify-content-end gap-2">
+                            <!-- Role change form -->
+                            <form method="post" action="{{ path('app_admin_user_role', {'id': u.id}) }}" class="d-inline">
+                                {% if 'ROLE_ADMIN' in u.role %}
+                                    <input type="hidden" name="role" value="ROLE_USER">
+                                    <button class="btn btn-sm btn-pro" style="color:#D97706;" title="Rétrograder en Utilisateur" {% if u == app.user %}disabled{% endif %}><i class="bi bi-arrow-down-circle"></i></button>
+                                {% else %}
+                                    <input type="hidden" name="role" value="ROLE_ADMIN">
+                                    <button class="btn btn-sm btn-pro" style="color:#2563EB;" title="Promouvoir Administrateur"><i class="bi bi-arrow-up-circle"></i></button>
+                                {% endif %}
+                            </form>
+                            
+                            <!-- View/Edit profile trigger (can be a modal or linked to an edit page) -->
+                            <button type="button" class="btn btn-sm btn-pro" style="color:var(--admin-primary);" data-bs-toggle="modal" data-bs-target="#userModal{{ u.id }}" title="Voir les détails">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            
+                            <!-- Delete user form -->
+                            <form method="post" action="{{ path('app_admin_user_delete', {'id': u.id}) }}" class="d-inline" onsubmit="return confirm('Confirmez-vous la suppression définitive de {{ u.prenom }} ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ u.id) }}">
+                                <button class="btn btn-sm btn-pro" style="color:#DC2626;" {% if u == app.user %}disabled{% endif %}><i class="bi bi-trash3"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- User Details Modal -->
+                <div class="modal fade" id="userModal{{ u.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                            <div class="modal-header border-bottom-0 pb-0">
+                                <h5 class="modal-title fw-bold" style="color:var(--admin-primary);">Dossier Utilisateur #{{ "%04d"|format(u.id) }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="text-center mb-4">
+                                    <div style="width:80px;height:80px;border-radius:50%;background:#F3F4F6;color:var(--admin-primary);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:32px;border:1px solid #E5E7EB;margin:0 auto 15px;">
+                                        {{ u.prenom|first|upper }}
+                                    </div>
+                                    <h4 class="fw-bold mb-1" style="color:var(--admin-primary);">{{ u.prenom }} {{ u.nom }}</h4>
+                                    <p class="text-muted mb-0">{{ u.email }}</p>
+                                </div>
+                                <div class="p-3 rounded" style="background:#F9FAFB; border:1px solid var(--border-color);">
+                                    <div class="d-flex justify-content-between border-bottom pb-2 mb-2">
+                                        <span class="text-muted fw-semibold" style="font-size:13px; text-transform:uppercase;">Niveau</span>
+                                        <span class="fw-bold">{% if 'ROLE_ADMIN' in u.role %}Administrateur{% else %}Utilisateur Standard{% endif %}</span>
+                                    </div>
+                                    <div class="text-center mt-3 pt-2">
+                                        <!-- Note: Edit logic would go to a specific route, here we just show details -->
+                                        <button type="button" class="btn btn-primary-pro w-100" data-bs-dismiss="modal">Fermer la fiche</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Modal -->
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

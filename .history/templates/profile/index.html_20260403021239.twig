@@ -1,0 +1,293 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil - GoVibe{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    body {
+        background-color: #f8faf9;
+    }
+    .profile-hero {
+        height: 280px;
+        position: relative;
+        background: url('{{ asset("images/home-hero5.png") }}') center center/cover fixed;
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
+        overflow: hidden;
+    }
+    .profile-hero-overlay {
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(to bottom, rgba(1, 50, 32, 0.4), rgba(1, 50, 32, 0.8));
+    }
+    
+    .profile-container {
+        margin-top: -100px;
+        position: relative;
+        z-index: 10;
+        max-width: 900px;
+    }
+    
+    .profile-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+        padding: 50px;
+        margin-bottom: 40px;
+    }
+
+    .profile-avatar-wrapper {
+        text-align: center;
+        margin-bottom: 40px;
+        margin-top: -100px;
+    }
+    
+    .profile-avatar {
+        width: 140px; height: 140px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: 6px solid #f8faf9;
+        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+        display: inline-flex;
+        align-items: center; justify-content: center;
+        color: white; font-size: 56px; font-weight: 700; font-family: 'Outfit', sans-serif;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .profile-avatar:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 45px rgba(16, 185, 129, 0.5);
+    }
+    
+    .profile-name {
+        font-size: 32px; font-weight: 700; color: #1f2937; margin-top: 20px; font-family: 'Outfit', sans-serif;
+    }
+    .profile-role {
+        display: inline-block;
+        padding: 6px 16px;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: 30px;
+        color: #059669;
+        font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;
+        margin-top: 5px;
+    }
+
+    .section-title {
+        font-family: 'Outfit', sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        color: #111827;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .section-title i {
+        color: #10b981;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+        position: relative;
+    }
+    .form-group label {
+        display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 8px; letter-spacing: 0.5px;
+    }
+    .form-control {
+        border-radius: 14px; padding: 15px 20px; border: 1.5px solid #e5e7eb; background-color: #f9fafb;
+        color: #1f2937; font-size: 15px; font-family: 'Inter', sans-serif;
+        transition: all 0.3s ease; box-shadow: none;
+    }
+    .form-control::placeholder {
+        color: #9ca3af;
+    }
+    .form-control:focus {
+        background-color: white; border-color: #10b981;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+        outline: none;
+    }
+    
+    .divider {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+        margin: 40px 0;
+    }
+
+    .security-section {
+        background: rgba(249, 250, 251, 0.6);
+        border-radius: 20px;
+        padding: 30px;
+        border: 1px dashed #e5e7eb;
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white; border: none; border-radius: 14px;
+        padding: 16px 35px; font-weight: 600; font-size: 16px; font-family: 'Outfit', sans-serif;
+        letter-spacing: 0.5px; transition: all 0.3s ease; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px;
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+    .btn-save:hover {
+        transform: translateY(-3px); box-shadow: 0 12px 35px rgba(16, 185, 129, 0.45); color: white;
+    }
+
+    .alert { padding: 16px 20px; border-radius: 14px; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 30px;}
+    .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #059669; }
+    .alert-error, .alert-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #b91c1c; }
+
+    /* Validation UI */
+    .form-control.is-invalid { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
+    .invalid-feedback { color: #ef4444; font-size: 13px; margin-top: 6px; font-weight: 500; display: block;}
+</style>
+{% endblock %}
+
+{% block body %}
+    <div class="profile-hero">
+        <div class="profile-hero-overlay"></div>
+    </div>
+    
+    <div class="container profile-container">
+        <div class="profile-card">
+            <div class="profile-avatar-wrapper">
+                <div class="profile-avatar">{{ user.prenom|first|upper }}</div>
+                <h1 class="profile-name">{{ user.prenom }} {{ user.nom }}</h1>
+                <div class="profile-role"><i class="bi bi-shield-check me-1"></i> {{ user.role|replace({'ROLE_': ''}) }}</div>
+            </div>
+            
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success mb-4 text-center"><i class="bi bi-check-circle-fill"></i> {{ message }}</div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-error mb-4 text-center"><i class="bi bi-exclamation-triangle-fill"></i> {{ message }}</div>
+            {% endfor %}
+
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'ultra-profile-form'}}) }}
+                
+                <!-- Section Informations -->
+                <div class="section-title">
+                    <i class="bi bi-person-lines-fill fs-4"></i> Informations Personnelles
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6 form-group">
+                        {{ form_label(form.prenom) }}
+                        {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.prenom) }}
+                    </div>
+                    <div class="col-md-6 form-group">
+                        {{ form_label(form.nom) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.nom) }}
+                    </div>
+                    <div class="col-md-12 form-group">
+                        {{ form_label(form.email) }}
+                        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.email) }}
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Section Sécurité -->
+                <div class="security-section">
+                    <div class="section-title">
+                        <i class="bi bi-shield-lock-fill fs-4"></i> Sécurité & Mot de passe
+                    </div>
+                    <p class="text-muted mb-4" style="font-size: 13px;">Vous pouvez modifier votre mot de passe ci-dessous. Si vous ne souhaitez pas le changer, laissez ces champs vides.</p>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-12 form-group">
+                            {{ form_label(form.currentPassword, 'Mot de passe actuel') }}
+                            {{ form_widget(form.currentPassword, {'attr': {'class': 'form-control', 'placeholder': 'Nécessaire uniquement pour changer de mot de passe', 'id': 'current-pwd'}}) }}
+                            {{ form_errors(form.currentPassword) }}
+                            <div class="invalid-feedback js-pwd-error"></div>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            {{ form_label(form.newPassword.first) }}
+                            {{ form_widget(form.newPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Nouveau mot de passe', 'id': 'new-pwd'}}) }}
+                            {{ form_errors(form.newPassword.first) }}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            {{ form_label(form.newPassword.second) }}
+                            {{ form_widget(form.newPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Confirmez le nouveau mot de passe', 'id': 'confirm-pwd'}}) }}
+                            {{ form_errors(form.newPassword.second) }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <button type="submit" class="btn-save" id="btn-update">
+                        <i class="bi bi-cloud-arrow-up-fill"></i> Sauvegarder les modifications
+                    </button>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('ultra-profile-form');
+        const currentPwd = document.getElementById('current-pwd');
+        const newPwd = document.getElementById('new-pwd');
+        const confirmPwd = document.getElementById('confirm-pwd');
+        const btnSubmit = document.getElementById('btn-update');
+
+        function checkPasswords() {
+            let isValid = true;
+            let errorText = '';
+            
+            // Si on tente de changer le mot de passe (via nouveau)
+            if (newPwd.value.trim() !== '' || confirmPwd.value.trim() !== '') {
+                if (currentPwd.value.trim() === '') {
+                    isValid = false;
+                    errorText = 'Vous devez indiquer votre mot de passe actuel.';
+                    currentPwd.classList.add('is-invalid');
+                } else {
+                    currentPwd.classList.remove('is-invalid');
+                }
+
+                if (newPwd.value.trim() !== confirmPwd.value.trim()) {
+                    isValid = false;
+                    confirmPwd.classList.add('is-invalid');
+                    newPwd.classList.add('is-invalid');
+                } else {
+                    confirmPwd.classList.remove('is-invalid');
+                    if(newPwd.value.trim() !== '') newPwd.classList.remove('is-invalid');
+                }
+            } else {
+                currentPwd.classList.remove('is-invalid');
+                newPwd.classList.remove('is-invalid');
+                confirmPwd.classList.remove('is-invalid');
+            }
+
+            const errorContainer = currentPwd.parentElement.querySelector('.js-pwd-error');
+            if(errorContainer) errorContainer.textContent = errorText;
+
+            return isValid;
+        }
+
+        [currentPwd, newPwd, confirmPwd].forEach(el => {
+            if(el) {
+                el.addEventListener('input', checkPasswords);
+                el.addEventListener('blur', checkPasswords);
+            }
+        });
+
+        form.addEventListener('submit', (e) => {
+            if (!checkPasswords()) {
+                e.preventDefault();
+            } else {
+                btnSubmit.innerHTML = '<i class="bi bi-hourglass-split"></i> Sauvegarde...';
+                btnSubmit.style.opacity = '0.8';
+            }
+        });
+    });
+</script>
+{% endblock %}
