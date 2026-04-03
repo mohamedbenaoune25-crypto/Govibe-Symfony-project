@@ -27,7 +27,7 @@
         <button type="button" class="btn-close" aria-label="Fermer" onclick="bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide()"></button>
     </div>
 
-    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    {{ form_start(form, {'action': vol.flightId ? path('app_admin_vols_edit', {'flightId': vol.flightId}) : path('app_admin_vols_new'), 'attr': {'novalidate': 'novalidate'}}) }}
             <div class="row g-4 mb-4">
                 <div class="col-md-6 form-group">
                     {{ form_label(form.flightId) }}
@@ -108,7 +108,7 @@
     <div class="go-form-card-body">
         <a href="{{ path('app_admin_vols_index') }}" class="btn btn-sm btn-light mb-4"><i class="bi bi-arrow-left"></i> Retour à la flotte</a>
 
-        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+        {{ form_start(form, {'action': vol.flightId ? path('app_admin_vols_edit', {'flightId': vol.flightId}) : path('app_admin_vols_new'), 'attr': {'novalidate': 'novalidate'}}) }}
             <div class="row g-4 mb-4">
                 <div class="col-md-6 form-group">
                     {{ form_label(form.flightId) }}
