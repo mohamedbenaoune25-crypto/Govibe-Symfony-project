@@ -1,0 +1,114 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block page_title %}Gestion des Réclamations{% endblock %}
+
+{% block body %}
+<div class="admin-card">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-inbox-fill me-2" style="color:var(--admin-accent);"></i> Dossiers de Réclamation</span>
+    </div>
+    <div class="admin-card-body p-0 table-responsive">
+        <table class="table admin-table mb-0">
+            <thead>
+                <tr>
+                    <th style="padding-left: 25px;">Date</th>
+                    <th>Émetteur</th>
+                    <th>Sujet & Problème</th>
+                    <th>Statut</th>
+                    <th class="text-end" style="padding-right: 25px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in reclamations %}
+                <tr>
+                    <td style="padding-left: 25px; color: var(--text-muted); font-size:13px;">
+                        <i class="bi bi-calendar3 me-1"></i> {{ r.dateEnvoi ? r.dateEnvoi|date('d/m/Y') : '' }}
+                    </td>
+                    <td>
+                        <span class="fw-bold" style="color:var(--admin-primary);">
+                            {% if r.user %}
+                                {{ r.user.prenom }} {{ r.user.nom }}
+                            {% else %}
+                                ID Utilisateur: {{ r.createdByUser }}
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="fw-bold mb-1" style="color:var(--admin-primary); font-size:14px;">{{ r.sujet }}</div>
+                        <div style="font-size:12px;color:var(--text-muted); max-width:300px;" class="text-truncate">{{ r.message }}</div>
+                    </td>
+                    <td>
+                        {% if r.status == 'EN_ATTENTE' or r.status == 'En attente' %}
+                            <span class="badge" style="background:rgba(245, 158, 11, 0.1);color:#D97706;border:1px solid rgba(245, 158, 11, 0.2);padding:5px 10px;">En attente</span>
+                        {% elseif r.status == 'TRAITEE' or r.status == 'Traitée' %}
+                            <span class="badge" style="background:rgba(16, 185, 129, 0.1);color:#059669;border:1px solid rgba(16, 185, 129, 0.2);padding:5px 10px;">Traitée</span>
+                        {% else %}
+                            <span class="badge" style="background:rgba(239, 68, 68, 0.1);color:#DC2626;border:1px solid rgba(239, 68, 68, 0.2);padding:5px 10px;">{{ r.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end" style="padding-right: 25px;">
+                        <!-- Traiter Bouton Modale -->
+                        <button type="button" class="btn btn-sm btn-primary-pro" data-bs-toggle="modal" data-bs-target="#reclamationModal{{ r.id }}">
+                            <i class="bi bi-reply-fill"></i> Traiter
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Modal de Traitement -->
+                <div class="modal fade" id="reclamationModal{{ r.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.15);">
+                            <div class="modal-header border-bottom" style="background:#F9FAFB; border-radius: 12px 12px 0 0;">
+                                <h5 class="modal-title fw-bold" style="color:var(--admin-primary);">
+                                    Traitement de la Réclamation #{{ "%04d"|format(r.id) }}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="post" action="{{ path('app_admin_reclamation_status', {'id': r.id}) }}">
+                                <div class="modal-body p-4">
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold text-uppercase mb-2" style="font-size:12px; color:var(--text-muted); letter-spacing:1px;">Message de l'utilisateur :</h6>
+                                        <div class="p-3 rounded" style="background:#F3F4F6; border:1px solid #E5E7EB; color:var(--text-main);">
+                                            <p class="mb-1 fw-semibold">{{ r.sujet }}</p>
+                                            <p class="mb-0" style="font-size:14px; white-space:pre-wrap;">{{ r.message }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if r.reponse %}
+                                    <div class="mb-4">
+                                        <h6 class="fw-bold text-uppercase mb-2" style="font-size:12px; color:var(--admin-accent); letter-spacing:1px;">Réponse (Déjà envoyée) :</h6>
+                                        <div class="p-3 rounded" style="background:rgba(37,99,235,0.05); border:1px solid rgba(37,99,235,0.2); color:var(--admin-primary);">
+                                            <p class="mb-0" style="font-size:14px; white-space:pre-wrap;">{{ r.reponse }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold" style="color:var(--admin-primary);">Répondre à l'utilisateur :</label>
+                                        <textarea name="reponse" class="form-control" rows="4" placeholder="Tapez la réponse ici..." style="border-radius: 8px; border:1px solid #E5E7EB;"></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold" style="color:var(--admin-primary);">Modifier le statut :</label>
+                                        <select name="status" class="form-select" style="border-radius: 8px; border:1px solid #E5E7EB;">
+                                            <option value="EN_ATTENTE" {% if r.status == 'EN_ATTENTE' or r.status == 'En attente' %}selected{% endif %}>En Attente</option>
+                                            <option value="TRAITEE" {% if r.status == 'TRAITEE' or r.status == 'Traitée' %}selected{% endif %}>Traitée</option>
+                                            <option value="REFUSEE" {% if r.status == 'REFUSEE' %}selected{% endif %}>Refusée</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="border-top: 1px solid #E5E7EB; background:#F9FAFB; border-radius: 0 0 12px 12px;">
+                                    <button type="button" class="btn btn-pro" data-bs-dismiss="modal">Annuler</button>
+                                    <button type="submit" class="btn btn-primary-pro px-4"><i class="bi bi-send-fill me-2"></i> Envoyer & Mettre à jour</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- Fin Modal -->
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
