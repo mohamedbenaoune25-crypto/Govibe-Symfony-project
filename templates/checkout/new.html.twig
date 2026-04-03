@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau checkout - GoVibe{% endblock %}
+
+{% block body %}
+{% if app.request.isXmlHttpRequest %}
+    {% include 'checkout/_form_modal.html.twig' with {
+        checkout: checkout,
+        form: form,
+        button_label: 'Confirmer',
+        page_title: 'Créer un checkout',
+        page_subtitle: 'Réservez votre vol en quelques étapes.'
+    } %}
+{% else %}
+<section class="go-form-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8">
+                <div class="go-form-card">
+                    <div class="go-form-card-header">
+                        <div class="position-relative" style="z-index:1;">
+                            <div style="font-size:12px; font-weight:700; letter-spacing:0.06em; opacity:0.7; text-transform:uppercase; margin-bottom:8px;">
+                                <i class="bi bi-ticket-perforated me-1"></i> Nouveau checkout
+                            </div>
+                            <h2 class="h3 mb-1 fw-bold">Créer un checkout</h2>
+                            <p class="mb-0 text-white-50">Réservez votre vol en quelques étapes.</p>
+                        </div>
+                    </div>
+                    <div class="go-form-card-body">
+                        {% include 'checkout/_form.html.twig' with {button_label: 'Confirmer'} %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

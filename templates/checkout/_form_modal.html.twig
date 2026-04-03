@@ -1,0 +1,14 @@
+<div class="p-4 p-md-5">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <div style="font-size:12px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#94a3b8; margin-bottom:6px;">
+                <i class="bi bi-ticket-perforated me-1 text-success"></i> Checkout
+            </div>
+            <h2 class="h3 fw-bold mb-1" style="color:#013220; letter-spacing:-0.02em;">{{ page_title|default('Checkout') }}</h2>
+            <p class="text-muted mb-0" style="font-size:14px;">{{ page_subtitle|default('Formulaire de réservation') }}</p>
+        </div>
+        <button type="button" class="btn-close" aria-label="Fermer" onclick="bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide()"></button>
+    </div>
+
+    {% include 'checkout/_form.html.twig' with {button_label: button_label|default('Enregistrer')} %}
+</div>

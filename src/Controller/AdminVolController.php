@@ -40,6 +40,13 @@ class AdminVolController extends AbstractController
             return $this->redirectToRoute('app_admin_vols_index', [], Response::HTTP_SEE_OTHER);
         }
 
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('admin/vols/new.html.twig', [
+                'vol' => $vol,
+                'form' => $form->createView(),
+            ]);
+        }
+
         return $this->render('admin/vols/new.html.twig', [
             'vol' => $vol,
             'form' => $form->createView(),
@@ -57,6 +64,13 @@ class AdminVolController extends AbstractController
 
             $this->addFlash('success', 'Vol mis à jour avec succès.');
             return $this->redirectToRoute('app_admin_vols_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('admin/vols/new.html.twig', [
+                'vol' => $vol,
+                'form' => $form->createView(),
+            ]);
         }
 
         return $this->render('admin/vols/new.html.twig', [ // We reuse the 'new' template as 'edit' usually has the same form layout

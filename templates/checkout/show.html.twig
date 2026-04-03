@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails checkout - GoVibe{% endblock %}
+
+{% block body %}
+{% set pilotNames = ['Amir Ben Salem', 'Youssef Haddad', 'Nabil Karim', 'Sami Trabelsi', 'Omar Mansouri'] %}
+{% set agencyNames = ['GoVibe Airways', 'SkyLine Travel', 'AeroPlus Agency', 'BlueWing Services', 'Nimbus Aviation'] %}
+{% set aircraftNumbers = ['TU-101', 'TU-107', 'TU-204', 'A320-7', 'B737-9'] %}
+{% set pilotName = random(pilotNames) %}
+{% set agencyName = random(agencyNames) %}
+{% set aircraftNumber = random(aircraftNumbers) %}
+
+<style>
+    .detail-card {
+        border: 0;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(1, 50, 32, 0.12);
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(16px);
+    }
+
+    .detail-header {
+        padding: 32px 36px;
+        background: linear-gradient(135deg, var(--dark-green), var(--mid-green), var(--light-green));
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .detail-header::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 90% 20%, rgba(34, 197, 94, 0.3), transparent 50%),
+                    radial-gradient(circle at 10% 80%, rgba(46, 139, 87, 0.2), transparent 40%);
+        pointer-events: none;
+    }
+
+    .detail-body { padding: 32px 36px; }
+
+    .detail-info {
+        padding: 14px 18px;
+        border-radius: 16px;
+        background: #eef8f1;
+        border: 1px solid rgba(34, 197, 94, 0.06);
+        height: 100%;
+    }
+
+    .detail-info .info-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        margin-bottom: 4px;
+    }
+
+    .detail-info .info-value {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--dark-green);
+        word-break: break-word;
+    }
+
+    .detail-total {
+        border-radius: 20px;
+        background: linear-gradient(135deg, #effaf1, #dcfce7);
+        border: 1px solid rgba(34, 197, 94, 0.12);
+        padding: 20px 24px;
+    }
+
+    .detail-total .total-price {
+        font-size: 32px;
+        font-weight: 800;
+        color: #16a34a;
+    }
+</style>
+
+<section class="py-5" style="padding-top: 130px !important;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8">
+                <div class="detail-card">
+                    <div class="detail-header position-relative">
+                        <div class="position-relative" style="z-index:1;">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                                <div>
+                                    <div style="font-size:13px; font-weight:600; letter-spacing:0.06em; opacity:0.7; text-transform:uppercase; margin-bottom:8px;">
+                                        CHECKOUT #{{ checkout.checkoutId }}
+                                    </div>
+                                    <h1 class="h2 fw-bold mb-2">{{ checkout.flight }}</h1>
+                                    <p class="mb-0" style="opacity:0.6;">
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        Créé le {{ checkout.reservationDate ? checkout.reservationDate|date('d/m/Y H:i') : '-' }}
+                                    </p>
+                                </div>
+                                <span class="badge bg-success rounded-pill px-3 py-2">{{ checkout.statusReservation }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-body">
+                        <h6 style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:16px;">
+                            <i class="bi bi-person me-1 text-success"></i> Informations passager
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6"><div class="detail-info"><div class="info-label">Nom complet</div><div class="info-value">{{ checkout.passengerName }}</div></div></div>
+                            <div class="col-md-6"><div class="detail-info"><div class="info-label">Email</div><div class="info-value">{{ checkout.passengerEmail }}</div></div></div>
+                            <div class="col-md-6"><div class="detail-info"><div class="info-label">Téléphone</div><div class="info-value">{{ checkout.passengerPhone }}</div></div></div>
+                            <div class="col-md-6"><div class="detail-info"><div class="info-label">Passagers</div><div class="info-value">{{ checkout.passengerNbr }}</div></div></div>
+                            <div class="col-md-6"><div class="detail-info"><div class="info-label">Paiement</div><div class="info-value">{{ checkout.paymentMethod }}</div></div></div>
+                            <div class="col-md-6"><div class="detail-info"><div class="info-label">Classe</div><div class="info-value">{{ checkout.travelClass }}</div></div></div>
+                        </div>
+
+                        <h6 style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:16px;">
+                            <i class="bi bi-airplane me-1 text-success"></i> Détails du vol
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4"><div class="detail-info"><div class="info-label">Pilote</div><div class="info-value">{{ pilotName }}</div></div></div>
+                            <div class="col-md-4"><div class="detail-info"><div class="info-label">Agence</div><div class="info-value">{{ agencyName }}</div></div></div>
+                            <div class="col-md-4"><div class="detail-info"><div class="info-label">Avion</div><div class="info-value">{{ aircraftNumber }}</div></div></div>
+                        </div>
+
+                        <div class="detail-total d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold" style="font-size:16px; color:var(--dark-green);">Total payé</span>
+                            <span class="total-price">{{ checkout.totalPrix }} DT</span>
+                        </div>
+
+                        <div class="d-flex gap-3 justify-content-end mt-4">
+                            <a href="{{ path('app_checkout_edit', {checkoutId: checkout.checkoutId}) }}" onclick="openDetailModal(this.href); return false;" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                                <i class="bi bi-pencil me-1"></i> Modifier
+                            </a>
+                            <a href="{{ path('app_checkout_index') }}" class="btn btn-success rounded-pill px-4 fw-semibold">
+                                <i class="bi bi-arrow-left me-1"></i> Retour
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

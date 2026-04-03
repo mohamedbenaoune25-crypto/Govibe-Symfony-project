@@ -1,0 +1,156 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block page_title %}Gestion des Checkouts{% endblock %}
+
+{% block body %}
+<style>
+    .dashboard-hero {
+        background: linear-gradient(135deg, rgba(8, 58, 45, 0.06), rgba(34, 197, 94, 0.05));
+        border: 1px solid rgba(34, 197, 94, 0.08);
+        border-radius: 24px;
+        padding: 26px 28px;
+        margin-bottom: 28px;
+    }
+    .checkout-stat {
+        border-radius: 24px;
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.10), rgba(8, 58, 45, 0.06));
+        border: 1px solid rgba(34, 197, 94, 0.10);
+    }
+    .checkout-card {
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid #E5E7EB;
+        box-shadow: 0 14px 36px rgba(15, 23, 42, 0.07);
+        overflow: hidden;
+    }
+    .checkout-badge {
+        border-radius: 999px;
+        padding: .45rem .75rem;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .05em;
+    }
+    .checkout-action {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        border: 1px solid rgba(34, 197, 94, 0.10);
+    }
+</style>
+
+<div class="dashboard-hero">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+            <h2 class="mb-2 fw-bold" style="color: var(--admin-primary);">Reservations Tracking</h2>
+            <p class="mb-0 text-muted">Monitor and moderate all passenger bookings</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ path('app_admin_vols_index') }}" class="btn btn-pro rounded-pill px-4"><i class="bi bi-airplane me-2"></i> Vols</a>
+            <a href="{{ path('app_admin_dashboard') }}" class="btn btn-primary-pro rounded-pill px-4"><i class="bi bi-arrow-clockwise me-2"></i> Actualiser</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="admin-card checkout-stat h-100">
+            <div class="admin-card-body">
+                <div class="text-muted small text-uppercase fw-semibold mb-2">En attente</div>
+                <div class="display-6 fw-bold text-success">{{ pendingCount }}</div>
+                <div class="text-muted">Checkouts à confirmer</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="admin-card h-100">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span>Filtrer les checkouts</span>
+                <div class="btn-group btn-group-sm" role="group">
+                    <a href="{{ path('app_admin_checkouts_index', {status: 'all'}) }}" class="btn btn-pro">Tous</a>
+                    <a href="{{ path('app_admin_checkouts_index', {status: 'EN_ATTENTE'}) }}" class="btn btn-pro">Attente</a>
+                    <a href="{{ path('app_admin_checkouts_index', {status: 'CONFIRMEE'}) }}" class="btn btn-pro">Confirmés</a>
+                    <a href="{{ path('app_admin_checkouts_index', {status: 'REFUSEE'}) }}" class="btn btn-pro">Refusés</a>
+                </div>
+            </div>
+            <div class="admin-card-body">
+                <p class="mb-0 text-muted">Les vols sont réservés par les utilisateurs via le checkout. Confirmez ou refusez les demandes en attente.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="checkout-card">
+    <div class="table-responsive">
+        <table class="table admin-table mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Passager</th>
+                    <th>Vol</th>
+                    <th>Info</th>
+                    <th>Total</th>
+                    <th>Statut</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for checkout in checkouts %}
+                    <tr>
+                        <td>
+                            <div class="fw-bold text-success">#{{ checkout.checkoutId }}</div>
+                            <div class="text-muted small">{{ checkout.reservationDate ? checkout.reservationDate|date('d/m/Y') : '-' }}</div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">{{ checkout.passengerName }}</div>
+                            <div class="text-muted small">{{ checkout.passengerEmail }}</div>
+                        </td>
+                        <td>
+                            <div class="fw-semibold">{{ checkout.flight }}</div>
+                            <div class="text-muted small">{{ checkout.flight.airline }}</div>
+                        </td>
+                        <td>
+                            <div class="small text-muted">{{ checkout.passengerNbr }} passager(s)</div>
+                            <div class="small text-muted">{{ checkout.paymentMethod }}</div>
+                        </td>
+                        <td><strong class="text-success">{{ checkout.totalPrix }} DT</strong></td>
+                        <td>
+                            {% if checkout.statusReservation == 'EN_ATTENTE' %}
+                                <span class="checkout-badge bg-warning bg-opacity-10 text-warning">EN ATTENTE</span>
+                            {% elseif checkout.statusReservation == 'CONFIRMEE' %}
+                                <span class="checkout-badge bg-success bg-opacity-10 text-success">CONFIRMÉE</span>
+                            {% else %}
+                                <span class="checkout-badge bg-danger bg-opacity-10 text-danger">REFUSÉE</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <form method="post" action="{{ path('app_admin_checkouts_confirm', {checkoutId: checkout.checkoutId}) }}" onsubmit="return confirm('Confirmer ce checkout ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ checkout.checkoutId) }}">
+                                    <button class="checkout-action btn btn-sm btn-success" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% endif %}>
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                </form>
+                                <form method="post" action="{{ path('app_admin_checkouts_reject', {checkoutId: checkout.checkoutId}) }}" onsubmit="return confirm('Refuser ce checkout ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ checkout.checkoutId) }}">
+                                    <button class="checkout-action btn btn-sm btn-outline-danger" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% endif %}>
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            Aucun checkout disponible.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

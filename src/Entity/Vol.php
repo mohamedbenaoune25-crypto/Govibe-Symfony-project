@@ -150,4 +150,11 @@ class Vol
         $this->description = $description;
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $route = trim(sprintf('%s → %s', (string) $this->getDepartureAirport(), (string) $this->getDestination()));
+
+        return $route !== '→' ? $route : (string) $this->getFlightId();
+    }
 }

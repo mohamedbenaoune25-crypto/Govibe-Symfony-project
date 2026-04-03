@@ -1,11 +1,11 @@
 {# templates/forum/forumitem.html.twig #}
-<div class="col h-100">
+<div class="col h-100" data-card-animate>
     <div class="card h-100 border-0 shadow-sm rounded-5 overflow-hidden transition-all hover-lift bg-white">
         <!-- Card Header / Cover -->
         <div class="position-relative" style="height: 140px;">
             <div class="w-100 h-100" style="background: linear-gradient(135deg, #A2D9CE 0%, #52BE80 100%);">
                 {% if forum.image %}
-                    <img src="{{ forum.image }}" class="w-100 h-100 object-fit-cover opacity-75" onerror="this.src='https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800';">
+                    <img src="{{ forum.image }}" class="w-100 h-100 object-fit-cover opacity-75" loading="lazy" decoding="async" onerror="this.src='https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800';">
                 {% else %}
                     <div class="w-100 h-100 d-flex align-items-center justify-content-center">
                         <i class="bi bi-chat-dots-fill text-white opacity-25" style="font-size: 4rem;"></i>
@@ -70,8 +70,8 @@
                 </div>
             </div>
 
-            <a href="{{ path('app_forum_show', {'forumId': forum.forumId}) }}" class="btn btn-success w-100 rounded-pill fw-bold py-2 shadow-sm transition-hover border-0" 
-               style="background-color: #52BE80;">
+                <a href="{{ path('app_forum_show', {'forumId': forum.forumId}) }}" onclick="openDetailModal(this.href); return false;" class="btn btn-success w-100 rounded-pill fw-bold py-2 shadow-sm transition-hover border-0" 
+                    style="background-color: #52BE80;">
                 Voir le Forum <i class="bi bi-arrow-right-short ms-1"></i>
             </a>
         </div>

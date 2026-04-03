@@ -77,7 +77,7 @@ class ForumController extends AbstractController
     }
 
     #[Route('/{forumId}', name: 'app_forum_show', methods: ['GET'])]
-    public function show(Forum $forum, PosteRepository $posteRepository, MembreForumRepository $mfr): Response
+    public function show(Request $request, Forum $forum, PosteRepository $posteRepository, MembreForumRepository $mfr): Response
     {
         // Fetch posts belonging to this forum
         $postes = $posteRepository->findBy(['forum' => $forum], ['dateCreation' => 'DESC']);
@@ -86,6 +86,14 @@ class ForumController extends AbstractController
         $isMember = false;
         if ($this->getUser()) {
             $isMember = (bool) $mfr->findOneBy(['forum' => $forum, 'user' => $this->getUser()]);
+        }
+
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('forum/_detail_modal.html.twig', [
+                'forum' => $forum,
+                'postes' => $postes,
+                'isMember' => $isMember,
+            ]);
         }
 
         return $this->render('forum/show.html.twig', [
