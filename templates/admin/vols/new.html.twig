@@ -1,4 +1,4 @@
-{% extends 'admin/base_admin.html.twig' %}
+{% extends app.request.isXmlHttpRequest ? 'base_empty.html.twig' : 'admin/base_admin.html.twig' %}
 
 {% block page_title %}{{ vol.flightId ? 'Modifier le Vol ' ~ vol.flightId : 'Créer un Nouveau Vol' }}{% endblock %}
 
