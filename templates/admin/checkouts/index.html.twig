@@ -25,19 +25,21 @@
     }
     .checkout-badge {
         border-radius: 999px;
-        padding: .45rem .75rem;
-        font-size: .72rem;
-        font-weight: 700;
-        letter-spacing: .05em;
+        padding: .40rem .80rem;
+        font-size: .68rem;
+        font-weight: 800;
+        letter-spacing: .08em;
     }
-    .checkout-action {
-        width: 42px;
-        height: 42px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 14px;
-        border: 1px solid rgba(34, 197, 94, 0.10);
+    .checkout-card-anim {
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        transform: translateY(0);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+        background: #fff;
+    }
+    .checkout-card-anim:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 24px 48px rgba(34, 197, 94, 0.12);
+        border-color: rgba(34, 197, 94, 0.3) !important;
     }
 </style>
 
@@ -82,75 +84,83 @@
     </div>
 </div>
 
-<div class="checkout-card">
-    <div class="table-responsive">
-        <table class="table admin-table mb-0 align-middle">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Passager</th>
-                    <th>Vol</th>
-                    <th>Info</th>
-                    <th>Total</th>
-                    <th>Statut</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for checkout in checkouts %}
-                    <tr>
-                        <td>
-                            <div class="fw-bold text-success">#{{ checkout.checkoutId }}</div>
-                            <div class="text-muted small">{{ checkout.reservationDate ? checkout.reservationDate|date('d/m/Y') : '-' }}</div>
-                        </td>
-                        <td>
-                            <div class="fw-semibold">{{ checkout.passengerName }}</div>
-                            <div class="text-muted small">{{ checkout.passengerEmail }}</div>
-                        </td>
-                        <td>
-                            <div class="fw-semibold">{{ checkout.flight }}</div>
-                            <div class="text-muted small">{{ checkout.flight.airline }}</div>
-                        </td>
-                        <td>
-                            <div class="small text-muted">{{ checkout.passengerNbr }} passager(s)</div>
-                            <div class="small text-muted">{{ checkout.paymentMethod }}</div>
-                        </td>
-                        <td><strong class="text-success">{{ checkout.totalPrix }} DT</strong></td>
-                        <td>
-                            {% if checkout.statusReservation == 'EN_ATTENTE' %}
-                                <span class="checkout-badge bg-warning bg-opacity-10 text-warning">EN ATTENTE</span>
-                            {% elseif checkout.statusReservation == 'CONFIRMEE' %}
-                                <span class="checkout-badge bg-success bg-opacity-10 text-success">CONFIRMÉE</span>
-                            {% else %}
-                                <span class="checkout-badge bg-danger bg-opacity-10 text-danger">REFUSÉE</span>
-                            {% endif %}
-                        </td>
-                        <td class="text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <form method="post" action="{{ path('app_admin_checkouts_confirm', {checkoutId: checkout.checkoutId}) }}" onsubmit="return confirm('Confirmer ce checkout ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ checkout.checkoutId) }}">
-                                    <button class="checkout-action btn btn-sm btn-success" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% endif %}>
-                                        <i class="bi bi-check-lg"></i>
-                                    </button>
-                                </form>
-                                <form method="post" action="{{ path('app_admin_checkouts_reject', {checkoutId: checkout.checkoutId}) }}" onsubmit="return confirm('Refuser ce checkout ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ checkout.checkoutId) }}">
-                                    <button class="checkout-action btn btn-sm btn-outline-danger" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% endif %}>
-                                        <i class="bi bi-x-lg"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+    {% for checkout in checkouts %}
+    <div class="col" data-card-animate>
+        <div class="admin-card h-100 position-relative d-flex flex-column checkout-card-anim" style="padding: 25px; border-radius: 20px; border: 1px solid #E5E7EB;">
+            <!-- Status Badge -->
+            <div class="position-absolute" style="top: 20px; right: 20px;">
+                {% if checkout.statusReservation == 'EN_ATTENTE' %}
+                    <span class="checkout-badge" style="background:rgba(245, 158, 11, 0.12);color:#D97706;border:1px solid rgba(245, 158, 11, 0.2);">EN ATTENTE</span>
+                {% elseif checkout.statusReservation == 'CONFIRMEE' %}
+                    <span class="checkout-badge" style="background:rgba(34, 197, 94, 0.12);color:#16A34A;border:1px solid rgba(34, 197, 94, 0.2);">CONFIRMÉE</span>
                 {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center py-5 text-muted">
-                            Aucun checkout disponible.
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    <span class="checkout-badge" style="background:rgba(239, 68, 68, 0.12);color:#DC2626;border:1px solid rgba(239, 68, 68, 0.2);">REFUSÉE</span>
+                {% endif %}
+            </div>
+
+            <!-- Header: ID + Date -->
+            <div class="mb-4">
+                <div class="fw-bold" style="font-size:22px; color:var(--admin-primary);">#{{ checkout.checkoutId }}</div>
+                <div class="text-muted" style="font-size:13px; font-weight:500;"><i class="bi bi-calendar3 me-1"></i>{{ checkout.reservationDate ? checkout.reservationDate|date('d/m/Y à H:i') : '-' }}</div>
+            </div>
+
+            <!-- Passenger details -->
+            <div class="d-flex align-items-center gap-3 mb-4 pb-4" style="border-bottom: 1px dashed #E2E8F0;">
+                <div style="width:48px;height:48px;border-radius:14px;background:rgba(34, 197, 94, 0.08);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid rgba(34, 197, 94, 0.15);">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div style="overflow: hidden;">
+                    <h6 class="fw-bold mb-1 text-truncate" style="color:var(--admin-primary); font-family:'Outfit', sans-serif;">{{ checkout.passengerName }}</h6>
+                    <div class="text-muted text-truncate" style="font-size:12px;"><i class="bi bi-envelope me-1"></i>{{ checkout.passengerEmail }}</div>
+                </div>
+            </div>
+
+            <!-- Flight & Payment -->
+            <div class="row g-2 mb-4">
+                <div class="col-6">
+                    <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#94A3B8;letter-spacing:0.5px;">Vol Réservé</div>
+                    <div class="fw-bold text-dark mt-1 text-truncate" style="font-size:14px;">{{ checkout.flight }}</div>
+                    <div class="text-muted text-truncate" style="font-size:12px;">{{ checkout.flight.airline }}</div>
+                </div>
+                <div class="col-6 text-end">
+                    <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#94A3B8;letter-spacing:0.5px;">Détails</div>
+                    <div class="fw-bold text-dark mt-1" style="font-size:14px;">{{ checkout.passengerNbr }} passager(s)</div>
+                    <div class="text-muted" style="font-size:12px;">{{ checkout.paymentMethod }}</div>
+                </div>
+            </div>
+
+            <!-- Total Price box -->
+            <div class="d-flex justify-content-between align-items-center mb-4 p-3" style="background:#F8FAFC; border-radius:14px; border:1px solid #F1F5F9;">
+                <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748B;letter-spacing:0.5px;">Total Facturé</span>
+                <strong style="font-size:20px; color:#10B981; font-weight:800;">{{ checkout.totalPrix }} DT</strong>
+            </div>
+
+            <!-- Actions -->
+            <div class="mt-auto d-flex gap-2">
+                <form method="post" action="{{ path('app_admin_checkouts_confirm', {checkoutId: checkout.checkoutId}) }}" class="flex-grow-1" onsubmit="return confirm('Confirmer cette réservation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ checkout.checkoutId) }}">
+                    <button class="btn w-100 d-flex align-items-center justify-content-center gap-2" style="background:rgba(16, 185, 129, 0.1);color:#059669;border:1px solid rgba(16, 185, 129, 0.2);font-weight:600;padding:10px;border-radius:12px;font-size:14px;transition:all 0.2s;" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% else %}onmouseover="this.style.background='rgba(16, 185, 129, 1)'; this.style.color='white';" onmouseout="this.style.background='rgba(16, 185, 129, 0.1)'; this.style.color='#059669';"{% endif %}>
+                        <i class="bi bi-check-circle-fill"></i> Confirmer
+                    </button>
+                </form>
+                <form method="post" action="{{ path('app_admin_checkouts_reject', {checkoutId: checkout.checkoutId}) }}" class="flex-grow-1" onsubmit="return confirm('Refuser cette réservation ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ checkout.checkoutId) }}">
+                    <button class="btn w-100 d-flex align-items-center justify-content-center gap-2" style="background:rgba(239, 68, 68, 0.05);color:#DC2626;border:1px solid rgba(239, 68, 68, 0.15);font-weight:600;padding:10px;border-radius:12px;font-size:14px;transition:all 0.2s;" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% else %}onmouseover="this.style.background='rgba(239, 68, 68, 1)'; this.style.color='white';" onmouseout="this.style.background='rgba(239, 68, 68, 0.05)'; this.style.color='#DC2626';"{% endif %}>
+                        <i class="bi bi-x-circle-fill"></i> Refuser
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
+    {% else %}
+    <div class="col-12 w-100">
+        <div class="admin-card text-center py-5" style="border-radius:24px;">
+            <div style="font-size:50px; color:#E2E8F0; margin-bottom:15px;"><i class="bi bi-inbox"></i></div>
+            <h5 class="fw-bold text-muted">Aucun checkout disponible</h5>
+            <p class="text-muted mb-0">Les demandes de réservation des utilisateurs apparaîtront ici.</p>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}
