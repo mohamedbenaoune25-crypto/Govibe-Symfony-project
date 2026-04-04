@@ -1,0 +1,338 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Gestion des Voitures - Admin{% endblock %}
+
+{% block page_title %}Gestion des Voitures{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2 d-flex align-items-center gap-2" style="color: #013220;">
+                <i class="bi bi-car-front"></i>
+                Gestion des Voitures
+            </h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('admin_voiture_new') }}" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i> Ajouter une Voiture
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #50C878;">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Total Voitures</p>
+                    <h3 style="color: #50C878;">{{ stats.totalVoitures }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #50C878;">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Disponibles</p>
+                    <h3 style="color: #50C878;">{{ stats.byStatut['DISPONIBLE'] ?? 0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #FF9500;">
+                <div class="card-body">
+                    <p class="text-muted mb-2">En Maintenance</p>
+                    <h3 style="color: #FF9500;">{{ stats.byStatut['EN_MAINTENANCE'] ?? 0 }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm" style="border-left: 4px solid #E74C3C;">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Accidentées</p>
+                    <h3 style="color: #E74C3C;">{{ stats.byStatut['ACCIDENTE'] ?? 0 }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques Financières -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Valeur Parc (DT)</p>
+                    <h4 style="color: #013220;">{{ "%.2f"|format(stats.totalValue) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Prix Moyen (DT/jour)</p>
+                    <h4 style="color: #013220;">{{ "%.2f"|format(stats.avgPrice) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Prix Min (DT/jour)</p>
+                    <h4 style="color: #013220;">{{ "%.2f"|format(stats.minPrice) }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Prix Max (DT/jour)</p>
+                    <h4 style="color: #013220;">{{ "%.2f"|format(stats.maxPrice) }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtres et Export -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ path('admin_voiture_index') }}" class="row g-3 align-items-end">
+                <div class="col-md-2">
+                    <label for="marque" class="form-label fw-bold">Marque</label>
+                    <input type="text" id="marque" name="marque" class="form-control" 
+                           value="{{ app.request.query.get('marque', '') }}"
+                           placeholder="Filtrer...">
+                </div>
+                <div class="col-md-2">
+                    <label for="modele" class="form-label fw-bold">Modèle</label>
+                    <input type="text" id="modele" name="modele" class="form-control" 
+                           value="{{ app.request.query.get('modele', '') }}"
+                           placeholder="Filtrer...">
+                </div>
+                <div class="col-md-2">
+                    <label for="carburant" class="form-label fw-bold">Carburant</label>
+                    <select id="carburant" name="carburant" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="Essence" {% if app.request.query.get('carburant') == 'Essence' %}selected{% endif %}>Essence</option>
+                        <option value="Diesel" {% if app.request.query.get('carburant') == 'Diesel' %}selected{% endif %}>Diesel</option>
+                        <option value="Électrique" {% if app.request.query.get('carburant') == 'Électrique' %}selected{% endif %}>Électrique</option>
+                        <option value="Hybride" {% if app.request.query.get('carburant') == 'Hybride' %}selected{% endif %}>Hybride</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="statut" class="form-label fw-bold">Statut</label>
+                    <select id="statut" name="statut" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="DISPONIBLE" {% if app.request.query.get('statut') == 'DISPONIBLE' %}selected{% endif %}>Disponible</option>
+                        <option value="EN_MAINTENANCE" {% if app.request.query.get('statut') == 'EN_MAINTENANCE' %}selected{% endif %}>Maintenance</option>
+                        <option value="ACCIDENTE" {% if app.request.query.get('statut') == 'ACCIDENTE' %}selected{% endif %}>Accidentée</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-outline-success w-100">
+                        <i class="bi bi-funnel"></i> Filtrer
+                    </button>
+                </div>
+                <div class="col-md-1">
+                    <a href="{{ path('admin_voiture_index') }}" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bouttons Export -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <a href="{{ path('admin_voiture_export_pdf') }}" class="btn btn-outline-danger">
+                <i class="bi bi-file-pdf"></i> Exporter PDF
+            </a>
+            <a href="{{ path('admin_voiture_export_excel') }}" class="btn btn-outline-success">
+                <i class="bi bi-file-excel"></i> Exporter Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- Tableau des Voitures -->
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background-color: #50C878;">
+                    <tr style="color: white;">
+                        <th>
+                            <a href="?sort=matricule&order={% if app.request.query.get('sort') == 'matricule' and app.request.query.get('order') == 'asc' %}desc{% else %}asc{% endif %}" 
+                               style="color: white; text-decoration: none;">
+                                Matricule
+                                {% if app.request.query.get('sort') == 'matricule' %}
+                                    <i class="bi bi-arrow-{% if app.request.query.get('order') == 'asc' %}up{% else %}down{% endif %}"></i>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <th>
+                            <a href="?sort=marque&order={% if app.request.query.get('sort') == 'marque' and app.request.query.get('order') == 'asc' %}desc{% else %}asc{% endif %}" 
+                               style="color: white; text-decoration: none;">
+                                Marque / Modèle
+                                {% if app.request.query.get('sort') == 'marque' %}
+                                    <i class="bi bi-arrow-{% if app.request.query.get('order') == 'asc' %}up{% else %}down{% endif %}"></i>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <th>Année</th>
+                        <th>Carburant</th>
+                        <th>
+                            <a href="?sort=prixJour&order={% if app.request.query.get('sort') == 'prixJour' and app.request.query.get('order') == 'asc' %}desc{% else %}asc{% endif %}" 
+                               style="color: white; text-decoration: none;">
+                                Prix/Jour
+                                {% if app.request.query.get('sort') == 'prixJour' %}
+                                    <i class="bi bi-arrow-{% if app.request.query.get('order') == 'asc' %}up{% else %}down{% endif %}"></i>
+                                {% endif %}
+                            </a>
+                        </th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if voitures|length > 0 %}
+                        {% for voiture in voitures %}
+                            <tr>
+                                <td>
+                                    <strong>{{ voiture.matricule }}</strong>
+                                </td>
+                                <td>
+                                    {{ voiture.marque }} <br>
+                                    <small class="text-muted">{{ voiture.modele }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark">{{ voiture.annee }}</span>
+                                </td>
+                                <td>
+                                    <i class="bi bi-fuel-pump"></i> {{ voiture.typeCarburant }}
+                                </td>
+                                <td>
+                                    <strong style="color: #50C878;">{{ "%.2f"|format(voiture.prixJour) }} DT</strong>
+                                </td>
+                                <td>
+                                    {% set statutColor = voiture.statut == 'DISPONIBLE' ? '#50C878' : (voiture.statut == 'EN_MAINTENANCE' ? '#FF9500' : '#E74C3C') %}
+                                    {% set statutLabel = voiture.statut == 'DISPONIBLE' ? 'Disponible' : (voiture.statut == 'EN_MAINTENANCE' ? 'Maintenance' : 'Accidentée') %}
+                                    <span class="badge" style="background-color: {{ statutColor }};">
+                                        {{ statutLabel }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ path('admin_voiture_show', {'id': voiture.idVoiture}) }}" 
+                                           class="btn btn-outline-info" title="Voir">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ path('admin_voiture_edit', {'id': voiture.idVoiture}) }}" 
+                                           class="btn btn-outline-warning" title="Éditer">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{{ path('admin_voiture_download_pdf', {'id': voiture.idVoiture}) }}" 
+                                           class="btn btn-outline-danger" title="PDF">
+                                            <i class="bi bi-file-pdf"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteModal{{ voiture.idVoiture }}"
+                                                title="Supprimer">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Modal Confirmation Suppression -->
+                                    <div class="modal fade" id="deleteModal{{ voiture.idVoiture }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header border-0">
+                                                    <h5 class="modal-title">Confirmer la suppression</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Êtes-vous sûr de vouloir supprimer la voiture <strong>{{ voiture.marque }} {{ voiture.modele }}</strong> ({{ voiture.matricule }}) ?</p>
+                                                    <p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> Cette action est irréversible.</p>
+                                                </div>
+                                                <div class="modal-footer border-0">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                    <form method="POST" action="{{ path('admin_voiture_delete', {'id': voiture.idVoiture}) }}" style="display: inline;">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ voiture.idVoiture) }}">
+                                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <i class="bi bi-inbox" style="font-size: 2rem; color: #CCC;"></i>
+                                <p class="mt-2 text-muted">Aucune voiture trouvée</p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if totalPages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1&sort={{ app.request.query.get('sort', '') }}&order={{ app.request.query.get('order', 'asc') }}">Première</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page - 1 }}&sort={{ app.request.query.get('sort', '') }}&order={{ app.request.query.get('order', 'asc') }}">Précédente</a>
+                    </li>
+                {% endif %}
+
+                {% for p in 1..totalPages %}
+                    {% if p == page %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ p }}</span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ p }}&sort={{ app.request.query.get('sort', '') }}&order={{ app.request.query.get('order', 'asc') }}">{{ p }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page < totalPages %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page + 1 }}&sort={{ app.request.query.get('sort', '') }}&order={{ app.request.query.get('order', 'asc') }}">Suivante</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ totalPages }}&sort={{ app.request.query.get('sort', '') }}&order={{ app.request.query.get('order', 'asc') }}">Dernière</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+
+<style>
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .card {
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+    
+    table tbody tr:hover {
+        background-color: #F5F3E7;
+    }
+</style>
+{% endblock %}

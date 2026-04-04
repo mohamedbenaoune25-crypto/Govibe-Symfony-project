@@ -1,0 +1,344 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier Location - GoVibe{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --primary-emerald: #50C878;
+        --dark-green: #013220;
+        --light-green: #2E8B57;
+    }
+
+    .edit-hero {
+        background: linear-gradient(135deg, var(--dark-green) 0%, var(--light-green) 100%);
+        color: white;
+        padding: 50px 0;
+        margin-bottom: 40px;
+    }
+
+    .edit-hero h1 {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .form-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--dark-green);
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--primary-emerald);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--dark-green);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-emerald);
+        box-shadow: 0 0 0 3px rgba(80, 200, 120, 0.1);
+        outline: none;
+    }
+
+    .form-help {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .form-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+
+    .btn-primary-govibe {
+        background-color: var(--primary-emerald);
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-primary-govibe:hover {
+        background-color: var(--light-green);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(80, 200, 120, 0.3);
+    }
+
+    .btn-secondary-govibe {
+        background-color: #6c757d;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .buttons-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .buttons-group .btn {
+        flex: 1;
+    }
+
+    .alert {
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .summary-box {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        border: 2px solid var(--primary-emerald);
+    }
+
+    .summary-title {
+        font-weight: 700;
+        color: var(--dark-green);
+        margin-bottom: 15px;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    .total-amount {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-top: 2px solid var(--primary-emerald);
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary-emerald);
+    }
+</style>
+
+<div class="edit-hero">
+    <div class="container">
+        <h1><i class="bi bi-pencil-square"></i> Modifier Location</h1>
+        <p>{{ location.reference }}</p>
+    </div>
+</div>
+
+<div class="container form-container">
+    {% if location.statut != 'EN_ATTENTE' %}
+    <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Attention:</strong> Vous ne pouvez modifier que les locations en attente de confirmation.
+    </div>
+    {% endif %}
+
+    {{ form_start(form, {'attr': {'class': 'form-card needs-validation', 'novalidate': 'novalidate'}}) }}
+
+    {% if form.vars.errors|length > 0 %}
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        <strong>Erreur:</strong> Veuillez vérifier les champs ci-dessous
+    </div>
+    {% endif %}
+
+    <!-- Section Voiture -->
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-car-front-fill"></i> Voiture
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.voiture) }}
+            {{ form_widget(form.voiture) }}
+            {% if form.voiture.vars.errors|length %}
+            <div class="form-error">
+                {% for error in form.voiture.vars.errors %}
+                    {{ error.message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Section Dates -->
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-calendar-event"></i> Période de Location
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="form-group">
+                {{ form_label(form.dateDebut) }}
+                {{ form_widget(form.dateDebut) }}
+                {% if form.dateDebut.vars.errors|length %}
+                <div class="form-error">
+                    {% for error in form.dateDebut.vars.errors %}
+                        {{ error.message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.dateFin) }}
+                {{ form_widget(form.dateFin) }}
+                {% if form.dateFin.vars.errors|length %}
+                <div class="form-error">
+                    {% for error in form.dateFin.vars.errors %}
+                        {{ error.message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Montant -->
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-cash-coin"></i> Montant
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.montantTotal) }}
+            {{ form_widget(form.montantTotal) }}
+            {% if form.montantTotal.vars.errors|length %}
+            <div class="form-error">
+                {% for error in form.montantTotal.vars.errors %}
+                    {{ error.message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-title">Résumé du Devis</div>
+            <div class="summary-item">
+                <span>Voiture:</span>
+                <span>{{ location.voiture.marque }} {{ location.voiture.modele }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Nombre de jours:</span>
+                <span id="resume-jours">{{ location.nbJours }}</span>
+            </div>
+            <div class="summary-item">
+                <span>Prix journalier:</span>
+                <span>{{ '%0.2f'|format(location.voiture.prixJour) }} DT</span>
+            </div>
+            <div class="total-amount">
+                <span>Montant Total:</span>
+                <span id="resume-montant">{{ '%0.2f'|format(location.montantTotal) }} DT</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="buttons-group">
+        <a href="{{ path('app_location_show', {id: location.idLocation}) }}" class="btn btn-secondary-govibe">
+            <i class="bi bi-x"></i> Annuler
+        </a>
+        <button type="submit" class="btn-primary-govibe">
+            <i class="bi bi-check"></i> Enregistrer les modifications
+        </button>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateDebutInput = document.querySelector('input[name*="dateDebut"]');
+    const dateFinInput = document.querySelector('input[name*="dateFin"]');
+    const montantTotalInput = document.querySelector('input[name*="montantTotal"]');
+    const prixJour = {{ location.voiture.prixJour }};
+    const form = document.querySelector('form.needs-validation');
+
+    function updateQuote() {
+        const dateDebut = new Date(dateDebutInput.value);
+        const dateFin = new Date(dateFinInput.value);
+
+        if (dateDebutInput.value && dateFinInput.value && dateFin > dateDebut) {
+            const timeDiff = dateFin.getTime() - dateDebut.getTime();
+            const nbJours = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+            
+            document.getElementById('resume-jours').innerText = nbJours;
+            
+            const montantTotal = prixJour * nbJours;
+            montantTotalInput.value = montantTotal.toFixed(2);
+            document.getElementById('resume-montant').innerText = montantTotal.toFixed(2) + ' DT';
+        }
+    }
+
+    dateDebutInput?.addEventListener('change', updateQuote);
+    dateFinInput?.addEventListener('change', updateQuote);
+
+    form?.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const dateDebut = new Date(dateDebutInput.value);
+        const dateFin = new Date(dateFinInput.value);
+
+        if (dateFin <= dateDebut) {
+            e.preventDefault();
+            alert('La date de fin doit être après la date de début');
+            return;
+        }
+
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,222 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Détails Voiture - Admin{% endblock %}
+
+{% block page_title %}Détails Voiture{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="h2" style="color: #013220;">
+                <i class="bi bi-car-front"></i> {{ voiture.marque }} {{ voiture.modele }}
+            </h1>
+            <p class="text-muted">{{ voiture.matricule }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ path('admin_voiture_edit', {'id': voiture.idVoiture}) }}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Éditer
+            </a>
+            <a href="{{ path('admin_voiture_index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Image et Statut -->
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                {% if voiture.imageUrl %}
+                    <img src="{{ voiture.imageUrl }}" class="card-img-top" alt="{{ voiture.marque }} {{ voiture.modele }}" style="object-fit: cover; height: 250px;">
+                {% else %}
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                        <i class="bi bi-car-front" style="font-size: 4rem; color: #CCC;"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    {% set statutColor = voiture.statut == 'DISPONIBLE' ? '#50C878' : (voiture.statut == 'EN_MAINTENANCE' ? '#FF9500' : '#E74C3C') %}
+                    {% set statutLabel = voiture.statut == 'DISPONIBLE' ? 'Disponible' : (voiture.statut == 'EN_MAINTENANCE' ? 'En Maintenance' : 'Accidentée') %}
+                    
+                    <div class="text-center mb-3">
+                        <span class="badge" style="background-color: {{ statutColor }}; padding: 0.75rem 1.5rem; font-size: 1rem;">
+                            {{ statutLabel }}
+                        </span>
+                    </div>
+
+                    <h5 class="card-title" style="color: #50C878;">Prix de Location</h5>
+                    <h3 style="color: #013220;">{{ "%.2f"|format(voiture.prixJour) }} <small>DT/jour</small></h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Détails -->
+        <div class="col-lg-8">
+            <!-- Infos Générales -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header" style="background-color: #50C878; border: none;">
+                    <h5 class="mb-0" style="color: white;">
+                        <i class="bi bi-info-circle"></i> Informations Générales
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Matricule</label>
+                            <p class="form-control-plaintext">
+                                <strong>{{ voiture.matricule }}</strong>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Marque</label>
+                            <p class="form-control-plaintext">{{ voiture.marque }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Modèle</label>
+                            <p class="form-control-plaintext">{{ voiture.modele }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Année</label>
+                            <p class="form-control-plaintext">
+                                <span class="badge bg-light text-dark">{{ voiture.annee }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specs Techniques -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header" style="background-color: #50C878; border: none;">
+                    <h5 class="mb-0" style="color: white;">
+                        <i class="bi bi-gear"></i> Spécifications Techniques
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Type de Carburant</label>
+                            <p class="form-control-plaintext">
+                                <i class="bi bi-fuel-pump"></i> {{ voiture.typeCarburant }}
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Prix Journalier</label>
+                            <p class="form-control-plaintext" style="color: #50C878; font-weight: bold;">
+                                {{ "%.2f"|format(voiture.prixJour) }} DT
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Infos Agence -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header" style="background-color: #50C878; border: none;">
+                    <h5 class="mb-0" style="color: white;">
+                        <i class="bi bi-map-pin"></i> Informations Agence
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <label class="form-label fw-bold">Adresse</label>
+                    <p class="form-control-plaintext mb-3">{{ voiture.adresseAgence }}</p>
+                    
+                    {% if voiture.getLatitude() and voiture.getLongitude() %}
+                        <label class="form-label fw-bold">Coordonnées GPS</label>
+                        <p class="form-control-plaintext">
+                            <i class="bi bi-geo-alt"></i>
+                            {{ voiture.getLatitude() }}, {{ voiture.getLongitude() }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Description -->
+            {% if voiture.description %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header" style="background-color: #50C878; border: none;">
+                        <h5 class="mb-0" style="color: white;">
+                            <i class="bi bi-file-text"></i> Description
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="form-control-plaintext">{{ voiture.description|nl2br }}</p>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="d-grid gap-2">
+                <a href="{{ path('admin_voiture_download_pdf', {'id': voiture.idVoiture}) }}" class="btn btn-outline-danger btn-lg">
+                    <i class="bi bi-file-pdf"></i> Télécharger le PDF
+                </a>
+                <div class="btn-group btn-group-lg" role="group">
+                    <a href="{{ path('admin_voiture_edit', {'id': voiture.idVoiture}) }}" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Éditer
+                    </a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Infos Système -->
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header" style="background-color: #F5F3E7; border: none;">
+                    <h6 class="mb-0" style="color: #013220;">
+                        <i class="bi bi-clock"></i> Informations Système
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">ID Voiture</dt>
+                        <dd class="col-sm-9"><code>{{ voiture.idVoiture }}</code></dd>
+                        <dt class="col-sm-3">Créée le</dt>
+                        <dd class="col-sm-9">
+                            <i class="bi bi-calendar"></i> 
+                            {{ voiture.dateCreation ? voiture.dateCreation|date('d/m/Y à H:i') : 'N/A' }}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmation Suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer la voiture <strong>{{ voiture.marque }} {{ voiture.modele }}</strong> ({{ voiture.matricule }}) ?</p>
+                <p class="text-danger mb-0"><i class="bi bi-exclamation-triangle"></i> Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="POST" action="{{ path('admin_voiture_delete', {'id': voiture.idVoiture}) }}" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ voiture.idVoiture) }}">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control-plaintext {
+        color: #333;
+        font-size: 1rem;
+    }
+</style>
+{% endblock %}

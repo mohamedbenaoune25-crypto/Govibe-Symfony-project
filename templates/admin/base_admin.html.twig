@@ -414,8 +414,18 @@
                 </a>
             </li>
             <li class="sidebar-nav-item">
+                <a href="{{ path('app_admin_location_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_location' %}active{% endif %}">
+                    <i class="bi bi-geo-alt"></i> Locations
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_vols_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_vols' %}active{% endif %}">
                     <i class="bi bi-airplane"></i> Vols
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('admin_voiture_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'admin_voiture' %}active{% endif %}">
+                    <i class="bi bi-car-front"></i> Voitures
                 </a>
             </li>
             <li class="sidebar-nav-item">

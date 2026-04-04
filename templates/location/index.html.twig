@@ -1,0 +1,486 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Locations - GoVibe{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --primary-emerald: #50C878;
+        --dark-green: #013220;
+        --light-green: #2E8B57;
+        --bg-light: #F5F3E7;
+    }
+
+    .location-hero {
+        background: linear-gradient(135deg, var(--dark-green) 0%, var(--light-green) 100%);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .location-hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .location-hero p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .filter-section {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .location-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-left: 5px solid var(--primary-emerald);
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    .location-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 25px rgba(80, 200, 120, 0.2);
+    }
+
+    .location-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .location-reference {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--dark-green);
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-en_attente {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .status-confirmee {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-annulee {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-terminee {
+        background-color: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .location-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .detail-item {
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+        color: #666;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        color: var(--dark-green);
+        font-weight: 600;
+        margin-top: 5px;
+    }
+
+    .location-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        border-radius: 6px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-view {
+        background-color: var(--primary-emerald);
+        color: white;
+    }
+
+    .btn-view:hover {
+        background-color: var(--light-green);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background-color: #17a2b8;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background-color: #138496;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-download {
+        background-color: #6c757d;
+        color: white;
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .btn-download:hover {
+        background-color: #5a6268;
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-new-location {
+        background-color: var(--primary-emerald);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-new-location:hover {
+        background-color: var(--light-green);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(80, 200, 120, 0.3);
+        text-decoration: none;
+        color: white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        color: var(--primary-emerald);
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .pagination {
+        margin-top: 40px;
+        justify-content: center;
+    }
+
+    .pagination .page-link {
+        color: var(--primary-emerald);
+        border-color: var(--primary-emerald);
+    }
+
+    .pagination .page-link:hover {
+        color: white;
+        background-color: var(--primary-emerald);
+        border-color: var(--primary-emerald);
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: var(--primary-emerald);
+        border-color: var(--primary-emerald);
+    }
+
+    .voiture-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        color: var(--dark-green);
+    }
+
+    .voiture-icon {
+        font-size: 1.5rem;
+        color: var(--primary-emerald);
+    }
+
+    .dates-section {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .date-badge {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .date-label {
+        font-size: 0.75rem;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+    }
+
+    .date-value {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--dark-green);
+    }
+
+    .price-section {
+        background: linear-gradient(135deg, rgba(80, 200, 120, 0.1) 0%, rgba(46, 139, 87, 0.1) 100%);
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .price-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary-emerald);
+    }
+
+    .price-label {
+        font-size: 0.85rem;
+        color: #666;
+    }
+</style>
+
+<div class="location-hero">
+    <div class="container">
+        <h1><i class="bi bi-car-front-fill"></i> Mes Locations</h1>
+        <p>Gérez vos locations de voitures</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Bouton nouvelle location -->
+    <div style="margin-bottom: 30px;">
+        <a href="{{ path('app_location_new') }}" class="btn-new-location">
+            <i class="bi bi-plus-circle"></i> Nouvelle Location
+        </a>
+    </div>
+
+    <!-- Section filtre -->
+    <div class="filter-section">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <input type="text" name="reference" class="form-control" placeholder="Rechercher par référence" value="{{ searchRef }}">
+            </div>
+            <div class="col-md-3">
+                <select name="statut" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    {% for s in statutes %}
+                    <option value="{{ s }}" {% if statut == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="sort" class="form-select">
+                    <option value="dateDebut" {% if sortBy == 'dateDebut' %}selected{% endif %}>Date début</option>
+                    <option value="montantTotal" {% if sortBy == 'montantTotal' %}selected{% endif %}>Montant</option>
+                    <option value="dateCreation" {% if sortBy == 'dateCreation' %}selected{% endif %}>Récente</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="order" class="form-select">
+                    <option value="DESC" {% if sortOrder == 'DESC' %}selected{% endif %}>DESC</option>
+                    <option value="ASC" {% if sortOrder == 'ASC' %}selected{% endif %}>ASC</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Messages de flash -->
+    {% for message in app.flashes('success') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i> {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+
+    <!-- Liste des locations -->
+    {% if locations|length > 0 %}
+    <div style="margin-bottom: 30px;">
+        <p style="color: #666; margin-bottom: 20px;">
+            Affichage <strong>{{ (page - 1) * 10 + 1 }}</strong> à <strong>{{ min(page * 10, total) }}</strong> sur <strong>{{ total }}</strong> locations
+        </p>
+
+        {% for location in locations %}
+        <div class="location-card">
+            <div class="location-card-header">
+                <span class="location-reference">{{ location.reference }}</span>
+                <span class="status-badge status-{{ location.statut|lower|replace({'_': ''}) }}">
+                    {{ location.statut }}
+                </span>
+            </div>
+
+            <div class="location-details">
+                <div class="detail-item">
+                    <div class="detail-label"><i class="bi bi-car-front-fill"></i> Voiture</div>
+                    <div class="detail-value">{{ location.voiture.marque }} {{ location.voiture.modele }}</div>
+                    <div style="font-size: 0.85rem; color: #999;">{{ location.voiture.matricule }}</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label"><i class="bi bi-calendar-event"></i> Période</div>
+                    <div class="detail-value">{{ location.dateDebut|date('d/m/Y') }} → {{ location.dateFin|date('d/m/Y') }}</div>
+                    <div style="font-size: 0.85rem; color: #999;">{{ location.nbJours }} jour(s)</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label"><i class="bi bi-cash-coin"></i> Montant</div>
+                    <div class="detail-value">{{ '%0.2f'|format(location.montantTotal) }} DT</div>
+                    <div style="font-size: 0.85rem; color: #999;">Prix/jour: {{ '%0.2f'|format(location.voiture.prixJour) }} DT</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label"><i class="bi bi-clock-history"></i> Créé le</div>
+                    <div class="detail-value">{{ location.dateCreation|date('d/m/Y') }}</div>
+                    <div style="font-size: 0.85rem; color: #999;">{{ location.dateCreation|date('H:i') }}</div>
+                </div>
+            </div>
+
+            <div class="location-actions">
+                <a href="{{ path('app_location_show', {id: location.idLocation}) }}" class="btn-action btn-view">
+                    <i class="bi bi-eye"></i> Voir détails
+                </a>
+                {% if location.statut == 'EN_ATTENTE' %}
+                <a href="{{ path('app_location_edit', {id: location.idLocation}) }}" class="btn-action btn-edit">
+                    <i class="bi bi-pencil"></i> Modifier
+                </a>
+                {% endif %}
+                <form method="POST" action="{{ path('app_location_delete', {id: location.idLocation}) }}" style="display: inline;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ location.idLocation) }}">
+                    <button type="submit" class="btn-action btn-danger" onclick="return confirm('Cette action supprimera définitivement la location. Continuer ?');">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                </form>
+                {% if location.contratPdf %}
+                <a href="{{ path('app_location_contrat', {id: location.idLocation}) }}" class="btn-action btn-download">
+                    <i class="bi bi-file-pdf"></i> Contrat
+                </a>
+                {% endif %}
+                <a href="{{ path('app_location_pdf', {id: location.idLocation}) }}" class="btn-action btn-download">
+                    <i class="bi bi-file-earmark-pdf"></i> Détails PDF
+                </a>
+                <a href="{{ path('app_location_excel', {id: location.idLocation}) }}" class="btn-action btn-download">
+                    <i class="bi bi-file-earmark-spreadsheet"></i> Détails Excel
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if totalPages > 1 %}
+    <nav>
+        <ul class="pagination">
+            {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_location_index', {page: 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Première</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_location_index', {page: page - 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Précédente</a>
+            </li>
+            {% endif %}
+
+            {% for p in range(max(1, page - 2), min(totalPages, page + 2)) %}
+            <li class="page-item {% if p == page %}active{% endif %}">
+                <a class="page-link" href="{{ path('app_location_index', {page: p, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">{{ p }}</a>
+            </li>
+            {% endfor %}
+
+            {% if page < totalPages %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_location_index', {page: page + 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Suivante</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ path('app_location_index', {page: totalPages, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Dernière</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    <!-- Export -->
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="{{ path('app_location_stats_export') }}" class="btn btn-outline-primary">
+            <i class="bi bi-download"></i> Exporter en Excel
+        </a>
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon"><i class="bi bi-car-front-fill"></i></div>
+        <h3>Aucune location</h3>
+        <p>Vous n'avez pas encore effectué de location.</p>
+        <a href="{{ path('app_location_new') }}" class="btn-new-location" style="margin-top: 20px;">
+            <i class="bi bi-plus-circle"></i> Créer une nouvelle location
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Animation du nombre de jours en temps réel
+    document.addEventListener('DOMContentLoaded', function() {
+        // Code pour interactivité supplémentaire si nécessaire
+    });
+</script>
+{% endblock %}
