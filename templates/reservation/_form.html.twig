@@ -1,0 +1,106 @@
+{{ form_start(form, {'attr': {'class': 'reservation-form'}}) }}
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                {{ form_label(form.dateDebut, 'Date de début', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.dateDebut) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                {{ form_label(form.dateFin, 'Date de fin', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.dateFin) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form_widget(form.prixTotal, {'attr': {'class': 'form-control', 'placeholder': 'Prix total'}}) }}
+                {{ form_label(form.prixTotal, 'Prix total (€)', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.prixTotal) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form_widget(form.statut, {'attr': {'class': 'form-select'}}) }}
+                {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.statut) }}
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-floating">
+                {{ form_widget(form.user, {'attr': {'class': 'form-select'}}) }}
+                {{ form_label(form.user, 'Utilisateur', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.user) }}
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-floating">
+                {{ form_widget(form.chambre, {'attr': {'class': 'form-select'}}) }}
+                {{ form_label(form.chambre, 'Chambre', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.chambre) }}
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-floating">
+                {{ form_widget(form.hotel, {'attr': {'class': 'form-select'}}) }}
+                {{ form_label(form.hotel, 'Hôtel', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.hotel) }}
+            </div>
+        </div>
+    </div>
+    <div class="d-grid mt-4">
+        <button class="btn btn-primary btn-lg">
+            <i class="bi bi-check-circle me-2"></i>{{ button_label|default('Sauvegarder la réservation') }}
+        </button>
+    </div>
+{{ form_end(form) }}
+
+<style>
+.reservation-form .form-floating {
+    margin-bottom: 1rem;
+}
+
+.reservation-form .form-control, .reservation-form .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem 0.75rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reservation-form .form-control:focus, .reservation-form .form-select:focus {
+    border-color: var(--primary-emerald);
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+}
+
+.reservation-form .form-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.reservation-form .invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-emerald), var(--accent-green));
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+    background: linear-gradient(135deg, var(--accent-green), var(--primary-emerald));
+}
+</style>

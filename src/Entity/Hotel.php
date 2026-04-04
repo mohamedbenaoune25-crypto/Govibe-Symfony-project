@@ -44,6 +44,9 @@ class Hotel
     #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $isFavoris = false;
+
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: Chambre::class, cascade: ['remove'])]
     private Collection $chambres;
 
@@ -173,6 +176,23 @@ class Hotel
             }
         }
 
+        return $this;
+    }
+
+    public function isFavoris(): bool
+    {
+        return $this->isFavoris;
+    }
+
+    public function setIsFavoris(bool $isFavoris): self
+    {
+        $this->isFavoris = $isFavoris;
+        return $this;
+    }
+
+    public function toggleFavoris(): self
+    {
+        $this->isFavoris = !$this->isFavoris;
         return $this;
     }
 }

@@ -1,0 +1,106 @@
+{{ form_start(form, {'attr': {'class': 'chambre-form'}}) }}
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form_widget(form.type, {'attr': {'class': 'form-control', 'placeholder': 'Type de chambre'}}) }}
+                {{ form_label(form.type, 'Type de chambre', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.type) }}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form_widget(form.capacite, {'attr': {'class': 'form-control', 'placeholder': 'Capacité'}}) }}
+                {{ form_label(form.capacite, 'Capacité', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.capacite) }}
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-floating">
+                {{ form_widget(form.equipements, {'attr': {'class': 'form-control', 'placeholder': 'Équipements'}}) }}
+                {{ form_label(form.equipements, 'Équipements', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.equipements) }}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form_widget(form.prixStandard, {'attr': {'class': 'form-control', 'placeholder': 'Prix standard'}}) }}
+                {{ form_label(form.prixStandard, 'Prix standard (€)', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.prixStandard) }}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form_widget(form.prixHauteSaison, {'attr': {'class': 'form-control', 'placeholder': 'Prix haute saison'}}) }}
+                {{ form_label(form.prixHauteSaison, 'Prix haute saison (€)', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.prixHauteSaison) }}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-floating">
+                {{ form_widget(form.prixBasseSaison, {'attr': {'class': 'form-control', 'placeholder': 'Prix basse saison'}}) }}
+                {{ form_label(form.prixBasseSaison, 'Prix basse saison (€)', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.prixBasseSaison) }}
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-floating">
+                {{ form_widget(form.hotel, {'attr': {'class': 'form-select'}}) }}
+                {{ form_label(form.hotel, 'Hôtel', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_errors(form.hotel) }}
+            </div>
+        </div>
+    </div>
+    <div class="d-grid mt-4">
+        <button class="btn btn-primary btn-lg">
+            <i class="bi bi-check-circle me-2"></i>{{ button_label|default('Sauvegarder la chambre') }}
+        </button>
+    </div>
+{{ form_end(form) }}
+
+<style>
+.chambre-form .form-floating {
+    margin-bottom: 1rem;
+}
+
+.chambre-form .form-control, .chambre-form .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1rem 0.75rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chambre-form .form-control:focus, .chambre-form .form-select:focus {
+    border-color: var(--primary-emerald);
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+}
+
+.chambre-form .form-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.chambre-form .invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-emerald), var(--accent-green));
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(34, 197, 94, 0.4);
+    background: linear-gradient(135deg, var(--accent-green), var(--primary-emerald));
+}
+</style>

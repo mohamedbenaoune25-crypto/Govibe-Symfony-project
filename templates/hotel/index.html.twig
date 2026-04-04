@@ -1,0 +1,366 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hôtels - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4 fw-bold text-white mb-4">
+                    <i class="bi bi-building me-3"></i>Nos Hôtels
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Découvrez notre sélection d'hôtels de qualité pour votre séjour idéal
+                </p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <form method="GET" action="{{ path('app_hotel_index') }}" class="search-form">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="search" class="form-control search-input" placeholder="Rechercher un hôtel par nom, ville ou description..." value="{{ search }}">
+                        <button class="btn btn-emerald" type="submit">
+                            <i class="bi bi-search me-2"></i>Rechercher
+                        </button>
+                        {% if search %}
+                            <a href="{{ path('app_hotel_index') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x me-2"></i>Réinitialiser
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-4">
+                <a href="{{ path('app_hotel_new') }}" class="btn btn-emerald btn-lg w-100">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter un Hôtel
+                </a>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="sort-controls d-flex gap-2 flex-wrap">
+                    <div class="btn-group" role="group">
+                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nom', 'sortDir': 'asc'}) }}" class="btn btn-sm {{ sortBy == 'nom' and sortDir == 'asc' ? 'btn-emerald' : 'btn-outline-secondary' }}">
+                            <i class="bi bi-sort-alpha-up me-1"></i>Nom (A-Z)
+                        </a>
+                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nom', 'sortDir': 'desc'}) }}" class="btn btn-sm {{ sortBy == 'nom' and sortDir == 'desc' ? 'btn-emerald' : 'btn-outline-secondary' }}">
+                            <i class="bi bi-sort-alpha-down me-1"></i>Nom (Z-A)
+                        </a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'budget', 'sortDir': 'asc'}) }}" class="btn btn-sm {{ sortBy == 'budget' and sortDir == 'asc' ? 'btn-emerald' : 'btn-outline-secondary' }}">
+                            <i class="bi bi-sort-down me-1"></i>Prix (↑)
+                        </a>
+                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'budget', 'sortDir': 'desc'}) }}" class="btn btn-sm {{ sortBy == 'budget' and sortDir == 'desc' ? 'btn-emerald' : 'btn-outline-secondary' }}">
+                            <i class="bi bi-sort-up me-1"></i>Prix (↓)
+                        </a>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nombreEtoiles', 'sortDir': 'desc'}) }}" class="btn btn-sm {{ sortBy == 'nombreEtoiles' ? 'btn-emerald' : 'btn-outline-secondary' }}">
+                            <i class="bi bi-star-fill me-1"></i>Note
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for hotel in hotels %}
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="card hotel-card h-100 shadow-lg border-0">
+                        <div class="card-img-wrapper">
+                            {% if hotel.photoUrl %}
+                                <img src="{{ hotel.photoUrl }}" class="card-img-top" alt="{{ hotel.nom }}">
+                            {% else %}
+                                <div class="card-img-top placeholder-img d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-building text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="card-img-overlay d-flex align-items-end">
+                                {% if hotel.nombreEtoiles %}
+                                    <div class="stars-rating mb-2">
+                                        {% for i in 1..5 %}
+                                            <i class="bi bi-star-fill {{ i <= hotel.nombreEtoiles ? 'text-warning' : 'text-muted' }}"></i>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold text-dark mb-0">{{ hotel.nom }}</h5>
+                                <button class="btn btn-favorite toggle-favorite" data-hotel-id="{{ hotel.id }}" type="button" title="{% if hotel.isFavoris() %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
+                                    <i class="bi bi-star{% if hotel.isFavoris() %}-fill{% endif %}"></i>
+                                </button>
+                            </div>
+                            <p class="card-text text-muted mb-2">
+                                <i class="bi bi-geo-alt me-1"></i>{{ hotel.adresse }}, {{ hotel.ville }}
+                            </p>
+                            {% if hotel.description %}
+                                <p class="card-text flex-grow-1">{{ hotel.description|slice(0, 100) }}...</p>
+                            {% endif %}
+                            {% if hotel.budget %}
+                                <p class="card-text fw-semibold text-emerald">
+                                    À partir de {{ hotel.budget }}€
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ path('app_hotel_show', {'id': hotel.id}) }}" class="btn btn-outline-emerald btn-sm">
+                                    <i class="bi bi-eye me-1"></i>Voir Détails
+                                </a>
+                                <a href="{{ path('app_hotel_edit', {'id': hotel.id}) }}" class="btn btn-emerald btn-sm">
+                                    <i class="bi bi-pencil me-1"></i>Modifier
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-building text-muted" style="font-size: 4rem;"></i>
+                        <h3 class="text-white mt-3">Aucun hôtel trouvé</h3>
+                        <p class="text-white-50">Soyez le premier à ajouter un hôtel à notre plateforme.</p>
+                        <a href="{{ path('app_hotel_new') }}" class="btn btn-emerald btn-lg mt-3">
+                            <i class="bi bi-plus-circle me-2"></i>Créer le Premier Hôtel
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-emerald {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.btn-emerald:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    color: white;
+}
+
+.btn-outline-emerald {
+    border-color: var(--primary-emerald);
+    color: var(--primary-emerald);
+}
+
+.btn-outline-emerald:hover {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.hotel-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hotel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px var(--shadow-green);
+}
+
+.card-img-wrapper {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
+
+.card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.hotel-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.placeholder-img {
+    background: linear-gradient(135deg, var(--soft-green), var(--light-green));
+    height: 200px;
+}
+
+.stars-rating {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+}
+
+.text-emerald {
+    color: var(--primary-emerald) !important;
+}
+
+.search-form {
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid var(--primary-emerald);
+    border-radius: 25px 0 0 25px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    background-color: white;
+    border-color: var(--primary-emerald);
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+}
+
+.search-input::placeholder {
+    color: #999;
+}
+
+.search-form .input-group-lg > .btn {
+    border-radius: 0 25px 25px 0;
+    padding: 0.75rem 1.5rem;
+}
+
+.sort-controls {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-group .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.btn-outline-secondary:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-favorite {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--primary-emerald);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0.25rem;
+}
+
+.btn-favorite:hover {
+    color: var(--accent-green);
+    transform: scale(1.2);
+}
+
+.btn-favorite i {
+    transition: all 0.3s ease;
+}
+
+.btn-favorite.favorited i {
+    color: #ffc107;
+    text-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
+}
+
+.btn-favorite.favorited:hover {
+    color: #ffb300;
+    transform: scale(1.25);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const favoriteButtons = document.querySelectorAll('.toggle-favorite');
+    
+    favoriteButtons.forEach(button => {
+        // Set initial state
+        const hotelId = button.getAttribute('data-hotel-id');
+        if (button.querySelector('i').classList.contains('bi-star-fill')) {
+            button.classList.add('favorited');
+        }
+        
+        button.addEventListener('click', async function(e) {
+            e.preventDefault();
+            const hotelId = this.getAttribute('data-hotel-id');
+            
+            try {
+                const response = await fetch(`/hotel/${hotelId}/toggle-favoris`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    
+                    if (data.isFavoris) {
+                        icon.classList.remove('bi-star');
+                        icon.classList.add('bi-star-fill');
+                        this.classList.add('favorited');
+                        this.title = 'Retirer des favoris';
+                    } else {
+                        icon.classList.remove('bi-star-fill');
+                        icon.classList.add('bi-star');
+                        this.classList.remove('favorited');
+                        this.title = 'Ajouter aux favoris';
+                    }
+                    
+                    // Show toast notification
+                    showNotification(data.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Une erreur est survenue', 'error');
+            }
+        });
+    });
+});
+
+function showNotification(message, type = 'success') {
+    const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
+    const alertHTML = `
+        <div class="alert ${alertClass} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 300px;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    
+    const alertContainer = document.createElement('div');
+    alertContainer.innerHTML = alertHTML;
+    document.body.appendChild(alertContainer.firstElementChild);
+    
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => alert.remove());
+    }, 3000);
+}
+</script>
+{% endblock %}

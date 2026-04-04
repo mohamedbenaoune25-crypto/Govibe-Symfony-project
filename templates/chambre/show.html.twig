@@ -1,0 +1,185 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chambre {{ chambre.type }} - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5">
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-transparent p-0">
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_hotel_index') }}" class="text-emerald text-decoration-none">
+                        <i class="bi bi-house me-2"></i>Hôtels
+                    </a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="text-emerald text-decoration-none">
+                        {{ chambre.hotel.nom }}
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    {{ chambre.type }}
+                </li>
+            </ol>
+        </nav>
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card chambre-detail-card shadow-lg border-0 mb-4">
+                    <div class="card-header bg-emerald text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="mb-0">{{ chambre.type }}</h2>
+                                <p class="mb-0 opacity-75">{{ chambre.hotel.nom }}</p>
+                            </div>
+                            <div class="text-end">
+                                {% if chambre.prixStandard %}
+                                    <div class="price-tag">
+                                        À partir de {{ chambre.prixStandard }}€
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-info-circle me-2"></i>Caractéristiques
+                                </h5>
+                                <p class="mb-1"><strong>Capacité:</strong> {{ chambre.capacite }} personne(s)</p>
+                                {% if chambre.equipements %}
+                                    <p class="mb-1"><strong>Équipements:</strong> {{ chambre.equipements }}</p>
+                                {% endif %}
+                                <p class="mb-1"><strong>ID:</strong> {{ chambre.id }}</p>
+                                {% if chambre.createdAt %}
+                                    <p class="mb-1"><strong>Créé le:</strong> {{ chambre.createdAt|date('d/m/Y à H:i') }}</p>
+                                {% endif %}
+                                {% if chambre.updatedAt %}
+                                    <p class="mb-0"><strong>Mis à jour le:</strong> {{ chambre.updatedAt|date('d/m/Y à H:i') }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-cash me-2"></i>Tarification
+                                </h5>
+                                {% if chambre.prixStandard %}
+                                    <p class="mb-1"><strong>Prix standard:</strong> {{ chambre.prixStandard }}€</p>
+                                {% endif %}
+                                {% if chambre.prixHauteSaison %}
+                                    <p class="mb-1"><strong>Prix haute saison:</strong> {{ chambre.prixHauteSaison }}€</p>
+                                {% endif %}
+                                {% if chambre.prixBasseSaison %}
+                                    <p class="mb-0"><strong>Prix basse saison:</strong> {{ chambre.prixBasseSaison }}€</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="hotel-info mb-4">
+                            <h5 class="text-emerald mb-3">
+                                <i class="bi bi-building me-2"></i>Hôtel associé
+                            </h5>
+                            <div class="hotel-summary p-3 border rounded">
+                                <h6>{{ chambre.hotel.nom }}</h6>
+                                <p class="mb-1">{{ chambre.hotel.adresse }}, {{ chambre.hotel.ville }}</p>
+                                {% if chambre.hotel.nombreEtoiles %}
+                                    <div class="stars-rating">
+                                        {% for i in 1..5 %}
+                                            <i class="bi bi-star-fill {{ i <= chambre.hotel.nombreEtoiles ? 'text-warning' : 'text-muted' }}"></i>
+                                        {% endfor %}
+                                        <span class="ms-2">{{ chambre.hotel.nombreEtoiles }} étoiles</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card action-card shadow-lg border-0 mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0 text-dark">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{{ path('app_chambre_edit', {'id': chambre.id}) }}" class="btn btn-emerald">
+                                <i class="bi bi-pencil me-2"></i>Modifier la chambre
+                            </a>
+                            <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="btn btn-info">
+                                <i class="bi bi-building me-2"></i>Voir l'hôtel
+                            </a>
+                            <a href="{{ path('app_chambre_index') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card danger-card shadow-lg border-0">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Zone dangereuse
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            La suppression de cette chambre est irréversible.
+                        </p>
+                        {{ include('chambre/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-emerald {
+    background-color: var(--primary-emerald) !important;
+}
+
+.chambre-detail-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}
+
+.action-card, .danger-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}
+
+.btn-emerald {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.btn-emerald:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    color: white;
+}
+
+.price-tag {
+    font-size: 1.1rem;
+    color: white;
+}
+
+.hotel-summary {
+    background: var(--soft-green);
+}
+
+.stars-rating {
+    display: inline-flex;
+    align-items: center;
+}
+
+.text-emerald {
+    color: var(--primary-emerald) !important;
+}
+</style>
+{% endblock %}

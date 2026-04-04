@@ -417,7 +417,7 @@
                     <li class="nav-item"><a class="nav-link" href="#">Activités</a></li>
                     <li class="nav-item"><a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_location' %}active{% endif %}" href="{{ path('app_location_index') }}">Voitures</a></li>
                     <li class="nav-item"><a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_vols' %}active{% endif %}" href="{{ path('app_vols_index') }}">Vols</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Hôtels</a></li>
+                    <li class="nav-item"><a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_hotel' %}active{% endif %}" href="{{ path('app_hotel_index') }}">Hôtels</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ path('app_poste_index') }}">Forums</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ path('app_reclamation_index') }}">Réclamations</a></li>
                     {% if app.user and app.user.role == 'admin' %}
