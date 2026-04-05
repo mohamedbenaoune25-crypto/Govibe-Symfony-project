@@ -78,6 +78,25 @@ class CommentaireController extends AbstractController
         return $this->redirectToRoute('app_poste_index');
     }
 
+    #[Route('/edit/{commentaireId}', name: 'app_commentaire_edit', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function edit(Request $request, Commentaire $commentaire, EntityManagerInterface $entityManager): Response
+    {
+        // Check if user is owner or admin
+        if ($this->getUser() === $commentaire->getUser() || $this->isGranted('ROLE_ADMIN')) {
+            $content = $request->request->get('contenu');
+            $token = $request->request->get('_token');
+
+            if ($this->isCsrfTokenValid('edit_comment'.$commentaire->getCommentaireId(), $token) && !empty(trim($content))) {
+                $commentaire->setContenu($content);
+                $entityManager->flush();
+            }
+        }
+
+        $referer = $request->headers->get('referer');
+        return $referer ? $this->redirect($referer) : $this->redirectToRoute('app_poste_index');
+    }
+
     #[Route('/delete/{commentaireId}', name: 'app_commentaire_delete', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function delete(Request $request, Commentaire $commentaire, EntityManagerInterface $entityManager): Response

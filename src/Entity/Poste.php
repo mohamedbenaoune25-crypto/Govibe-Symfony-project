@@ -46,6 +46,9 @@ class Poste
     #[ORM\OneToMany(mappedBy: 'poste', targetEntity: Commentaire::class, cascade: ['remove'])]
     private Collection $commentaires;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $localisation = null;
+
     public function __construct()
     {
         $this->dateCreation = new \DateTime();
@@ -173,6 +176,18 @@ class Poste
                 $commentaire->setPoste(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLocalisation(): ?string
+    {
+        return $this->localisation;
+    }
+
+    public function setLocalisation(?string $localisation): static
+    {
+        $this->localisation = $localisation;
 
         return $this;
     }

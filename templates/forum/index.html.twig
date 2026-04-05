@@ -1,10 +1,12 @@
-{% extends 'base.html.twig' %}
+{% extends is_granted('ROLE_ADMIN') ? 'admin/base_admin.html.twig' : 'base.html.twig' %}
+
+{% block page_title %}Communautés Forums{% endblock %}
 
 {% block title %}Explorez les Communautés Forums{% endblock %}
 
 {% block body %}
-<!-- Hero Section -->
-<div class="container-fluid bg-white py-5 shadow-sm text-center mb-5 border-bottom rounded-bottom-5 px-lg-5">
+<!-- Forum Hero Header -->
+<div class="container-fluid bg-white {% if is_granted('ROLE_ADMIN') %}py-4 mb-4{% else %}py-5 mb-5{% endif %} shadow-sm border-bottom rounded-bottom-5 px-lg-5 position-relative overflow-hidden">
     <div class="row align-items-center justify-content-center">
         <div class="col-lg-8">
             <h1 class="display-3 fw-bold text-dark mb-3 animate-fade-in-up">Communautés <span style="color: #52BE80;">GoVibe</span></h1>
@@ -19,21 +21,30 @@
                     </button>
                 {% endif %}
                 <div class="dropdown">
-                    <button class="btn btn-outline-secondary rounded-pill px-4 py-3 fw-bold dropdown-toggle border-2" type="button" data-bs-toggle="dropdown">
-                        Trier par : Tous
+                    <button class="btn btn-outline-secondary rounded-pill px-4 py-3 fw-bold dropdown-toggle border-2 shadow-sm" type="button" data-bs-toggle="dropdown">
+                        Trier par : 
+                        {% if current_sort == 'popular' %}Les plus populaires
+                        {% elseif current_sort == 'newest' %}Nouveautés
+                        {% elseif current_sort == 'private' %}Privés
+                        {% elseif current_sort == 'mine' %}Mes Forums
+                        {% else %}Tous{% endif %}
                     </button>
-                    <ul class="dropdown-menu shadow border-0 rounded-4">
-                        <li><a class="dropdown-item py-2" href="#">Les plus populaires</a></li>
-                        <li><a class="dropdown-item py-2" href="#">Nouveautés</a></li>
-                        <li><a class="dropdown-item py-2" href="#">Privés</a></li>
+                    <ul class="dropdown-menu shadow-lg border-0 rounded-4 p-2">
+                        {% if app.user %}
+                            <li><a class="dropdown-item rounded-3 py-2 {{ current_sort == 'mine' ? 'active bg-success text-white fw-bold' : '' }}" href="{{ path('app_forum_index', {'sort': 'mine'}) }}">Mes Forums</a></li>
+                            <li><hr class="dropdown-divider opacity-10"></li>
+                        {% endif %}
+                        <li><a class="dropdown-item rounded-3 py-2 {{ current_sort == 'popular' ? 'active bg-success' : '' }}" href="{{ path('app_forum_index', {'sort': 'popular'}) }}">Les plus populaires</a></li>
+                        <li><a class="dropdown-item rounded-3 py-2 {{ current_sort == 'newest' ? 'active bg-success' : '' }}" href="{{ path('app_forum_index', {'sort': 'newest'}) }}">Nouveautés</a></li>
+                        <li><a class="dropdown-item rounded-3 py-2 {{ current_sort == 'private' ? 'active bg-success' : '' }}" href="{{ path('app_forum_index', {'sort': 'private'}) }}">Privés</a></li>
                     </ul>
                 </div>
             </div>
             
             <div class="d-flex justify-content-center gap-5 mt-4 opacity-50 small fw-bold text-uppercase ls-1">
-                <span><i class="bi bi-people-fill me-2"></i>{{ forums|length * 42 }}+ Membres</span>
-                <span><i class="bi bi-chat-left-fill me-2"></i>{{ forums|length }}+ Forums</span>
-                <span><i class="bi bi-cpu-fill me-2"></i>Actif en continu</span>
+                <span><i class="bi bi-people-fill me-2 text-success"></i>{{ totalMembers }} Membres</span>
+                <span><i class="bi bi-chat-left-fill me-2 text-success"></i>{{ forums|length }}+ Forums</span>
+                <span><i class="bi bi-cpu-fill me-2 text-success"></i>Actif en continu</span>
             </div>
         </div>
     </div>

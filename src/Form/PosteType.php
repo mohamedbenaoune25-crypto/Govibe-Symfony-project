@@ -27,6 +27,11 @@ class PosteType extends AbstractType
                 'attr' => ['class' => 'd-none'] // We will use a custom button
             ])
 
+            ->add('localisation', null, [
+                'label' => 'Localisation',
+                'required' => false,
+                'attr' => ['placeholder' => 'Ajouter un lieu (ex: Paris, France)']
+            ])
             ->add('forum', EntityType::class, [
                 'class' => Forum::class,
                 'choice_label' => 'name',

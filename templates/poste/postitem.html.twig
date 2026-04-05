@@ -1,216 +1,296 @@
 {# templates/poste/postitem.html.twig #}
-<div class="card mb-5 border-0 shadow-sm rounded-4 overflow-hidden mx-auto" style="max-width: 900px; background-color: #ffffff;">
+<div class="card mb-5 border-0 shadow-sm rounded-4 overflow-hidden mx-auto post-item-card" style="max-width: 900px; background-color: rgba(255, 255, 255, 0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);">
     <!-- Post Header -->
-    <div class="card-header bg-white border-0 d-flex align-items-center justify-content-between p-4">
+    <div class="card-header bg-transparent border-0 d-flex align-items-center justify-content-between p-4">
         <div class="d-flex align-items-center">
             <div class="avatar-circle rounded-circle d-flex align-items-center justify-content-center text-white fw-bold me-3" 
                  style="width: 60px; height: 60px; background-color: #52BE80; font-size: 1.3rem;">
                 {{ (poste.user ? (poste.user.prenom|first ~ poste.user.nom|first)|upper : 'AD') }}
             </div>
             <div>
-                <h5 class="mb-0 fw-bold text-dark">{{ poste.user ? poste.user.prenom ~ ' ' ~ poste.user.nom : 'Admin User' }}</h5>
+                <h5 class="mb-0 fw-bold text-dark" style="font-family: 'Outfit', sans-serif;">{{ poste.user ? poste.user.prenom ~ ' ' ~ poste.user.nom : 'Admin User' }}</h5>
                 <div class="d-flex align-items-center gap-2 text-muted small mt-1">
-                    <span style="color: #AAB7B8;">{{ poste.user ? poste.user.email|split('@')|first : 'admin_govibe' }}</span>
+                    <span style="color: #64748b;">{{ poste.user ? poste.user.email|split('@')|first : 'admin_govibe' }}</span>
                     <span class="opacity-50">&bull;</span>
-                    <span style="color: #AAB7B8;">{{ poste.dateCreation|date('Y-m-d H:i:s.0') }}</span>
+                    <span style="color: #64748b;">{{ poste.dateCreation|date('d M Y, H:i') }}</span>
+                    {% if poste.localisation %}
+                        <span class="opacity-50">&bull;</span>
+                        <span class="text-success small fw-bold d-flex align-items-center gap-1">
+                            <i class="bi bi-geo-alt-fill"></i>{{ poste.localisation }}
+                        </span>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <div class="dropdown">
-            <button class="btn btn-link link-secondary p-0" type="button" data-bs-toggle="dropdown">
-                <i class="bi bi-three-dots-vertical fs-5"></i>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
-                <li><button class="dropdown-item py-2" type="button" onclick="openPostModal('{{ path('app_poste_edit', {'postId': poste.postId}) }}')"><i class="bi bi-pencil me-2"></i> Edit</button></li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                    <form method="post" action="{{ path('app_poste_delete', {'postId': poste.postId}) }}" onsubmit="return confirm('Delete this post?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ poste.postId) }}">
-                        <button class="dropdown-item text-danger py-2"><i class="bi bi-trash me-2"></i> Delete</button>
-                    </form>
-                </li>
-            </ul>
-        </div>
+        {% if is_granted('ROLE_ADMIN') or (app.user and app.user == poste.user) %}
+            <div class="dropdown">
+                <button class="btn btn-link link-secondary p-0 shadow-none" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-three-dots-vertical fs-5"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2">
+                    <li><button class="dropdown-item py-2 rounded-3" type="button" onclick="openPostModal('{{ path('app_poste_edit', {'postId': poste.postId}) }}')"><i class="bi bi-pencil me-2"></i> Modifier</button></li>
+                    <li><hr class="dropdown-divider opacity-10"></li>
+                    <li>
+                        <form method="post" action="{{ path('app_poste_delete', {'postId': poste.postId}) }}" onsubmit="return confirm('Voulez-vous supprimer cette publication ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ poste.postId) }}">
+                            <button class="dropdown-item text-danger py-2 rounded-3"><i class="bi bi-trash me-2"></i> Supprimer</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
     </div>
 
     <!-- Post Content -->
     <div class="card-body px-4 pt-1">
-        <p class="post-text fs-5 mb-4 px-1" style="color: #2C3E50;">
-            {{ poste.contenu }}
+        <p class="post-text mb-4 px-1" style="color: #1e293b; font-size: 1.15rem; line-height: 1.6;">
+            {{ poste.contenu|nl2br }}
         </p>
 
         {% if poste.url %}
-            <div class="post-media-container text-center bg-light rounded-4 overflow-hidden mb-4 mx-2">
+            <div class="post-media-container text-center bg-light bg-opacity-50 rounded-4 overflow-hidden mb-4 mx-2 border">
                 <img src="{{ poste.url }}" class="img-fluid" 
-                     style="max-height: 500px; width: auto; display: inline-block;"
-                     onerror="this.src='https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1200'; this.onerror=null;">
+                     style="max-height: 500px; width: 100%; object-fit: cover; display: inline-block;"
+                     onerror="this.src='/img/placeholder.jpg'; this.onerror=null;">
             </div>
         {% endif %}
     </div>
+
     <!-- Post Footer -->
-    <div class="card-footer bg-white border-top p-4 d-flex align-items-center justify-content-between">
-        <div class="d-flex gap-5">
-            <span class="fw-bold text-dark"><span class="me-1">{{ poste.likes|default(0) }}</span> Likes</span>
-            <span class="fw-bold text-dark"><span class="me-1">{{ poste.commentaires|length }}</span> Comm.</span>
+    <div class="card-footer bg-transparent border-top p-4 d-flex align-items-center justify-content-between">
+        <div class="d-flex gap-4">
+            <button class="btn btn-link link-dark text-decoration-none fw-bold p-0 d-flex align-items-center gap-2 group transition-all">
+                <div class="icon-sq bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="bi bi-heart-fill small"></i>
+                </div>
+                <span>{{ poste.likes|default(0) }} <span class="d-none d-sm-inline">Likes</span></span>
+            </button>
+            <button class="btn btn-link link-dark text-decoration-none fw-bold p-0 d-flex align-items-center gap-2" onclick="toggleComments({{ poste.postId }})">
+                <div class="icon-sq bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                    <i class="bi bi-chat-dots-fill small"></i>
+                </div>
+                <span>{{ poste.commentaires|length }} <span class="d-none d-sm-inline">Commentaires</span></span>
+                <i class="bi bi-chevron-down small opacity-50 ms-1 transition-all" id="chevron-{{ poste.postId }}"></i>
+            </button>
         </div>
-        <div class="d-flex gap-3">
-            {% if is_granted('ROLE_ADMIN') or (app.user and app.user == poste.user) %}
-                <button type="button" onclick="openPostModal('{{ path('app_poste_edit', {'postId': poste.postId}) }}')" 
-                   class="btn px-4 py-2 rounded-3 fw-bold border-0 transition-hover" 
-                   style="background-color: #E9F7EF; color: #1E8449;">
-                    Modifier
-                </button>
-                
-                <form method="post" action="{{ path('app_poste_delete', {'postId': poste.postId}) }}" onsubmit="return confirm('Delete this post?');">
-                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ poste.postId) }}">
-                    <button class="btn px-4 py-2 rounded-3 fw-bold border-0 transition-hover" 
-                            style="background-color: #FDEDEC; color: #C0392B;">
-                        Supprimer
-                    </button>
+    </div>
+
+    <!-- Collapsible Comments Section -->
+    <div class="comments-section bg-light bg-opacity-25 border-top" id="comments-{{ poste.postId }}" style="display: none;">
+        <div class="p-4">
+            <h6 class="fw-bold mb-4 px-1 text-secondary small text-uppercase ls-1">Fil de discussion</h6>
+            
+            <div class="comments-list">
+                {% for comment in poste.commentaires|filter(c => c.parentId == 0) %}
+                    <!-- Parent Comment -->
+                    <div class="comment-wrapper mb-4">
+                        <div class="comment d-flex gap-3 animate-fade-in">
+                            <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                                 style="width: 40px; height: 40px; background-color: #64748b; font-size: 0.85rem; flex-shrink: 0;">
+                                {{ (comment.user ? (comment.user.prenom|first ~ comment.user.nom|first)|upper : 'U') }}
+                            </div>
+                            <div class="comment-bubble bg-white rounded-4 p-3 shadow-sm flex-grow-1 position-relative border border-light">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <span class="fw-bold small text-dark">{{ comment.user ? comment.user.prenom ~ ' ' ~ comment.user.nom : 'Utilisateur' }}</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted" style="font-size: 0.7rem;">{{ comment.dateCreation|date('d M, H:i') }}</span>
+                                        
+                                        {% if is_granted('ROLE_ADMIN') or (app.user and app.user == comment.user) %}
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-link text-muted p-0 opacity-50" type="button" data-bs-toggle="dropdown">
+                                                    <i class="bi bi-three-dots"></i>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-1">
+                                                    <li><button class="dropdown-item py-1 px-3 small rounded-2" onclick="showEditComment({{ comment.commentaireId }})"><i class="bi bi-pencil me-2"></i>Modifier</button></li>
+                                                    <li>
+                                                        <form method="post" action="{{ path('app_commentaire_delete', {'commentaireId': comment.commentaireId}) }}" onsubmit="return confirm('Supprimer ce commentaire ?');">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.commentaireId) }}">
+                                                            <button class="dropdown-item py-1 px-3 small text-danger rounded-2"><i class="bi bi-trash me-2"></i>Supprimer</button>
+                                                        </form>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <p class="mb-0 small text-secondary" style="line-height: 1.5; font-size: 0.9rem;" id="comment-text-{{ comment.commentaireId }}">{{ comment.contenu }}</p>
+                                
+                                <!-- Inline Edit Form -->
+                                <form id="edit-form-{{ comment.commentaireId }}" style="display: none;" method="post" action="{{ path('app_commentaire_edit', {'commentaireId': comment.commentaireId}) }}" class="mt-2">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('edit_comment' ~ comment.commentaireId) }}">
+                                    <textarea name="contenu" class="form-control form-control-sm rounded-3 mb-2" rows="2">{{ comment.contenu }}</textarea>
+                                    <div class="d-flex gap-2">
+                                        <button type="submit" class="btn btn-sm btn-success px-3 rounded-pill fw-bold">Sauvegarder</button>
+                                        <button type="button" class="btn btn-sm btn-light px-3 rounded-pill" onclick="hideEditComment({{ comment.commentaireId }})">Annuler</button>
+                                    </div>
+                                </form>
+
+                                <!-- Comment Actions -->
+                                <div class="d-flex align-items-center gap-3 mt-3">
+                                    <form method="post" action="{{ path('app_commentaire_like', {'commentaireId': comment.commentaireId}) }}" class="d-inline">
+                                        <button class="btn btn-link p-0 text-muted small text-decoration-none hover-mint d-flex align-items-center gap-1">
+                                            <i class="bi bi-hand-thumbs-up"></i><span>{{ comment.likes }}</span>
+                                        </button>
+                                    </form>
+                                    <button type="button" onclick="toggleReplyForm({{ comment.commentaireId }})" class="btn btn-link p-0 text-secondary fw-bold small text-decoration-none hover-mint" style="font-size: 0.75rem;">
+                                        Répondre
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Replies Container -->
+                        {% set replies = poste.commentaires|filter(r => r.parentId == comment.commentaireId) %}
+                        {% if replies|length > 0 or is_granted('ROLE_USER') %}
+                            <div class="replies-container ms-5 mt-3 border-start ps-4">
+                                {% for reply in replies %}
+                                    <div class="reply mb-3 d-flex gap-2 animate-fade-in">
+                                        <div class="avatar-xs rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                                             style="width: 32px; height: 32px; background-color: #94a3b8; font-size: 0.7rem; flex-shrink: 0;">
+                                            {{ (reply.user ? (reply.user.prenom|first ~ reply.user.nom|first)|upper : 'U') }}
+                                        </div>
+                                        <div class="comment-bubble bg-white rounded-4 p-2 px-3 border border-light flex-grow-1 position-relative shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="fw-bold" style="font-size: 0.8rem;">{{ reply.user ? reply.user.prenom ~ ' ' ~ reply.user.nom : 'Utilisateur' }}</span>
+                                                {% if is_granted('ROLE_ADMIN') or (app.user and app.user == reply.user) %}
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-sm btn-link text-muted p-0 opacity-50" type="button" data-bs-toggle="dropdown">
+                                                            <i class="bi bi-three-dots" style="font-size: 0.7rem;"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 p-1">
+                                                            <li><button class="dropdown-item py-1 px-3 x-small rounded-2" onclick="showEditComment({{ reply.commentaireId }})"><i class="bi bi-pencil me-1"></i>Modifier</button></li>
+                                                            <li>
+                                                                <form method="post" action="{{ path('app_commentaire_delete', {'commentaireId': reply.commentaireId}) }}" onsubmit="return confirm('Supprimer ?');">
+                                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ reply.commentaireId) }}">
+                                                                    <button class="dropdown-item py-1 px-3 x-small text-danger rounded-2"><i class="bi bi-trash me-1"></i>Supprimer</button>
+                                                                </form>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <p class="mb-0 small text-secondary" id="comment-text-{{ reply.commentaireId }}">{{ reply.contenu }}</p>
+                                            
+                                            <!-- Inline Edit Form (Reply) -->
+                                            <form id="edit-form-{{ reply.commentaireId }}" style="display: none;" method="post" action="{{ path('app_commentaire_edit', {'commentaireId': reply.commentaireId}) }}" class="mt-2">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('edit_comment' ~ reply.commentaireId) }}">
+                                                <textarea name="contenu" class="form-control form-control-sm rounded-3 mb-2" rows="1" style="font-size: 0.8rem;">{{ reply.contenu }}</textarea>
+                                                <div class="d-flex gap-2">
+                                                    <button type="submit" class="btn btn-sm btn-success px-2 py-0 rounded-pill fw-bold small" style="font-size: 0.7rem;">OK</button>
+                                                    <button type="button" class="btn btn-sm btn-light px-2 py-0 rounded-pill small" style="font-size: 0.7rem;" onclick="hideEditComment({{ reply.commentaireId }})">Annuler</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                                <!-- Inline Reply Form -->
+                                {% if is_granted('ROLE_USER') %}
+                                    <div id="reply-form-{{ comment.commentaireId }}" class="mt-3" style="display: none;">
+                                        <form method="post" action="{{ path('app_commentaire_reply', {'postId': poste.postId, 'parentId': comment.commentaireId}) }}" class="d-flex gap-2 align-items-center" novalidate>
+                                            <input type="hidden" name="_token" value="{{ csrf_token('add_comment') }}">
+                                            <input type="text" name="contenu" class="form-control form-control-sm border-0 rounded-pill px-3 bg-white shadow-sm" style="font-size: 0.85rem;" placeholder="Votre réponse...">
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold" style="background-color: #52BE80; font-size: 0.8rem;">Répondre</button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p class="text-center text-muted small py-3">Aucun commentaire pour le moment.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Add Comment Input (Top Level) -->
+            {% if is_granted('ROLE_USER') %}
+                <form method="post" action="{{ path('app_commentaire_new', {'postId': poste.postId}) }}" class="mt-4 pt-4 border-top d-flex gap-3 align-items-center" novalidate>
+                    <input type="hidden" name="_token" value="{{ csrf_token('add_comment') }}">
+                    <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
+                         style="width: 44px; height: 44px; background-color: #52BE80; font-size: 0.9rem; flex-shrink: 0;">
+                        {{ (app.user.prenom|first ~ app.user.nom|first)|upper }}
+                    </div>
+                    <div class="flex-grow-1 position-relative">
+                        <textarea name="contenu" class="form-control border-0 rounded-4 px-4 py-3 bg-white shadow-sm" style="resize: none; font-size: 0.95rem;" placeholder="Écrire un commentaire..." rows="1"></textarea>
+                        <button type="submit" class="btn position-absolute top-50 end-0 translate-middle-y me-2" 
+                                style="color: #52BE80; border: 0; background: none;">
+                            <i class="bi bi-send-fill" style="font-size: 1.2rem;"></i>
+                        </button>
+                    </div>
                 </form>
             {% endif %}
         </div>
     </div>
-    <!-- Comments Section -->
-    <div class="comments-section bg-light border-top p-4" style="background-color: #F8F9F9 !important;">
-        <h6 class="fw-bold mb-4 px-1" style="color: #566573;">Commentaires ({{ poste.commentaires|length }})</h6>
-        
-        <div class="comments-list">
-            {% for comment in poste.commentaires|filter(c => c.parentId == 0) %}
-                <!-- Parent Comment -->
-                <div class="comment-wrapper mb-4">
-                    <div class="comment d-flex gap-3 animate-fade-in">
-                        <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
-                             style="width: 38px; height: 38px; background-color: #5D6D7E; font-size: 0.8rem; flex-shrink: 0;">
-                            {{ (comment.user ? (comment.user.prenom|first ~ comment.user.nom|first)|upper : 'U') }}
-                        </div>
-                        <div class="comment-bubble bg-white rounded-4 p-3 shadow-sm flex-grow-1 position-relative border border-light">
-                            <div class="d-flex justify-content-between align-items-start mb-1">
-                                <span class="fw-bold small text-dark">{{ comment.user ? comment.user.prenom ~ ' ' ~ comment.user.nom : 'Unknown User' }}</span>
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="text-muted" style="font-size: 0.7rem;">{{ comment.dateCreation|date('d M, H:i') }}</span>
-                                    {% if is_granted('ROLE_ADMIN') or (app.user and app.user == comment.user) %}
-                                        <form method="post" action="{{ path('app_commentaire_delete', {'commentaireId': comment.commentaireId}) }}" onsubmit="return confirm('Supprimer ce commentaire ?');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ comment.commentaireId) }}">
-                                            <button class="btn btn-link link-danger p-0 opacity-50 hover-opacity-100" style="font-size: 0.9rem; line-height: 1;"><i class="bi bi-trash-fill"></i></button>
-                                        </form>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <p class="mb-2 small text-secondary" style="line-height: 1.4;">{{ comment.contenu }}</p>
-                            
-                            <!-- Comment Actions (Like/Dislike/Reply) -->
-                            <div class="d-flex align-items-center gap-3 mt-1">
-                                <form method="post" action="{{ path('app_commentaire_like', {'commentaireId': comment.commentaireId}) }}" class="d-inline">
-                                    <button class="btn btn-link p-0 text-muted small text-decoration-none hover-mint">
-                                        <i class="bi bi-hand-thumbs-up me-1"></i>{{ comment.likes }}
-                                    </button>
-                                </form>
-                                <form method="post" action="{{ path('app_commentaire_dislike', {'commentaireId': comment.commentaireId}) }}" class="d-inline">
-                                    <button class="btn btn-link p-0 text-primary small text-decoration-none hover-red" style="--hover-color: #E74C3C;">
-                                        <i class="bi bi-hand-thumbs-down me-1"></i>{{ comment.dislikes }}
-                                    </button>
-                                </form>
-                                <button type="button" onclick="toggleReplyForm({{ comment.commentaireId }})" class="btn btn-link p-0 text-secondary fw-bold small text-decoration-none hover-mint" style="font-size: 0.75rem;">
-                                    Répondre
-                                </button>
-                            </div>
-
-
-                        </div>
-                    </div>
-
-                    <!-- Replies Count Header (Optional) -->
-                    {% set replies = poste.commentaires|filter(r => r.parentId == comment.commentaireId) %}
-                    
-                    <!-- Nested Replies -->
-                    <div class="replies-container ms-5 mt-3 border-start ps-3">
-                        {% for reply in replies %}
-                            <div class="reply mb-3 d-flex gap-2 animate-fade-in">
-                                <div class="avatar-xs rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
-                                     style="width: 28px; height: 28px; background-color: #AAB7B8; font-size: 0.65rem; flex-shrink: 0;">
-                                    {{ (reply.user ? (reply.user.prenom|first ~ reply.user.nom|first)|upper : 'U') }}
-                                </div>
-                                <div class="comment-bubble bg-white bg-opacity-75 rounded-4 p-2 px-3 shadow-none border border-light flex-grow-1 position-relative">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <span class="fw-bold" style="font-size: 0.8rem;">{{ reply.user ? reply.user.prenom ~ ' ' ~ reply.user.nom : 'User' }}</span>
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="text-muted" style="font-size: 0.65rem;">{{ reply.dateCreation|date('H:i') }}</span>
-                                            {% if is_granted('ROLE_ADMIN') or (app.user and app.user == reply.user) %}
-                                                <form method="post" action="{{ path('app_commentaire_delete', {'commentaireId': reply.commentaireId}) }}" onsubmit="return confirm('Supprimer ?');">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_comment' ~ reply.commentaireId) }}">
-                                                    <button class="btn btn-link link-danger p-0 opacity-50 hover-opacity-100" style="font-size: 0.75rem; line-height: 1;"><i class="bi bi-trash-fill"></i></button>
-                                                </form>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <p class="mb-0 small text-secondary">{{ reply.contenu }}</p>
-                                    
-
-                                </div>
-                            </div>
-                        {% endfor %}
-
-                        <!-- Inline Reply Form (Hidden by default) -->
-                        {% if is_granted('ROLE_USER') %}
-                            <div id="reply-form-{{ comment.commentaireId }}" class="mt-2" style="display: none;">
-                                <form method="post" action="{{ path('app_commentaire_reply', {'postId': poste.postId, 'parentId': comment.commentaireId}) }}" class="d-flex gap-2 align-items-center">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('add_comment') }}">
-                                    <input type="text" name="contenu" class="form-control form-control-sm border-0 rounded-pill px-3 bg-white shadow-sm" style="font-size: 0.85rem;" placeholder="Votre réponse..." required>
-                                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold" style="background-color: #52BE80; font-size: 0.8rem;">Répondre</button>
-                                </form>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% else %}
-                <p class="text-center text-muted small py-3">Aucun commentaire pour le moment. Soyez le premier !</p>
-            {% endfor %}
-        </div>
-
-        <!-- Add Comment Input (Top Level) -->
-        {% if is_granted('ROLE_USER') %}
-            <form method="post" action="{{ path('app_commentaire_new', {'postId': poste.postId}) }}" class="mt-4 pt-3 border-top d-flex gap-2 align-items-center">
-                <input type="hidden" name="_token" value="{{ csrf_token('add_comment') }}">
-                <div class="avatar-sm rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm me-1" 
-                     style="width: 38px; height: 38px; background-color: #52BE80; font-size: 0.8rem; flex-shrink: 0;">
-                    {{ (app.user.prenom|first ~ app.user.nom|first)|upper }}
-                </div>
-                <div class="flex-grow-1 position-relative">
-                    <textarea name="contenu" class="form-control border-0 rounded-pill px-4 py-2 bg-white shadow-sm" style="resize: none; font-size: 0.95rem;" placeholder="Votre commentaire..." required rows="1"></textarea>
-                </div>
-                <button type="submit" class="btn btn-send rounded-circle d-flex align-items-center justify-content-center transition-hover" 
-                        style="width: 40px; height: 40px; background-color: #52BE80; border: 0; min-width: 40px;">
-                    <i class="bi bi-send-fill text-white" style="font-size: 1rem;"></i>
-                </button>
-            </form>
-        {% else %}
-            <div class="text-center mt-3 p-3 bg-white rounded-4 border border-dashed text-muted small">
-                <i class="bi bi-lock me-2"></i>Veuillez <a href="{{ path('app_login') }}" class="text-decoration-none fw-bold" style="color: #52BE80;">vous connecter</a> pour participer à la discussion.
-            </div>
-        {% endif %}
-    </div>
 </div>
 
-{% block javascripts %}
 <script>
+    function toggleComments(id) {
+        const el = document.getElementById('comments-' + id);
+        const chev = document.getElementById('chevron-' + id);
+        if (el) {
+            const isHidden = el.style.display === 'none';
+            el.style.display = isHidden ? 'block' : 'none';
+            chev.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    }
+
     function toggleReplyForm(id) {
         const el = document.getElementById('reply-form-' + id);
         if (el) {
             el.style.display = el.style.display === 'none' ? 'block' : 'none';
+            if (el.style.display === 'block') {
+                el.querySelector('input').focus();
+            }
         }
     }
+
+    function showEditComment(id) {
+        document.getElementById('comment-text-' + id).style.display = 'none';
+        document.getElementById('edit-form-' + id).style.display = 'block';
+        document.getElementById('edit-form-' + id).querySelector('textarea').focus();
+    }
+
+    function hideEditComment(id) {
+        document.getElementById('comment-text-' + id).style.display = 'block';
+        document.getElementById('edit-form-' + id).style.display = 'none';
+    }
+
+    // Global Validation for Comments/Replies
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (form.matches('form[action*="/commentaire/new/"], form[action*="/commentaire/reply/"], form[action*="/commentaire/edit/"]')) {
+            const input = form.querySelector('textarea[name="contenu"], input[name="contenu"]');
+            if (input && input.value.trim() === '') {
+                e.preventDefault();
+                input.classList.add('is-invalid-custom');
+                input.focus();
+                return false;
+            }
+        }
+    });
+
+    document.addEventListener('input', function(e) {
+        if (e.target.matches('textarea[name="contenu"], input[name="contenu"]')) {
+            if (e.target.value.trim() !== '') {
+                e.target.classList.remove('is-invalid-custom');
+            }
+        }
+    });
 </script>
-{% endblock %}
 
 <style>
-    .transition-hover { transition: transform 0.2s, opacity 0.2s; }
-    .transition-hover:hover { transform: translateY(-2px); opacity: 0.9; }
-    .hover-opacity-100:hover { opacity: 1 !important; }
-    .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .post-item-card { transition: all 0.3s ease; }
+    .ls-1 { letter-spacing: 1px; }
+    .x-small { font-size: 0.75rem; }
+    .hover-bg-light:hover { background-color: rgba(34, 197, 94, 0.04); }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .hover-mint:hover { color: #52BE80 !important; transform: scale(1.1); }
+    .backdrop-blur { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
     
-    .hover-mint:hover { color: #52BE80 !important; }
-    .hover-red:hover { color: #E74C3C !important; }
-    .avatar-xs { font-family: 'Outfit', sans-serif; }
+    .is-invalid-custom {
+        border: 2px solid #E74C3C !important;
+        background-color: rgba(231, 76, 60, 0.02) !important;
+        box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.1) !important;
+    }
 </style>

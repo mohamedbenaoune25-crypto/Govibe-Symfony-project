@@ -429,6 +429,16 @@
                 </a>
             </li>
             <li class="sidebar-nav-item">
+                <a href="{{ path('app_poste_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_poste' %}active{% endif %}">
+                    <i class="bi bi-chat-square-text"></i> Publications
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_forum_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_forum' %}active{% endif %}">
+                    <i class="bi bi-collection"></i> Forums
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_checkouts_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_checkouts' %}active{% endif %}">
                     <i class="bi bi-ticket-perforated"></i> Checkouts
                 </a>

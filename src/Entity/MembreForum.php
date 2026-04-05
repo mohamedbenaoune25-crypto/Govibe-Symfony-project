@@ -23,9 +23,13 @@ class MembreForum
     #[ORM\Column(name: 'date_adhesion', type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $dateAdhesion = null;
 
+    #[ORM\Column(name: 'status', length: 20, options: ['default' => 'PENDING'])]
+    private ?string $status = 'PENDING';
+
     public function __construct()
     {
         $this->dateAdhesion = new \DateTime();
+        $this->status = 'PENDING';
     }
 
     public function getForum(): ?Forum
@@ -58,6 +62,17 @@ class MembreForum
     public function setDateAdhesion(?\DateTimeInterface $dateAdhesion): self
     {
         $this->dateAdhesion = $dateAdhesion;
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
         return $this;
     }
 }

@@ -8,7 +8,10 @@ use App\Entity\Poste;
 use App\Form\PosteType;
 use App\Repository\MembreForumRepository;
 use App\Repository\PosteRepository;
+use App\Repository\ForumRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,14 +24,75 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PosteController extends AbstractController
 {
     #[Route('/', name: 'app_poste_index', methods: ['GET'])]
-    public function index(PosteRepository $posteRepository): Response
+    public function index(Request $request, PosteRepository $posteRepository, ForumRepository $forumRepository): Response
     {
-        // Display only global posts (those without a forum)
-        $postes = $posteRepository->findBy(['forum' => null], ['dateCreation' => 'DESC']);
+        $query = $request->query->get('q');
+        $sort = $request->query->get('sort', 'newest');
+        $user = $this->getUser();
+        
+        // Fetch posts with search, sort and personal filter
+        $postes = $posteRepository->searchAndSort($query, $sort, true, null, $user);
+        
+        // Fetch forums for sidebar
+        $forums = $forumRepository->findAll();
 
         return $this->render('poste/index.html.twig', [
             'postes' => $postes,
-            'title' => 'Community Feed'
+            'forums' => $forums,
+            'current_query' => $query,
+            'current_sort' => $sort,
+            'title' => $sort === 'mine' ? 'Mes Publications' : 'Community Feed'
+        ]);
+    }
+
+    #[Route('/export/pdf', name: 'app_poste_export_pdf', methods: ['GET'])]
+    public function exportPdf(PosteRepository $posteRepository): Response
+    {
+        $postes = $posteRepository->findBy(['forum' => null], ['dateCreation' => 'DESC']);
+        
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->set('isRemoteEnabled', true);
+        
+        $dompdf = new Dompdf($pdfOptions);
+        
+        $html = $this->renderView('poste/pdf_export.html.twig', [
+            'postes' => $postes
+        ]);
+        
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="publications_govibe.pdf"'
+        ]);
+    }
+
+    #[Route('/export/excel', name: 'app_poste_export_excel', methods: ['GET'])]
+    public function exportExcel(PosteRepository $posteRepository): Response
+    {
+        $postes = $posteRepository->findBy(['forum' => null], ['dateCreation' => 'DESC']);
+        
+        $csvData = "ID;Auteur;Contenu;Date;Likes;Commentaires\n";
+        foreach ($postes as $p) {
+            $auteur = $p->getUser() ? $p->getUser()->getPrenom() . ' ' . $p->getUser()->getNom() : 'Anonyme';
+            $contenu = str_replace([';', "\n", "\r"], [' ', ' ', ' '], $p->getContenu());
+            $csvData .= sprintf(
+                "%d;%s;%s;%s;%d;%d\n",
+                $p->getPostId(),
+                $auteur,
+                $contenu,
+                $p->getDateCreation()->format('Y-m-d H:i'),
+                $p->getLikes(),
+                count($p->getCommentaires())
+            );
+        }
+
+        return new Response($csvData, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="publications_govibe.csv"'
         ]);
     }
 

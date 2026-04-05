@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Personne;
 use App\Entity\Reclamation;
+use App\Entity\Poste;
+use App\Entity\Forum;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,14 +34,17 @@ class AdminController extends AbstractController
         $chartLabels = [];
         $chartData = [];
         
-        // Initialiser avec 0
+        $frenchMonths = [
+            '01' => 'Janv.', '02' => 'Févr.', '03' => 'Mars', '04' => 'Avr.', '05' => 'Mai', '06' => 'Juin',
+            '07' => 'Juil.', '08' => 'Août', '09' => 'Sept.', '10' => 'Oct.', '11' => 'Nov.', '12' => 'Déc.'
+        ];
+
         for ($i = 5; $i >= 0; $i--) {
             $d = (new \DateTime())->modify("-$i months");
             $key = $d->format('Y-m');
+            $monthNum = $d->format('m');
             
-            // Format fr : janv., févr., etc.
-            $formatter = new \IntlDateFormatter('fr_FR', \IntlDateFormatter::NONE, \IntlDateFormatter::NONE, null, null, 'MMM');
-            $label = ucfirst($formatter->format($d));
+            $label = $frenchMonths[$monthNum];
             
             $chartLabels[$key] = $label;
             $chartData[$key] = 0;
@@ -170,5 +175,49 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_reclamations');
+    }
+
+    #[Route('/publications', name: 'app_admin_postes')]
+    public function postes(EntityManagerInterface $entityManager): Response
+    {
+        $postes = $entityManager->getRepository(Poste::class)->findBy([], ['dateCreation' => 'DESC']);
+        
+        return $this->render('admin/postes.html.twig', [
+            'postes' => $postes,
+        ]);
+    }
+
+    #[Route('/forums_admin', name: 'app_admin_forums')]
+    public function forums(EntityManagerInterface $entityManager): Response
+    {
+        $forums = $entityManager->getRepository(Forum::class)->findAll();
+        
+        return $this->render('admin/forums.html.twig', [
+            'forums' => $forums,
+        ]);
+    }
+
+    #[Route('/publications/{id}/delete', name: 'app_admin_poste_delete', methods: ['POST'])]
+    public function deletePoste(Request $request, Poste $poste, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $poste->getPostId(), $request->request->get('_token'))) {
+            $entityManager->remove($poste);
+            $entityManager->flush();
+            $this->addFlash('success', 'Publication supprimée avec succès.');
+        }
+
+        return $this->redirectToRoute('app_admin_postes');
+    }
+
+    #[Route('/forums_admin/{id}/delete', name: 'app_admin_forum_delete', methods: ['POST'])]
+    public function deleteForum(Request $request, Forum $forum, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $forum->getForumId(), $request->request->get('_token'))) {
+            $entityManager->remove($forum);
+            $entityManager->flush();
+            $this->addFlash('success', 'Forum supprimé avec succès.');
+        }
+
+        return $this->redirectToRoute('app_admin_forums');
     }
 }
