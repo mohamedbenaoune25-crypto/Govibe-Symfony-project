@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Sessions - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid bg-white py-5 shadow-sm text-center mb-5 border-bottom rounded-bottom-5 px-lg-5">
+    <div class="row align-items-center justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="display-3 fw-bold text-dark mb-3 animate-fade-in-up">Planning des <span style="color: #52BE80;">Sessions</span></h1>
+            <p class="text-secondary fs-5 mb-5 opacity-75">Gérez le calendrier et les disponibilités des activités GoVibe.</p>
+            
+            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center align-items-center mb-4">
+                <a href="{{ path('app_activite_session_new') }}" 
+                   class="btn btn-success rounded-pill px-5 py-3 fw-bold shadow transition-all hover-lift-2 border-0" 
+                   style="background-color: #52BE80; font-size: 1.1rem;">
+                    <i class="bi bi-calendar-plus me-2"></i>Programmer une Session
+                </a>
+                <a href="{{ path('app_activite_index') }}" class="btn btn-outline-secondary rounded-pill px-4 py-3 fw-bold border-2">
+                    <i class="bi bi-arrow-left me-2"></i>Liste des Activités
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5 px-lg-5">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} rounded-4 border-0 shadow-sm mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="card border-0 shadow-sm rounded-5 overflow-hidden bg-white">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light text-uppercase small ls-1 fw-bold text-secondary">
+                    <tr>
+                        <th class="ps-5 py-3">Activités</th>
+                        <th class="py-3">Date</th>
+                        <th class="py-3">Heure</th>
+                        <th class="py-3">Capacité</th>
+                        <th class="py-3">Restant</th>
+                        <th class="pe-5 text-end py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for session in sessions %}
+                    <tr class="transition-all hover-lift">
+                        <td class="ps-5 py-4">
+                            <a href="{{ path('app_activite_session_show', {'idSession': session.idSession}) }}" class="text-decoration-none border-bottom border-transparent hover-border-success transition-all">
+                                <span class="fw-bold text-dark">{{ session.activite.name }}</span>
+                            </a>
+                            <br><small class="text-muted">{{ session.activite.localisation }}</small>
+                        </td>
+                        <td>{{ session.date ? session.date|date('d/m/Y') : '' }}</td>
+                        <td>{{ session.heure ? session.heure|date('H:i') : '' }}</td>
+                        <td>{{ session.capacite }}</td>
+                        <td>
+                            <span class="badge rounded-pill {% if session.nbrPlacesRestant > 5 %}bg-success{% else %}bg-warning{% endif %} px-3" style="{% if session.nbrPlacesRestant > 5 %}background-color: #52BE80;{% endif %}">
+                                {{ session.nbrPlacesRestant }} Places
+                            </span>
+                        </td>
+                        <td class="pe-5 text-end">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{{ path('app_activite_session_edit', {'idSession': session.idSession}) }}" class="btn btn-sm btn-outline-success rounded-circle border-2 p-2">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                {{ include('activite_session/_delete_form.html.twig', {'session': session}) }}
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <p class="text-muted mb-0">Aucune session programmée</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body { background-color: #F8F9F9 !important; }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .ls-1 { letter-spacing: 1px; }
+    .hover-lift:hover { background-color: #FDFEFE !important; transition: all 0.2s ease; }
+    .rounded-bottom-5 { border-bottom-left-radius: 4rem !important; border-bottom-right-radius: 4rem !important; }
+    .hover-border-success:hover { border-bottom-color: #52BE80 !important; }
+    .border-transparent { border-bottom: 2px solid transparent; }
+</style>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier la Session - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5 text-center mb-5 border-bottom rounded-bottom-5 px-lg-5 shadow-sm bg-white">
+    <h1 class="display-4 fw-bold text-dark mb-2">Modifier la <span style="color: #52BE80;">Session</span></h1>
+    <p class="text-secondary text-truncate">Pour l'activité : <strong>{{ session.activite.name }}</strong></p>
+</div>
+
+<div class="container mb-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg p-5 rounded-4 bg-white">
+                {{ form_start(form) }}
+                    {{ include('activite_session/_form.html.twig', {'button_label': 'Mettre à jour la session'}) }}
+                {{ form_end(form) }}
+                
+                <div class="text-center mt-4">
+                    <a href="{{ path('app_activite_session_index') }}" class="btn btn-outline-secondary rounded-pill px-4 py-2 border-2 text-decoration-none small">
+                        <i class="bi bi-arrow-left me-1"></i>Retour au planning
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body { background-color: #F8F9F9 !important; }
+    .rounded-bottom-5 { border-bottom-left-radius: 4rem !important; border-bottom-right-radius: 4rem !important; }
+</style>
+{% endblock %}

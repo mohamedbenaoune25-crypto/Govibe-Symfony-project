@@ -1,0 +1,87 @@
+{# templates/forum/forumitem.html.twig #}
+<div class="col h-100">
+    <div class="card h-100 border-0 shadow-sm rounded-5 overflow-hidden transition-all hover-lift bg-white">
+        <!-- Card Header / Cover -->
+        <div class="position-relative" style="height: 140px;">
+            <div class="w-100 h-100" style="background: linear-gradient(135deg, #A2D9CE 0%, #52BE80 100%);">
+                {% if forum.image %}
+                    <img src="{{ forum.image }}" class="w-100 h-100 object-fit-cover opacity-75" onerror="this.src='https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800';">
+                {% else %}
+                    <div class="w-100 h-100 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-chat-dots-fill text-white opacity-25" style="font-size: 4rem;"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if forum.isPrivate %}
+                <div class="position-absolute top-0 end-0 m-3">
+                    <span class="badge bg-danger bg-opacity-75 rounded-pill px-3 py-2 small shadow-sm"><i class="bi bi-lock-fill me-1"></i>Privé</span>
+                </div>
+            {% endif %}
+
+            <!-- Mini Avatar -->
+            <div class="position-absolute bottom-0 start-0 m-3 mb-n4 z-index-1">
+                <div class="avatar-md rounded-circle border-4 border-white shadow-sm d-flex align-items-center justify-content-center text-white fw-bold" 
+                     style="width: 50px; height: 50px; background-color: #1E8449; font-size: 1.2rem;">
+                    {{ forum.name|first|upper }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4 pt-5">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title fw-bold text-dark mb-0">{{ forum.name }}</h5>
+                <div class="dropdown">
+                    <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3">
+                        {% if is_granted('ROLE_ADMIN') or (app.user and app.user == forum.createdBy) %}
+                            <li><button class="dropdown-item py-2" type="button" onclick="openForumModal('{{ path('app_forum_edit', {'forumId': forum.forumId}) }}')"><i class="bi bi-pencil me-2"></i> Modifier</button></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="{{ path('app_forum_delete', {'forumId': forum.forumId}) }}" onsubmit="return confirm('Confirmer la suppression ?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ forum.forumId) }}">
+                                    <button class="dropdown-item text-danger py-2"><i class="bi bi-trash me-2"></i> Supprimer</button>
+                                </form>
+                            </li>
+                        {% endif %}
+                        <li><a class="dropdown-item py-2" href="#"><i class="bi bi-share me-2"></i> Partager</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <p class="card-text text-muted small mb-4" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.8rem;">
+                {{ forum.description|default('Explorez et discutez des dernières tendances avec la communauté.') }}
+            </p>
+
+            <div class="d-flex align-items-center justify-content-between bg-light rounded-4 p-3 mb-3">
+                <div class="text-center">
+                    <div class="fw-bold text-dark">{{ forum.nbrMembers }}</div>
+                    <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Membres</div>
+                </div>
+                <div class="text-center">
+                    <div class="fw-bold text-dark">{{ forum.postes|length }}</div>
+                    <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Sujets</div>
+                </div>
+                <div class="text-center">
+                    <div class="fw-bold text-dark">{{ forum.dateCreation|date('M Y') }}</div>
+                    <div class="text-muted" style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.5px;">Créé</div>
+                </div>
+            </div>
+
+            <a href="{{ path('app_forum_show', {'forumId': forum.forumId}) }}" class="btn btn-success w-100 rounded-pill fw-bold py-2 shadow-sm transition-hover border-0" 
+               style="background-color: #52BE80;">
+                Voir le Forum <i class="bi bi-arrow-right-short ms-1"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift { transition: all 0.3s ease; }
+    .hover-lift:hover { transform: translateY(-8px); box-shadow: 0 1rem 3rem rgba(0,0,0,.15) !important; }
+    .z-index-1 { z-index: 1; }
+    .object-fit-cover { object-fit: cover; }
+    .transition-hover:hover { background-color: #48AC71 !important; transform: scale(1.02); }
+</style>

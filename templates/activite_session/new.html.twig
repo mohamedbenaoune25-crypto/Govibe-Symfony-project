@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Session - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5 text-center mb-5 border-bottom rounded-bottom-5 px-lg-5 shadow-sm bg-white">
+    <h1 class="display-4 fw-bold text-dark mb-2">Programmer une <span style="color: #52BE80;">Session</span></h1>
+    <p class="text-secondary">Définissez la date et l'heure pour une activité spécifique.</p>
+</div>
+
+<div class="container mb-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-lg p-5 rounded-4 bg-white animate-fade-in-up">
+                {{ form_start(form) }}
+                    {{ include('activite_session/_form.html.twig') }}
+                {{ form_end(form) }}
+                
+                <div class="text-center mt-4">
+                    <a href="{{ path('app_activite_session_index') }}" class="btn btn-outline-secondary rounded-pill px-4 py-2 border-2 text-decoration-none small">
+                        <i class="bi bi-arrow-left me-1"></i>Retour au planning
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block style %}
+<style>
+    body { background-color: #F8F9F9 !important; }
+    .rounded-bottom-5 { border-bottom-left-radius: 4rem !important; border-bottom-right-radius: 4rem !important; }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+{% endblock %}

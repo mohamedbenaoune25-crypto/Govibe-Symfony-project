@@ -1,0 +1,104 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block page_title %}Gestion des Utilisateurs{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold" style="color:var(--admin-primary); margin:0;">
+        <i class="bi bi-people-fill me-2" style="color:var(--admin-accent);"></i> Annuaire des Comptes
+    </h4>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for u in users %}
+    <div class="col">
+        <div class="admin-card h-100 position-relative d-flex flex-column" style="overflow: hidden; padding: 25px;">
+            <!-- Badge de rôle -->
+            <div class="position-absolute" style="top: 20px; right: 20px;">
+                {% if 'admin' in u.role|lower or 'ROLE_ADMIN' in u.role %}
+                    <span class="badge" style="background:rgba(37, 99, 235, 0.1);color:#2563EB;border:1px solid rgba(37, 99, 235, 0.2);padding:6px 12px;font-weight:600;">Administrateur</span>
+                {% else %}
+                    <span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E7EB;padding:6px 12px;font-weight:600;">Utilisateur</span>
+                {% endif %}
+            </div>
+
+            <!-- Info Utilisateur -->
+            <div class="text-center mt-3 mb-4">
+                <div style="width:70px;height:70px;border-radius:16px;background:rgba(10, 25, 47, 0.04);color:var(--admin-primary);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid var(--border-color);margin:0 auto 15px;">
+                    {{ u.prenom|first|upper }}
+                </div>
+                <h5 class="fw-bold mb-1" style="color:var(--admin-primary); font-family:'Outfit', sans-serif;">{{ u.prenom }} {{ u.nom }}</h5>
+                <p class="text-muted mb-0" style="font-size: 13px;">{{ u.email }}</p>
+                <div class="mt-2 text-muted" style="font-size: 11px; text-transform:uppercase; letter-spacing:0.5px;">
+                    Réf. #{{ "%04d"|format(u.id) }} &bull; Inscrit le {{ u.createdAt ? u.createdAt|date('d/m/Y') : 'N/A' }}
+                </div>
+            </div>
+
+            <!-- Actions Pro (Boutons étirés en bas) -->
+            <div class="mt-auto d-flex flex-column gap-2">
+                <!-- Bouton Promouvoir ou Rétrograder -->
+                <form method="post" action="{{ path('app_admin_user_role', {'id': u.id}) }}" class="w-100">
+                    {% if 'admin' in u.role|lower or 'ROLE_ADMIN' in u.role %}
+                        <input type="hidden" name="role" value="user">
+                        <button class="btn w-100" style="background:#F3F4F6;color:#4B5563;border:1px solid #E5E7EB;font-size:14px;font-weight:500;" {% if u == app.user %}disabled{% endif %}>
+                            <i class="bi bi-arrow-down-circle me-1"></i> Rétrograder
+                        </button>
+                    {% else %}
+                        <input type="hidden" name="role" value="admin">
+                        <button class="btn w-100" style="background:rgba(37, 99, 235, 0.05);color:#2563EB;border:1px solid rgba(37, 99, 235, 0.2);font-size:14px;font-weight:600;">
+                            <i class="bi bi-shield-lock-fill me-1"></i> Promouvoir Admin
+                        </button>
+                    {% endif %}
+                </form>
+
+                <div class="d-flex gap-2">
+                    <!-- Bouton Modifier (Ouvre le modal pour éviter de casser s'il n'y a pas de route /edit) -->
+                    <button type="button" class="btn flex-grow-1" style="background:#F8FAFC;color:#0F172A;border:1px solid #E2E8F0;font-size:14px;font-weight:500;" data-bs-toggle="modal" data-bs-target="#editModal{{ u.id }}">
+                        <i class="bi bi-pencil-square me-1"></i> Modifier
+                    </button>
+                    
+                    <!-- Bouton Supprimer -->
+                    <form method="post" action="{{ path('app_admin_user_delete', {'id': u.id}) }}" class="flex-grow-1" onsubmit="return confirm('Confirmez-vous la suppression définitive de ce profil ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ u.id) }}">
+                        <button class="btn w-100" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;font-size:14px;font-weight:500;" {% if u == app.user %}disabled{% endif %}>
+                            <i class="bi bi-trash3-fill me-1"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dummy Edit Modal (SaaS Style) -->
+        <div class="modal fade" id="editModal{{ u.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div class="modal-header border-bottom-0 pb-0">
+                        <h5 class="modal-title fw-bold" style="color:var(--admin-primary);">Modifier les informations</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="alert alert-info text-center" style="font-size:14px;">
+                            <i class="bi bi-info-circle-fill me-1"></i> Édition rapide du profil (Aperçu)
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;">Prénom</label>
+                            <input type="text" class="form-control" value="{{ u.prenom }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;">Nom</label>
+                            <input type="text" class="form-control" value="{{ u.nom }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;">Email</label>
+                            <input type="email" class="form-control" value="{{ u.email }}" readonly>
+                        </div>
+                        <button type="button" class="btn btn-primary-pro w-100" data-bs-dismiss="modal">Sauvegarder (Simulation)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

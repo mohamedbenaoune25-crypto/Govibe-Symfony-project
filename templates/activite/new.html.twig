@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Activité - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5 text-center mb-5 border-bottom rounded-bottom-5 px-lg-5" style="background-color: #FDFEFE;">
+    <h1 class="display-4 fw-bold text-dark mb-2">Créer une <span style="color: #52BE80;">Activité</span></h1>
+    <p class="text-secondary">Ajoutez une nouvelle expérience au catalogue de GoVibe.</p>
+</div>
+
+<div class="container mb-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg p-5 rounded-5 bg-white">
+                {{ form_start(form) }}
+                    {{ include('activite/_form.html.twig') }}
+                {{ form_end(form) }}
+                
+                <div class="text-center mt-4">
+                    <a href="{{ path('app_activite_index') }}" class="btn btn-outline-secondary rounded-pill px-4 py-2 border-2 text-decoration-none small">
+                        <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body { background-color: #F8F9F9 !important; }
+    .rounded-bottom-5 { border-bottom-left-radius: 4rem !important; border-bottom-right-radius: 4rem !important; }
+    .btn-success:hover { background-color: #48AC71 !important; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(82,190,128,0.2) !important; }
+</style>
+{% endblock %}

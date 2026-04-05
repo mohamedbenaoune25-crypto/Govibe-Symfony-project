@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réserver une Session - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5 text-center mb-5 border-bottom rounded-bottom-5 px-lg-5 shadow-sm bg-white">
+    <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
+        <span class="badge rounded-pill bg-light text-dark border px-3">Étape de réservation</span>
+    </div>
+    <h1 class="display-3 fw-bold text-dark mb-2">Confirmez votre <span style="color: #2ECC71;">Réservation</span></h1>
+    <p class="text-secondary fs-5">{{ activite.name }} - {{ activite.localisation }}</p>
+</div>
+
+<div class="container mb-5 pb-5 px-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-5 overflow-hidden animate-fade-in-up">
+                <div class="row g-0">
+                    <!-- Left Side: Session info -->
+                    <div class="col-md-5 bg-dark text-white p-5 d-flex flex-column justify-content-center">
+                        <div class="mb-4">
+                            <i class="bi bi-calendar-check fs-1 text-success mb-3 d-block"></i>
+                            <h4 class="fw-bold mb-1">Détails du créneau</h4>
+                            <p class="opacity-75">Date : {{ session.date|date('d/m/Y') }}</p>
+                            <p class="opacity-75">Heure : {{ session.heure|date('H:i') }}</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-top border-secondary">
+                            <p class="small opacity-50 mb-1">Prix unitaire</p>
+                            <p class="h3 fw-bold mb-0 text-success">{{ activite.prix }} <small>DT</small></p>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Side: Booking Form -->
+                    <div class="col-md-7 p-5 bg-white">
+                        <h4 class="fw-bold mb-4 text-dark">Informations de réservation</h4>
+                        
+                        <form action="{{ path('app_reservation_session_reserve', {'idSession': session.idSession}) }}" method="post" id="bookingForm">
+                            <div class="mb-4">
+                                <label for="nbPlaces" class="form-label fw-bold text-secondary text-uppercase small">Nombre de participants</label>
+                                <div class="input-group input-group-lg border rounded-4 overflow-hidden">
+                                    <button type="button" class="btn btn-light px-4 border-end" id="btnMinus"><i class="bi bi-dash-lg"></i></button>
+                                    <input type="number" name="nbPlaces" id="nbPlaces" class="form-control text-center border-0 fw-bold" value="1" min="1" max="{{ session.nbrPlacesRestant }}">
+                                    <button type="button" class="btn btn-light px-4 border-start" id="btnPlus"><i class="bi bi-plus-lg"></i></button>
+                                </div>
+                                <div class="form-text mt-2">Maximum : {{ session.nbrPlacesRestant }} places disponibles</div>
+                            </div>
+
+                            <div class="p-4 rounded-4 bg-light mb-5">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-secondary fw-medium">Total à payer :</span>
+                                    <span class="h2 fw-bold mb-0 text-dark" id="totalPrice">{{ activite.prix }} <small>DT</small></span>
+                                </div>
+                            </div>
+
+                            <div class="d-grid gap-3">
+                                <button type="submit" class="btn btn-success btn-lg rounded-pill py-3 fw-bold shadow border-0 transition-all hover-lift-2" style="background-color: #2ECC71;">
+                                    Confirmer la réservation
+                                </button>
+                                <a href="{{ path('app_activite_show', {'id': activite.id}) }}" class="btn btn-outline-secondary btn-lg rounded-pill py-2 fw-medium border-0 opacity-75">
+                                    Annuler
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nbInput = document.getElementById('nbPlaces');
+        const btnMinus = document.getElementById('btnMinus');
+        const btnPlus = document.getElementById('btnPlus');
+        const totalSpan = document.getElementById('totalPrice');
+        const unitPrice = parseFloat("{{ activite.prix }}");
+        const maxPlaces = parseInt("{{ session.nbrPlacesRestant }}");
+
+        function updateTotal() {
+            const count = parseInt(nbInput.value) || 1;
+            const total = (count * unitPrice).toFixed(2);
+            totalSpan.innerHTML = total + ' <small>DT</small>';
+        }
+
+        btnMinus.addEventListener('click', () => {
+            if (nbInput.value > 1) {
+                nbInput.value--;
+                updateTotal();
+            }
+        });
+
+        btnPlus.addEventListener('click', () => {
+            if (nbInput.value < maxPlaces) {
+                nbInput.value++;
+                updateTotal();
+            }
+        });
+
+        nbInput.addEventListener('change', () => {
+            if (nbInput.value < 1) nbInput.value = 1;
+            if (nbInput.value > maxPlaces) nbInput.value = maxPlaces;
+            updateTotal();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body { background-color: #F8F9F9 !important; }
+    .rounded-bottom-5 { border-bottom-left-radius: 4rem !important; border-bottom-right-radius: 4rem !important; }
+    #nbPlaces::-webkit-inner-spin-button, 
+    #nbPlaces::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .hover-lift-2:hover { transform: translateY(-3px); }
+</style>
+{% endblock %}
