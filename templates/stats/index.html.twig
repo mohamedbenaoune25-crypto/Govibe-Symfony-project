@@ -1,0 +1,170 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques & Performance | GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stats-hero {
+        background: linear-gradient(135deg, #1e1e2f 0%, #2d1b69 60%, #11998e 100%);
+        padding: 90px 0 80px; position: relative; overflow: hidden;
+    }
+    .stats-hero::before {
+        content:''; position:absolute; inset:0;
+        background: radial-gradient(circle at 75% 30%, rgba(80,200,120,0.1) 0%, transparent 65%);
+    }
+    .dashboard-grid { 
+        display:grid; 
+        grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); 
+        gap:30px; 
+        margin-top:-50px; 
+        position: relative;
+        z-index: 2;
+    }
+    .stat-card {
+        background:white; border-radius:24px; padding:32px 28px;
+        box-shadow:0 12px 40px rgba(0,0,0,0.1); display:flex; align-items:center; gap:24px;
+        transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-bottom:5px solid transparent;
+    }
+    .stat-card:hover { transform:translateY(-10px); box-shadow:0 20px 50px rgba(0,0,0,0.15); }
+    .s-icon { width:64px; height:64px; border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:1.8rem; flex-shrink:0; }
+    .s-val { font-size:2.2rem; font-weight:800; color:#2d1b69; font-family:'Outfit',sans-serif; margin-bottom:2px; line-height: 1.1; }
+    .s-lbl { font-size:13px; color:#888; font-weight:600; text-transform:uppercase; letter-spacing:0.8px; }
+
+    .chart-container { background:white; border-radius:24px; padding:32px; box-shadow:0 8px 30px rgba(0,0,0,0.06); margin-top:40px; }
+    .chart-title { font-family:'Outfit',sans-serif; font-size:1.25rem; font-weight:700; color:#1e1e2f; margin-bottom:24px; display:flex; align-items:center; gap:10px; }
+    .chart-title i { color:#50c878; }
+
+    .color-1 { background:#f0e8ff; color:#6f42c1; } .stat-card.c-1 { border-color:#6f42c1; }
+    .color-2 { background:#e8f7ee; color:#28a745; } .stat-card.c-2 { border-color:#28a745; }
+    .color-3 { background:#e8f4fd; color:#007bff; } .stat-card.c-3 { border-color:#007bff; }
+    .color-4 { background:#fff3cd; color:#856404; } .stat-card.c-4 { border-color:#ffc107; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="stats-hero">
+    <div class="container position-relative">
+        <h1 style="font-family:'Outfit',sans-serif; font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; color:white; margin-bottom:10px;">
+            <i class="bi bi-graph-up-arrow me-2" style="color:#50c878;"></i> Analyse & <span style="color:#50c878;">Performance</span>
+        </h1>
+        <p class="text-white-50 ms-5" style="font-size:16px;">
+            Vision globale de l'activité GoVibe, des fréquentations et des réservations en cours.
+        </p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    {# Key metrics #}
+    <div class="dashboard-grid">
+        <div class="stat-card c-1">
+            <div class="s-icon color-1"><i class="bi bi-calendar-event"></i></div>
+            <div><div class="s-val">{{ totalActivites }}</div><div class="s-lbl">Activités</div></div>
+        </div>
+        <div class="stat-card c-2">
+            <div class="s-icon color-2"><i class="bi bi-play-circle"></i></div>
+            <div><div class="s-val">{{ totalSessions }}</div><div class="s-lbl">Sessions</div></div>
+        </div>
+        <div class="stat-card c-3">
+            <div class="s-icon color-3"><i class="bi bi-ticket-perforated"></i></div>
+            <div><div class="s-val">{{ totalResas }}</div><div class="s-lbl">Réservations</div></div>
+        </div>
+        <div class="stat-card c-4">
+            <div class="s-icon color-4"><i class="bi bi-people"></i></div>
+            <div><div class="s-val">{{ totalPlacesReservees }}</div><div class="s-lbl">Ventes Totales</div></div>
+        </div>
+    </div>
+
+    <div class="row gx-5 gy-4 mt-2 mb-5">
+        {# Distribution Chart #}
+        <div class="col-lg-8">
+            <div class="chart-container" style="padding: 40px;">
+                <div class="chart-title"><i class="bi bi-bar-chart-fill"></i> Flux des Réservations (Dates)</div>
+                <div style="height:350px;">
+                    <canvas id="reservationsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        {# Popularity Chart (Pie/Doughnut) #}
+        <div class="col-lg-4">
+            <div class="chart-container h-100">
+                <div class="chart-title"><i class="bi bi-pie-chart-fill"></i> Top 5 Activités</div>
+                <div style="height:280px; display:flex; align-items:center; justify-content:center;">
+                    <canvas id="popularityChart"></canvas>
+                </div>
+                <div class="mt-4">
+                    {% for act in topActivites %}
+                        <div class="d-flex justify-content-between align-items-center mb-2 px-2">
+                            <span style="font-size:13px; color:#555; font-weight:600;">{{ act.name }}</span>
+                            <span class="badge rounded-pill bg-light text-dark shadow-sm">{{ act.count }} resas</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Data labels & values from Controller
+    const dateLabels = {{ dateLabels|json_encode|raw }};
+    const dateValues = {{ dateValues|json_encode|raw }};
+    
+    const popLabels = {{ topPopLabels|json_encode|raw }};
+    const popValues = {{ topPopValues|json_encode|raw }};
+
+    // 1. Line Chart: Reservations per date
+    new Chart(document.getElementById('reservationsChart'), {
+        type: 'line',
+        data: {
+            labels: dateLabels,
+            datasets: [{
+                label: 'Réservations par jour',
+                data: dateValues,
+                borderColor: '#6f42c1',
+                backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                borderWidth: 3,
+                tension: 0.4,
+                fill: true,
+                pointBackgroundColor: '#6f42c1',
+                pointRadius: 5
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Doughnut Chart: Top Activites
+    new Chart(document.getElementById('popularityChart'), {
+        type: 'doughnut',
+        data: {
+            labels: popLabels,
+            datasets: [{
+                data: popValues,
+                backgroundColor: ['#50c878', '#6f42c1', '#007bff', '#ffc107', '#17a2b8'],
+                borderWidth: 0,
+                hoverOffset: 12
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { boxWidth: 10, padding: 20, font: { family:'Outfit', size: 10 } } }
+            },
+            cutout: '65%'
+        }
+    });
+});
+</script>
+{% endblock %}

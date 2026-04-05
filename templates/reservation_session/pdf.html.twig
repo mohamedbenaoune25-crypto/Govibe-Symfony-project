@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reçu de Réservation #{{ reservation.idReservation }}</title>
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; line-height: 1.5; margin: 0; padding: 0; }
+        .container { width: 90%; margin: 40px auto; border: 1px solid #eee; padding: 40px; border-radius: 8px; }
+        .header { display: flex; justify-content: space-between; border-bottom: 2px solid #50c878; padding-bottom: 20px; margin-bottom: 30px; }
+        .brand { color: #50c878; font-size: 28px; font-weight: bold; text-transform: uppercase; }
+        .recu-title { font-size: 20px; color: #888; text-align: right; }
+        
+        .section { margin-bottom: 30px; }
+        .section-title { font-size: 14px; color: #777; text-transform: uppercase; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; margin-bottom: 15px; }
+        
+        .info-grid { width: 100%; border-collapse: collapse; }
+        .info-grid td { padding: 10px 0; vertical-align: top; }
+        .label { font-weight: bold; color: #555; width: 180px; }
+        .value { color: #000; font-weight: normal; }
+
+        .item-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .item-table th { background: #f8f9fa; text-align: left; padding: 12px; border-bottom: 1px solid #dee2e6; color: #555; font-size: 13px; }
+        .item-table td { padding: 12px; border-bottom: 1px solid #eee; }
+
+        .footer { text-align: center; margin-top: 50px; font-size: 12px; color: #aaa; border-top: 1px solid #eee; pt: 20px; }
+        .print-only { display: none; margin-top: 20px; text-align: center; }
+        
+        {% if is_printable %}
+            .print-only { display: block; }
+            .no-print { display: none; }
+            @media print { .no-print { display: none; } }
+        {% endif %}
+    </style>
+</head>
+<body {% if is_printable %}onload="window.print()"{% endif %}>
+
+<div class="container">
+    <div class="header">
+        <div class="brand">GoVibe</div>
+        <div class="recu-title">#{{ reservation.idReservation }} / {{ reservation.reservedAt ? reservation.reservedAt|date('d/m/Y') : '' }}</div>
+    </div>
+
+    {# Récapitulatif #}
+    <div class="section">
+        <div class="section-title">Informations de Réservation</div>
+        <table class="info-grid">
+            <tr>
+                <td class="label">Date de réservation :</td>
+                <td class="value">{{ reservation.reservedAt ? reservation.reservedAt|date('d/m/Y à H:i') : '—' }}</td>
+            </tr>
+            <tr>
+                <td class="label">Référence client :</td>
+                <td class="value"><strong>{{ reservation.userRef }}</strong></td>
+            </tr>
+            <tr>
+                <td class="label">Nombre de places :</td>
+                <td class="value">{{ reservation.nbPlaces }} place(s)</td>
+            </tr>
+        </table>
+    </div>
+
+    {# Détails Session #}
+    <div class="section">
+        <div class="section-title">Détails de l'Activité & Session</div>
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th>Activité</th>
+                    <th>Date & Heure</th>
+                    <th>Lieu / Détail</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-weight: bold; color: #2d1b69;">
+                        {{ reservation.session and reservation.session.activite ? reservation.session.activite.name : 'N/A' }}
+                    </td>
+                    <td>
+                        {{ reservation.session and reservation.session.date ? reservation.session.date|date('d/m/Y') : '-' }} <br>
+                        {{ reservation.session and reservation.session.heure ? reservation.session.heure|date('H:i') : '-' }}
+                    </td>
+                    <td>
+                        {{ reservation.session and reservation.session.activite ? reservation.session.activite.localisation : '-' }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top: 60px; padding: 20px; background: #e8f7ee; color: #155724; border-radius: 8px; font-weight: bold; text-align: center;">
+        REÇU CONFIRMÉ - PRÉSENTER LORS DE L'ACTIVITÉ
+    </div>
+
+    <div class="footer">
+        GoVibe &copy; 2026. Merci de votre confiance. <br>
+        Document généré automatiquement le {{ "now"|date("d/m/Y H:i") }}.
+    </div>
+
+    {% if is_printable %}
+    <div class="print-only">
+        <hr>
+        <p><em>Dompdf n'est pas détecté. Utilisation de la vue imprimable système.</em></p>
+        <button onclick="window.print()" class="no-print" style="padding: 10px 20px; background: #50c878; color: white; border: 0; border-radius: 5px; cursor: pointer;">Lancer l'impression</button>
+        <a href="{{ path('app_reservation_session_show', {id: reservation.idReservation}) }}" class="no-print" style="margin-left: 10px; color: #555;">Retour</a>
+    </div>
+    {% endif %}
+</div>
+
+</body>
+</html>

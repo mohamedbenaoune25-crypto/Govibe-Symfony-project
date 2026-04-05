@@ -1,0 +1,111 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block page_title %}Vue d'ensemble{% endblock %}
+
+{% block body %}
+<!-- Corporate Stat Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="admin-card text-center p-4 h-100" style="border-left: 4px solid var(--admin-accent);">
+            <div style="width:60px;height:60px;border-radius:12px;background:rgba(37, 99, 235, 0.1);color:var(--admin-accent);font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <h3 style="font-family:'Outfit';font-weight:700;font-size:36px;color:var(--admin-primary);margin-bottom:5px;">{{ total_users }}</h3>
+            <span style="font-size:12px;font-weight:600;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;">Utilisateurs Actifs</span>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="admin-card text-center p-4 h-100" style="border-left: 4px solid #F59E0B;">
+            <div style="width:60px;height:60px;border-radius:12px;background:rgba(245, 158, 11, 0.1);color:#F59E0B;font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                <i class="bi bi-exclamation-square-fill"></i>
+            </div>
+            <h3 style="font-family:'Outfit';font-weight:700;font-size:36px;color:var(--admin-primary);margin-bottom:5px;">{{ attente_reclamations }}</h3>
+            <span style="font-size:12px;font-weight:600;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;">Requêtes en Attente</span>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="admin-card text-center p-4 h-100" style="border-left: 4px solid #10B981;">
+            <div style="width:60px;height:60px;border-radius:12px;background:rgba(16, 185, 129, 0.1);color:#10B981;font-size:24px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+                <i class="bi bi-check-circle-fill"></i>
+            </div>
+            <h3 style="font-family:'Outfit';font-weight:700;font-size:36px;color:var(--admin-primary);margin-bottom:5px;">{{ total_reclamations }}</h3>
+            <span style="font-size:12px;font-weight:600;letter-spacing:1px;color:var(--text-muted);text-transform:uppercase;">Réclamations Traitées</span>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Latest Users -->
+    <div class="col-lg-6">
+        <div class="admin-card h-100">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-lines-fill me-2 text-muted"></i> Inscriptions Récentes</span>
+                <a href="{{ path('app_admin_users') }}" class="btn btn-pro py-1 px-3">Gérer</a>
+            </div>
+            <div class="admin-card-body p-0 table-responsive">
+                <table class="table admin-table mb-0">
+                    <tbody>
+                        {% for u in latest_users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width:40px;height:40px;border-radius:50%;background:#F3F4F6;color:var(--admin-primary);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid #E5E7EB;">
+                                        {{ u.prenom|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold" style="color:var(--admin-primary);font-size:14px;">{{ u.prenom }} {{ u.nom }}</div>
+                                        <div style="font-size:12px;color:var(--text-muted);">{{ u.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                {% if 'ROLE_ADMIN' in u.role %}
+                                    <span class="badge" style="background:rgba(37, 99, 235, 0.1);color:#2563EB;border:1px solid rgba(37, 99, 235, 0.2);padding:5px 10px;">Admnistrateur</span>
+                                {% else %}
+                                    <span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E7EB;padding:5px 10px;">Utilisateur</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Reclamations -->
+    <div class="col-lg-6">
+        <div class="admin-card h-100">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-inbox-fill me-2 text-muted"></i> Derniers Dossiers</span>
+                <a href="{{ path('app_admin_reclamations') }}" class="btn btn-pro py-1 px-3">Détails</a>
+            </div>
+            <div class="admin-card-body p-0 table-responsive">
+                <table class="table admin-table mb-0">
+                    <tbody>
+                        {% for r in latest_reclamations %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold mb-1" style="color:var(--admin-primary);font-size:14px;">{{ r.sujet }}</div>
+                                <div style="font-size:12px;color:var(--text-muted);" class="text-truncate" style="max-width:240px;">{{ r.message }}</div>
+                            </td>
+                            <td class="text-end">
+                                {% if r.status == 'EN_ATTENTE' or r.status == 'En attente' %}
+                                    <span class="badge" style="background:rgba(245, 158, 11, 0.1);color:#D97706;border:1px solid rgba(245, 158, 11, 0.2);padding:5px 10px;">En attente</span>
+                                {% elseif r.status == 'TRAITEE' or r.status == 'Traitée' %}
+                                    <span class="badge" style="background:rgba(16, 185, 129, 0.1);color:#059669;border:1px solid rgba(16, 185, 129, 0.2);padding:5px 10px;">Traitée</span>
+                                {% else %}
+                                    <span class="badge" style="background:rgba(239, 68, 68, 0.1);color:#DC2626;border:1px solid rgba(239, 68, 68, 0.2);padding:5px 10px;">{{ r.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,267 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réservations Sessions | GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .resa-hero {
+        background: linear-gradient(135deg, #1a0533 0%, #2d1b69 50%, #11998e 100%);
+        padding: 120px 0 60px; position: relative; overflow: hidden;
+    }
+    .resa-hero::before {
+        content:''; position:absolute; inset:0;
+        background: radial-gradient(ellipse at 80% 30%, rgba(80,200,120,0.1) 0%, transparent 65%);
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(80,200,120,0.15); border: 1px solid rgba(80,200,120,0.35);
+        color: #50c878; padding: 6px 16px; border-radius: 30px;
+        font-size: 13px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 20px;
+    }
+    .hero-title {
+        font-family:'Outfit',sans-serif; font-size:clamp(2rem,5vw,3.2rem);
+        font-weight:700; color:white; line-height:1.15; margin-bottom:14px;
+    }
+    .hero-title span { color: #50c878; }
+    .stats-bar { display:flex; gap:20px; flex-wrap:wrap; margin-top:28px; }
+    .stat-pill {
+        background:rgba(255,255,255,0.08); backdrop-filter:blur(10px);
+        border:1px solid rgba(255,255,255,0.12); border-radius:12px;
+        padding:12px 20px; color:white; display:flex; align-items:center; gap:10px;
+    }
+    .stat-pill .num { font-size:1.4rem; font-weight:700; font-family:'Outfit',sans-serif; color:#50c878; }
+    .stat-pill .lbl { font-size:12px; color:rgba(255,255,255,0.6); }
+
+    /* Section */
+    .section-resa { padding:50px 0 80px; background:#f5f4fb; min-height:60vh; }
+    .toolbar { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:30px; }
+    .results-count { background:white; border-radius:10px; padding:10px 20px; font-weight:600; color:#2d1b69; box-shadow:0 2px 10px rgba(0,0,0,0.06); display:inline-flex; align-items:center; gap:8px; font-size:14px; }
+    .btn-new-resa { background:linear-gradient(135deg,#50c878,#3aad65); color:white; border:0; border-radius:12px; padding:12px 24px; font-weight:600; display:inline-flex; align-items:center; gap:8px; transition:all 0.3s; box-shadow:0 4px 15px rgba(80,200,120,0.35); text-decoration:none; font-size:14px; }
+    .btn-new-resa:hover { transform:translateY(-2px); color:white; box-shadow:0 8px 25px rgba(80,200,120,0.45); }
+
+    /* Table-card hybride */
+    .resa-table-wrap { background:white; border-radius:20px; overflow:hidden; box-shadow:0 4px 18px rgba(0,0,0,0.07); }
+    .resa-table { width:100%; border-collapse:collapse; }
+    .resa-table thead tr { background:linear-gradient(135deg, #2d1b69, #11998e); }
+    .resa-table thead th { padding:16px 20px; color:rgba(255,255,255,0.85); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; border:0; }
+    .resa-table tbody tr { border-bottom:1px solid #f0f0f0; transition:background 0.15s; }
+    .resa-table tbody tr:last-child { border-bottom:0; }
+    .resa-table tbody tr:hover { background:#f9f7ff; }
+    .resa-table tbody td { padding:16px 20px; font-size:14px; color:#444; vertical-align:middle; }
+
+    .user-cell { display:flex; align-items:center; gap:10px; }
+    .user-avatar { width:36px; height:36px; background:linear-gradient(135deg,#2d1b69,#11998e); border-radius:10px; display:flex; align-items:center; justify-content:center; color:white; font-size:13px; font-weight:700; flex-shrink:0; }
+    .user-name { font-weight:700; color:#2d1b69; font-size:14px; }
+
+    .places-badge { display:inline-flex; align-items:center; gap:5px; background:#d4edda; color:#155724; border-radius:20px; padding:4px 12px; font-size:12px; font-weight:700; }
+
+    .session-chip { background:#f0e8ff; color:#2d1b69; border-radius:8px; padding:4px 10px; font-size:12px; font-weight:600; display:inline-block; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    .date-cell { font-size:13px; color:#666; }
+    .date-cell .time { color:#999; font-size:11px; }
+
+    .action-cell { display:flex; align-items:center; gap:6px; }
+    .btn-tbl { width:32px; height:32px; border-radius:8px; border:0; display:flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer; text-decoration:none; transition:all 0.2s; }
+    .btn-eye { background:#e8f4fd; color:#1a6898; }
+    .btn-eye:hover { background:#1a6898; color:white; }
+    .btn-edt { background:#fff3cd; color:#856404; }
+    .btn-edt:hover { background:#ffc107; color:white; }
+    .btn-del { background:#f8d7da; color:#721c24; }
+    .btn-del:hover { background:#dc3545; color:white; }
+
+    .empty-state { text-align:center; padding:80px 20px; }
+    .empty-icon { font-size:5rem; color:#dee2e6; margin-bottom:20px; }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="resa-hero">
+    <div class="container position-relative">
+        <div class="hero-badge"><i class="bi bi-ticket-perforated-fill"></i> Réservations de Sessions</div>
+        <h1 class="hero-title">Toutes les <span>Réservations</span></h1>
+        <p class="text-white-50 mb-0" style="max-width:520px;">
+            Consultez, ajoutez et gérez les réservations liées aux sessions d'activités GoVibe.
+        </p>
+        <div class="stats-bar">
+            <div class="stat-pill">
+                <i class="bi bi-ticket-perforated-fill" style="color:#50c878; font-size:1.3rem;"></i>
+                <div><div class="num">{{ reservations|length }}</div><div class="lbl">Réservations totales</div></div>
+            </div>
+            <div class="stat-pill">
+                <i class="bi bi-people-fill" style="color:#50c878; font-size:1.3rem;"></i>
+                <div>
+                    <div class="num">{{ reservations|reduce((carry, r) => carry + r.nbPlaces, 0) }}</div>
+                    <div class="lbl">Places réservées</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="section-resa">
+    <div class="container">
+        <div class="toolbar">
+            <div class="results-count">
+                <i class="bi bi-ticket-perforated text-success"></i>
+                {{ reservations|length }} réservation{{ reservations|length > 1 ? 's' : '' }}
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ path('app_stats_index') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">
+                    <i class="bi bi-graph-up me-1"></i> Dashboard Stats
+                </a>
+                <a href="{{ path('app_session_index') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="bi bi-calendar-week me-1"></i> Voir les sessions
+                </a>
+                <a href="{{ path('app_reservation_session_new') }}" class="btn-new-resa">
+                    <i class="bi bi-plus-circle-fill"></i> Nouvelle Réservation
+                </a>
+            </div>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4">
+                <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('danger') %}
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+
+        {% if reservations is empty %}
+            <div class="resa-table-wrap">
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="bi bi-ticket-detailed"></i></div>
+                    <h3 style="font-family:'Outfit',sans-serif; color:#2d1b69;">Aucune réservation</h3>
+                    <p class="text-muted">Créez la première réservation pour une session disponible.</p>
+                    <a href="{{ path('app_reservation_session_new') }}" class="btn-new-resa d-inline-flex mt-3">
+                        <i class="bi bi-plus-circle-fill"></i> Créer une réservation
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="resa-table-wrap">
+                <div class="table-responsive">
+                    <table class="resa-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><i class="bi bi-person me-1"></i>Utilisateur</th>
+                                <th><i class="bi bi-calendar-event me-1"></i>Session</th>
+                                <th><i class="bi bi-people me-1"></i>Places</th>
+                                <th><i class="bi bi-clock me-1"></i>Réservé le</th>
+                                <th><i class="bi bi-file-earmark-pdf me-1"></i>Documents</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for resa in reservations %}
+                                <tr>
+                                    <td><span style="color:#999; font-size:13px;">#{{ resa.idReservation }}</span></td>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar">{{ resa.userRef|slice(0,2)|upper }}</div>
+                                            <div class="user-name">{{ resa.userRef }}</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if resa.session %}
+                                            <a href="{{ path('app_session_show', {'id': resa.session.idSession}) }}"
+                                               class="session-chip" title="{{ resa.session.activite ? resa.session.activite.name : '' }} — {{ resa.session.date ? resa.session.date|date('d/m/Y') : '' }}">
+                                                <i class="bi bi-calendar3 me-1"></i>
+                                                {{ resa.session.activite ? resa.session.activite.name : 'N/A' }}
+                                                — {{ resa.session.date ? resa.session.date|date('d/m/Y') : '' }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="places-badge">
+                                            <i class="bi bi-people-fill"></i>
+                                            {{ resa.nbPlaces }} place{{ resa.nbPlaces > 1 ? 's' : '' }}
+                                        </span>
+                                    </td>
+                                    <td class="date-cell">
+                                        {{ resa.reservedAt ? resa.reservedAt|date('d/m/Y') : '—' }}
+                                        <div class="time">{{ resa.reservedAt ? resa.reservedAt|date('H:i') : '' }}</div>
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('app_reservation_session_pdf', {'id': resa.idReservation}) }}" 
+                                           class="btn btn-sm btn-outline-success rounded-pill fw-bold" style="font-size:11px;">
+                                            <i class="bi bi-file-earmark-pdf-fill me-1"></i> REÇU PDF
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <div class="action-cell">
+                                            <a href="{{ path('app_reservation_session_show', {'id': resa.idReservation}) }}"
+                                               class="btn-tbl btn-eye" title="Voir">
+                                                <i class="bi bi-eye-fill"></i>
+                                            </a>
+                                            <a href="{{ path('app_reservation_session_edit', {'id': resa.idReservation}) }}"
+                                               class="btn-tbl btn-edt" title="Modifier">
+                                                <i class="bi bi-pencil-fill"></i>
+                                            </a>
+                                            <button type="button" class="btn-tbl btn-del" title="Annuler"
+                                                    onclick="confirmCancelResa({{ resa.idReservation }}, '{{ resa.userRef }}')">
+                                                <i class="bi bi-trash-fill"></i>
+                                            </button>
+                                            <form id="del-resa-{{ resa.idReservation }}" method="post"
+                                                  action="{{ path('app_reservation_session_delete', {'id': resa.idReservation}) }}" style="display:none;">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_reservation' ~ resa.idReservation) }}">
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{# Delete Modal #}
+<div class="modal fade" id="delResaModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-body text-center p-5">
+                <div style="font-size:3rem; color:#dc3545; margin-bottom:16px;"><i class="bi bi-ticket-detailed-fill"></i></div>
+                <h5 class="fw-bold mb-2" style="font-family:'Outfit',sans-serif;">Annuler cette réservation ?</h5>
+                <p class="text-muted mb-4" id="del-resa-msg">Les places seront automatiquement restituées à la session.</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <button class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Garder</button>
+                    <button class="btn btn-danger rounded-pill px-4 fw-bold" id="btnConfirmDelResa">
+                        <i class="bi bi-x-circle me-1"></i> Annuler la réservation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+let targetResaId = null;
+const delResaModal = new bootstrap.Modal(document.getElementById('delResaModal'));
+
+function confirmCancelResa(id, userRef) {
+    targetResaId = id;
+    document.getElementById('del-resa-msg').textContent =
+        `Voulez-vous annuler la réservation de « ${userRef} » ? Les places seront automatiquement restituées.`;
+    delResaModal.show();
+}
+
+document.getElementById('btnConfirmDelResa').addEventListener('click', () => {
+    if (targetResaId) {
+        document.getElementById('del-resa-' + targetResaId).submit();
+    }
+});
+</script>
+{% endblock %}

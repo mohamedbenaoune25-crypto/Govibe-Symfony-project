@@ -1,0 +1,153 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Réservation | GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .form-hero {
+        background: linear-gradient(135deg, #1a0533 0%, #2d1b69 60%, #11998e 100%);
+        padding: 120px 0 80px; position: relative; overflow: hidden;
+    }
+    .form-hero::before {
+        content:''; position:absolute; inset:0;
+        background: radial-gradient(circle at 70% 40%, rgba(80,200,120,0.1) 0%, transparent 65%);
+    }
+    .form-card { background:white; border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,0.1); overflow:hidden; margin-top:-40px; }
+    .form-card-header { background:linear-gradient(135deg,#2d1b69,#11998e); padding:28px 36px; display:flex; align-items:center; gap:16px; }
+    .form-card-header .hico { width:48px; height:48px; background:rgba(80,200,120,0.2); border:1px solid rgba(80,200,120,0.4); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; color:#50c878; flex-shrink:0; }
+    .form-card-header h2 { font-family:'Outfit',sans-serif; font-size:1.4rem; font-weight:700; color:white; margin:0; }
+    .form-card-header p  { font-size:13px; color:rgba(255,255,255,0.55); margin:4px 0 0; }
+
+    .form-body { padding:36px; }
+    .field-group { margin-bottom:24px; }
+    .field-label { font-size:12px; font-weight:700; color:#555; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+    .field-label i { color:#50c878; }
+    .field-required { color:#dc3545; margin-left:2px; }
+    .form-control, .form-select { border:2px solid #e9ecef; border-radius:12px; padding:12px 16px; font-size:15px; transition:border-color 0.2s,box-shadow 0.2s; background:#fcfcfc; }
+    .form-control:focus, .form-select:focus { border-color:#50c878; box-shadow:0 0 0 3px rgba(80,200,120,0.12); background:white; outline:none; }
+    .invalid-feedback { font-size:12px; color:#dc3545; margin-top:6px; }
+
+    .tip-box { background:#f0faf5; border:1px solid #b8dfc9; border-radius:12px; padding:14px 18px; font-size:13px; color:#155724; display:flex; gap:10px; align-items:flex-start; margin-bottom:24px; }
+    .tip-box i { color:#50c878; font-size:1.1rem; flex-shrink:0; margin-top:1px; }
+
+    .form-footer { background:#f8f9fa; padding:24px 36px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #eee; flex-wrap:wrap; gap:12px; }
+    .btn-cancel { background:white; border:2px solid #dee2e6; color:#555; border-radius:12px; padding:11px 24px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s; }
+    .btn-cancel:hover { border-color:#2d1b69; color:#2d1b69; }
+    .btn-save { background:linear-gradient(135deg,#50c878,#3aad65); color:white; border:0; border-radius:12px; padding:12px 32px; font-weight:700; font-size:15px; display:inline-flex; align-items:center; gap:8px; transition:all 0.3s; cursor:pointer; box-shadow:0 4px 15px rgba(80,200,120,0.35); }
+    .btn-save:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(80,200,120,0.45); }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="form-hero">
+    <div class="container position-relative">
+        <p style="font-size:13px; margin-bottom:16px;">
+            <a href="{{ path('app_reservation_session_index') }}" style="color:#50c878; text-decoration:none;">
+                <i class="bi bi-ticket-perforated me-1"></i>Réservations
+            </a>
+            <span style="color:rgba(255,255,255,0.4); margin:0 8px;">/</span>
+            <span class="text-white-50">Nouvelle réservation</span>
+        </p>
+        <h1 style="font-family:'Outfit',sans-serif; font-size:clamp(1.8rem,4vw,2.8rem); font-weight:700; color:white; margin-bottom:10px;">
+            Nouvelle <span style="color:#50c878;">Réservation</span>
+        </h1>
+        <p class="text-white-50" style="font-size:15px; max-width:480px;">
+            Sélectionnez une session disponible et indiquez le nombre de places à réserver.
+        </p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="hico"><i class="bi bi-ticket-perforated-fill"></i></div>
+            <div>
+                <h2>Nouvelle réservation</h2>
+                <p>Choisissez une session et remplissez les informations du réservant.</p>
+            </div>
+        </div>
+
+        <div class="form-body">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+            <div class="tip-box">
+                <i class="bi bi-info-circle-fill"></i>
+                <div>
+                    Seules les sessions avec des <strong>places disponibles</strong> sont affichées.
+                    Le nombre de places restantes sera automatiquement mis à jour.
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="field-group">
+                        <div class="field-label"><i class="bi bi-calendar-event-fill"></i> Session <span class="field-required">*</span></div>
+                        {{ form_widget(form.session, {'attr': {'class': 'form-select'}}) }}
+                        {{ form_errors(form.session) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-group">
+                        <div class="field-label"><i class="bi bi-people-fill"></i> Nombre de places <span class="field-required">*</span></div>
+                        {{ form_widget(form.nbPlaces, {'attr': {'class': 'form-control', 'placeholder': 'Ex: 2', 'min': 1}}) }}
+                        {{ form_errors(form.nbPlaces) }}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="field-group">
+                        <div class="field-label"><i class="bi bi-person-badge-fill"></i> Référence utilisateur <span class="field-required">*</span></div>
+                        {{ form_widget(form.userRef, {'attr': {'class': 'form-control', 'placeholder': 'Ex: USER001'}}) }}
+                        {{ form_errors(form.userRef) }}
+                    </div>
+                </div>
+            </div>
+
+            {{ form_rest(form) }}
+
+            <div class="form-footer mt-4 mx-n4" style="margin-left:-36px; margin-right:-36px;">
+                <a href="{{ path('app_reservation_session_index') }}" class="btn-cancel">
+                    <i class="bi bi-x-circle"></i> Annuler
+                </a>
+                <button type="submit" class="btn-save">
+                    <i class="bi bi-check-circle-fill"></i> Confirmer la réservation
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sessionSelect = document.querySelector('select[name$="[session]"]');
+    const nbPlacesInput = document.querySelector('input[name$="[nbPlaces]"]');
+    const tipBoxText = document.querySelector('.tip-box div');
+
+    function updateMax() {
+        const option = sessionSelect.options[sessionSelect.selectedIndex];
+        if (option && option.value) {
+            const matches = option.text.match(/\((\d+) places restantes\)/);
+            if (matches) {
+                const max = parseInt(matches[1]);
+                nbPlacesInput.max = max;
+                tipBoxText.innerHTML = `Il reste <strong>${max} place(s)</strong> disponibles pour cette session.`;
+                if (parseInt(nbPlacesInput.value) > max) {
+                    nbPlacesInput.setCustomValidity(`Maximum ${max} places.`);
+                } else {
+                    nbPlacesInput.setCustomValidity('');
+                }
+            }
+        } else {
+            tipBoxText.innerHTML = 'Sélectionnez une session pour voir les places disponibles.';
+        }
+    }
+
+    sessionSelect.addEventListener('change', updateMax);
+    nbPlacesInput.addEventListener('input', updateMax);
+    updateMax();
+});
+</script>
+{% endblock %}

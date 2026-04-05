@@ -1,0 +1,200 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ activite.name }} | Activités GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .show-hero {
+        background: linear-gradient(135deg, var(--dark-green) 0%, var(--mid-green) 100%);
+        padding: 120px 0 80px; position: relative; overflow: hidden;
+    }
+    .show-hero::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 70% 50%, rgba(80,200,120,0.15) 0%, transparent 70%);
+    }
+    .breadcrumb-act { font-size: 13px; }
+    .breadcrumb-act a { color: var(--primary-emerald); text-decoration: none; }
+    .breadcrumb-act span { color: rgba(255,255,255,0.5); margin: 0 8px; }
+    .hero-type-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: rgba(80,200,120,0.15); border: 1px solid rgba(80,200,120,0.35);
+        color: var(--primary-emerald); padding: 5px 14px; border-radius: 20px;
+        font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        margin-bottom: 14px;
+    }
+    .show-title { font-family:'Outfit',sans-serif; font-size:clamp(1.8rem,4vw,3rem); font-weight:700; color:white; margin-bottom:14px; }
+    .status-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 6px 16px; border-radius: 30px; font-size: 13px; font-weight: 700;
+    }
+    .status-confirmed { background:#d4edda; color:#155724; }
+    .status-cancelled { background:#f8d7da; color:#721c24; }
+    .status-pending   { background:#fff3cd; color:#856404; }
+
+    .show-card {
+        background: white; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden; margin-top: -40px; position: relative;
+    }
+    .info-section { padding: 40px; border-bottom: 1px solid #f0f0f0; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 20px; }
+    .info-box {
+        background: #f8f9fa; border-radius: 16px; padding: 20px;
+        display: flex; flex-direction: column; gap: 6px;
+    }
+    .info-box .label { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+    .info-box .value { font-size: 1.1rem; font-weight: 700; color: var(--dark-green); font-family: 'Outfit', sans-serif; }
+    .info-box .icon { font-size: 1.4rem; color: var(--primary-emerald); margin-bottom: 4px; }
+    .price-box { background: linear-gradient(135deg, #e8f7ee, #d4edda); border: 1px solid #b8dfc9; }
+    .price-box .value { color: #155724; font-size: 1.8rem; }
+
+    .desc-section { padding: 40px; border-bottom: 1px solid #f0f0f0; }
+    .desc-section h4 { font-family:'Outfit',sans-serif; color:var(--dark-green); font-size:1.2rem; font-weight:700; margin-bottom:14px; }
+    .desc-text { color: #555; line-height: 1.8; font-size: 15px; }
+
+    .sessions-section { padding: 40px; }
+    .sessions-section h4 { font-family:'Outfit',sans-serif; color:var(--dark-green); font-size:1.2rem; font-weight:700; margin-bottom:20px; }
+    .session-card {
+        background: #f8f9fa; border-radius: 14px; padding: 18px 20px;
+        display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+        border: 1px solid #e9ecef; transition: all 0.2s;
+    }
+    .session-card:hover { background: #f0faf5; border-color: #b8dfc9; }
+    .session-icon { width: 44px; height: 44px; background: var(--primary-emerald); border-radius: 12px; display:flex; align-items:center; justify-content:center; color:white; font-size:1.1rem; flex-shrink:0; }
+    .session-info { flex: 1; }
+    .session-info .s-name { font-weight: 700; color: var(--dark-green); font-size: 15px; }
+    .session-info .s-meta { font-size: 12px; color: #888; margin-top: 3px; }
+    .empty-sessions { text-align:center; padding:40px; color:#adb5bd; }
+    .empty-sessions i { font-size:2.5rem; display:block; margin-bottom:12px; }
+
+    .action-bar {
+        background: #f8f9fa; padding: 24px 40px;
+        display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        border-top: 1px solid #eee;
+    }
+    .btn-back { background: white; border: 2px solid #dee2e6; color: #555; border-radius: 12px; padding: 10px 22px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--dark-green); color: var(--dark-green); }
+    .btn-edit-main { background: linear-gradient(135deg, #ffc107, #fd7e14); color: white; border: 0; border-radius: 12px; padding: 10px 22px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-edit-main:hover { transform: translateY(-1px); color: white; box-shadow: 0 6px 20px rgba(255,193,7,0.4); }
+    .btn-del-main { background: linear-gradient(135deg, #dc3545, #c0392b); color: white; border: 0; border-radius: 12px; padding: 10px 22px; font-weight: 700; cursor:pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-del-main:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(220,53,69,0.4); }
+    .add-session-btn {
+        background: var(--dark-green); color: white; border: 0; border-radius: 10px;
+        padding: 8px 18px; font-size: 13px; font-weight: 600; text-decoration: none;
+        display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+        float: right;
+    }
+    .add-session-btn:hover { background: var(--mid-green); color: white; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="show-hero">
+    <div class="container position-relative">
+        <p class="breadcrumb-act mb-3">
+            <a href="{{ path('app_activite_index') }}"><i class="bi bi-grid me-1"></i>Activités</a>
+            <span>/</span> <span class="text-white-50">{{ activite.name }}</span>
+        </p>
+        <div class="hero-type-badge"><i class="bi bi-tag-fill"></i> {{ activite.type }}</div>
+        <h1 class="show-title">{{ activite.name }}</h1>
+        <span class="status-pill {{ activite.status == 'Confirmed' ? 'status-confirmed' : (activite.status == 'Cancelled' ? 'status-cancelled' : 'status-pending') }}">
+            {% if activite.status == 'Confirmed' %}<i class="bi bi-check-circle-fill"></i> Confirmé
+            {% elseif activite.status == 'Cancelled' %}<i class="bi bi-x-circle-fill"></i> Annulé
+            {% else %}<i class="bi bi-clock-fill"></i> En attente{% endif %}
+        </span>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="show-card">
+
+        {# Info Grid #}
+        <div class="info-section">
+            <div class="info-grid">
+                <div class="info-box price-box">
+                    <div class="icon"><i class="bi bi-cash-coin"></i></div>
+                    <div class="label">Prix par personne</div>
+                    <div class="value">{{ activite.prix }} TND</div>
+                </div>
+                <div class="info-box">
+                    <div class="icon"><i class="bi bi-geo-alt-fill"></i></div>
+                    <div class="label">Localisation</div>
+                    <div class="value">{{ activite.localisation }}</div>
+                </div>
+                <div class="info-box">
+                    <div class="icon"><i class="bi bi-layers-fill"></i></div>
+                    <div class="label">Type d'activité</div>
+                    <div class="value">{{ activite.type }}</div>
+                </div>
+                <div class="info-box">
+                    <div class="icon"><i class="bi bi-calendar3"></i></div>
+                    <div class="label">Sessions disponibles</div>
+                    <div class="value">{{ activite.sessions|length }} session{{ activite.sessions|length > 1 ? 's' : '' }}</div>
+                </div>
+            </div>
+        </div>
+
+        {# Description #}
+        <div class="desc-section">
+            <h4><i class="bi bi-file-text me-2 text-success"></i>Description</h4>
+            <p class="desc-text">{{ activite.description ?? 'Aucune description n\'est disponible pour cette activité.' }}</p>
+        </div>
+
+        {# Sessions #}
+        <div class="sessions-section">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0"><i class="bi bi-calendar-event me-2 text-success"></i>Sessions planifiées</h4>
+                <a href="{{ path('app_session_new', {'activite': activite.id, 'redirect': 'activite'}) }}" class="add-session-btn"><i class="bi bi-plus-circle-fill"></i> Ajouter une session</a>
+            </div>
+            {% if activite.sessions is empty %}
+                <div class="empty-sessions">
+                    <i class="bi bi-calendar-x"></i>
+                    <p class="mb-0 text-muted">Aucune session planifiée pour cette activité.</p>
+                </div>
+            {% else %}
+                <div class="d-flex flex-column gap-3">
+                    {% for session in activite.sessions %}
+                    {% set pct = session.capacite > 0 ? ((session.nbrPlacesRestant / session.capacite) * 100)|round : 0 %}
+                    <a href="{{ path('app_session_show', {'id': session.idSession}) }}" class="session-card" style="text-decoration:none;">
+                        <div class="session-icon"><i class="bi bi-calendar-check"></i></div>
+                        <div class="session-info" style="flex:1;">
+                            <div class="s-name">
+                                {{ session.date ? session.date|date('d/m/Y') : '—' }}
+                                à {{ session.heure ? session.heure|date('H:i') : '—' }}
+                            </div>
+                            <div class="s-meta">
+                                <i class="bi bi-people me-1"></i>
+                                {{ session.nbrPlacesRestant }} / {{ session.capacite }} places restantes
+                            </div>
+                        </div>
+                        <span style="background:{% if pct == 0 %}#f8d7da; color:#721c24{% elseif pct < 30 %}#fff3cd; color:#856404{% else %}#d4edda; color:#155724{% endif %}; border-radius:20px; padding:4px 12px; font-size:12px; font-weight:700;">
+                            {% if pct == 0 %}Complet{% elseif pct < 30 %}Presque plein{% else %}Disponible{% endif %}
+                        </span>
+                        <i class="bi bi-chevron-right text-muted ms-2"></i>
+                    </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# Action Bar #}
+        <div class="action-bar">
+            <a href="{{ path('app_activite_index') }}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ path('app_activite_edit', {'id': activite.id}) }}" class="btn-edit-main">
+                    <i class="bi bi-pencil-fill"></i> Modifier
+                </a>
+                <button class="btn-del-main" onclick="document.getElementById('delete-form').submit()">
+                    <i class="bi bi-trash-fill"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="delete-form" method="post" action="{{ path('app_activite_delete', {'id': activite.id}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ activite.id) }}">
+    <input type="hidden" name="_method" value="DELETE">
+</form>
+{% endblock %}

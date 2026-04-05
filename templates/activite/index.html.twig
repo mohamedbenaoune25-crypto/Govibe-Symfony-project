@@ -1,0 +1,338 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activités | GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .activite-hero {
+        background: linear-gradient(135deg, var(--dark-green) 0%, var(--mid-green) 60%, #0f6b47 100%);
+        padding: 120px 0 60px;
+        position: relative;
+        overflow: hidden;
+    }
+    .activite-hero::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2350C878' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.4;
+    }
+    .hero-badge {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: rgba(80, 200, 120, 0.15); border: 1px solid rgba(80, 200, 120, 0.3);
+        color: var(--primary-emerald); padding: 6px 16px; border-radius: 30px;
+        font-size: 13px; font-weight: 600; letter-spacing: 0.5px; margin-bottom: 20px;
+    }
+    .hero-title {
+        font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 700; color: white; line-height: 1.1; margin-bottom: 16px;
+    }
+    .hero-title span { color: var(--primary-emerald); }
+    .search-bar-wrap {
+        background: rgba(255,255,255,0.08); backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.15); border-radius: 16px;
+        padding: 20px 24px; margin-top: 30px;
+    }
+    .search-bar-wrap .form-control, .search-bar-wrap .form-select {
+        background: rgba(255,255,255,0.95); border: 0; border-radius: 10px;
+        padding: 12px 16px; font-size: 14px;
+    }
+    .btn-search {
+        background: var(--primary-emerald); color: white; border: 0;
+        border-radius: 10px; padding: 12px 28px; font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    .btn-search:hover { background: #3aad65; color: white; transform: translateY(-1px); }
+
+    /* Section */
+    .section-activites { padding: 60px 0; }
+    .section-header { margin-bottom: 40px; }
+    .results-count {
+        background: white; border-radius: 10px; padding: 10px 20px;
+        font-weight: 600; color: var(--dark-green); box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-add-activite {
+        background: linear-gradient(135deg, var(--primary-emerald), #3aad65);
+        color: white; border: 0; border-radius: 12px; padding: 12px 24px;
+        font-weight: 600; display: inline-flex; align-items: center; gap: 8px;
+        transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(80,200,120,0.35);
+    }
+    .btn-add-activite:hover { transform: translateY(-2px); color: white; box-shadow: 0 8px 25px rgba(80,200,120,0.45); }
+
+    /* Cards */
+    .activite-card {
+        background: white; border-radius: 20px; overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.07); transition: all 0.3s ease;
+        border: 1px solid rgba(0,0,0,0.05); height: 100%;
+    }
+    .activite-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.12); }
+    .card-img-wrap {
+        height: 200px; overflow: hidden; position: relative;
+        background: linear-gradient(135deg, var(--mid-green), var(--light-green));
+    }
+    .card-type-badge {
+        position: absolute; top: 14px; left: 14px;
+        background: rgba(0,0,0,0.45); backdrop-filter: blur(6px);
+        color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .card-status-badge {
+        position: absolute; top: 14px; right: 14px;
+        padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    }
+    .status-confirmed { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+    .status-pending   { background: #fff3cd; color: #856404; }
+    .card-icon-placeholder {
+        width: 100%; height: 100%;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        color: rgba(255,255,255,0.6);
+    }
+    .card-icon-placeholder i { font-size: 3.5rem; margin-bottom: 8px; }
+    .card-icon-placeholder span { font-size: 13px; font-weight: 500; }
+    .activite-card .card-body { padding: 22px; }
+    .card-title-act {
+        font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 700;
+        color: var(--dark-green); margin-bottom: 8px;
+        display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-desc {
+        color: #6c757d; font-size: 13px; line-height: 1.5; margin-bottom: 14px;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+    .meta-item {
+        display: flex; align-items: center; gap: 5px;
+        font-size: 12px; color: #555; background: #f8f9fa; padding: 4px 10px; border-radius: 20px;
+    }
+    .meta-item i { color: var(--light-green); }
+    .card-price {
+        font-family: 'Outfit', sans-serif; font-size: 1.4rem; font-weight: 700;
+        color: var(--primary-emerald);
+    }
+    .card-price span { font-size: 13px; font-weight: 400; color: #999; }
+    .card-actions { display: flex; gap: 8px; }
+    .btn-view { flex: 1; background: var(--dark-green); color: white; border: 0; border-radius: 10px; padding: 9px; font-size: 13px; font-weight: 600; text-align: center; text-decoration: none; transition: all 0.2s; }
+    .btn-view:hover { background: var(--mid-green); color: white; }
+    .btn-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; border: 0; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .btn-edit-ic { background: #fff3cd; color: #856404; }
+    .btn-edit-ic:hover { background: #ffc107; color: white; }
+    .btn-del-ic { background: #f8d7da; color: #721c24; }
+    .btn-del-ic:hover { background: #dc3545; color: white; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 80px 20px; }
+    .empty-state .empty-icon { font-size: 5rem; color: #dee2e6; margin-bottom: 20px; }
+    .empty-state h3 { color: var(--dark-green); font-family: 'Outfit', sans-serif; }
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── Hero ── #}
+<div class="activite-hero">
+    <div class="container position-relative">
+        <div class="hero-badge">
+            <i class="bi bi-lightning-charge-fill"></i> Gestion des Activités
+        </div>
+        <h1 class="hero-title">Explorez nos <span>Activités</span> <br>& Expériences</h1>
+        <p class="text-white-50 mb-0" style="max-width:560px;">
+            Gérez toutes vos activités — ajoutez, modifiez et organisez facilement chaque expérience proposée.
+        </p>
+
+        {# Search bar #}
+        <div class="search-bar-wrap mt-4">
+            <form method="GET" action="{{ path('app_activite_index') }}" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="text-white-50 small mb-1">Rechercher</label>
+                    <input type="text" name="q" value="{{ app.request.query.get('q') }}" class="form-control" placeholder="Nom de l'activité...">
+                </div>
+                <div class="col-md-3">
+                    <label class="text-white-50 small mb-1">Type</label>
+                    <select name="type" class="form-select">
+                        <option value="">Tous les types</option>
+                        {% set types = [] %}
+                        {% for a in activites %}
+                            {% if a.type not in types %}
+                                {% set types = types|merge([a.type]) %}
+                            {% endif %}
+                        {% endfor %}
+                        {% for t in types %}
+                            <option value="{{ t }}" {{ app.request.query.get('type') == t ? 'selected' : '' }}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="text-white-50 small mb-1">Statut</label>
+                    <select name="status" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="Confirmed" {{ app.request.query.get('status') == 'Confirmed' ? 'selected' : '' }}>Confirmé</option>
+                        <option value="Cancelled" {{ app.request.query.get('status') == 'Cancelled' ? 'selected' : '' }}>Annulé</option>
+                        <option value="Pending" {{ app.request.query.get('status') == 'Pending' ? 'selected' : '' }}>En attente</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-search w-100">
+                        <i class="bi bi-search me-1"></i> Rechercher
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{# ── Main Content ── #}
+<section class="section-activites">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center section-header flex-wrap gap-3">
+            <div class="results-count">
+                <i class="bi bi-grid-3x3-gap-fill text-success"></i>
+                {{ activites|length }} activité{{ activites|length > 1 ? 's' : '' }} trouvée{{ activites|length > 1 ? 's' : '' }}
+            </div>
+            <div class="d-flex gap-3 align-items-center">
+                <a href="{{ path('app_stats_index') }}" class="btn rounded-pill px-4" style="background: rgba(255,255,255,0.1); border: 2px solid var(--primary-emerald); color: var(--primary-emerald); font-weight: 700; transition: all 0.3s; text-decoration: none; font-size: 14px;">
+                    <i class="bi bi-graph-up-arrow me-2"></i> Voir les Stats
+                </a>
+                <a href="{{ path('app_activite_new') }}" class="btn-add-activite">
+                    <i class="bi bi-plus-circle-fill"></i> Nouvelle Activité
+                </a>
+            </div>
+        </div>
+
+        {% if activites is empty %}
+            <div class="empty-state">
+                <div class="empty-icon"><i class="bi bi-calendar-x"></i></div>
+                <h3>Aucune activité trouvée</h3>
+                <p class="text-muted">Aucune activité ne correspond à votre recherche. Essayez d'autres critères ou créez-en une nouvelle.</p>
+                <a href="{{ path('app_activite_new') }}" class="btn-add-activite d-inline-flex mt-3">
+                    <i class="bi bi-plus-circle-fill"></i> Créer une activité
+                </a>
+            </div>
+        {% else %}
+            <div class="row g-4">
+                {% for activite in activites %}
+                    {# Apply filters client-side via JS — filters are applied in controller in real projects #}
+                    <div class="col-sm-6 col-lg-4 activite-item"
+                         data-name="{{ activite.name|lower }}"
+                         data-type="{{ activite.type|lower }}"
+                         data-status="{{ activite.status|lower }}">
+                        <div class="activite-card">
+                            <div class="card-img-wrap">
+                                <div class="card-icon-placeholder">
+                                    {% if activite.type == 'Sport' %}
+                                        <i class="bi bi-bicycle"></i>
+                                    {% elseif activite.type == 'Culture' %}
+                                        <i class="bi bi-building-fill"></i>
+                                    {% elseif activite.type == 'Nature' %}
+                                        <i class="bi bi-tree-fill"></i>
+                                    {% elseif activite.type == 'Gastronomie' %}
+                                        <i class="bi bi-egg-fried"></i>
+                                    {% elseif activite.type == 'Bien-être' or activite.type == 'Bien-etre' %}
+                                        <i class="bi bi-heart-pulse-fill"></i>
+                                    {% else %}
+                                        <i class="bi bi-star-fill"></i>
+                                    {% endif %}
+                                    <span>{{ activite.type }}</span>
+                                </div>
+                                <span class="card-type-badge"><i class="bi bi-tag-fill me-1"></i>{{ activite.type }}</span>
+                                <span class="card-status-badge {{ activite.status == 'Confirmed' ? 'status-confirmed' : (activite.status == 'Cancelled' ? 'status-cancelled' : 'status-pending') }}">
+                                    {% if activite.status == 'Confirmed' %}<i class="bi bi-check-circle-fill me-1"></i>Confirmé
+                                    {% elseif activite.status == 'Cancelled' %}<i class="bi bi-x-circle-fill me-1"></i>Annulé
+                                    {% else %}<i class="bi bi-clock-fill me-1"></i>En attente{% endif %}
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title-act">{{ activite.name }}</h5>
+                                <p class="card-desc">{{ activite.description ?? 'Aucune description disponible.' }}</p>
+                                <div class="card-meta">
+                                    <span class="meta-item"><i class="bi bi-geo-alt-fill"></i>{{ activite.localisation }}</span>
+                                    <span class="meta-item"><i class="bi bi-calendar3"></i>{{ activite.sessions|length }} session{{ activite.sessions|length > 1 ? 's' : '' }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="card-price">{{ activite.prix }} TND<span> / pers.</span></div>
+                                </div>
+                                <div class="card-actions">
+                                    <a href="{{ path('app_activite_show', {'id': activite.id}) }}" class="btn-view">
+                                        <i class="bi bi-eye-fill me-1"></i> Voir
+                                    </a>
+                                    <a href="{{ path('app_activite_edit', {'id': activite.id}) }}" class="btn-icon btn-edit-ic" title="Modifier">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <button type="button" class="btn-icon btn-del-ic"
+                                            title="Supprimer"
+                                            onclick="confirmDelete({{ activite.id }}, '{{ activite.name }}')">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </button>
+                                    {# Hidden delete form #}
+                                    <form id="delete-form-{{ activite.id }}" method="post"
+                                          action="{{ path('app_activite_delete', {'id': activite.id}) }}" style="display:none;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ activite.id) }}">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{# Delete Confirmation Modal #}
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg">
+            <div class="modal-body text-center p-5">
+                <div style="font-size:3rem; color:#dc3545; margin-bottom:16px;"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                <h5 class="fw-bold mb-2" style="font-family:'Outfit',sans-serif;">Supprimer cette activité ?</h5>
+                <p class="text-muted mb-4" id="delete-msg">Cette action est irréversible.</p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <button class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Annuler</button>
+                    <button class="btn btn-danger rounded-pill px-4 fw-bold" id="confirmDeleteBtn">
+                        <i class="bi bi-trash me-1"></i> Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+let currentDeleteId = null;
+const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+function confirmDelete(id, name) {
+    currentDeleteId = id;
+    document.getElementById('delete-msg').textContent = `Voulez-vous vraiment supprimer « ${name} » ? Cette action est irréversible.`;
+    deleteModal.show();
+}
+
+document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+    if (currentDeleteId) {
+        document.getElementById('delete-form-' + currentDeleteId).submit();
+    }
+});
+
+// Client-side filter
+const searchInput = document.querySelector('input[name="q"]');
+const typeSelect  = document.querySelector('select[name="type"]');
+const statusSelect= document.querySelector('select[name="status"]');
+
+function applyFilters() {
+    const q      = searchInput ? searchInput.value.toLowerCase() : '';
+    const type   = typeSelect  ? typeSelect.value.toLowerCase()  : '';
+    const status = statusSelect? statusSelect.value.toLowerCase(): '';
+    document.querySelectorAll('.activite-item').forEach(item => {
+        const n = item.dataset.name   || '';
+        const t = item.dataset.type   || '';
+        const s = item.dataset.status || '';
+        const show = n.includes(q) && (type===''||t===type) && (status===''||s===status);
+        item.style.display = show ? '' : 'none';
+    });
+}
+
+[searchInput, typeSelect, statusSelect].forEach(el => el && el.addEventListener('input', applyFilters));
+</script>
+{% endblock %}

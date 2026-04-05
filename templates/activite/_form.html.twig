@@ -1,0 +1,49 @@
+{# Reusable form partial for new and edit #}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'activiteForm'}}) }}
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="form-group-custom">
+            <label class="form-label-custom"><i class="bi bi-pencil-square me-1"></i> Nom de l'activité <span class="required">*</span></label>
+            {{ form_widget(form.name, {'attr': {'class': 'form-control-custom', 'placeholder': 'Ex: Randonnée en montagne'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group-custom">
+            <label class="form-label-custom"><i class="bi bi-tag-fill me-1"></i> Type d'activité <span class="required">*</span></label>
+            {{ form_widget(form.type, {'attr': {'class': 'form-control-custom', 'placeholder': 'Ex: Sport, Culture, Nature...'}}) }}
+            {{ form_errors(form.type) }}
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="form-group-custom">
+            <label class="form-label-custom"><i class="bi bi-file-text me-1"></i> Description</label>
+            {{ form_widget(form.description, {'attr': {'class': 'form-control-custom', 'rows': '4', 'placeholder': 'Décrivez l\'activité en détail...'}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group-custom">
+            <label class="form-label-custom"><i class="bi bi-geo-alt-fill me-1"></i> Localisation <span class="required">*</span></label>
+            {{ form_widget(form.localisation, {'attr': {'class': 'form-control-custom', 'placeholder': 'Ex: Tunis, Hammamet...'}}) }}
+            {{ form_errors(form.localisation) }}
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group-custom">
+            <label class="form-label-custom"><i class="bi bi-cash-coin me-1"></i> Prix (TND) <span class="required">*</span></label>
+            {{ form_widget(form.prix, {'attr': {'class': 'form-control-custom', 'placeholder': '0.00', 'min': '0', 'step': '0.01'}}) }}
+            {{ form_errors(form.prix) }}
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="form-group-custom">
+            <label class="form-label-custom"><i class="bi bi-check2-circle me-1"></i> Statut <span class="required">*</span></label>
+            {{ form_widget(form.status, {'attr': {'class': 'form-control-custom'}}) }}
+            {{ form_errors(form.status) }}
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GoVibe - Connectez-vous pour découvrir des expériences de voyage uniques">
+    <title>GoVibe - Connexion</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================
+           GoVibe Login - Glassmorphism Design
+           ============================================ */
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background with image + dark overlay */
+        .login-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .login-background img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.7);
+        }
+
+        .login-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1;
+        }
+
+        /* Floating particles effect */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(80, 200, 120, 0.3);
+            border-radius: 50%;
+            animation: float-particle linear infinite;
+        }
+
+        .particle:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; width: 4px; height: 4px; }
+        .particle:nth-child(2) { left: 25%; animation-duration: 15s; animation-delay: 2s; width: 6px; height: 6px; }
+        .particle:nth-child(3) { left: 40%; animation-duration: 10s; animation-delay: 4s; width: 3px; height: 3px; }
+        .particle:nth-child(4) { left: 55%; animation-duration: 18s; animation-delay: 1s; width: 5px; height: 5px; }
+        .particle:nth-child(5) { left: 70%; animation-duration: 14s; animation-delay: 3s; width: 4px; height: 4px; }
+        .particle:nth-child(6) { left: 85%; animation-duration: 11s; animation-delay: 5s; width: 7px; height: 7px; }
+        .particle:nth-child(7) { left: 15%; animation-duration: 16s; animation-delay: 6s; width: 3px; height: 3px; }
+        .particle:nth-child(8) { left: 60%; animation-duration: 13s; animation-delay: 7s; width: 5px; height: 5px; }
+
+        @keyframes float-particle {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Glassmorphism Card */
+        .login-card {
+            position: relative;
+            z-index: 10;
+            width: 420px;
+            padding: 48px 40px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: card-appear 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(30px) scale(0.96);
+        }
+
+        @keyframes card-appear {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Logo */
+        .login-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #50C878, #2E8B57);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 25px rgba(80, 200, 120, 0.4);
+            animation: logo-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes logo-pulse {
+            0%, 100% { box-shadow: 0 8px 25px rgba(80, 200, 120, 0.4); }
+            50% { box-shadow: 0 8px 40px rgba(80, 200, 120, 0.6); }
+        }
+
+        .login-logo span {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        /* Title */
+        .login-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 30px;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .login-subtitle {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.85);
+            text-align: center;
+            margin-bottom: 32px;
+            font-weight: 300;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.90);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1.5px solid rgba(255, 255, 255, 0.30);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.50);
+        }
+
+        .form-group input:focus {
+            border-color: #50C878;
+            background: rgba(255, 255, 255, 0.20);
+            box-shadow: 0 0 0 3px rgba(80, 200, 120, 0.25);
+        }
+
+        /* Password container with toggle */
+        .password-container {
+            position: relative;
+        }
+
+        .password-container input {
+            padding-right: 50px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.60);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+
+        .password-toggle:hover {
+            color: #50C878;
+        }
+
+        /* Forgot password link */
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            margin-top: -12px;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: #50C878;
+        }
+
+        /* Error message */
+        .login-error {
+            background: rgba(198, 40, 40, 0.2);
+            border: 1px solid rgba(198, 40, 40, 0.4);
+            color: #ff9a9a;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        /* Validation Styles */
+        .form-group input.is-invalid {
+            border-color: #ff9a9a;
+            background: rgba(198, 40, 40, 0.1);
+            animation: shake 0.4s ease-in-out;
+        }
+        .form-group input.is-valid {
+            border-color: #50C878;
+            background: rgba(80, 200, 120, 0.1);
+        }
+        .invalid-feedback {
+            color: #ff9a9a;
+            font-size: 12px;
+            margin-top: 6px;
+            display: none;
+            text-align: left;
+            font-weight: 500;
+        }
+        .form-group input.is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+        
+        .btn-signin {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #50C878, #2E8B57);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .btn-signin::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-signin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(80, 200, 120, 0.50);
+        }
+
+        .btn-signin:hover::before {
+            left: 100%;
+        }
+
+        .btn-signin:active {
+            transform: translateY(0);
+        }
+
+        /* Create Account link */
+        .signup-link {
+            text-align: center;
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .signup-link span {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.70);
+        }
+
+        .signup-link a {
+            color: #50C878;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .signup-link a:hover {
+            color: #6ddb97;
+            text-shadow: 0 0 10px rgba(80, 200, 120, 0.3);
+        }
+
+        /* Already logged in info */
+        .logged-in-info {
+            background: rgba(80, 200, 120, 0.15);
+            border: 1px solid rgba(80, 200, 120, 0.3);
+            color: #a0f0c0;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .logged-in-info a {
+            color: #50C878;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                width: 92%;
+                margin: 16px;
+                padding: 36px 28px;
+            }
+
+            .login-logo {
+                width: 70px;
+                height: 70px;
+            }
+
+            .login-logo span {
+                font-size: 26px;
+            }
+
+            .login-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Image -->
+    <div class="login-background">
+        <img src="{{ asset('images/go_vibe_bg.png') }}" alt="GoVibe Background">
+    </div>
+
+    <!-- Floating Particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="login-card">
+        <!-- Logo -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <img src="{{ asset('images/logo.png') }}" alt="GoVibe Logo" style="width: 120px; height: auto;">
+        </div>
+
+        <!-- Title -->
+        <h1 class="login-title">GoVibe</h1>
+        <p class="login-subtitle">Welcome Back</p>
+
+        <!-- Already logged in -->
+        {% if app.user %}
+            <div class="logged-in-info">
+                Connecté en tant que {{ app.user.userIdentifier }}
+                <br><a href="{{ path('app_logout') }}">Se déconnecter</a>
+            </div>
+        {% endif %}
+
+        <!-- Error Message -->
+        {% if error %}
+            <div class="login-error" id="login-error">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <!-- Login Form -->
+        <form method="post" id="professional-login-form" novalidate>
+            <div class="form-group">
+                <label for="inputEmail">Email</label>
+                <input
+                    type="email"
+                    id="inputEmail"
+                    name="_username"
+                    value="{{ last_username }}"
+                    placeholder="votre@email.com"
+                    autocomplete="email"
+                    required
+                    autofocus
+                >
+                <div class="invalid-feedback" id="email-error">Veuillez entrer une adresse email valide.</div>
+            </div>
+
+            <div class="form-group">
+                <label for="inputPassword">Password</label>
+                <div class="password-container">
+                    <input
+                        type="password"
+                        id="inputPassword"
+                        name="_password"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" class="password-toggle" id="togglePassword" aria-label="Afficher le mot de passe">
+                        👁
+                    </button>
+                </div>
+                <div class="invalid-feedback" id="password-error">Le mot de passe est obligatoire.</div>
+            </div>
+
+            <a href="{{ path('app_forgot_password') }}" class="forgot-link" id="forgot-password-link">Forgot Password?</a>
+
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+            <button type="submit" class="btn-signin" id="btn-signin">
+                Sign In
+            </button>
+
+            <div class="signup-link">
+                <span>Don't have an account? </span>
+                <a href="{{ path('app_register') }}" id="create-account-link">Create Account</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Password visibility toggle
+        const toggleBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('inputPassword');
+
+        toggleBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? '👁' : '🙈';
+        });
+
+        // Subtle input focus animations
+        document.querySelectorAll('.form-group input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.closest('.form-group').style.transform = 'scale(1.02)';
+                this.parentElement.closest('.form-group').style.transition = 'transform 0.2s ease';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.closest('.form-group').style.transform = 'scale(1)';
+                validateField(this);
+            });
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid')) validateField(this);
+            });
+        });
+
+        // Professional Validations
+        const logForm = document.getElementById('professional-login-form');
+        const btnSubmit = document.getElementById('btn-signin');
+        
+        function validateField(field) {
+            let isValid = true;
+            if (field.type === 'email') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                isValid = field.value.trim() !== '' && emailRegex.test(field.value);
+            } else if (field.type === 'password' || field.name === '_password') {
+                isValid = field.value.trim() !== '';
+            }
+
+            if (!isValid) {
+                field.classList.add('is-invalid');
+                field.classList.remove('is-valid');
+            } else {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            }
+            return isValid;
+        }
+
+        logForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const isEmailValid = validateField(document.getElementById('inputEmail'));
+            const isPassValid = validateField(document.getElementById('inputPassword'));
+
+            if (isEmailValid && isPassValid) {
+                btnSubmit.innerHTML = 'Connexion en cours... <span class="spinner"></span>';
+                btnSubmit.style.opacity = '0.8';
+                btnSubmit.style.pointerEvents = 'none';
+                setTimeout(() => logForm.submit(), 300); // Small 300ms delay for UI effect
+            }
+        });
+    </script>
+</body>
+</html>

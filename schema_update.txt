@@ -1,0 +1,55 @@
+﻿symfony :  Updating 
+database schema...
+At line:1 char:1
++ symfony console 
+doctrine:schema:update 
+--force 2>&1 | Out-File 
+-Encod ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo        
+      : NotSpecified: (   
+  Updating database sch   
+ ema...:String) [], Re    
+moteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+
+
+In ExceptionConverter.php 
+line 102:
+                          
+  An exception occurred   
+  while executing a quer  
+  y: SQLSTATE[HY000]: Ge  
+  neral error: 1553 Cann  
+  ot drop index 'idx_use  
+  r_id': needed in a for  
+  eign key constraint     
+                          
+
+In Exception.php line 24:
+                          
+  SQLSTATE[HY000]: Gener  
+  al error: 1553 Cannot   
+  drop index 'idx_user_i  
+  d': needed in a foreig  
+  n key constraint        
+                          
+
+In Connection.php line 27:
+                          
+  SQLSTATE[HY000]: Gener  
+  al error: 1553 Cannot   
+  drop index 'idx_user_i  
+  d': needed in a foreig  
+  n key constraint        
+                          
+
+doctrine:schema:update 
+[--em EM] [--complete] 
+[--dump-sql] [-f|--force]
+

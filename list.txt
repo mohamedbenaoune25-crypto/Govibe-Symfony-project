@@ -1,0 +1,13 @@
+﻿+---------+----------------+---------+---------+-------------+---------+---------+
+| [36mVersion[39m |   [36mDirectory[39m    |   [36mPHP   |   [36mPHP   |     [36mPHP     | [36mServer[39m  | [36mSystem?[39m |
+|         |                |   CLI[39m   |   FPM[39m   |     CGI[39m     |         |         |
++---------+----------------+---------+---------+-------------+---------+---------+
+| [7m8.0.30[27m  | C:\xampp\php   | php.exe |         | php-cgi.exe | PHP CGI | *       |
+| 8.2.0   | C:\tools\php82 | php.exe |         | php-cgi.exe | PHP CGI |         |
++---------+----------------+---------+---------+-------------+---------+---------+
+
+The current PHP version is selected from default version in $PATH
+
+To control the version used in a directory, create a [33m.php-version[39m file that contains the version number (e.g. 8.4 or 8.4.12),
+or define config.platform.php inside [33mcomposer.json[39m.
+If you're using Platform.sh or Upsun, the version can also be specified in their configuration files.

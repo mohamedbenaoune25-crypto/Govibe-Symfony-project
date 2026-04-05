@@ -1,0 +1,73 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block page_title %}Gestion des Vols{% endblock %}
+
+{% block body %}
+<div class="admin-card">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <span>Flotte & Vols Programmés</span>
+        <a href="{{ path('app_admin_vols_new') }}" class="btn btn-sm" style="background:var(--admin-accent);color:white;font-weight:600;"><i class="bi bi-plus-lg me-1"></i> Nouveau Vol</a>
+    </div>
+    <div class="admin-card-body p-0">
+        <table class="table admin-table mb-0">
+            <thead>
+                <tr>
+                    <th>Vol ID</th>
+                    <th>Trajet</th>
+                    <th>Horaires</th>
+                    <th>Compagnie / Classe</th>
+                    <th>Places / Prix</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vol in vols %}
+                <tr>
+                    <td><strong>{{ vol.flightId }}</strong></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold" style="color:#333;">{{ vol.departureAirport }}</span>
+                            <i class="bi bi-arrow-right text-muted"></i>
+                            <span class="fw-bold" style="color:#333;">{{ vol.destination }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-size:13px;color:#555;">Départ: <strong>{{ vol.departureTime ? vol.departureTime|date('H:i') : '' }}</strong></div>
+                        <div style="font-size:13px;color:#555;">Arrivée: <strong>{{ vol.arrivalTime ? vol.arrivalTime|date('H:i') : '' }}</strong></div>
+                    </td>
+                    <td>
+                        <div><i class="bi bi-airplane me-1"></i> {{ vol.airline }}</div>
+                        <span class="badge" style="background:rgba(13, 110, 253, 0.1);color:#0d6efd;font-weight:600;">{{ vol.classeChaise }}</span>
+                    </td>
+                    <td>
+                        {% if vol.availableSeats < 10 %}
+                            <div class="text-danger fw-bold"><i class="bi bi-exclamation-circle"></i> {{ vol.availableSeats }} places</div>
+                        {% else %}
+                            <div class="text-success fw-bold">{{ vol.availableSeats }} places</div>
+                        {% endif %}
+                        <div style="font-size:18px;font-weight:700;color:var(--admin-primary);">{{ vol.prix }} €</div>
+                    </td>
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ path('app_admin_vols_edit', {'flightId': vol.flightId}) }}" class="btn btn-sm" style="background:#FFF3CD;color:#856404;" title="Modifier"><i class="bi bi-pencil"></i></a>
+                            
+                            <form method="post" action="{{ path('app_admin_vols_delete', {'flightId': vol.flightId}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler et supprimer ce vol ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ vol.flightId) }}">
+                                <button class="btn btn-sm" style="background:#F8D7DA;color:#721C24;" title="Supprimer"><i class="bi bi-trash3"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-5">
+                        <i class="bi bi-cloud-slash text-muted" style="font-size:40px;"></i>
+                        <p class="text-muted mt-2">Aucun vol n'est actuellement programmé.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

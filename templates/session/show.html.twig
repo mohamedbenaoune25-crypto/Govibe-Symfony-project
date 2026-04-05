@@ -1,0 +1,212 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Session #{{ session.idSession }} | GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .show-hero {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 60%, #2c5364 100%);
+        padding: 120px 0 80px; position: relative; overflow: hidden;
+    }
+    .show-hero::before {
+        content:''; position:absolute; inset:0;
+        background: radial-gradient(circle at 80% 50%, rgba(80,200,120,0.12) 0%, transparent 65%);
+    }
+    .breadcrumb-nav { font-size:13px; }
+    .breadcrumb-nav a { color:#50c878; text-decoration:none; }
+    .breadcrumb-nav a:hover { text-decoration: underline; }
+    .breadcrumb-nav span { color: rgba(255,255,255,0.4); margin: 0 8px; }
+
+    .show-card {
+        background: white; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden; margin-top: -40px;
+    }
+
+    .info-section { padding: 36px 40px; border-bottom: 1px solid #f0f0f0; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 18px; }
+    .info-box {
+        background: #f8f9fa; border-radius: 16px; padding: 20px;
+        display: flex; flex-direction: column; gap: 6px; transition: all 0.2s;
+    }
+    .info-box:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
+    .info-box .lbl { font-size: 11px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+    .info-box .val { font-size: 1.1rem; font-weight: 700; color: #1a4731; font-family:'Outfit',sans-serif; }
+    .info-box .ico { font-size: 1.3rem; color: #50c878; margin-bottom: 4px; }
+    .highlight-box { background: linear-gradient(135deg, #e8f7ee, #d4edda); border: 1px solid #b8dfc9; }
+    .highlight-box .val { color: #155724; font-size: 1.6rem; }
+
+    /* Progress dans le show */
+    .progress-section { padding: 32px 40px; border-bottom: 1px solid #f0f0f0; }
+    .progress-section h4 { font-family:'Outfit',sans-serif; color:#1a4731; font-weight:700; margin-bottom:16px; }
+    .prog-bar-big { background: #e9ecef; border-radius: 100px; height: 16px; overflow:hidden; margin-bottom: 10px; }
+    .prog-fill { height:100%; border-radius:100px; transition: width 0.6s ease; }
+    .fill-ok   { background: linear-gradient(90deg,#50c878,#3aad65); }
+    .fill-low  { background: linear-gradient(90deg,#ffc107,#fd7e14); }
+    .fill-full { background: linear-gradient(90deg,#dc3545,#c0392b); }
+    .prog-legend { display:flex; justify-content:space-between; font-size:13px; color:#666; }
+
+    /* Réservations */
+    .reservations-section { padding: 36px 40px; }
+    .reservations-section h4 { font-family:'Outfit',sans-serif; color:#1a4731; font-weight:700; margin-bottom:20px; }
+    .resa-card {
+        background: #f8f9fa; border-radius: 14px; padding: 16px 20px;
+        display: flex; align-items: center; gap: 14px; border: 1px solid #e9ecef; transition: all 0.2s;
+    }
+    .resa-card:hover { background:#f0faf5; border-color:#b8dfc9; }
+    .resa-icon { width: 42px; height: 42px; background: #1a4731; border-radius: 12px; display:flex; align-items:center; justify-content:center; color:white; font-size:1.1rem; flex-shrink:0; }
+    .resa-info { flex: 1; }
+    .resa-info .r-user { font-weight:700; color:#1a4731; font-size:14px; }
+    .resa-info .r-meta { font-size:12px; color:#888; margin-top:3px; }
+    .resa-places { background: #d4edda; color:#155724; border-radius:20px; padding:4px 12px; font-size:12px; font-weight:700; flex-shrink:0; }
+    .empty-resa { text-align:center; padding:36px; color:#adb5bd; }
+    .empty-resa i { font-size:2.5rem; display:block; margin-bottom:10px; }
+
+    /* Action bar */
+    .action-bar {
+        background: #f8f9fa; padding: 22px 40px;
+        display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+        border-top: 1px solid #eee;
+    }
+    .btn-back { background:white; border:2px solid #dee2e6; color:#555; border-radius:12px; padding:10px 22px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s; }
+    .btn-back:hover { border-color:#1a4731; color:#1a4731; }
+    .btn-edit-main { background:linear-gradient(135deg,#ffc107,#fd7e14); color:white; border:0; border-radius:12px; padding:10px 22px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s; }
+    .btn-edit-main:hover { transform:translateY(-1px); color:white; box-shadow:0 6px 20px rgba(255,193,7,0.4); }
+    .btn-del-main { background:linear-gradient(135deg,#dc3545,#c0392b); color:white; border:0; border-radius:12px; padding:10px 22px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:all 0.2s; }
+    .btn-del-main:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(220,53,69,0.4); }
+    .btn-add-resa { background:#203a43; color:white; border:0; border-radius:10px; padding:9px 18px; font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:all 0.2s; }
+    .btn-add-resa:hover { background:#2c5364; color:white; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="show-hero">
+    <div class="container position-relative">
+        <p class="breadcrumb-nav mb-3">
+            <a href="{{ path('app_activite_index') }}"><i class="bi bi-grid me-1"></i>Activités</a>
+            <span>/</span>
+            {% if session.activite %}
+                <a href="{{ path('app_activite_show', {'id': session.activite.id}) }}">{{ session.activite.name }}</a>
+                <span>/</span>
+            {% endif %}
+            <span class="text-white-50">Session #{{ session.idSession }}</span>
+        </p>
+        <div class="d-inline-flex align-items: center gap-2 mb-3"
+             style="background:rgba(80,200,120,0.15);border:1px solid rgba(80,200,120,0.35);color:#50c878;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">
+            <i class="bi bi-calendar-event-fill me-1"></i> Session planifiée
+        </div>
+        <h1 style="font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;color:white;margin-bottom:10px;">
+            {{ session.date ? session.date|date('d MMMM Y')|capitalize : 'Date non définie' }}
+            — {{ session.heure ? session.heure|date('H:i') : '' }}
+        </h1>
+        <p class="text-white-50" style="font-size:15px;">
+            <i class="bi bi-lightning-charge-fill me-1" style="color:#50c878;"></i>
+            {{ session.activite ? session.activite.name : 'Activité non liée' }}
+        </p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="show-card">
+        {# Info boxes #}
+        <div class="info-section">
+            <div class="info-grid">
+                <div class="info-box highlight-box">
+                    <div class="ico"><i class="bi bi-people-fill"></i></div>
+                    <div class="lbl">Places restantes</div>
+                    <div class="val">{{ session.nbrPlacesRestant }} / {{ session.capacite }}</div>
+                </div>
+                <div class="info-box">
+                    <div class="ico"><i class="bi bi-calendar3"></i></div>
+                    <div class="lbl">Date</div>
+                    <div class="val">{{ session.date ? session.date|date('d/m/Y') : '—' }}</div>
+                </div>
+                <div class="info-box">
+                    <div class="ico"><i class="bi bi-clock-fill"></i></div>
+                    <div class="lbl">Heure</div>
+                    <div class="val">{{ session.heure ? session.heure|date('H:i') : '—' }}</div>
+                </div>
+                <div class="info-box">
+                    <div class="ico"><i class="bi bi-bar-chart-fill"></i></div>
+                    <div class="lbl">Capacité totale</div>
+                    <div class="val">{{ session.capacite }} pers.</div>
+                </div>
+            </div>
+        </div>
+
+        {# Barre de progression #}
+        {% set pct = session.capacite > 0 ? ((session.nbrPlacesRestant / session.capacite) * 100)|round : 0 %}
+        {% set fillClass = pct == 0 ? 'fill-full' : (pct < 30 ? 'fill-low' : 'fill-ok') %}
+        <div class="progress-section">
+            <h4><i class="bi bi-speedometer2 me-2 text-success"></i>Occupation de la session</h4>
+            <div class="prog-bar-big">
+                <div class="prog-fill {{ fillClass }}" style="width: {{ 100 - pct }}%;"></div>
+            </div>
+            <div class="prog-legend">
+                <span>{{ session.capacite - session.nbrPlacesRestant }} places réservées</span>
+                <span>
+                    {% if pct == 0 %}<span class="badge bg-danger">Complet</span>
+                    {% elseif pct < 30 %}<span class="badge bg-warning text-dark">Presque plein</span>
+                    {% else %}<span class="badge bg-success">Disponible</span>
+                    {% endif %}
+                </span>
+                <span>{{ session.nbrPlacesRestant }} places libres</span>
+            </div>
+        </div>
+
+        {# Réservations liées #}
+        <div class="reservations-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="mb-0"><i class="bi bi-ticket-perforated-fill me-2 text-success"></i>Réservations liées</h4>
+                <a href="{{ path('app_reservation_session_new') }}" class="btn-add-resa">
+                    <i class="bi bi-plus-circle-fill"></i> Ajouter une réservation
+                </a>
+            </div>
+
+            {% set reservations = session.reservationSessions is defined ? session.reservationSessions : [] %}
+            {% if reservations is empty %}
+                <div class="empty-resa">
+                    <i class="bi bi-ticket-detailed"></i>
+                    <p class="mb-0 text-muted">Aucune réservation pour cette session.</p>
+                </div>
+            {% else %}
+                <div class="d-flex flex-column gap-3">
+                    {% for resa in reservations %}
+                        <div class="resa-card">
+                            <div class="resa-icon"><i class="bi bi-person-fill"></i></div>
+                            <div class="resa-info">
+                                <div class="r-user"><i class="bi bi-person me-1"></i>{{ resa.userRef }}</div>
+                                <div class="r-meta">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Réservé le {{ resa.reservedAt ? resa.reservedAt|date('d/m/Y à H:i') : '—' }}
+                                </div>
+                            </div>
+                            <span class="resa-places"><i class="bi bi-people me-1"></i>{{ resa.nbPlaces }} place{{ resa.nbPlaces > 1 ? 's' : '' }}</span>
+                            <a href="{{ path('app_reservation_session_show', {'id': resa.idReservation}) }}"
+                               class="btn btn-sm btn-outline-secondary rounded-pill ms-2">Détail</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        {# Action bar #}
+        <div class="action-bar">
+            <a href="{{ path('app_session_index') }}" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ path('app_session_edit', {'id': session.idSession}) }}" class="btn-edit-main">
+                    <i class="bi bi-pencil-fill"></i> Modifier
+                </a>
+                <button class="btn-del-main" onclick="document.getElementById('delete-session-form').submit()">
+                    <i class="bi bi-trash-fill"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<form id="delete-session-form" method="post" action="{{ path('app_session_delete', {'id': session.idSession}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete_session' ~ session.idSession) }}">
+</form>
+{% endblock %}

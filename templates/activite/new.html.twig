@@ -1,0 +1,124 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Activité | GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .form-hero {
+        background: linear-gradient(135deg, var(--dark-green) 0%, var(--mid-green) 100%);
+        padding: 120px 0 80px; position: relative;
+    }
+    .form-hero::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 30% 70%, rgba(80,200,120,0.1) 0%, transparent 60%);
+    }
+    .form-card {
+        background: white; border-radius: 24px; box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+        margin-top: -40px; overflow: hidden; position: relative;
+    }
+    .form-card-header {
+        padding: 30px 40px; background: linear-gradient(135deg, #f0faf5, #e8f5ee);
+        border-bottom: 1px solid #d4edda;
+        display: flex; align-items: center; gap: 16px;
+    }
+    .header-icon {
+        width: 52px; height: 52px; background: var(--primary-emerald);
+        border-radius: 14px; display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 1.4rem; box-shadow: 0 4px 14px rgba(80,200,120,0.4);
+    }
+    .form-card-body { padding: 40px; }
+
+    /* Form controls */
+    .form-group-custom { margin-bottom: 0; }
+    .form-label-custom { font-weight: 700; font-size: 13px; color: var(--dark-green); margin-bottom: 8px; display: block; }
+    .required { color: #dc3545; }
+    .form-control-custom {
+        display: block; width: 100%; padding: 13px 16px;
+        border: 2px solid #e9ecef; border-radius: 12px; font-size: 14px;
+        color: #333; background: #fdfdfd; transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif; outline: none;
+    }
+    .form-control-custom:focus { border-color: var(--primary-emerald); background: white; box-shadow: 0 0 0 4px rgba(80,200,120,0.1); }
+    textarea.form-control-custom { resize: vertical; }
+    select.form-control-custom { cursor: pointer; }
+
+    .form-divider { height: 1px; background: #f0f0f0; margin: 10px 0; }
+
+    .form-footer {
+        padding: 24px 40px; background: #f8f9fa;
+        border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .btn-back-form { background: white; border: 2px solid #dee2e6; color: #555; border-radius: 12px; padding: 11px 24px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-back-form:hover { border-color: var(--dark-green); color: var(--dark-green); }
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary-emerald), #3aad65);
+        color: white; border: 0; border-radius: 12px; padding: 12px 32px;
+        font-weight: 700; font-size: 15px; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(80,200,120,0.35);
+    }
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(80,200,120,0.45); }
+
+    /* Tips sidebar */
+    .tip-card { background: #f0faf5; border: 1px solid #b8dfc9; border-radius: 16px; padding: 22px; }
+    .tip-card h6 { font-family:'Outfit',sans-serif; color:var(--dark-green); font-weight:700; }
+    .tip-item { display:flex; gap:10px; margin-bottom:12px; font-size:13px; color:#555; }
+    .tip-item i { color:var(--primary-emerald); flex-shrink:0; margin-top:2px; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="form-hero">
+    <div class="container position-relative">
+        <p class="mb-2" style="font-size:13px;">
+            <a href="{{ path('app_activite_index') }}" class="text-success text-decoration-none"><i class="bi bi-grid me-1"></i>Activités</a>
+            <span class="text-white-50 mx-2">/</span>
+            <span class="text-white-50">Nouvelle activité</span>
+        </p>
+        <h1 style="font-family:'Outfit',sans-serif; font-size:2.5rem; font-weight:700; color:white;">
+            Créer une <span style="color:var(--primary-emerald);">nouvelle activité</span>
+        </h1>
+        <p class="text-white-50">Remplissez les informations ci-dessous pour ajouter une activité à la plateforme.</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="header-icon"><i class="bi bi-plus-circle-fill"></i></div>
+                    <div>
+                        <h5 class="mb-1" style="font-family:'Outfit',sans-serif; font-weight:700; color:var(--dark-green);">Informations de l'activité</h5>
+                        <p class="mb-0 text-muted" style="font-size:13px;">Tous les champs marqués <span style="color:#dc3545;">*</span> sont obligatoires</p>
+                    </div>
+                </div>
+                <div class="form-card-body">
+                    {% include 'activite/_form.html.twig' %}
+                </div>
+                <div class="form-footer">
+                    <a href="{{ path('app_activite_index') }}" class="btn-back-form">
+                        <i class="bi bi-arrow-left"></i> Annuler
+                    </a>
+                    <button type="submit" form="activiteForm" class="btn-submit">
+                        <i class="bi bi-check-circle-fill"></i> Créer l'activité
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div style="position:sticky; top:100px;">
+                <div class="tip-card">
+                    <h6 class="mb-3"><i class="bi bi-lightbulb-fill me-2 text-warning"></i>Conseils</h6>
+                    <div class="tip-item"><i class="bi bi-check-circle-fill"></i><span>Choisissez un nom clair et accrocheur pour attirer les participants.</span></div>
+                    <div class="tip-item"><i class="bi bi-check-circle-fill"></i><span>Une description détaillée aide les visiteurs à comprendre ce qu'ils vivront.</span></div>
+                    <div class="tip-item"><i class="bi bi-check-circle-fill"></i><span>Précisez la localisation exacte pour faciliter la navigation des participants.</span></div>
+                    <div class="tip-item"><i class="bi bi-check-circle-fill"></i><span>Fixez un prix compétitif aligné avec le marché local.</span></div>
+                    <div class="tip-item mb-0"><i class="bi bi-check-circle-fill"></i><span>Après création, ajoutez des sessions pour planifier les dates disponibles.</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

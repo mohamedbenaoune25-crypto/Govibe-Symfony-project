@@ -1,0 +1,103 @@
+﻿[notice] Migrating up to DoctrineMigrations\Version20260325110947
+symfony : [error] 
+Migration DoctrineMigrat
+ions\Version202603251109
+47 failed during 
+Execution. Error: "An 
+exception occurred 
+while executing a 
+query: SQLSTATE[42S02]: 
+Base table or view not 
+found: 1146 Table 'govib
+e_project.poste_likes' 
+doesn't exist"
+At line:1 char:1
++ symfony console doctri
+ne:migrations:migrate 
+--no-interaction 2>&1 | 
+O ...
++ ~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo      
+        : NotSpecified: 
+([    error] Migrati... 
+doe    sn't 
+exist":String) [    ], 
+RemoteException
+    + 
+FullyQualifiedError    
+Id : NativeCommandErr   
+ or
+ 
+
+In 
+ExceptionConverter.php 
+line 51:
+                        
+  
+  An exception occurred 
+  
+  while executing a 
+quer  
+  y: SQLSTATE[42S02]: 
+Ba  
+  se table or view not 
+f  
+  ound: 1146 Table 
+'govi  
+  
+be_project.poste_likes  
+  ' doesn't exist       
+  
+                        
+  
+
+In Exception.php line 
+24:
+                        
+  
+  SQLSTATE[42S02]: Base 
+  
+  table or view not 
+foun  
+  d: 1146 Table 
+'govibe_  
+  project.poste_likes' 
+d  
+  oesn't exist          
+  
+                        
+  
+
+In Connection.php line 
+57:
+                        
+  
+  SQLSTATE[42S02]: Base 
+  
+  table or view not 
+foun  
+  d: 1146 Table 
+'govibe_  
+  project.poste_likes' 
+d  
+  oesn't exist          
+  
+                        
+  
+
+doctrine:migrations:migr
+ate [--write-sql 
+[WRITE-SQL]] 
+[--dry-run] 
+[--query-time] 
+[--allow-no-migration] 
+[--all-or-nothing 
+[ALL-OR-NOTHING]] 
+[--no-all-or-nothing] 
+[--configuration 
+CONFIGURATION] [--em 
+EM] [--conn CONN] [--] 
+[<version>]
+

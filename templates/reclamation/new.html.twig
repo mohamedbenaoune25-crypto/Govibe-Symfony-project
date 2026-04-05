@@ -1,0 +1,222 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Réclamation - GoVibe{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        --emerald-glow: rgba(16, 185, 129, 0.4);
+    }
+
+    body {
+        background-color: #050505;
+        background-image: 
+            radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.15), transparent 25%),
+            radial-gradient(circle at 20% 80%, rgba(6, 78, 59, 0.2), transparent 25%);
+        color: #f3f4f6;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Hero header for reclamations */
+    .reclamation-hero {
+        position: relative;
+        padding: 150px 0 80px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .reclamation-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: linear-gradient(180deg, rgba(6, 78, 59, 0.8) 0%, #050505 100%);
+        z-index: -2;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        background: linear-gradient(to right, #ffffff, #A7F3D0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 20px;
+        letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: #9CA3AF;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Form Glass Container */
+    .form-glass {
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        box-shadow: var(--glass-shadow);
+        padding: 50px;
+        margin-top: -40px;
+        position: relative;
+        z-index: 10;
+        max-width: 750px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 100px;
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    
+    .form-glass:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 45px rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Input styling */
+    .form-group label {
+        font-weight: 700; 
+        font-size: 0.85rem; 
+        text-transform: uppercase; 
+        color: #9CA3AF; 
+        margin-bottom: 10px; 
+        letter-spacing: 1px;
+    }
+    
+    .form-control {
+        border-radius: 12px; 
+        padding: 16px 20px; 
+        border: 1px solid rgba(255,255,255,0.1); 
+        background: rgba(0,0,0,0.2) !important;
+        color: #fff !important;
+        transition: all 0.3s;
+        font-size: 1rem;
+    }
+    
+    .form-control::placeholder {
+        color: rgba(255,255,255,0.3);
+    }
+
+    .form-control:focus {
+        background: rgba(0,0,0,0.4) !important;
+        border-color: #10B981 !important;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15) !important;
+        outline: none;
+    }
+
+    /* Button Cyber */
+    .btn-cyber {
+        background: linear-gradient(135deg, #10B981, #064E3B);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 16px 30px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px var(--emerald-glow);
+        text-decoration: none;
+        display: block;
+        width: 100%;
+        text-align: center;
+        margin-top: 30px;
+    }
+
+    .btn-cyber:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.6);
+        color: white;
+    }
+    
+    /* Back link */
+    .btn-back {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+        color: #9CA3AF;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+    
+    .btn-back:hover { 
+        color: #10B981; 
+    }
+    
+    /* Error styling */
+    .invalid-feedback {
+        display: block;
+        color: #FCA5A5;
+        background: rgba(239, 68, 68, 0.1);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+    <div class="reclamation-hero">
+        <div class="container" data-aos="fade-down" data-aos-duration="1000">
+            <h1 class="hero-title">Transmission Sécurisée</h1>
+            <p class="hero-subtitle">Initiez une nouvelle requête réseau. Notre algorithme analysera et retransmettra votre demande aux agents d'assistance GoVibe.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-glass" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'cyber-form'}}) }}
+                
+                <div class="mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="form-group">
+                        {{ form_label(form.sujet) }}
+                        {{ form_widget(form.sujet, {'attr': {'class': 'form-control', 'placeholder': 'Objet de votre transmission...'}}) }}
+                        {{ form_errors(form.sujet) }}
+                    </div>
+                </div>
+                
+                <div class="mb-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="form-group">
+                        {{ form_label(form.message) }}
+                        {{ form_widget(form.message, {'attr': {'class': 'form-control', 'rows': '6', 'placeholder': 'Décrivez minutieusement les données du problème...'}}) }}
+                        {{ form_errors(form.message) }}
+                    </div>
+                </div>
+
+                <div data-aos="zoom-in" data-aos-delay="500">
+                    <button type="submit" class="btn-cyber">
+                        <i class="bi bi-send-fill me-2"></i> Initialiser la Requête
+                    </button>
+                    <a href="{{ path('app_reclamation_index') }}" class="btn-back">
+                        <i class="bi bi-arrow-left"></i> Annuler et retourner au Centre de Commande
+                    </a>
+                </div>
+                
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        AOS.init({
+            once: true,
+            offset: 50
+        });
+    });
+</script>
+{% endblock %}

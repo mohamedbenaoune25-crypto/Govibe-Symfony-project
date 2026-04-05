@@ -1,0 +1,155 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ activite.name }} | GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .form-hero {
+        background: linear-gradient(135deg, #4a2c00 0%, #7b4a00 100%);
+        padding: 120px 0 80px; position: relative;
+    }
+    .form-hero::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 70% 30%, rgba(255,193,7,0.1) 0%, transparent 60%);
+    }
+    .form-card {
+        background: white; border-radius: 24px; box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+        margin-top: -40px; overflow: hidden; position: relative;
+    }
+    .form-card-header {
+        padding: 30px 40px; background: linear-gradient(135deg, #fff8e1, #fff3cd);
+        border-bottom: 1px solid #ffeaa7;
+        display: flex; align-items: center; gap: 16px;
+    }
+    .header-icon {
+        width: 52px; height: 52px; background: #ffc107;
+        border-radius: 14px; display: flex; align-items: center; justify-content: center;
+        color: white; font-size: 1.4rem; box-shadow: 0 4px 14px rgba(255,193,7,0.4);
+    }
+    .form-card-body { padding: 40px; }
+
+    /* Current values preview */
+    .current-values {
+        background: #f8f9fa; border-radius: 14px; padding: 16px 20px;
+        margin-bottom: 30px; border: 1px solid #e9ecef;
+    }
+    .current-values h6 { font-size: 12px; font-weight: 700; color:#999; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+    .cv-row { display:flex; flex-wrap:wrap; gap:10px; }
+    .cv-tag { background:white; border:1px solid #dee2e6; border-radius:8px; padding:5px 12px; font-size:12px; color:#555; display:flex; align-items:center; gap:5px; }
+    .cv-tag i { color: #ffc107; }
+
+    /* Form controls */
+    .form-group-custom { margin-bottom: 0; }
+    .form-label-custom { font-weight: 700; font-size: 13px; color: var(--dark-green); margin-bottom: 8px; display: block; }
+    .required { color: #dc3545; }
+    .form-control-custom {
+        display: block; width: 100%; padding: 13px 16px;
+        border: 2px solid #e9ecef; border-radius: 12px; font-size: 14px;
+        color: #333; background: #fdfdfd; transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif; outline: none;
+    }
+    .form-control-custom:focus { border-color: #ffc107; background: white; box-shadow: 0 0 0 4px rgba(255,193,7,0.1); }
+    textarea.form-control-custom { resize: vertical; }
+    select.form-control-custom { cursor: pointer; }
+
+    .form-footer {
+        padding: 24px 40px; background: #f8f9fa;
+        border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .btn-back-form { background: white; border: 2px solid #dee2e6; color: #555; border-radius: 12px; padding: 11px 24px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+    .btn-back-form:hover { border-color: var(--dark-green); color: var(--dark-green); }
+    .btn-submit-edit {
+        background: linear-gradient(135deg, #ffc107, #fd7e14);
+        color: white; border: 0; border-radius: 12px; padding: 12px 32px;
+        font-weight: 700; font-size: 15px; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(255,193,7,0.35);
+    }
+    .btn-submit-edit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,193,7,0.45); }
+
+    .changes-tracker { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 14px; padding: 20px; margin-top: 20px; }
+    .changes-tracker h6 { font-family:'Outfit',sans-serif; color:#856404; font-weight:700; font-size:14px; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="form-hero">
+    <div class="container position-relative">
+        <p class="mb-2" style="font-size:13px;">
+            <a href="{{ path('app_activite_index') }}" class="text-warning text-decoration-none"><i class="bi bi-grid me-1"></i>Activités</a>
+            <span class="text-white-50 mx-2">/</span>
+            <a href="{{ path('app_activite_show', {'id': activite.id}) }}" class="text-warning text-decoration-none">{{ activite.name }}</a>
+            <span class="text-white-50 mx-2">/</span>
+            <span class="text-white-50">Modifier</span>
+        </p>
+        <h1 style="font-family:'Outfit',sans-serif; font-size:2.5rem; font-weight:700; color:white;">
+            Modifier <span style="color:#ffc107;">l'activité</span>
+        </h1>
+        <p class="text-white-50">Mettez à jour les informations de « {{ activite.name }} ».</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <div class="header-icon"><i class="bi bi-pencil-fill"></i></div>
+                    <div>
+                        <h5 class="mb-1" style="font-family:'Outfit',sans-serif; font-weight:700; color:#856404;">Modifier les informations</h5>
+                        <p class="mb-0 text-muted" style="font-size:13px;">ID de l'activité : #{{ activite.id }}</p>
+                    </div>
+                </div>
+                <div class="form-card-body">
+                    <div class="current-values">
+                        <h6><i class="bi bi-info-circle me-1"></i> Valeurs actuelles</h6>
+                        <div class="cv-row">
+                            <span class="cv-tag"><i class="bi bi-pencil"></i> {{ activite.name }}</span>
+                            <span class="cv-tag"><i class="bi bi-tag"></i> {{ activite.type }}</span>
+                            <span class="cv-tag"><i class="bi bi-geo-alt"></i> {{ activite.localisation }}</span>
+                            <span class="cv-tag"><i class="bi bi-cash"></i> {{ activite.prix }} TND</span>
+                            <span class="cv-tag"><i class="bi bi-check-circle"></i> {{ activite.status }}</span>
+                        </div>
+                    </div>
+                    {% include 'activite/_form.html.twig' %}
+                </div>
+                <div class="form-footer">
+                    <a href="{{ path('app_activite_show', {'id': activite.id}) }}" class="btn-back-form">
+                        <i class="bi bi-arrow-left"></i> Annuler
+                    </a>
+                    <button type="submit" form="activiteForm" class="btn-submit-edit">
+                        <i class="bi bi-save-fill"></i> Enregistrer les modifications
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 mt-4 mt-lg-0">
+            <div style="position:sticky; top:100px;" class="d-flex flex-column gap-3">
+                <div class="changes-tracker">
+                    <h6><i class="bi bi-clock-history me-2"></i>Activité #{{ activite.id }}</h6>
+                    <p class="mb-2 text-muted" style="font-size:13px;">Sessions liées :</p>
+                    <div class="d-flex align-items-center gap-2">
+                        <span style="font-size:2rem; font-weight:700; color:#856404; font-family:'Outfit',sans-serif;">{{ activite.sessions|length }}</span>
+                        <span style="font-size:13px; color:#aaa;">session{{ activite.sessions|length > 1 ? 's' : '' }} planifiée{{ activite.sessions|length > 1 ? 's' : '' }}</span>
+                    </div>
+                </div>
+                <div class="bg-white border rounded-4 p-4">
+                    <h6 class="fw-bold" style="font-size:13px; color:var(--dark-green); text-transform:uppercase; letter-spacing:0.5px;">Accès rapides</h6>
+                    <div class="d-flex flex-column gap-2 mt-3">
+                        <a href="{{ path('app_activite_show', {'id': activite.id}) }}" class="text-decoration-none d-flex align-items-center gap-2 p-2 rounded-3 text-dark" style="background:#f8f9fa; font-size:13px;">
+                            <i class="bi bi-eye-fill text-success"></i> Voir la page de l'activité
+                        </a>
+                        <a href="{{ path('app_activite_index') }}" class="text-decoration-none d-flex align-items-center gap-2 p-2 rounded-3 text-dark" style="background:#f8f9fa; font-size:13px;">
+                            <i class="bi bi-grid-fill text-primary"></i> Toutes les activités
+                        </a>
+                        <a href="{{ path('app_activite_new') }}" class="text-decoration-none d-flex align-items-center gap-2 p-2 rounded-3 text-dark" style="background:#f8f9fa; font-size:13px;">
+                            <i class="bi bi-plus-circle-fill text-success"></i> Créer une activité
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
