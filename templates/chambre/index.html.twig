@@ -1,0 +1,267 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chambres - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5">
+    <div class="container">
+        <!-- Breadcrumb Navigation -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-transparent p-0">
+                <li class="breadcrumb-item">
+                    <a href="{{ path('app_hotel_index') }}" class="text-emerald text-decoration-none">
+                        <i class="bi bi-house me-2"></i>Hôtels
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    Chambres
+                </li>
+            </ol>
+        </nav>
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4 fw-bold text-white mb-4">
+                    <i class="bi bi-door-open me-3"></i>Nos Chambres
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Découvrez notre sélection de chambres confortables pour votre séjour
+                </p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <a href="{{ path('app_chambre_new') }}" class="btn btn-emerald btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter une Chambre
+                </a>
+            </div>
+        </div>
+
+        <!-- Search and Sort Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card search-card shadow-lg border-0">
+                    <div class="card-body p-4">
+                        <form method="GET" action="{{ path('app_chambre_index') }}" class="row g-3 align-items-end">
+                            <!-- Search Bar -->
+                            <div class="col-md-6">
+                                <label for="search" class="form-label fw-bold text-dark">
+                                    <i class="bi bi-search me-2 text-emerald"></i>Rechercher
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="search" name="search" placeholder="Rechercher par type, hôtel ou équipements..." value="{{ search }}">
+                            </div>
+
+                            <!-- Sort By -->
+                            <div class="col-md-3">
+                                <label for="sortBy" class="form-label fw-bold text-dark">
+                                    <i class="bi bi-sort-down me-2 text-emerald"></i>Trier par
+                                </label>
+                                <select class="form-select form-select-lg" id="sortBy" name="sortBy">
+                                    <option value="type" {% if sortBy == 'type' %}selected{% endif %}>Type de chambre</option>
+                                    <option value="capacite" {% if sortBy == 'capacite' %}selected{% endif %}>Capacité</option>
+                                    <option value="prixStandard" {% if sortBy == 'prixStandard' %}selected{% endif %}>Prix standard</option>
+                                    <option value="prixHauteSaison" {% if sortBy == 'prixHauteSaison' %}selected{% endif %}>Prix haute saison</option>
+                                    <option value="prixBasseSaison" {% if sortBy == 'prixBasseSaison' %}selected{% endif %}>Prix basse saison</option>
+                                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>Date de création</option>
+                                </select>
+                            </div>
+
+                            <!-- Sort Direction -->
+                            <div class="col-md-2">
+                                <label for="sortDir" class="form-label fw-bold text-dark">
+                                    <i class="bi bi-arrow-up-down me-2 text-emerald"></i>Ordre
+                                </label>
+                                <select class="form-select form-select-lg" id="sortDir" name="sortDir">
+                                    <option value="ASC" {% if sortDir == 'ASC' %}selected{% endif %}>Croissant ↑</option>
+                                    <option value="DESC" {% if sortDir == 'DESC' %}selected{% endif %}>Décroissant ↓</option>
+                                </select>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-emerald btn-lg w-100">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+
+                            <!-- Reset Button -->
+                            {% if search or sortBy != 'type' or sortDir != 'ASC' %}
+                                <div class="col-md-2">
+                                    <a href="{{ path('app_chambre_index') }}" class="btn btn-outline-secondary btn-lg w-100">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>Réinitialiser
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for chambre in chambres %}
+                <div class="col-lg-4 col-md-6 col-sm-12">
+                    <div class="card chambre-card h-100 shadow-lg border-0">
+                        <div class="card-body d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title fw-bold text-dark mb-0">{{ chambre.type }}</h5>
+                                <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="badge bg-emerald text-decoration-none" title="Voir l'hôtel associé">
+                                {{ chambre.hotel.nom }}
+                            </a>
+                            </div>
+
+                            <div class="chambre-details mb-3">
+                                <p class="mb-2">
+                                    <i class="bi bi-people me-2 text-emerald"></i>
+                                    Capacité: {{ chambre.capacite }} personne(s)
+                                </p>
+                                {% if chambre.equipements %}
+                                    <p class="mb-2">
+                                        <i class="bi bi-gear me-2 text-emerald"></i>
+                                        {{ chambre.equipements }}
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            <div class="prix-section mt-auto">
+                                {% if chambre.prixStandard %}
+                                    <div class="prix-item mb-1">
+                                        <small class="text-muted">Prix standard:</small>
+                                        <span class="fw-bold text-emerald">{{ chambre.prixStandard }}€</span>
+                                    </div>
+                                {% endif %}
+                                {% if chambre.prixHauteSaison %}
+                                    <div class="prix-item mb-1">
+                                        <small class="text-muted">Haute saison:</small>
+                                        <span class="fw-bold text-warning">{{ chambre.prixHauteSaison }}€</span>
+                                    </div>
+                                {% endif %}
+                                {% if chambre.prixBasseSaison %}
+                                    <div class="prix-item">
+                                        <small class="text-muted">Basse saison:</small>
+                                        <span class="fw-bold text-info">{{ chambre.prixBasseSaison }}€</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ path('app_chambre_show', {'id': chambre.id}) }}" class="btn btn-outline-emerald btn-sm">
+                                    <i class="bi bi-eye me-1"></i>Voir Détails
+                                </a>
+                                <a href="{{ path('app_chambre_edit', {'id': chambre.id}) }}" class="btn btn-emerald btn-sm">
+                                    <i class="bi bi-pencil me-1"></i>Modifier
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-door-open text-muted" style="font-size: 4rem;"></i>
+                        <h3 class="text-white mt-3">Aucune chambre trouvée</h3>
+                        <p class="text-white-50">Soyez le premier à ajouter une chambre à notre plateforme.</p>
+                        <a href="{{ path('app_chambre_new') }}" class="btn btn-emerald btn-lg mt-3">
+                            <i class="bi bi-plus-circle me-2"></i>Créer la Première Chambre
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-emerald {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.btn-emerald:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    color: white;
+}
+
+.btn-outline-emerald {
+    border-color: var(--primary-emerald);
+    color: var(--primary-emerald);
+}
+
+.btn-outline-emerald:hover {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.chambre-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chambre-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px var(--shadow-green);
+}
+
+.badge.bg-emerald {
+    background-color: var(--primary-emerald) !important;
+}
+
+.chambre-details p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.prix-section {
+    border-top: 1px solid #e9ecef;
+    padding-top: 1rem;
+}
+
+.prix-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.text-emerald {
+    color: var(--primary-emerald) !important;
+}
+
+.search-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}
+
+.search-card .form-control,
+.search-card .form-select {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid #e9ecef;
+    color: #333;
+    border-radius: 10px;
+    transition: border-color 0.3s ease;
+}
+
+.search-card .form-control:focus,
+.search-card .form-select:focus {
+    border-color: var(--primary-emerald);
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.15);
+    background-color: rgba(255, 255, 255, 0.99);
+}
+
+.search-card .form-control::placeholder {
+    color: #999;
+}
+
+.search-card .form-label {
+    color: #333 !important;
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}

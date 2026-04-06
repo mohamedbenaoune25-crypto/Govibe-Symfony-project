@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier checkout - GoVibe{% endblock %}
+
+{% block body %}
+{% if app.request.isXmlHttpRequest %}
+    {% include 'checkout/_form_modal.html.twig' with {
+        checkout: checkout,
+        form: form,
+        button_label: 'Mettre à jour',
+        page_title: 'Modifier le checkout',
+        page_subtitle: 'Mettez à jour les informations de votre réservation.'
+    } %}
+{% else %}
+<section class="go-form-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8">
+                <div class="go-form-card">
+                    <div class="go-form-card-header">
+                        <div class="position-relative" style="z-index:1;">
+                            <div style="font-size:12px; font-weight:700; letter-spacing:0.06em; opacity:0.7; text-transform:uppercase; margin-bottom:8px;">
+                                <i class="bi bi-pencil me-1"></i> Modification
+                            </div>
+                            <h2 class="h3 mb-1 fw-bold">Modifier le checkout</h2>
+                            <p class="mb-0 text-white-50">Mettez à jour les informations de votre réservation.</p>
+                        </div>
+                    </div>
+                    <div class="go-form-card-body">
+                        {% include 'checkout/_form.html.twig' with {button_label: 'Mettre à jour'} %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

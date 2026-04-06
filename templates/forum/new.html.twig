@@ -1,0 +1,6 @@
+{# This page no longer exists — creation is handled via modal on the forums page. #}
+{% extends is_granted('ROLE_ADMIN') ? 'admin/base_admin.html.twig' : 'base.html.twig' %}
+{% block body %}
+    <script>window.location.replace("{{ path('app_forum_index') }}");</script>
+    <meta http-equiv="refresh" content="0;url={{ path('app_forum_index') }}">
+{% endblock %}

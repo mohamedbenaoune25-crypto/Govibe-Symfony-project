@@ -1,0 +1,208 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block page_title %}Vue d'ensemble Stratégique{% endblock %}
+
+{% block body %}
+<!-- Stat Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="admin-card text-center p-4 h-100" style="border-bottom: 4px solid #10B981;">
+            <div style="width:70px;height:70px;border-radius:20px;background:rgba(16, 185, 129, 0.1);color:#10B981;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);">
+                <i class="bi bi-people"></i>
+            </div>
+            <h3 style="font-family:'Outfit';font-weight:800;font-size:38px;color:#fff;margin-bottom:5px;">{{ total_users }}</h3>
+            <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#9CA3AF;text-transform:uppercase;">Agents Identifiés</span>
+        </div>
+    </div>
+    
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="admin-card text-center p-4 h-100" style="border-bottom: 4px solid #F59E0B;">
+            <div style="width:70px;height:70px;border-radius:20px;background:rgba(245, 158, 11, 0.1);color:#F59E0B;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow: 0 10px 20px rgba(245, 158, 11, 0.2);">
+                <i class="bi bi-envelope-exclamation"></i>
+            </div>
+            <h3 style="font-family:'Outfit';font-weight:800;font-size:38px;color:#fff;margin-bottom:5px;">{{ attente_reclamations }}</h3>
+            <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#9CA3AF;text-transform:uppercase;">Requêtes en Attente</span>
+        </div>
+    </div>
+    
+    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+        <div class="admin-card text-center p-4 h-100" style="border-bottom: 4px solid #3B82F6;">
+            <div style="width:70px;height:70px;border-radius:20px;background:rgba(59, 130, 246, 0.1);color:#3B82F6;font-size:28px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);">
+                <i class="bi bi-ui-checks-grid"></i>
+            </div>
+            <h3 style="font-family:'Outfit';font-weight:800;font-size:38px;color:#fff;margin-bottom:5px;">{{ total_reclamations }}</h3>
+            <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#9CA3AF;text-transform:uppercase;">Tickets Totaux</span>
+        </div>
+    </div>
+</div>
+
+<!-- Graphs Area -->
+<div class="row g-4 mb-4">
+    <div class="col-12" data-aos="zoom-in" data-aos-delay="400">
+        <div class="admin-card">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-graph-up-arrow me-2 text-success"></i> Flux de Données Global (2030)</span>
+            </div>
+            <div class="admin-card-body">
+                <canvas id="mainChart" height="80"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Latest Users -->
+    <div class="col-lg-6" data-aos="fade-right" data-aos-delay="500">
+        <div class="admin-card h-100">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span>Dernières Connexions</span>
+                <a href="{{ path('app_admin_users') }}" class="btn btn-cyber btn-sm px-3">Scan Complet</a>
+            </div>
+            <div class="admin-card-body p-0 table-responsive">
+                <table class="table admin-table mb-0">
+                    <tbody>
+                        {% for u in latest_users %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="width:45px;height:45px;border-radius:12px;background:rgba(255,255,255,0.05);color:#fff;border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;">
+                                        {{ u.prenom|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold" style="color:#fff;font-size:15px;letter-spacing:0.5px;">{{ u.prenom }} {{ u.nom }}</div>
+                                        <div style="font-size:12px;color:#10B981;font-family:monospace;">{{ u.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                {% if 'ROLE_ADMIN' in u.role %}
+                                    <span class="badge" style="background:rgba(139, 92, 246, 0.15);color:#A78BFA;border:1px solid rgba(139, 92, 246, 0.3);padding:6px 12px;">ADMIN</span>
+                                {% else %}
+                                    <span class="badge" style="background:rgba(156, 163, 175, 0.1);color:#9CA3AF;border:1px solid rgba(156, 163, 175, 0.2);padding:6px 12px;">USER</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Latest Reclamations -->
+    <div class="col-lg-6" data-aos="fade-left" data-aos-delay="600">
+        <div class="admin-card h-100">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span>Logs des Réclamations</span>
+                <a href="{{ path('app_admin_reclamations') }}" class="btn btn-cyber btn-sm px-3">Ouvrir Terminal</a>
+            </div>
+            <div class="admin-card-body p-0 table-responsive">
+                <table class="table admin-table mb-0">
+                    <tbody>
+                        {% for r in latest_reclamations %}
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-white mb-1" style="letter-spacing:0.5px;">{{ r.sujet }}</div>
+                                <div style="font-size:12px;color:#9CA3AF;" class="text-truncate" style="max-width:250px;">{{ r.message }}</div>
+                            </td>
+                            <td class="text-end">
+                                {% if r.status == 'EN_ATTENTE' or r.status == 'En attente' %}
+                                    <span class="badge" style="background:rgba(245, 158, 11, 0.15);color:#FCD34D;border:1px solid rgba(245, 158, 11, 0.3);padding:6px 12px;box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);"><i class="bi bi-hourglass-split me-1"></i> STANDBY</span>
+                                {% elseif r.status == 'TRAITEE' or r.status == 'Traitée' %}
+                                    <span class="badge" style="background:rgba(16, 185, 129, 0.15);color:#6EE7B7;border:1px solid rgba(16, 185, 129, 0.3);padding:6px 12px;box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);"><i class="bi bi-check2-circle me-1"></i> RESOLVED</span>
+                                {% else %}
+                                    <span class="badge" style="background:rgba(239, 68, 68, 0.15);color:#FCA5A5;border:1px solid rgba(239, 68, 68, 0.3);padding:6px 12px;">{{ r.status|upper }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        
+        let gradientEmerald = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientEmerald.addColorStop(0, 'rgba(16, 185, 129, 0.5)');
+        gradientEmerald.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+        
+        let gradientBlue = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientBlue.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
+        gradientBlue.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+                datasets: [
+                    {
+                        label: 'Nouveaux Utilisateurs',
+                        data: [12, 19, 15, 25, 22, 30, {{ total_users }}],
+                        borderColor: '#10B981',
+                        backgroundColor: gradientEmerald,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#050505',
+                        pointBorderColor: '#10B981',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Tickets',
+                        data: [5, 8, 4, 12, 9, 15, {{ total_reclamations }}],
+                        borderColor: '#3B82F6',
+                        backgroundColor: gradientBlue,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#050505',
+                        pointBorderColor: '#3B82F6',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: { color: '#9CA3AF', font: { family: 'Inter', size: 12 } }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: '#10B981',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 10
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+                        ticks: { color: '#9CA3AF' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
+                        ticks: { color: '#9CA3AF', stepSize: 10 }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+            }
+        });
+    });
+</script>
+{% endblock %}

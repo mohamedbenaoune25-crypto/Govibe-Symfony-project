@@ -1,0 +1,186 @@
+{% extends app.request.isXmlHttpRequest ? 'base_empty.html.twig' : 'admin/base_admin.html.twig' %}
+
+{% block page_title %}{{ vol.flightId ? 'Modifier le Vol ' ~ vol.flightId : 'Créer un Nouveau Vol' }}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+{% endblock %}
+
+{% block body %}
+<style>
+    .form-group label {
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        color: #6c757d !important;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% if app.request.isXmlHttpRequest %}
+<div class="p-4 p-md-5">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <p class="text-uppercase text-success fw-semibold mb-2 mb-1">Vol</p>
+            <h2 class="h3 fw-bold mb-1">{{ vol.flightId ? 'Modifier le Vol ' ~ vol.flightId : 'Créer un Nouveau Vol' }}</h2>
+            <p class="text-muted mb-0">Ajoutez ou modifiez un vol depuis cette fenêtre.</p>
+        </div>
+        <button type="button" class="btn-close" aria-label="Fermer" onclick="bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide()"></button>
+    </div>
+
+    {{ form_start(form, {'action': vol.flightId ? path('app_admin_vols_edit', {'flightId': vol.flightId}) : path('app_admin_vols_new'), 'attr': {'novalidate': 'novalidate'}}) }}
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.flightId) }}
+                    {{ form_widget(form.flightId, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.flightId) }}
+                </div>
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.airline) }}
+                    {{ form_widget(form.airline, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.airline) }}
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.departureAirport) }}
+                    {{ form_widget(form.departureAirport, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.departureAirport) }}
+                </div>
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.destination) }}
+                    {{ form_widget(form.destination, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.destination) }}
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.departureTime) }}
+                    {{ form_widget(form.departureTime, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.departureTime) }}
+                </div>
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.arrivalTime) }}
+                    {{ form_widget(form.arrivalTime, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.arrivalTime) }}
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 form-group">
+                    {{ form_label(form.classeChaise) }}
+                    {{ form_widget(form.classeChaise, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.classeChaise) }}
+                </div>
+                <div class="col-md-4 form-group">
+                    {{ form_label(form.prix) }}
+                    <div class="input-group">
+                        {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+                        <span class="input-group-text">€</span>
+                    </div>
+                    {{ form_errors(form.prix) }}
+                </div>
+                <div class="col-md-4 form-group">
+                    {{ form_label(form.availableSeats) }}
+                    {{ form_widget(form.availableSeats, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.availableSeats) }}
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.description) }}
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary-pro w-100">{{ button_label|default('Enregistrer le vol') }}</button>
+            </div>
+    {{ form_end(form) }}
+</div>
+{% else %}
+<section class="go-form-page">
+<div class="go-form-card">
+    <div class="go-form-card-header">
+        <i class="bi bi-airplane"></i> Informations du Vol
+    </div>
+    <div class="go-form-card-body">
+        <a href="{{ path('app_admin_vols_index') }}" class="btn btn-sm btn-light mb-4"><i class="bi bi-arrow-left"></i> Retour à la flotte</a>
+
+        {{ form_start(form, {'action': vol.flightId ? path('app_admin_vols_edit', {'flightId': vol.flightId}) : path('app_admin_vols_new'), 'attr': {'novalidate': 'novalidate'}}) }}
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.flightId) }}
+                    {{ form_widget(form.flightId, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.flightId) }}
+                </div>
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.airline) }}
+                    {{ form_widget(form.airline, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.airline) }}
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.departureAirport) }}
+                    {{ form_widget(form.departureAirport, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.departureAirport) }}
+                </div>
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.destination) }}
+                    {{ form_widget(form.destination, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.destination) }}
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.departureTime) }}
+                    {{ form_widget(form.departureTime, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.departureTime) }}
+                </div>
+                <div class="col-md-6 form-group">
+                    {{ form_label(form.arrivalTime) }}
+                    {{ form_widget(form.arrivalTime, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.arrivalTime) }}
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 form-group">
+                    {{ form_label(form.classeChaise) }}
+                    {{ form_widget(form.classeChaise, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.classeChaise) }}
+                </div>
+                <div class="col-md-4 form-group">
+                    {{ form_label(form.prix) }}
+                    <div class="input-group">
+                        {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
+                        <span class="input-group-text">€</span>
+                    </div>
+                    {{ form_errors(form.prix) }}
+                </div>
+                <div class="col-md-4 form-group">
+                    {{ form_label(form.availableSeats) }}
+                    {{ form_widget(form.availableSeats, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.availableSeats) }}
+                </div>
+            </div>
+
+            <div class="form-group mb-4">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.description) }}
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary-pro w-100">{{ button_label|default('Enregistrer le vol') }}</button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+</section>
+{% endif %}
+{% endblock %}

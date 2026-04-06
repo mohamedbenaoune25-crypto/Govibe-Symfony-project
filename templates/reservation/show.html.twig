@@ -1,0 +1,183 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réservation #{{ reservation.id }} - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card reservation-detail-card shadow-lg border-0 mb-4">
+                    <div class="card-header bg-emerald text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="mb-0">Réservation #{{ reservation.id }}</h2>
+                                <span class="badge status-badge {{ reservation.statut == 'CONFIRMEE' ? 'bg-success' : reservation.statut == 'ANNULEE' ? 'bg-danger' : 'bg-warning' }} mt-2">
+                                    {{ reservation.statut }}
+                                </span>
+                            </div>
+                            <div class="text-end">
+                                <div class="price-tag">
+                                    Total: {{ reservation.prixTotal }}€
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-person me-2"></i>Client
+                                </h5>
+                                <p class="mb-1"><strong>Nom:</strong> {{ reservation.user.prenom }} {{ reservation.user.nom }}</p>
+                                <p class="mb-0"><strong>Email:</strong> {{ reservation.user.email }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-building me-2"></i>Hôtel & Chambre
+                                </h5>
+                                <p class="mb-1"><strong>Hôtel:</strong> {{ reservation.hotel.nom }}</p>
+                                <p class="mb-1"><strong>Chambre:</strong> {{ reservation.chambre.type }}</p>
+                                <p class="mb-0"><strong>Adresse:</strong> {{ reservation.hotel.adresse }}, {{ reservation.hotel.ville }}</p>
+                            </div>
+                        </div>
+
+                        <div class="dates-section mb-4">
+                            <h5 class="text-emerald mb-3">
+                                <i class="bi bi-calendar me-2"></i>Dates de séjour
+                            </h5>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="date-box">
+                                        <small class="text-muted d-block">Arrivée</small>
+                                        <strong class="fs-5">{{ reservation.dateDebut|date('d/m/Y') }}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="date-box">
+                                        <small class="text-muted d-block">Départ</small>
+                                        <strong class="fs-5">{{ reservation.dateFin|date('d/m/Y') }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-info-circle me-2"></i>Informations
+                                </h5>
+                                <p class="mb-1"><strong>ID Réservation:</strong> {{ reservation.id }}</p>
+                                {% if reservation.createdAt %}
+                                    <p class="mb-1"><strong>Réservé le:</strong> {{ reservation.createdAt|date('d/m/Y à H:i') }}</p>
+                                {% endif %}
+                                {% if reservation.updatedAt %}
+                                    <p class="mb-0"><strong>Mis à jour le:</strong> {{ reservation.updatedAt|date('d/m/Y à H:i') }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-cash me-2"></i>Paiement
+                                </h5>
+                                <div class="prix-total-card p-3 text-center">
+                                    <small class="text-muted d-block">Montant total</small>
+                                    <span class="fw-bold text-emerald fs-4">{{ reservation.prixTotal }}€</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card action-card shadow-lg border-0 mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0 text-dark">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-emerald">
+                                <i class="bi bi-pencil me-2"></i>Modifier la réservation
+                            </a>
+                            <a href="{{ path('app_reservation_index') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card danger-card shadow-lg border-0">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Zone dangereuse
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            La suppression de cette réservation est irréversible.
+                        </p>
+                        {{ include('reservation/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-emerald {
+    background-color: var(--primary-emerald) !important;
+}
+
+.reservation-detail-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}
+
+.action-card, .danger-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}
+
+.btn-emerald {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.btn-emerald:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    color: white;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.price-tag {
+    font-size: 1.1rem;
+    color: white;
+}
+
+.dates-section .date-box {
+    background: var(--soft-green);
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 0.25rem 0;
+}
+
+.prix-total-card {
+    background: linear-gradient(135deg, var(--soft-green), var(--light-green));
+    border-radius: 10px;
+}
+
+.text-emerald {
+    color: var(--primary-emerald) !important;
+}
+</style>
+{% endblock %}

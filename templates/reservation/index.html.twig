@@ -1,0 +1,269 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réservations - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-4 fw-bold text-white mb-4">
+                    <i class="bi bi-calendar-check me-3"></i>Gestion des Réservations
+                </h1>
+                <p class="lead text-white-50 mb-4">
+                    Gérez toutes les réservations de votre plateforme
+                </p>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <a href="{{ path('app_reservation_new') }}" class="btn btn-emerald btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>Créer une Réservation
+                </a>
+            </div>
+        </div>
+
+        <!-- Search and Sort Section -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card search-card shadow-lg border-0">
+                    <div class="card-body p-4">
+                        <form method="GET" action="{{ path('app_reservation_index') }}" class="row g-3 align-items-end">
+                            <!-- Search Bar -->
+                            <div class="col-md-6">
+                                <label for="search" class="form-label fw-bold text-dark">
+                                    <i class="bi bi-search me-2 text-emerald"></i>Rechercher
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="search" name="search" placeholder="Rechercher par client, hôtel, chambre ou statut..." value="{{ search }}">
+                            </div>
+
+                            <!-- Sort By -->
+                            <div class="col-md-3">
+                                <label for="sortBy" class="form-label fw-bold text-dark">
+                                    <i class="bi bi-sort-down me-2 text-emerald"></i>Trier par
+                                </label>
+                                <select class="form-select form-select-lg" id="sortBy" name="sortBy">
+                                    <option value="dateDebut" {% if sortBy == 'dateDebut' %}selected{% endif %}>Date d'arrivée</option>
+                                    <option value="dateFin" {% if sortBy == 'dateFin' %}selected{% endif %}>Date de départ</option>
+                                    <option value="prixTotal" {% if sortBy == 'prixTotal' %}selected{% endif %}>Prix total</option>
+                                    <option value="statut" {% if sortBy == 'statut' %}selected{% endif %}>Statut</option>
+                                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>Date de création</option>
+                                </select>
+                            </div>
+
+                            <!-- Sort Direction -->
+                            <div class="col-md-2">
+                                <label for="sortDir" class="form-label fw-bold text-dark">
+                                    <i class="bi bi-arrow-up-down me-2 text-emerald"></i>Ordre
+                                </label>
+                                <select class="form-select form-select-lg" id="sortDir" name="sortDir">
+                                    <option value="ASC" {% if sortDir == 'ASC' %}selected{% endif %}>Croissant ↑</option>
+                                    <option value="DESC" {% if sortDir == 'DESC' %}selected{% endif %}>Décroissant ↓</option>
+                                </select>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-emerald btn-lg w-100">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+
+                            <!-- Reset Button -->
+                            {% if search or sortBy != 'dateDebut' or sortDir != 'DESC' %}
+                                <div class="col-md-2">
+                                    <a href="{{ path('app_reservation_index') }}" class="btn btn-outline-secondary btn-lg w-100">
+                                        <i class="bi bi-arrow-clockwise me-2"></i>Réinitialiser
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for reservation in reservations %}
+                <div class="col-lg-6 col-xl-4">
+                    <div class="card reservation-card h-100 shadow-lg border-0">
+                        <div class="card-header bg-emerald text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">Réservation #{{ reservation.id }}</h6>
+                                <span class="badge status-badge {{ reservation.statut == 'CONFIRMEE' ? 'bg-success' : reservation.statut == 'ANNULEE' ? 'bg-danger' : 'bg-warning' }}">
+                                    {{ reservation.statut }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="reservation-info mb-3">
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-person me-2 text-emerald"></i>
+                                    <strong>{{ reservation.user.prenom }} {{ reservation.user.nom }}</strong>
+                                    <small class="text-muted">({{ reservation.user.email }})</small>
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-building me-2 text-emerald"></i>
+                                    <strong>{{ reservation.hotel.nom }}</strong>
+                                </div>
+                                <div class="info-item mb-2">
+                                    <i class="bi bi-door-open me-2 text-emerald"></i>
+                                    {{ reservation.chambre.type }}
+                                </div>
+                            </div>
+
+                            <div class="dates-section mb-3">
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="date-box">
+                                            <small class="text-muted d-block">Arrivée</small>
+                                            <strong>{{ reservation.dateDebut|date('d/m/Y') }}</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="date-box">
+                                            <small class="text-muted d-block">Départ</small>
+                                            <strong>{{ reservation.dateFin|date('d/m/Y') }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="prix-section text-center">
+                                <div class="prix-total">
+                                    <small class="text-muted d-block">Prix total</small>
+                                    <span class="fw-bold text-emerald fs-5">{{ reservation.prixTotal }}€</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent border-0">
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" class="btn btn-outline-emerald btn-sm">
+                                    <i class="bi bi-eye me-1"></i>Détails
+                                </a>
+                                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-emerald btn-sm">
+                                    <i class="bi bi-pencil me-1"></i>Modifier
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+                        <h3 class="text-white mt-3">Aucune réservation trouvée</h3>
+                        <p class="text-white-50">Il n'y a pas encore de réservations sur la plateforme.</p>
+                        <a href="{{ path('app_reservation_new') }}" class="btn btn-emerald btn-lg mt-3">
+                            <i class="bi bi-plus-circle me-2"></i>Créer la Première Réservation
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-emerald {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.btn-emerald:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    color: white;
+}
+
+.btn-outline-emerald {
+    border-color: var(--primary-emerald);
+    color: var(--primary-emerald);
+}
+
+.btn-outline-emerald:hover {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.reservation-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reservation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px var(--shadow-green);
+}
+
+.bg-emerald {
+    background-color: var(--primary-emerald) !important;
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.reservation-info .info-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.dates-section .date-box {
+    background: var(--soft-green);
+    padding: 0.5rem;
+    border-radius: 8px;
+    margin: 0.25rem 0;
+}
+
+.prix-total {
+    background: linear-gradient(135deg, var(--soft-green), var(--light-green));
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.text-emerald {
+    color: var(--primary-emerald) !important;
+}
+
+.search-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}
+
+.search-card .form-control,
+.search-card .form-select {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 2px solid #e9ecef;
+    color: #333;
+    border-radius: 10px;
+    transition: border-color 0.3s ease;
+}
+
+.search-card .form-control:focus,
+.search-card .form-select:focus {
+    border-color: var(--primary-emerald);
+    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.15);
+    background-color: rgba(255, 255, 255, 0.99);
+}
+
+.search-card .form-control::placeholder {
+    color: #999;
+}
+
+.search-card .form-label {
+    color: #333 !important;
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}

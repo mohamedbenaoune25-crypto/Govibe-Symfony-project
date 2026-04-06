@@ -1,0 +1,501 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle Location - GoVibe{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --primary-emerald: #50C878;
+        --dark-green: #013220;
+        --light-green: #2E8B57;
+        --bg-light: #F5F3E7;
+    }
+
+    .location-form-hero {
+        background: linear-gradient(135deg, var(--dark-green) 0%, var(--light-green) 100%);
+        color: white;
+        padding: 50px 0;
+        margin-bottom: 40px;
+    }
+
+    .location-form-hero h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .form-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+    }
+
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--dark-green);
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--primary-emerald);
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--dark-green);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-emerald);
+        box-shadow: 0 0 0 3px rgba(80, 200, 120, 0.1);
+        outline: none;
+    }
+
+    .form-help {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .form-error {
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+
+    .price-display {
+        background: linear-gradient(135deg, rgba(80, 200, 120, 0.1) 0%, rgba(46, 139, 87, 0.1) 100%);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+
+    .price-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 8px 0;
+    }
+
+    .price-label {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .price-value {
+        font-weight: 700;
+        color: var(--primary-emerald);
+        font-size: 1.1rem;
+    }
+
+    .btn-primary-govibe {
+        background-color: var(--primary-emerald);
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .btn-primary-govibe:hover {
+        background-color: var(--light-green);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(80, 200, 120, 0.3);
+    }
+
+    .btn-secondary-govibe {
+        background-color: #6c757d;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-secondary-govibe:hover {
+        background-color: #5a6268;
+    }
+
+    .buttons-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .buttons-group .btn {
+        flex: 1;
+    }
+
+    .alert {
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .voiture-option:disabled {
+        background-color: #f0f0f0;
+        color: #999;
+    }
+
+    .dates-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .summary-box {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 30px;
+        border: 2px solid var(--primary-emerald);
+    }
+
+    .summary-title {
+        font-weight: 700;
+        color: var(--dark-green);
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+
+    .summary-label {
+        color: #666;
+    }
+
+    .summary-value {
+        font-weight: 700;
+        color: var(--dark-green);
+    }
+
+    .total-amount {
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-top: 2px solid var(--primary-emerald);
+        margin-top: 15px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary-emerald);
+    }
+
+    .spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .btn-primary-govibe:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-primary-govibe:disabled .spinner {
+        display: inline-block;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="location-form-hero">
+    <div class="container">
+        <h1><i class="bi bi-plus-circle"></i> Nouvelle Location</h1>
+        <p>Créez une nouvelle location de voiture</p>
+    </div>
+</div>
+
+<div class="container form-container">
+    {{ form_start(form, {'attr': {'class': 'form-card needs-validation', 'novalidate': 'novalidate'}}) }}
+
+    {% if form.vars.errors|length > 0 %}
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-circle me-2"></i>
+        <strong>Erreur :</strong> Veuillez vérifier les champs ci-dessous
+    </div>
+    {% endif %}
+
+    <!-- Section Voiture -->
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-car-front-fill" style="color: var(--primary-emerald);"></i> Sélectionner une Voiture
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.voiture) }}
+            {{ form_widget(form.voiture) }}
+            {% if form.voiture.vars.errors|length %}
+            <div class="form-error">
+                {% for error in form.voiture.vars.errors %}
+                    <i class="bi bi-exclamation-circle"></i> {{ error.message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.voiture.vars.help %}
+            <div class="form-help">{{ form.voiture.vars.help }}</div>
+            {% endif %}
+        </div>
+
+        <div id="voiture-details" style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <div class="detail-item">
+                <strong>Prix journalier:</strong>
+                <span id="prix-jour" style="color: var(--primary-emerald); font-weight: 700;">-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Dates -->
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-calendar-event" style="color: var(--primary-emerald);"></i> Période de Location
+        </div>
+
+        <div class="dates-container">
+            <div class="form-group">
+                {{ form_label(form.dateDebut) }}
+                {{ form_widget(form.dateDebut) }}
+                {% if form.dateDebut.vars.errors|length %}
+                <div class="form-error">
+                    {% for error in form.dateDebut.vars.errors %}
+                        <i class="bi bi-exclamation-circle"></i> {{ error.message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if form.dateDebut.vars.help %}
+                <div class="form-help">{{ form.dateDebut.vars.help }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.dateFin) }}
+                {{ form_widget(form.dateFin) }}
+                {% if form.dateFin.vars.errors|length %}
+                <div class="form-error">
+                    {% for error in form.dateFin.vars.errors %}
+                        <i class="bi bi-exclamation-circle"></i> {{ error.message }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if form.dateFin.vars.help %}
+                <div class="form-help">{{ form.dateFin.vars.help }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="days-info" style="display: none; margin-top: 15px;">
+            <div class="price-display">
+                <div class="price-item">
+                    <span class="price-label">Nombre de jours:</span>
+                    <span class="price-value" id="nb-jours">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Montant -->
+    <div class="form-section">
+        <div class="form-section-title">
+            <i class="bi bi-cash-coin" style="color: var(--primary-emerald);"></i> Montant
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.montantTotal) }}
+            {{ form_widget(form.montantTotal) }}
+            {% if form.montantTotal.vars.errors|length %}
+            <div class="form-error">
+                {% for error in form.montantTotal.vars.errors %}
+                    <i class="bi bi-exclamation-circle"></i> {{ error.message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if form.montantTotal.vars.help %}
+            <div class="form-help">{{ form.montantTotal.vars.help }}</div>
+            {% endif %}
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-title">Résumé du Devis</div>
+            <div class="summary-item">
+                <span class="summary-label">Voiture:</span>
+                <span class="summary-value" id="resume-voiture">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Période:</span>
+                <span class="summary-value" id="resume-periode">-</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Nombre de jours:</span>
+                <span class="summary-value" id="resume-jours">0</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Prix journalier:</span>
+                <span class="summary-value" id="resume-prix-jour">-</span>
+            </div>
+            <div class="total-amount">
+                <span>Montant Total:</span>
+                <span id="resume-montant">0,00 DT</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="buttons-group">
+        <a href="{{ path('app_location_index') }}" class="btn btn-secondary-govibe">
+            <i class="bi bi-arrow-left"></i> Annuler
+        </a>
+        <button type="submit" class="btn-primary-govibe" id="submitBtn">
+            <i class="bi bi-check-circle"></i> Créer la Location
+        </button>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const voitureSelect = document.querySelector('select[name*="voiture"]');
+    const dateDebutInput = document.querySelector('input[name*="dateDebut"]');
+    const dateFinInput = document.querySelector('input[name*="dateFin"]');
+    const montantTotalInput = document.querySelector('input[name*="montantTotal"]');
+
+    // Données de voiture (à récupérer depuis le serveur idéalement)
+    const voitureData = {};
+
+    // Mettre à jour le devis en temps réel
+    function updateQuote() {
+        const voitureId = voitureSelect.value;
+        const dateDebut = new Date(dateDebutInput.value);
+        const dateFin = new Date(dateFinInput.value);
+
+        if (!voitureId || !dateDebutInput.value || !dateFinInput.value) {
+            document.getElementById('days-info').style.display = 'none';
+            document.getElementById('voiture-details').style.display = 'none';
+            return;
+        }
+
+        // Calculer le nombre de jours
+        if (dateFin > dateDebut) {
+            const timeDiff = dateFin.getTime() - dateDebut.getTime();
+            const nbJours = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+            
+            document.getElementById('nb-jours').innerText = nbJours;
+            document.getElementById('resume-jours').innerText = nbJours;
+            document.getElementById('days-info').style.display = 'block';
+
+            // Afficher la période
+            const dateDebutStr = dateDebut.toLocaleDateString('fr-FR');
+            const dateFinStr = dateFin.toLocaleDateString('fr-FR');
+            document.getElementById('resume-periode').innerText = `${dateDebutStr} → ${dateFinStr}`;
+        }
+
+        // Mettre à jour les détails de la voiture
+        const selectedOption = voitureSelect.options[voitureSelect.selectedIndex];
+        if (selectedOption) {
+            const voitureText = selectedOption.text;
+            document.getElementById('resume-voiture').innerText = voitureText.split(' - ')[0];
+            
+            // Extraire le prix journalier du texte
+            const prixMatch = voitureText.match(/(\d+(?:\.\d+)?)\s*DT/);
+            if (prixMatch) {
+                const prixJour = parseFloat(prixMatch[1]);
+                document.getElementById('prix-jour').innerText = prixJour.toFixed(2) + ' DT';
+                document.getElementById('resume-prix-jour').innerText = prixJour.toFixed(2) + ' DT';
+
+                // Calculer le montant total
+                if (dateFin > dateDebut) {
+                    const timeDiff = dateFin.getTime() - dateDebut.getTime();
+                    const nbJours = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
+                    const montantTotal = prixJour * nbJours;
+                    montantTotalInput.value = montantTotal.toFixed(2);
+                    document.getElementById('resume-montant').innerText = montantTotal.toFixed(2) + ' DT';
+                }
+            }
+            document.getElementById('voiture-details').style.display = 'block';
+        }
+    }
+
+    // Écouteurs d'événements
+    voitureSelect?.addEventListener('change', updateQuote);
+    dateDebutInput?.addEventListener('change', updateQuote);
+    dateFinInput?.addEventListener('change', updateQuote);
+
+    // Initialiser le devis au chargement
+    updateQuote();
+
+    // Validation du formulaire
+    const form = document.querySelector('form');
+    form?.addEventListener('submit', function(e) {
+        if (!form.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const dateDebut = new Date(dateDebutInput.value);
+        const dateFin = new Date(dateFinInput.value);
+        
+        if (dateFin <= dateDebut) {
+            e.preventDefault();
+            alert('La date de fin doit être après la date de début');
+            return;
+        }
+
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %}

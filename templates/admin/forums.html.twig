@@ -1,0 +1,54 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block page_title %}Gestion des Forums{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold" style="color:var(--admin-primary); margin:0;">
+        <i class="bi bi-collection-fill me-2" style="color:var(--admin-accent);"></i> Communautés & Forums
+    </h4>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for f in forums %}
+    <div class="col">
+        <div class="admin-card h-100 position-relative d-flex flex-column" style="overflow: hidden; padding: 25px;">
+            <!-- Badge des membres -->
+            <div class="position-absolute" style="top: 20px; right: 20px;">
+                <span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E7EB;padding:6px 12px;font-weight:600;">
+                    <i class="bi bi-people-fill me-1"></i> {{ f.nbrMembers }}
+                </span>
+            </div>
+
+            <!-- Image de forum -->
+            <div class="text-center mt-3 mb-4">
+                {% if f.image %}
+                    <img src="{{ f.image }}" alt="Forum image" style="width:70px;height:70px;border-radius:16px;object-fit:cover;border:1px solid var(--border-color);margin:0 auto 15px;display:block;">
+                {% else %}
+                    <div style="width:70px;height:70px;border-radius:16px;background:rgba(10, 25, 47, 0.04);color:var(--admin-primary);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid var(--border-color);margin:0 auto 15px;">
+                        {{ f.titre|first|upper }}
+                    </div>
+                {% endif %}
+                <h5 class="fw-bold mb-1" style="color:var(--admin-primary); font-family:'Outfit', sans-serif;">{{ f.titre }}</h5>
+                <p class="text-muted mb-0" style="font-size: 13px; min-height: 3.2em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">{{ f.description }}</p>
+                <div class="mt-2 text-muted" style="font-size: 11px; text-transform:uppercase; letter-spacing:0.5px;">
+                    Créé par {{ f.createdBy.prenom }} {{ f.createdBy.nom }}
+                </div>
+            </div>
+
+            <!-- Bouton Supprimer -->
+            <div class="mt-auto pt-3">
+                <form method="post" action="{{ path('app_admin_forum_delete', {'id': f.forumId}) }}" class="w-100" onsubmit="return confirm('Voulez-vous vraiment supprimer ce forum et TOUT son contenu ?');">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ f.forumId) }}">
+                    <button class="btn w-100" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;font-size:14px;font-weight:500;">
+                        <i class="bi bi-trash3-fill me-1"></i> Supprimer ce Forum
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12 w-100 text-center py-5 text-muted">Aunce forum trouvé.</div>
+    {% endfor %}
+</div>
+{% endblock %}

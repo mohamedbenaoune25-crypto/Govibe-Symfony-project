@@ -1,0 +1,452 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil - GoVibe{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .hero-section {
+        height: 650px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .hero-bg {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        object-fit: cover;
+        z-index: 0;
+        /* Image generated via generate_image (hot air balloons) */
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(1, 50, 32, 0.4); /* Dark green overlay */
+        z-index: 1;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        color: white;
+        margin-top: 50px; /* Offset for navbar */
+    }
+
+    .hero-title {
+        font-size: 56px;
+        font-weight: 700;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        margin-bottom: 20px;
+    }
+
+    /* Search Bar */
+    .search-bar-container {
+        position: relative;
+        z-index: 3;
+        margin-top: -45px; /* Pull up to overlap hero */
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        background: white;
+        border-radius: 100px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        padding: 10px 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .search-input-group {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        border-right: 1px solid #eee;
+    }
+    .search-input-group:last-child { border-right: none; }
+    
+    .search-input-group i { color: var(--primary-emerald); font-size: 20px; }
+    .search-input-group div { display: flex; flex-direction: column; text-align: left; }
+    .search-input-group label { font-size: 13px; font-weight: 600; color: #333; margin: 0; }
+    .search-input-group input { border: none; padding: 0; font-size: 14px; color: #666; outline: none; background: transparent; }
+    
+    .btn-search {
+        background: var(--primary-emerald);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 15px 30px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .btn-search:hover { background: var(--mid-green); transform: scale(1.05); }
+
+    /* Stats Bar */
+    .stats-bar {
+        background-color: var(--dark-green);
+        padding: 40px 0;
+        margin-top: 60px;
+    }
+    .stat-item {
+        text-align: center;
+        color: white;
+    }
+    .stat-number { font-size: 36px; font-weight: 700; color: var(--primary-emerald); font-family: 'Outfit', sans-serif; }
+    .stat-label { font-size: 15px; opacity: 0.8; }
+
+    /* Categories */
+    .categories-section {
+        padding: 80px 0;
+    }
+    .section-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--dark-green);
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .category-bubbles {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+    
+    .category-bubble {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    .category-bubble:hover { transform: translateY(-10px); }
+    
+    .bubble-icon {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        color: var(--primary-emerald);
+        transition: all 0.3s;
+    }
+    .category-bubble:hover .bubble-icon {
+        background-color: var(--primary-emerald);
+        color: white;
+        box-shadow: 0 15px 35px rgba(80, 200, 120, 0.4);
+    }
+    .bubble-label {
+        font-weight: 600;
+        color: #444;
+        font-size: 16px;
+    }
+
+    /* Activities Grid */
+    .activities-section {
+        padding: 60px 0 100px;
+        background-color: white;
+    }
+    
+    .activity-card {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        transition: all 0.3s;
+        height: 100%;
+        background: var(--bg-creme);
+    }
+    .activity-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    }
+    .activity-img {
+        height: 250px;
+        width: 100%;
+        background-color: #ddd; /* Skeleton bg */
+        object-fit: cover;
+    }
+    .activity-body {
+        padding: 25px;
+    }
+    .activity-category {
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--primary-emerald);
+        margin-bottom: 10px;
+        display: block;
+    }
+    .activity-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--dark-green);
+        margin-bottom: 15px;
+    }
+    .activity-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        padding-top: 15px;
+        margin-top: 15px;
+    }
+    .activity-price {
+        font-weight: 700;
+        font-size: 18px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <img src="{{ asset('images/home-hero5.png') }}" alt="Travel Scenery" class="hero-bg">
+    <div class="hero-overlay"></div>
+    <div class="hero-content container">
+        <h1 class="hero-title">Vivez l'aventure,<br>explorez le monde</h1>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="container">
+    <div class="search-bar-container">
+        <div class="search-input-group">
+            <i class="bi bi-geo-alt"></i>
+            <div>
+                <label>Destination</label>
+                <input type="text" placeholder="Où allez-vous ?">
+            </div>
+        </div>
+        <div class="search-input-group">
+            <i class="bi bi-calendar3"></i>
+            <div>
+                <label>Date de départ</label>
+                <input type="date">
+            </div>
+        </div>
+        <div class="search-input-group">
+            <i class="bi bi-people"></i>
+            <div>
+                <label>Voyageurs</label>
+                <input type="number" placeholder="Combien de personnes ?" min="1">
+            </div>
+        </div>
+        <button class="btn-search">Rechercher</button>
+    </div>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 stat-item">
+                <div class="stat-number">150+</div>
+                <div class="stat-label">Villes Explorées</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <div class="stat-number">2K+</div>
+                <div class="stat-label">Événements</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <div class="stat-number">4.9/5</div>
+                <div class="stat-label">Avis Positifs</div>
+            </div>
+            <div class="col-md-3 stat-item">
+                <div class="stat-number">10K+</div>
+                <div class="stat-label">Voyageurs Heureux</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Section -->
+<div class="categories-section container">
+    <h2 class="section-title">Trouvez votre prochaine aventure</h2>
+    <div class="category-bubbles">
+        <a href="#" class="category-bubble">
+            <div class="bubble-icon"><i class="bi bi-compass"></i></div>
+            <span class="bubble-label">Aventure</span>
+        </a>
+        <a href="#" class="category-bubble">
+            <div class="bubble-icon"><i class="bi bi-museum"></i></div>
+            <span class="bubble-label">Culture</span>
+        </a>
+        <a href="#" class="category-bubble">
+            <div class="bubble-icon"><i class="bi bi-cup-hot"></i></div>
+            <span class="bubble-label">Gastronomie</span>
+        </a>
+        <a href="#" class="category-bubble">
+            <div class="bubble-icon"><i class="bi bi-water"></i></div>
+            <span class="bubble-label">Détente</span>
+        </a>
+        <a href="#" class="category-bubble">
+            <div class="bubble-icon"><i class="bi bi-music-note-beamed"></i></div>
+            <span class="bubble-label">Festivals</span>
+        </a>
+    </div>
+</div>
+
+<!-- Activities Grid -->
+<div class="activities-section">
+    <div class="container">
+        <h2 class="section-title" data-aos="fade-up">Expériences Inoubliables</h2>
+        <div class="row g-5 mt-4">
+            
+            <!-- Activity 1 -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="activity-card">
+                    <div class="activity-img-wrapper">
+                        <div class="activity-badge">Plus Populaire</div>
+                        <div class="activity-img" style="background: linear-gradient(135deg, #1abc9c, #16a085);"></div>
+                    </div>
+                    <div class="activity-body">
+                        <span class="activity-category">Aventure Extrême</span>
+                        <h3 class="activity-title">Ascension Stellaire des Gorges</h3>
+                        <p class="activity-desc">Une immersion totale dans la nature sauvage avec un équipement de pointe et des guides d'élite.</p>
+                        <div class="activity-footer">
+                            <div class="activity-rating"><i class="bi bi-star-fill"></i> 4.9</div>
+                            <div class="activity-price"><span>Dès</span> 120€</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity 2 -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="activity-card">
+                    <div class="activity-img-wrapper">
+                        <div class="activity-badge">Nouveau</div>
+                        <div class="activity-img" style="background: linear-gradient(135deg, #e67e22, #d35400);"></div>
+                    </div>
+                    <div class="activity-body">
+                        <span class="activity-category">Culture Digitale</span>
+                        <h3 class="activity-title">Visite Virtuelle des Temples</h3>
+                        <p class="activity-desc">Plongez dans l'histoire avec notre technologie de réalité augmentée au cœur des ruines antiques.</p>
+                        <div class="activity-footer">
+                            <div class="activity-rating"><i class="bi bi-star-fill"></i> 5.0</div>
+                            <div class="activity-price"><span>Dès</span> 85€</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity 3 -->
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="activity-card">
+                    <div class="activity-img-wrapper">
+                        <div class="activity-badge">VIP</div>
+                        <div class="activity-img" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);"></div>
+                    </div>
+                    <div class="activity-body">
+                        <span class="activity-category">Gastronomie Luxe</span>
+                        <h3 class="activity-title">Dîner Sensoriel Suspendu</h3>
+                        <p class="activity-desc">Dégustez des mets étoilés dans une structure futuriste offrant une vue à 360° sur la ville.</p>
+                        <div class="activity-footer">
+                            <div class="activity-rating"><i class="bi bi-star-fill"></i> 4.9</div>
+                            <div class="activity-price"><span>Dès</span> 250€</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="cta-section" style="padding: 100px 0; background: linear-gradient(135deg, #064E3B, #10B981); color: white; text-align: center; position: relative; overflow: hidden; margin-top: 50px;">
+    <div class="cta-content" data-aos="zoom-in" style="position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 0 20px;">
+        <h2 class="cta-title" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 20px;">Prêt pour le Futur du Voyage ?</h2>
+        <p class="cta-text" style="font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9;">Rejoignez la communauté GoVibe et accédez à des offres holographiques exclusives et des expériences hors du commun.</p>
+        <a href="{{ path('app_register') }}" class="btn-cta" style="background: white; color: #064E3B; padding: 15px 40px; border-radius: 30px; font-weight: 800; font-size: 1.1rem; text-decoration: none; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">Créer un Compte Premium</a>
+    </div>
+</div>
+
+<!-- Scripts for Animations -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    // Initialize Animate on Scroll
+    AOS.init({
+        once: true,
+        offset: 100,
+        duration: 800,
+        easing: 'ease-out-cubic'
+    });
+
+    // Particle Generation
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.getElementById('particles-container');
+        if (container) {
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random properties
+                const size = Math.random() * 15 + 5;
+                const left = Math.random() * 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${left}vw`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+
+        // Counter Animation
+        const counters = document.querySelectorAll('.counters');
+        const speed = 200;
+
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText.replace(/\+/g, '').replace(/K/g, '000');
+                
+                const inc = target / speed;
+
+                if (count < target) {
+                    let nextVal = Math.ceil(count + inc);
+                    if(target >= 1000) {
+                        counter.innerText = (nextVal/1000).toFixed(1) + 'K+';
+                    } else {
+                        counter.innerText = nextVal + '+';
+                    }
+                    setTimeout(updateCount, 10);
+                } else {
+                    if(target >= 1000) {
+                       counter.innerText = (target/1000) + 'K+';
+                    } else {
+                        counter.innerText = target + '+';
+                    }
+                }
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    updateCount();
+                    observer.disconnect();
+                }
+            });
+            observer.observe(counter);
+        });
+    });
+</script>
+
+{% endblock %}

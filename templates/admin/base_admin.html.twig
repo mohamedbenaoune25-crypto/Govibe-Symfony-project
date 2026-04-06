@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GoVibe Administration{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --admin-primary: #083a2d;
+            --admin-secondary: #0f5132;
+            --admin-accent: #22c55e;
+            --bg-light: #F3F4F6;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --card-bg: #FFFFFF;
+            --border-color: #E5E7EB;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        /* Sidebar Styling - Solid Professional */
+        .sidebar {
+            width: 280px;
+            background: var(--admin-primary);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-brand {
+            padding: 30px 25px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--admin-secondary);
+            letter-spacing: -0.5px;
+        }
+        
+        .sidebar-brand span.gv {
+            color: #86efac;
+        }
+
+        .sidebar-nav {
+            padding: 25px 0;
+            list-style: none;
+            margin: 0;
+            flex: 1;
+        }
+
+        .sidebar-nav-item {
+            padding: 0 15px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14.5px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-nav-link i {
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+        .sidebar-nav-link:hover, .sidebar-nav-link.active {
+            color: white;
+            background: rgba(34, 197, 94, 0.14);
+            border-left: 4px solid var(--admin-accent);
+        }
+        
+        .sidebar-nav-link:hover i {
+            color: var(--admin-accent);
+            transform: translateX(3px);
+        }
+
+        /* Main Content Wrapper */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Header inside main content - Clean White */
+        .admin-header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            height: 75px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .header-title {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: var(--admin-primary);
+            font-size: 20px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .admin-badge {
+            background: rgba(34, 197, 94, 0.10);
+            color: var(--admin-accent);
+            padding: 6px 16px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 40px;
+            flex: 1;
+        }
+
+        /* Custom Professional Cards */
+        .admin-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        }
+        
+        .admin-card-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: #F9FAFB;
+            font-weight: 600;
+            color: var(--admin-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+        
+        .admin-card-body {
+            padding: 24px;
+        }
+
+        /* Admin Table */
+        .admin-table {
+            color: var(--text-main);
+            margin-bottom: 0;
+        }
+
+        .admin-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 14px 24px;
+            background: #F9FAFB;
+            border-top: none;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 0.5px;
+        }
+        
+        .admin-table td {
+            vertical-align: middle;
+            padding: 14px 24px;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-color);
+            background: transparent;
+            font-size: 14px;
+        }
+        
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .admin-table tr:hover td {
+            background: #F9FAFB;
+        }
+
+        /* Professional Buttons */
+        .btn-pro {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        
+        .btn-pro:hover {
+            background: #F3F4F6;
+            color: var(--admin-primary);
+            border-color: #D1D5DB;
+        }
+        
+        .btn-primary-pro {
+            background: var(--admin-accent);
+            border: 1px solid var(--admin-accent);
+            color: white;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        
+        .btn-primary-pro:hover {
+            background: #16a34a;
+            color: white;
+        }
+
+        form {
+            animation: adminFormLiftIn .45s ease both;
+        }
+
+        @keyframes adminFormLiftIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        form .form-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--text-muted);
+            margin-bottom: .5rem;
+        }
+
+        form .form-control,
+        form .form-select,
+        form select,
+        form textarea,
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="password"],
+        form input[type="number"],
+        form input[type="tel"],
+        form input[type="date"],
+        form input[type="time"] {
+            border-radius: 16px;
+            border: 1px solid #DDE3EA;
+            padding: .9rem 1rem;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+
+        form .form-control:focus,
+        form .form-select:focus,
+        form select:focus,
+        form textarea:focus,
+        form input[type="text"]:focus,
+        form input[type="email"]:focus,
+        form input[type="password"]:focus,
+        form input[type="number"]:focus,
+        form input[type="tel"]:focus,
+        form input[type="date"]:focus,
+        form input[type="time"]:focus {
+            border-color: var(--admin-accent);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        form .form-check-input {
+            width: 1.1em;
+            height: 1.1em;
+            border-radius: .35rem;
+        }
+
+        form .form-check-input:checked {
+            background-color: var(--admin-accent);
+            border-color: var(--admin-accent);
+        }
+
+        form .btn {
+            transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+        }
+
+        form .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        form .invalid-feedback {
+            font-size: 12px;
+            margin-top: .45rem;
+        }
+
+        .go-form-page {
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.06), rgba(243, 244, 246, 0.85));
+            min-height: calc(100vh - 75px);
+            padding: 34px 40px 56px;
+        }
+
+        .go-form-card {
+            border: 0;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.09);
+            background: #fff;
+        }
+
+        .go-form-card-header {
+            padding: 24px 28px;
+            color: white;
+            background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));
+        }
+
+        .go-form-card-body {
+            padding: 28px;
+            background: #fff;
+        }
+
+        .govibe-detail-modal .modal-content {
+            border: 0;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+            background: rgba(255, 255, 255, 0.98);
+            max-height: calc(100vh - 2rem);
+        }
+
+        .govibe-detail-modal .modal-dialog {
+            max-width: 760px;
+        }
+
+        .govibe-detail-modal .modal-backdrop.show,
+        .modal-backdrop.show {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            background-color: rgba(3, 27, 17, 0.55);
+            opacity: 1;
+        }
+
+        {% block stylesheets %}{% endblock %}
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a href="{{ path('app_user_home') }}" class="sidebar-brand">
+            <i class="bi bi-rocket-takeoff"></i> GoVibe <span class="gv">Panel</span>
+        </a>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_admin_dashboard') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') == 'app_admin_dashboard' %}active{% endif %}">
+                    <i class="bi bi-grid-1x2"></i> Dashboard
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_admin_users') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') == 'app_admin_users' %}active{% endif %}">
+                    <i class="bi bi-people"></i> Utilisateurs
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_admin_reclamations') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') == 'app_admin_reclamations' %}active{% endif %}">
+                    <i class="bi bi-envelope-exclamation"></i> Réclamations
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_admin_location_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_location' %}active{% endif %}">
+                    <i class="bi bi-geo-alt"></i> Locations
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_admin_vols_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_vols' %}active{% endif %}">
+                    <i class="bi bi-airplane"></i> Vols
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('admin_voiture_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'admin_voiture' %}active{% endif %}">
+                    <i class="bi bi-car-front"></i> Voitures
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_poste_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_poste' %}active{% endif %}">
+                    <i class="bi bi-chat-square-text"></i> Publications
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_forum_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_forum' %}active{% endif %}">
+                    <i class="bi bi-collection"></i> Forums
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_admin_checkouts_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_checkouts' %}active{% endif %}">
+                    <i class="bi bi-ticket-perforated"></i> Checkouts
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="{{ path('app_activite_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_activite' %}active{% endif %}">
+                    <i class="bi bi-calendar-event"></i> Activités
+                </a>
+            </li>
+            <li class="sidebar-nav-item pt-4">
+                <a href="{{ path('app_logout') }}" class="sidebar-nav-link text-danger mt-2">
+                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="admin-header" data-aos="fade-down" data-aos-duration="600">
+            <h1 class="header-title">{% block page_title %}Dashboard{% endblock %}</h1>
+            <div class="header-actions">
+                <div class="admin-badge"><i class="bi bi-shield-check me-2"></i>Espace Sécurisé</div>
+                <div class="fw-bold text-white">{{ app.user.prenom }} {{ app.user.nom }}</div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content -->
+        <div class="content-area">
+            {% for message in app.flashes('success') %}
+                <div class="alert text-white border-0" style="background: rgba(16, 185, 129, 0.2); border-left: 5px solid #10B981 !important; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);" data-aos="fade-in">
+                    <i class="bi bi-check-circle-fill me-2" style="color: #10B981;"></i> {{ message }}
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="alert text-white border-0" style="background: rgba(239, 68, 68, 0.2); border-left: 5px solid #EF4444 !important; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);" data-aos="fade-in">
+                    <i class="bi bi-exclamation-triangle-fill me-2" style="color: #EF4444;"></i> {{ message }}
+                </div>
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </div>
+    </main>
+
+    <div class="modal fade govibe-detail-modal" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div id="detailModalBody" class="modal-body p-0">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <p class="mt-3 text-muted small">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            AOS.init({ once: true, offset: 20 });
+
+            const detailModalEl = document.getElementById('detailModal');
+            const detailModal = detailModalEl ? new bootstrap.Modal(detailModalEl) : null;
+
+            window.openDetailModal = function(url) {
+                if (!detailModal) {
+                    return;
+                }
+
+                const body = document.getElementById('detailModalBody');
+                body.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <p class="mt-3 text-muted small">Chargement...</p>
+                    </div>
+                `;
+
+                detailModal.show();
+
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(response) { return response.text(); })
+                    .then(function(html) {
+                        body.innerHTML = html;
+                    })
+                    .catch(function() {
+                        body.innerHTML = '<div class="alert alert-danger m-4 rounded-4">Impossible de charger le contenu.</div>';
+                    });
+            };
+        });
+    </script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

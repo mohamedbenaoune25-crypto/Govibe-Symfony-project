@@ -1,0 +1,154 @@
+{% extends is_granted('ROLE_ADMIN') ? 'admin/base_admin.html.twig' : 'base.html.twig' %}
+
+{% block title %}Gestion des Activités - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid bg-white py-5 shadow-sm text-center mb-5 border-bottom rounded-bottom-5 px-lg-5">
+    <div class="row align-items-center justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="display-3 fw-bold text-dark mb-3 animate-fade-in-up">Nos <span style="color: #52BE80;">Activités</span></h1>
+            <p class="text-secondary fs-5 mb-5 opacity-75">Découvrez et gérez les expériences inoubliables de GoVibe.</p>
+            
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center align-items-center mb-4">
+                <a href="{{ path('app_activite_new') }}" 
+                   class="btn btn-success rounded-pill px-5 py-3 fw-bold shadow transition-all hover-lift-2 border-0" 
+                   style="background-color: #52BE80; font-size: 1.1rem;">
+                    <i class="bi bi-plus-lg me-2"></i>{{ is_granted('ROLE_ADMIN') ? 'Nouvelle Activité' : 'Proposer une Activité' }}
+                </a>
+                <a href="{{ path('app_activite_session_index') }}" class="btn btn-outline-secondary rounded-pill px-4 py-3 fw-bold border-2">
+                    <i class="bi bi-calendar-event me-2"></i>Gérer les Sessions
+                </a>
+            </div>
+
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-8 col-xl-6">
+                    <form method="get" action="{{ path('app_activite_index') }}" class="d-flex gap-2">
+                        <div class="input-group bg-white rounded-pill shadow-sm overflow-hidden border border-light transition-all focus-within-shadow">
+                            <span class="input-group-text bg-white border-0 ps-4 text-muted">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="q" value="{{ search_query }}" 
+                                   class="form-control border-0 py-3 ps-2 shadow-none" 
+                                   placeholder="Rechercher par nom..." 
+                                   aria-label="Rechercher">
+                            {% if search_query %}
+                                <a href="{{ path('app_activite_index') }}" 
+                                   class="btn bg-white border-0 text-muted pe-3 d-flex align-items-center shadow-none hover-text-danger" 
+                                   title="Réinitialiser">
+                                    <i class="bi bi-x-circle-fill"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-dark rounded-pill px-4 fw-bold shadow-sm transition-all hover-lift-2">
+                            Chercher
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5 px-lg-5">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} rounded-4 border-0 shadow-sm mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-5">
+        {% for activite in activites %}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm rounded-5 overflow-hidden transition-all hover-lift-2 bg-white">
+                    <div class="position-relative">
+                        <div style="height: 200px; background: linear-gradient(135deg, #52BE80, #2ECC71);" class="d-flex align-items-center justify-content-center">
+                            <i class="bi bi-geo-alt-fill display-1 text-white opacity-25"></i>
+                        </div>
+                        <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-2">
+                            <span class="badge rounded-pill bg-white text-dark shadow-sm px-3 py-2">
+                                {{ activite.type }}
+                            </span>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                {% if activite.status == 'Pending' %}
+                                    <span class="badge rounded-pill bg-warning text-dark shadow-sm px-3 py-2">
+                                        <i class="bi bi-hourglass-split me-1"></i>En attente
+                                    </span>
+                                {% elseif activite.status == 'Rejected' %}
+                                    <span class="badge rounded-pill bg-danger text-white shadow-sm px-3 py-2">
+                                        <i class="bi bi-x-circle me-1"></i>Rejetée
+                                    </span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <h3 class="card-title h4 fw-bold mb-3">{{ activite.name }}</h3>
+                        <p class="card-text text-muted mb-4 line-clamp-3 small">{{ activite.description }}</p>
+                        
+                        <div class="d-flex align-items-center gap-3 mb-4 text-secondary small">
+                            <span><i class="bi bi-pin-map me-1"></i> {{ activite.localisation }}</span>
+                            <span><i class="bi bi-tag me-1"></i> {{ activite.prix }} TND</span>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <a href="{{ path('app_activite_show', {'id': activite.id}) }}" class="btn btn-light rounded-pill flex-grow-1 fw-bold border-0 py-2">Détails</a>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                {% if activite.status == 'Pending' %}
+                                    <form method="post" action="{{ path('app_activite_validate', {'id': activite.id}) }}" class="d-inline">
+                                        <button class="btn btn-success rounded-circle border-0 p-2 shadow-sm d-flex align-items-center justify-content-center" title="Valider" style="width: 42px; height: 42px; background-color: #2ECC71;">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{{ path('app_activite_reject', {'id': activite.id}) }}" class="d-inline">
+                                        <button class="btn btn-danger rounded-circle border-0 p-2 shadow-sm d-flex align-items-center justify-content-center" title="Rejeter" style="width: 42px; height: 42px;">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                <a href="{{ path('app_activite_edit', {'id': activite.id}) }}" class="btn btn-outline-success rounded-circle border-2 p-2 d-flex align-items-center justify-content-center" style="width: 42px; height: 42px;">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center py-5 rounded-5 border bg-white shadow-sm mt-4">
+                <div class="display-3 text-muted opacity-25 mb-4">
+                    <i class="bi {{ search_query ? 'bi-search' : 'bi-emoji-neutral' }}"></i>
+                </div>
+                <h3 class="text-secondary fw-bold">
+                    {{ search_query ? 'Aucun résultat pour "' ~ search_query ~ '"' : 'Aucune activité disponible' }}
+                </h3>
+                <p class="text-muted">
+                    {{ search_query ? 'Essayez avec d\'autres mots-clés ou réinitialisez la recherche.' : 'Commencez par en créer une dès maintenant.' }}
+                </p>
+                {% if search_query %}
+                    <a href="{{ path('app_activite_index') }}" class="btn btn-outline-secondary rounded-pill px-4 mt-2">Voir tout</a>
+                {% else %}
+                    <a href="{{ path('app_activite_new') }}" class="btn btn-success rounded-pill px-4 mt-2 border-0" style="background-color: #52BE80;">Créer</a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body { background-color: #F8F9F9 !important; }
+    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .hover-lift-2:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(82,190,128,0.2) !important; }
+    .rounded-bottom-5 { border-bottom-left-radius: 4rem !important; border-bottom-right-radius: 4rem !important; }
+    .line-clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .focus-within-shadow:focus-within { border-color: #52BE80 !important; box-shadow: 0 0 0 0.25rem rgba(82, 190, 128, 0.2) !important; }
+    .hover-text-danger:hover { color: #E74C3C !important; }
+    .ls-1 { letter-spacing: 1px; }
+</style>
+{% endblock %}

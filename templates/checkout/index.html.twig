@@ -1,0 +1,491 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes checkouts - GoVibe{% endblock %}
+
+{% block body %}
+<style>
+    body { background: transparent; }
+
+    .checkout-hero {
+        position: relative;
+        padding: 155px 0 90px;
+        color: white;
+        min-height: 380px;
+        overflow: hidden;
+    }
+
+    .checkout-hero .hero-bg-img {
+        position: absolute;
+        inset: -30px;
+        z-index: 0;
+    }
+
+    .checkout-hero .hero-bg-img img {
+        width: calc(100% + 60px);
+        height: calc(100% + 60px);
+        object-fit: cover;
+        animation: heroPan 25s ease-in-out infinite alternate;
+    }
+
+    @keyframes heroPan {
+        0%   { transform: translate(0px, 0px) scale(1); }
+        25%  { transform: translate(-15px, -8px) scale(1.03); }
+        50%  { transform: translate(-25px, 5px) scale(1.05); }
+        75%  { transform: translate(-10px, -15px) scale(1.02); }
+        100% { transform: translate(-30px, -10px) scale(1.04); }
+    }
+
+    .checkout-hero .hero-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(135deg, rgba(1, 50, 32, 0.85), rgba(8, 78, 54, 0.75));
+    }
+
+    .checkout-hero::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        background: radial-gradient(circle at 70% 30%, rgba(34, 197, 94, 0.18), transparent 50%),
+                    radial-gradient(circle at 20% 70%, rgba(46, 139, 87, 0.12), transparent 40%);
+        pointer-events: none;
+    }
+
+    .hero-breadcrumb {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: rgba(34, 197, 94, 0.15);
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(8px);
+        margin-bottom: 16px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+    }
+
+    .hero-breadcrumb i { color: #86efac; }
+
+    .hero-glass-shell {
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(6px);
+        border-radius: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 24px 28px;
+    }
+
+    /* ─── Filter Pills ─── */
+    .filter-pills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 28px;
+    }
+
+    .filter-pill {
+        padding: 10px 22px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 600;
+        border: 1.5px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        text-decoration: none;
+        transition: all 0.25s ease;
+    }
+
+    .filter-pill:hover {
+        background: rgba(34, 197, 94, 0.15);
+        border-color: rgba(34, 197, 94, 0.3);
+        color: white;
+    }
+
+    .filter-pill.active {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        border-color: transparent;
+        color: white;
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+    }
+
+    /* ─── Checkout Cards with Background Images ─── */
+    .checkout-card {
+        border: 0;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(1, 50, 32, 0.12);
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .checkout-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 24px 60px rgba(1, 50, 32, 0.22);
+    }
+
+    /* Animated background image */
+    .checkout-card .card-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .checkout-card .card-bg img {
+        width: 130%;
+        height: 130%;
+        object-fit: cover;
+        position: absolute;
+        top: -15%;
+        left: -15%;
+        animation: panImage 12s ease-in-out infinite alternate;
+        transition: transform 0.6s ease;
+    }
+
+    .checkout-card:hover .card-bg img {
+        transform: scale(1.05);
+    }
+
+    /* Each card gets a slightly different pan direction */
+    .checkout-card:nth-child(3n+1) .card-bg img {
+        animation-name: panImage1;
+    }
+    .checkout-card:nth-child(3n+2) .card-bg img {
+        animation-name: panImage2;
+    }
+    .checkout-card:nth-child(3n) .card-bg img {
+        animation-name: panImage3;
+    }
+
+    @keyframes panImage1 {
+        0%   { transform: translate(0%, 0%) scale(1); }
+        100% { transform: translate(-8%, -5%) scale(1.08); }
+    }
+
+    @keyframes panImage2 {
+        0%   { transform: translate(-5%, 0%) scale(1.05); }
+        100% { transform: translate(3%, -6%) scale(1); }
+    }
+
+    @keyframes panImage3 {
+        0%   { transform: translate(0%, -5%) scale(1); }
+        100% { transform: translate(-6%, 3%) scale(1.06); }
+    }
+
+    /* Dark overlay for text readability */
+    .checkout-card .card-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: linear-gradient(
+            180deg,
+            rgba(1, 50, 32, 0.72) 0%,
+            rgba(1, 40, 25, 0.82) 50%,
+            rgba(0, 20, 12, 0.92) 100%
+        );
+        transition: background 0.4s ease;
+    }
+
+    .checkout-card:hover .card-overlay {
+        background: linear-gradient(
+            180deg,
+            rgba(1, 50, 32, 0.65) 0%,
+            rgba(1, 40, 25, 0.75) 50%,
+            rgba(0, 20, 12, 0.88) 100%
+        );
+    }
+
+    /* Card content sits above overlay */
+    .checkout-card .card-body {
+        position: relative;
+        z-index: 2;
+    }
+
+    .checkout-id {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .checkout-flight-name {
+        font-size: 22px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .status-pill {
+        border-radius: 10px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        backdrop-filter: blur(8px);
+    }
+
+    .status-pending {
+        background: rgba(245, 158, 11, 0.25);
+        color: #fbbf24;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-confirmed {
+        background: rgba(34, 197, 94, 0.25);
+        color: #86efac;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-rejected {
+        background: rgba(239, 68, 68, 0.25);
+        color: #fca5a5;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .checkout-meta {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .checkout-meta i {
+        width: 18px;
+        text-align: center;
+        color: #86efac;
+    }
+
+    .checkout-summary {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 16px;
+    }
+
+    .checkout-total-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .checkout-total {
+        font-size: 24px;
+        font-weight: 800;
+        color: #86efac;
+        text-shadow: 0 2px 12px rgba(34, 197, 94, 0.4);
+    }
+
+    .checkout-card .btn-outline-success {
+        color: #86efac !important;
+        border-color: rgba(134, 239, 172, 0.4) !important;
+        backdrop-filter: blur(4px);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .checkout-card .btn-outline-success:hover {
+        background: rgba(34, 197, 94, 0.3) !important;
+        border-color: #86efac !important;
+        color: #fff !important;
+    }
+
+    .checkout-card .btn-outline-primary {
+        color: rgba(255, 255, 255, 0.85) !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(4px);
+    }
+
+    .checkout-card .btn-outline-primary:hover {
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-color: rgba(255, 255, 255, 0.4) !important;
+        color: #fff !important;
+    }
+
+    .checkout-card .btn-outline-danger {
+        color: #fca5a5 !important;
+        border-color: rgba(252, 165, 165, 0.3) !important;
+        background: rgba(239, 68, 68, 0.08);
+        backdrop-filter: blur(4px);
+    }
+
+    .checkout-card .btn-outline-danger:hover {
+        background: rgba(239, 68, 68, 0.25) !important;
+        border-color: #fca5a5 !important;
+        color: #fff !important;
+    }
+
+    .section-header h2 {
+        font-size: 14px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .count-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        padding: 4px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .empty-state {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1.5px dashed rgba(1, 50, 32, 0.12);
+        border-radius: 24px;
+        padding: 48px;
+        text-align: center;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        color: var(--primary-emerald);
+        opacity: 0.5;
+        margin-bottom: 16px;
+    }
+</style>
+
+{% set cardImages = [
+    asset('images/plane_sunset_1.png'),
+    asset('images/plane_sunset_2.png'),
+    asset('images/plane_sunset_3.png')
+] %}
+
+<section class="checkout-hero">
+    <div class="hero-bg-img">
+        <img src="{{ asset('images/home-hero5.png') }}" alt="">
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="container position-relative" style="z-index: 3;">
+        <div class="hero-glass-shell">
+            <div class="row align-items-end g-4">
+                <div class="col-lg-8">
+                    <div class="hero-breadcrumb">
+                        <i class="bi bi-house-door-fill"></i> GoVibe
+                        <i class="bi bi-chevron-right" style="font-size:10px; opacity: 0.5;"></i>
+                        Vols
+                        <i class="bi bi-chevron-right" style="font-size:10px; opacity: 0.5;"></i>
+                        <span style="color: #86efac;">Checkouts</span>
+                    </div>
+                    <h1 class="display-5 fw-bold mb-3">Mes réservations de vol</h1>
+                    <p class="lead mb-0 text-white-50">Consultez, modifiez ou supprimez vos demandes en attente depuis un espace unique.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end pb-2">
+                    <a href="{{ path('app_checkout_new') }}" onclick="openDetailModal(this.href); return false;" class="btn btn-success btn-lg rounded-pill px-4 shadow-sm fw-semibold">
+                        <i class="bi bi-plus-circle me-2"></i> Nouveau checkout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="filter-pills">
+            <a href="{{ path('app_checkout_index', {status: 'all'}) }}" class="filter-pill {{ currentStatus == 'all' ? 'active' : '' }}">
+                <i class="bi bi-grid-3x3-gap me-1"></i> Tous
+            </a>
+            <a href="{{ path('app_checkout_index', {status: 'EN_ATTENTE'}) }}" class="filter-pill {{ currentStatus == 'EN_ATTENTE' ? 'active' : '' }}">
+                <i class="bi bi-hourglass-split me-1"></i> En attente
+            </a>
+            <a href="{{ path('app_checkout_index', {status: 'CONFIRMEE'}) }}" class="filter-pill {{ currentStatus == 'CONFIRMEE' ? 'active' : '' }}">
+                <i class="bi bi-check-circle me-1"></i> Confirmées
+            </a>
+            <a href="{{ path('app_checkout_index', {status: 'REFUSEE'}) }}" class="filter-pill {{ currentStatus == 'REFUSEE' ? 'active' : '' }}">
+                <i class="bi bi-x-circle me-1"></i> Refusées
+            </a>
+        </div>
+
+        <div class="section-header d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="bi bi-ticket-perforated me-2"></i> Vos checkouts</h2>
+            <span class="count-badge">{{ checkouts|length }} résultat{{ checkouts|length > 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="row g-4">
+            {% for checkout in checkouts %}
+                <div class="col-md-6 col-xl-4" data-card-animate>
+                    <div class="card checkout-card h-100">
+                        {# Animated background image — cycles through 3 images #}
+                        <div class="card-bg">
+                            <img src="{{ cardImages[loop.index0 % 3] }}" alt="" loading="lazy">
+                        </div>
+                        {# Dark overlay for readability #}
+                        <div class="card-overlay"></div>
+
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="checkout-id">#{{ checkout.checkoutId }}</div>
+                                    <h4 class="checkout-flight-name mt-1 mb-0">{{ checkout.flight }}</h4>
+                                </div>
+                                {% if checkout.statusReservation == 'EN_ATTENTE' %}
+                                    <span class="status-pill status-pending">EN ATTENTE</span>
+                                {% elseif checkout.statusReservation == 'CONFIRMEE' %}
+                                    <span class="status-pill status-confirmed">CONFIRMÉE</span>
+                                {% else %}
+                                    <span class="status-pill status-rejected">REFUSÉE</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="checkout-meta mb-3">
+                                <div class="mb-2"><i class="bi bi-calendar-event me-2"></i>{{ checkout.reservationDate ? checkout.reservationDate|date('d/m/Y H:i') : '-' }}</div>
+                                <div class="mb-2"><i class="bi bi-people me-2"></i>{{ checkout.passengerNbr }} passager(s)</div>
+                                <div><i class="bi bi-credit-card me-2"></i>{{ checkout.paymentMethod }}</div>
+                            </div>
+
+                            <div class="checkout-summary d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <div class="checkout-total-label">Total</div>
+                                    <span class="checkout-total">{{ checkout.totalPrix }} DT</span>
+                                </div>
+                                <a href="{{ path('app_checkout_show', {checkoutId: checkout.checkoutId}) }}" onclick="openDetailModal(this.href); return false;" class="btn btn-outline-success rounded-pill px-3 fw-semibold" style="font-size:14px;">
+                                    Détails <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+
+                            {% if checkout.statusReservation == 'EN_ATTENTE' %}
+                                <div class="d-flex gap-2 mt-3">
+                                    <a href="{{ path('app_checkout_edit', {checkoutId: checkout.checkoutId}) }}" onclick="openDetailModal(this.href); return false;" class="btn btn-sm btn-outline-primary rounded-pill flex-fill fw-semibold">
+                                        <i class="bi bi-pencil me-1"></i> Modifier
+                                    </a>
+                                    <form method="post" action="{{ path('app_checkout_delete', {checkoutId: checkout.checkoutId}) }}" class="flex-fill" onsubmit="return confirm('Supprimer ce checkout ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ checkout.checkoutId) }}">
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill w-100 fw-semibold">
+                                            <i class="bi bi-trash3 me-1"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="empty-state">
+                        <i class="bi bi-inbox d-block"></i>
+                        <h4 style="color: var(--dark-green); font-weight: 700;">Aucun checkout trouvé</h4>
+                        <p class="text-muted mb-3">Créez votre première réservation de vol pour commencer.</p>
+                        <a href="{{ path('app_vols_index') }}" class="btn btn-success rounded-pill px-4 fw-semibold">
+                            <i class="bi bi-airplane me-2"></i> Voir les vols
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

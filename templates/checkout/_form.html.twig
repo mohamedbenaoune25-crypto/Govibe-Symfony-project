@@ -1,0 +1,21 @@
+{% if checkout.checkoutId %}
+    {% set formAction = path('app_checkout_edit', {checkoutId: checkout.checkoutId}) %}
+{% else %}
+    {% set createParams = checkout.flight ? {flight: checkout.flight.flightId} : {} %}
+    {% set formAction = path('app_checkout_new', createParams) %}
+{% endif %}
+
+{{ form_start(form, {action: formAction, attr: {class: 'row g-4'}}) }}
+    <div class="col-md-6">{{ form_row(form.flight) }}</div>
+    <div class="col-md-6">{{ form_row(form.passengerNbr) }}</div>
+    <div class="col-md-6">{{ form_row(form.passengerName) }}</div>
+    <div class="col-md-6">{{ form_row(form.passengerEmail) }}</div>
+    <div class="col-md-6">{{ form_row(form.passengerPhone) }}</div>
+    <div class="col-md-6">{{ form_row(form.paymentMethod) }}</div>
+    <div class="col-md-6">{{ form_row(form.seatPreference) }}</div>
+    <div class="col-md-6">{{ form_row(form.travelClass) }}</div>
+    <div class="col-12 d-flex gap-3 justify-content-end pt-2">
+        <a href="{{ path('app_checkout_index') }}" class="btn btn-outline-secondary rounded-pill px-4 py-2">Retour</a>
+        <button class="btn btn-success rounded-pill px-4 py-2 fw-semibold">{{ button_label|default('Enregistrer') }}</button>
+    </div>
+{{ form_end(form) }}

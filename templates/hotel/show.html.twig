@@ -1,0 +1,301 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ hotel.nom }} - GoVibe{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card hotel-detail-card shadow-lg border-0 mb-4">
+                    <div class="card-header bg-emerald text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2 class="mb-0">{{ hotel.nom }}</h2>
+                                {% if hotel.nombreEtoiles %}
+                                    <div class="stars-rating mt-2">
+                                        {% for i in 1..5 %}
+                                            <i class="bi bi-star-fill {{ i <= hotel.nombreEtoiles ? 'text-warning' : 'text-white-50' }}"></i>
+                                        {% endfor %}
+                                        <span class="ms-2">{{ hotel.nombreEtoiles }} étoiles</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="text-end">
+                                {% if hotel.budget %}
+                                    <div class="price-tag">
+                                        À partir de <strong>{{ hotel.budget }}€</strong>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        {% if hotel.photoUrl %}
+                            <div class="hotel-image mb-4">
+                                <img src="{{ hotel.photoUrl }}" class="img-fluid rounded" alt="{{ hotel.nom }}">
+                            </div>
+                        {% endif %}
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-geo-alt me-2"></i>Localisation
+                                </h5>
+                                <p class="mb-1"><strong>Adresse:</strong> {{ hotel.adresse }}</p>
+                                <p class="mb-0"><strong>Ville:</strong> {{ hotel.ville }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-info-circle me-2"></i>Informations
+                                </h5>
+                                <p class="mb-1"><strong>ID:</strong> {{ hotel.id }}</p>
+                                {% if hotel.createdAt %}
+                                    <p class="mb-1"><strong>Créé le:</strong> {{ hotel.createdAt|date('d/m/Y à H:i') }}</p>
+                                {% endif %}
+                                {% if hotel.updatedAt %}
+                                    <p class="mb-0"><strong>Mis à jour le:</strong> {{ hotel.updatedAt|date('d/m/Y à H:i') }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if hotel.description %}
+                            <div class="mb-4">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-file-text me-2"></i>Description
+                                </h5>
+                                <div class="description-content">
+                                    {{ hotel.description|nl2br }}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        {% if hotel.chambres|length > 0 %}
+                            <div class="mb-4">
+                                <h5 class="text-emerald mb-3">
+                                    <i class="bi bi-door-open me-2"></i>Chambres disponibles ({{ hotel.chambres|length }})
+                                </h5>
+                                <div class="row g-3">
+                                    {% for chambre in hotel.chambres %}
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="chambre-card p-3 border rounded">
+                                                <h6 class="mb-2">{{ chambre.type }}</h6>
+                                                <p class="mb-1"><small>Capacité: {{ chambre.capacite }} personne(s)</small></p>
+                                                {% if chambre.prixStandard %}
+                                                    <p class="mb-0 fw-semibold text-emerald">{{ chambre.prixStandard }}€/nuit</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card action-card shadow-lg border-0 mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0 text-dark">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-warning toggle-favorite-show" data-hotel-id="{{ hotel.id }}" type="button" id="favoriteBtn">
+                                <i class="bi bi-star{% if hotel.isFavoris() %}-fill{% endif %} me-2"></i>
+                                <span id="favoriteText">{% if hotel.isFavoris() %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}</span>
+                            </button>
+                            <a href="{{ path('app_hotel_edit', {'id': hotel.id}) }}" class="btn btn-emerald">
+                                <i class="bi bi-pencil me-2"></i>Modifier l'hôtel
+                            </a>
+                            <a href="{{ path('app_chambre_index') }}" class="btn btn-outline-emerald">
+                                <i class="bi bi-door-open me-2"></i>Voir les chambres
+                            </a>
+                            <a href="{{ path('app_reservation_new') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-calendar-plus me-2"></i>Nouvelle réservation
+                            </a>
+                            <a href="{{ path('app_hotel_index') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card danger-card shadow-lg border-0">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Zone dangereuse
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            La suppression de cet hôtel est irréversible et supprimera également toutes les chambres associées.
+                        </p>
+                        {{ include('hotel/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-emerald {
+    background-color: var(--primary-emerald) !important;
+}
+
+.btn-emerald {
+    background-color: var(--primary-emerald);
+    border-color: var(--primary-emerald);
+    color: white;
+}
+
+.btn-emerald:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    color: white;
+}
+
+.hotel-detail-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}
+
+.action-card, .danger-card {
+    background: var(--glass-card);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+}
+
+.hotel-image img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.stars-rating {
+    display: inline-flex;
+    align-items: center;
+}
+
+.price-tag {
+    font-size: 1.1rem;
+    color: white;
+}
+
+.description-content {
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.chambre-card {
+    background: var(--soft-green);
+    transition: transform 0.2s ease;
+}
+
+.chambre-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--shadow-green);
+}
+
+.text-emerald {
+    color: var(--primary-emerald) !important;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #333;
+}
+
+.btn-warning:hover {
+    background-color: #ffb300;
+    border-color: #ffb300;
+}
+
+.toggle-favorite-show {
+    transition: all 0.3s ease;
+}
+
+.toggle-favorite-show.favorited {
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const favoriteBtn = document.querySelector('.toggle-favorite-show');
+    
+    if (favoriteBtn) {
+        const hotelId = favoriteBtn.getAttribute('data-hotel-id');
+        
+        // Set initial state
+        const icon = favoriteBtn.querySelector('i');
+        if (icon.classList.contains('bi-star-fill')) {
+            favoriteBtn.classList.add('favorited');
+        }
+        
+        favoriteBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch(`/hotel/${hotelId}/toggle-favoris`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const icon = this.querySelector('i');
+                    const text = this.querySelector('#favoriteText');
+                    
+                    if (data.isFavoris) {
+                        icon.classList.remove('bi-star');
+                        icon.classList.add('bi-star-fill');
+                        text.textContent = 'Retirer des favoris';
+                        this.classList.add('favorited');
+                    } else {
+                        icon.classList.remove('bi-star-fill');
+                        icon.classList.add('bi-star');
+                        text.textContent = 'Ajouter aux favoris';
+                        this.classList.remove('favorited');
+                    }
+                    
+                    // Show toast notification
+                    showNotification(data.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Une erreur est survenue', 'error');
+            }
+        });
+    }
+});
+
+function showNotification(message, type = 'success') {
+    const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
+    const alertHTML = `
+        <div class="alert ${alertClass} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 300px;">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    
+    const alertContainer = document.createElement('div');
+    alertContainer.innerHTML = alertHTML;
+    document.body.appendChild(alertContainer.firstElementChild);
+    
+    setTimeout(() => {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(alert => alert.remove());
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Réservations - GoVibe</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 14px; color: #333; line-height: 1.6; }
+        .header { text-align: center; margin-bottom: 50px; border-bottom: 2px solid #2ECC71; padding-bottom: 20px; }
+        .header h1 { color: #2ECC71; margin-bottom: 5px; }
+        .user-info { margin-bottom: 30px; }
+        .table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
+        .table th { background-color: #f8f9fa; color: #333; text-align: left; padding: 12px; border-bottom: 2px solid #dee2e6; }
+        .table td { padding: 12px; border-bottom: 1px solid #dee2e6; vertical-align: top; }
+        .footer { text-align: center; font-size: 10px; color: #777; position: fixed; bottom: 0; width: 100%; border-top: 1px solid #eee; padding-top: 10px; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; background-color: #e9ecef; border: 1px solid #ced4da; }
+        .total-box { background-color: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #dee2e6; margin-top: 30px; }
+        .total-box h3 { margin-top: 0; color: #2ECC71; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GoVibe</h1>
+        <p>Historique des Réservations d'Activités</p>
+    </div>
+
+    <div class="user-info">
+        <p><strong>Utilisateur :</strong> {{ user.prenom }} {{ user.nom }}</p>
+        <p><strong>Date d'export :</strong> {{ "now"|date("d/m/Y H:i") }}</p>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Activité</th>
+                <th>Session</th>
+                <th>Places</th>
+                <th>Réservé le</th>
+                <th>Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set totalToPay = 0 %}
+            {% for reservation in reservations %}
+                {% set totalPrice = reservation.nbPlaces * reservation.session.activite.prix %}
+                {% set totalToPay = totalToPay + totalPrice %}
+                <tr>
+                    <td>
+                        <strong>{{ reservation.session.activite.name }}</strong><br>
+                        <small>{{ reservation.session.activite.localisation }}</small>
+                    </td>
+                    <td>
+                        {{ reservation.session.date|date('d/m/Y') }}<br>
+                        <small>{{ reservation.session.heure|date('H:i') }}</small>
+                    </td>
+                    <td>{{ reservation.nbPlaces }}</td>
+                    <td>{{ reservation.reservedAt|date('d/m/Y') }}</td>
+                    <td>{{ totalPrice|number_format(2) }} DT</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total-box">
+        <h3>Résumé Financier</h3>
+        <p><strong>Nombre de réservations :</strong> {{ reservations|length }}</p>
+        <p><strong>Montant Total estimé :</strong> {{ totalToPay|number_format(2) }} DT</p>
+    </div>
+
+    <div class="footer">
+        <p>© 2026 GoVibe - Ce document est un récapitulatif officiel de vos réservations.</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GoVibe{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        /* ═══════════════════════════════════════════════════
+           GoVibe — Professional Green Theme
+           Emerald green palette + tropical background
+        ═══════════════════════════════════════════════════ */
+
+        :root {
+            --primary-emerald: #22c55e;
+            --dark-green: #013220;
+            --mid-green: #084E36;
+            --light-green: #2E8B57;
+            --accent-green: #16a34a;
+            --soft-green: #dcfce7;
+            --bg-creme: #F5F3E7;
+            --bg-footer: #002211;
+            --glass-card: rgba(255, 255, 255, 0.92);
+            --shadow-green: rgba(1, 50, 32, 0.12);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(165deg, rgba(1, 50, 32, 0.45), rgba(5, 35, 24, 0.35)),
+                        url('{{ asset('images/home-hero5.png') }}') center/cover fixed no-repeat;
+            color: #333;
+            padding-top: 0;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        /* ─── Floating Header Navbar ─── */
+        .govibe-navbar {
+            position: absolute;
+            top: 0; left: 0; width: 100%; z-index: 1030;
+            background: linear-gradient(180deg, rgba(1, 50, 32, 0.7) 0%, rgba(0,0,0,0) 100%);
+            padding: 18px 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .govibe-navbar.scrolled {
+            position: fixed;
+            background: rgba(1, 50, 32, 0.95);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+            padding: 12px 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 26px;
+            color: var(--primary-emerald) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.03em;
+        }
+
+        .brand-logo-circle {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-emerald), var(--light-green));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 18px;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.85) !important;
+            font-weight: 500; font-size: 15px;
+            margin: 0 8px; padding: 8px 14px !important;
+            border-radius: 12px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #fff !important;
+            background: rgba(34, 197, 94, 0.15);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 2px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 2px;
+            background: linear-gradient(90deg, var(--primary-emerald), var(--light-green));
+            border-radius: 2px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-link:hover::after, .nav-link.active::after { width: 60%; }
+
+        /* User Menu */
+        .user-dropdown-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            border-radius: 30px;
+            padding: 6px 16px 6px 6px;
+            display: flex; align-items: center; gap: 10px;
+            transition: all 0.25s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .user-dropdown-btn:hover {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: white;
+        }
+
+        .user-avatar {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-emerald), var(--accent-green));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; color: white; font-size: 14px;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+
+        .dropdown-menu {
+            border: 1px solid rgba(0,0,0,0.06);
+            border-radius: 16px !important;
+            box-shadow: 0 20px 50px rgba(1, 50, 32, 0.15);
+            padding: 8px;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.98);
+            animation: dropdownFadeIn 0.2s ease;
+        }
+
+        @keyframes dropdownFadeIn {
+            from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .dropdown-item {
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.15s;
+        }
+
+        .dropdown-item:hover { background: rgba(34, 197, 94, 0.08); }
+
+        /* ─── Global Footer ─── */
+        .govibe-footer {
+            background: linear-gradient(180deg, var(--bg-footer), #050e08);
+            color: rgba(255, 255, 255, 0.6);
+            padding: 60px 0 30px;
+            margin-top: 80px;
+            border-top: 1px solid rgba(34, 197, 94, 0.08);
+        }
+
+        .footer-brand {
+            color: var(--primary-emerald);
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: block;
+            letter-spacing: -0.03em;
+        }
+
+        .govibe-footer a:hover {
+            color: var(--primary-emerald) !important;
+        }
+
+        /* ─── Detail Modal (global) ─── */
+        .govibe-detail-modal .modal-content {
+            border: 0;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 40px 100px rgba(1, 50, 32, 0.25);
+            background: rgba(255, 255, 255, 0.98);
+            max-height: calc(100vh - 2rem);
+        }
+
+        .govibe-detail-modal .modal-dialog {
+            max-width: 720px;
+        }
+
+        .govibe-detail-modal .modal-backdrop.show,
+        .modal-backdrop.show {
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            background-color: rgba(1, 50, 32, 0.55);
+            opacity: 1;
+        }
+
+        /* ─── Card Reveal Animations ─── */
+        .reveal-card {
+            opacity: 0;
+            transform: translateY(24px) scale(0.97);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s ease;
+            will-change: transform, opacity;
+        }
+
+        .reveal-card.is-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* ─── Form Styles ─── */
+        form {
+            animation: formLiftIn .45s ease both;
+        }
+
+        @keyframes formLiftIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        form .form-label,
+        .modal .form-label {
+            font-size: 11.5px;
+            font-weight: 700;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: .5rem;
+        }
+
+        form .form-control,
+        form .form-select,
+        form select,
+        form textarea,
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="password"],
+        form input[type="number"],
+        form input[type="tel"],
+        form input[type="date"],
+        form input[type="time"],
+        .modal .form-control,
+        .modal .form-select,
+        .modal select,
+        .modal textarea,
+        .modal input[type="text"],
+        .modal input[type="email"],
+        .modal input[type="password"],
+        .modal input[type="number"],
+        .modal input[type="tel"],
+        .modal input[type="date"],
+        .modal input[type="time"] {
+            border-radius: 14px;
+            border: 1.5px solid rgba(1, 50, 32, 0.10);
+            padding: .85rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 1px 3px rgba(1, 50, 32, 0.04);
+            transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14.5px;
+        }
+
+        form .form-control:focus,
+        form .form-select:focus,
+        form select:focus,
+        form textarea:focus,
+        form input[type="text"]:focus,
+        form input[type="email"]:focus,
+        form input[type="password"]:focus,
+        form input[type="number"]:focus,
+        form input[type="tel"]:focus,
+        form input[type="date"]:focus,
+        form input[type="time"]:focus,
+        .modal .form-control:focus,
+        .modal .form-select:focus,
+        .modal select:focus,
+        .modal textarea:focus,
+        .modal input[type="text"]:focus,
+        .modal input[type="email"]:focus,
+        .modal input[type="password"]:focus,
+        .modal input[type="number"]:focus,
+        .modal input[type="tel"]:focus,
+        .modal input[type="date"]:focus,
+        .modal input[type="time"]:focus {
+            border-color: var(--primary-emerald);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12), 0 2px 6px rgba(34, 197, 94, 0.08);
+            background: #fff;
+            transform: translateY(-1px);
+            outline: none;
+        }
+
+        form .form-check-input,
+        .modal .form-check-input {
+            width: 1.15em; height: 1.15em;
+            border-radius: .35rem;
+            border-color: rgba(1, 50, 32, 0.15);
+            transition: all .2s ease;
+        }
+
+        form .form-check-input:checked,
+        .modal .form-check-input:checked {
+            background-color: var(--primary-emerald);
+            border-color: var(--primary-emerald);
+        }
+
+        form .form-check-input:focus,
+        .modal .form-check-input:focus {
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
+        }
+
+        form .btn, .modal .btn {
+            transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        form .btn:hover, .modal .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        form .invalid-feedback, .modal .invalid-feedback {
+            font-size: 12px;
+            margin-top: .45rem;
+        }
+
+        /* ─── Form Page Layout ─── */
+        .go-form-page {
+            min-height: calc(100vh - 90px);
+            padding: 128px 0 72px;
+        }
+
+        .go-form-card {
+            border: 0;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(1, 50, 32, 0.12);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+        }
+
+        .go-form-card-header {
+            padding: 28px 32px;
+            color: white;
+            background: linear-gradient(135deg, var(--dark-green), var(--mid-green), var(--light-green));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .go-form-card-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 90% 10%, rgba(34, 197, 94, 0.3), transparent 50%),
+                        radial-gradient(circle at 10% 90%, rgba(46, 139, 87, 0.2), transparent 50%);
+            pointer-events: none;
+        }
+
+        .go-form-card-body {
+            padding: 32px;
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        /* ─── Alerts ─── */
+        .alert {
+            border-radius: 16px;
+            border: none;
+            backdrop-filter: blur(12px);
+        }
+
+        /* ─── Scrollbar ─── */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(34, 197, 94, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.5); }
+    </style>
+    {% block stylesheets %}{% endblock %}
+</head>
+<body>
+
+    {% block header %}
+    <nav class="navbar navbar-expand-lg govibe-navbar" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('app_user_home') }}">
+                <img src="{{ asset('images/logo.png') }}" alt="GV" style="width: 40px; height: 40px; object-fit: contain; margin-right: 10px;"> GoVibe
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="bi bi-list text-white fs-2"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="{{ path('app_user_home') }}">Accueil</a></li>
+                    <li class="nav-item"><a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_activite' %}active{% endif %}" href="{{ path('app_activite_index') }}">Activités</a></li>
+                    <li class="nav-item"><a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_location' %}active{% endif %}" href="{{ path('app_location_index') }}">Voitures</a></li>
+                    <li class="nav-item"><a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_vols' %}active{% endif %}" href="{{ path('app_vols_index') }}">Vols</a></li>
+                    <li class="nav-item"><a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_hotel' %}active{% endif %}" href="{{ path('app_hotel_index') }}">Hôtels</a></li>
+                    <li class="nav-item"><a class="nav-link {% if app.request.attributes.get('_route') starts with 'app_poste' %}active{% endif %}" href="{{ path('app_poste_index') }}">Publications</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ path('app_reclamation_index') }}">Réclamations</a></li>
+                    {% if app.user and app.user.role == 'admin' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ path('app_admin_location_index') }}" style="color: #ff9800 !important;"><i class="bi bi-shield-lock"></i> Admin Locations</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ path('admin_voiture_index') }}" style="color: #ff9800 !important;"><i class="bi bi-car-front"></i> Gestion Voitures</a></li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex align-items-center">
+                    {% if app.user %}
+                        <div class="dropdown">
+                            <button class="btn user-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <div class="user-avatar">{{ app.user.prenom|first|upper }}</div>
+                                <span>{{ app.user.prenom }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-2">
+                                <li><a class="dropdown-item" href="{{ path('app_user_profile') }}"><i class="bi bi-person me-2"></i> Mon Profil</a></li>
+                                <li><a class="dropdown-item" href="{{ path('app_checkout_index') }}"><i class="bi bi-ticket-perforated me-2"></i> Mes checkouts</a></li>
+                                <li><a class="dropdown-item" href="{{ path('app_reservation_session_index') }}"><i class="bi bi-calendar-check me-2"></i> Mes réservations</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Déconnexion</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="btn btn-outline-light rounded-pill px-4">Connexion</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endblock %}
+
+    <div class="container position-relative" style="z-index: 1040; margin-top: 90px;">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show shadow-sm rounded-4 mb-3" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    {% block body %}{% endblock %}
+
+    <div class="modal fade govibe-detail-modal" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div id="detailModalBody" class="modal-body p-0">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <p class="mt-3 text-muted small">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% block footer %}
+    <footer class="govibe-footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <span class="footer-brand">GoVibe</span>
+                    <p>Vivez l'aventure, explorez le monde. Votre partenaire de voyage intelligent.</p>
+                </div>
+                <div class="col-lg-2 offset-lg-2">
+                    <h5 class="text-white mb-3" style="font-size:16px; font-weight:600;">Découvrir</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">Destinations</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">Aventures</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">Événements</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="text-white mb-3" style="font-size:16px; font-weight:600;">Support</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">Contact</a></li>
+                        <li class="mb-2"><a href="#" class="text-decoration-none text-secondary">FAQ</a></li>
+                        <li class="mb-2"><a href="{{ path('app_reclamation_index') }}" class="text-decoration-none text-secondary">Réclamations</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2">
+                    <h5 class="text-white mb-3" style="font-size:16px; font-weight:600;">Suivez-nous</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 20px;"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 20px;"><i class="bi bi-instagram"></i></a>
+                        <a href="#" class="text-decoration-none text-secondary" style="font-size: 20px;"><i class="bi bi-twitter-x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-top border-secondary mt-5 pt-4 text-center">
+                <p class="mb-0">&copy; 2026 GoVibe. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var navbar = document.getElementById("mainNav");
+            window.addEventListener("scroll", function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add("scrolled");
+                } else {
+                    navbar.classList.remove("scrolled");
+                }
+            });
+
+            var revealCards = document.querySelectorAll('[data-card-animate]');
+            if (revealCards.length) {
+                var observer = new IntersectionObserver(function(entries) {
+                    entries.forEach(function(entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+                revealCards.forEach(function(card, index) {
+                    card.classList.add('reveal-card');
+                    card.style.transitionDelay = (index * 80) + 'ms';
+                    observer.observe(card);
+                });
+            }
+
+            const detailModalEl = document.getElementById('detailModal');
+            const detailModal = detailModalEl ? new bootstrap.Modal(detailModalEl) : null;
+
+            window.openDetailModal = function(url) {
+                if (!detailModal) return;
+
+                const body = document.getElementById('detailModalBody');
+                body.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-success" role="status"></div><p class="mt-3 text-muted small">Chargement des détails...</p></div>';
+
+                detailModal.show();
+
+                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(response) { return response.text(); })
+                    .then(function(html) { body.innerHTML = html; })
+                    .catch(function() {
+                        body.innerHTML = '<div class="alert alert-danger m-4 rounded-4">Impossible de charger les détails.</div>';
+                    });
+            };
+        });
+    </script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

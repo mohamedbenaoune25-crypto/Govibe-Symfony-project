@@ -1,0 +1,25 @@
+<div class="row g-4">
+    <div class="col-md-6">
+        {{ form_row(form.name) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.type) }}
+    </div>
+    <div class="col-12">
+        {{ form_row(form.description) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.localisation) }}
+    </div>
+    <div class="col-md-3">
+        {{ form_row(form.prix) }}
+    </div>
+    <div class="col-md-3">
+        {{ form_row(form.status) }}
+    </div>
+    <div class="col-12 text-center mt-5">
+        <button class="btn btn-success rounded-pill px-5 py-3 fw-bold shadow transition-all hover-lift-2 border-0" style="background-color: #52BE80; font-size: 1.1rem;">
+            {{ button_label|default('Enregistrer l\'activité') }}
+        </button>
+    </div>
+</div>

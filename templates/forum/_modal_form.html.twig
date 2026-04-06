@@ -1,0 +1,132 @@
+{# Rendered directly into the Bootstrap modal body #}
+<div class="px-2">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h4 class="fw-bold mb-1 text-dark">
+                {% if forum.forumId %}
+                    <i class="bi bi-pencil-square me-2 text-success"></i>Modifier le Forum
+                {% else %}
+                    <i class="bi bi-plus-circle-fill me-2 text-success"></i>Créer un Forum
+                {% endif %}
+            </h4>
+            <p class="text-muted small mb-0">
+                {% if forum.forumId %}
+                    Forum <strong>{{ forum.name }}</strong> &bull; créé le {{ forum.dateCreation|date('d M Y') }}
+                {% else %}
+                    Lancez une nouvelle communauté sur GoVibe
+                {% endif %}
+            </p>
+        </div>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    {{ form_start(form, {'attr': {'id': 'forum-form', 'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
+        <div class="mb-4">
+            {{ form_label(form.name, null, {'label_attr': {'class': 'form-label fw-bold small text-uppercase text-secondary ls-1'}}) }} <span class="text-danger">*</span>
+            {{ form_widget(form.name, {'attr': {'class': 'form-control border-secondary-subtle rounded-3 p-3 validate-field', 'placeholder': 'Ex: Voyage en Asie'}}) }}
+            <div class="invalid-feedback-custom text-danger small mt-1 fw-bold" id="error-name" style="display: none;">Le nom du forum est obligatoire.</div>
+        </div>
+
+        <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold small text-uppercase text-secondary ls-1'}}) }} 
+                <span class="text-danger">*</span>
+            </div>
+            <div class="position-relative">
+                {{ form_widget(form.description, {'attr': {'class': 'form-control border-secondary-subtle rounded-3 p-3 validate-field', 'style': 'height: 120px; resize: none;', 'placeholder': 'De quoi parle ce forum ?'}}) }}
+                <div class="char-counter text-muted position-absolute bottom-0 end-0 m-2 small" style="opacity: 0.5;">
+                    <span id="forum-char-count">0</span> / 500
+                </div>
+            </div>
+            <div class="invalid-feedback-custom text-danger small mt-1 fw-bold" id="error-desc" style="display: none;">La description est obligatoire (max 500 caractères).</div>
+        </div>
+
+        <div class="mb-4">
+            {{ form_label(form.imageFile, null, {'label_attr': {'class': 'form-label fw-bold small text-uppercase text-secondary ls-1'}}) }} <span class="text-danger">*</span>
+            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control border-secondary-subtle rounded-3 p-2 validate-field'}}) }}
+            <div class="invalid-feedback-custom text-danger small mt-1 fw-bold" id="error-image" style="display: none;">L'image de couverture est obligatoire.</div>
+        </div>
+
+        <div class="form-check form-switch mb-4">
+            {{ form_widget(form.isPrivate, {'attr': {'class': 'form-check-input'}}) }}
+            {{ form_label(form.isPrivate, null, {'label_attr': {'class': 'form-check-label fw-bold text-secondary'}}) }}
+        </div>
+
+        <div class="d-flex justify-content-end align-items-center gap-3 pt-3 border-top mt-4">
+            <button type="button" class="btn btn-link link-danger fw-bold text-decoration-none" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-success rounded-pill px-5 py-2 fw-bold shadow-sm border-0" style="background-color: #52BE80;">
+                {% if forum.forumId %}Enregistrer{% else %}Créer le Forum{% endif %}
+            </button>
+        </div>
+    {{ form_end(form) }}
+
+    <script>
+        (function() {
+            const form = document.getElementById('forum-form');
+            const nameInput = form.querySelector('[name*="[name]"]');
+            const descInput = form.querySelector('[name*="[description]"]');
+            const imgInput = form.querySelector('[name*="[imageFile]"]');
+            const charCount = document.getElementById('forum-char-count');
+
+            const validate = () => {
+                let isValid = true;
+
+                // Name
+                if (nameInput.value.trim() === '') {
+                    nameInput.classList.add('is-invalid-custom');
+                    document.getElementById('error-name').style.display = 'block';
+                    isValid = false;
+                } else {
+                    nameInput.classList.remove('is-invalid-custom');
+                    document.getElementById('error-name').style.display = 'none';
+                }
+
+                // Description
+                const descLen = descInput.value.length;
+                charCount.textContent = descLen;
+                if (descInput.value.trim() === '' || descLen > 500) {
+                    descInput.classList.add('is-invalid-custom');
+                    document.getElementById('error-desc').style.display = 'block';
+                    if (descLen > 500) charCount.classList.add('text-danger', 'fw-bold');
+                    isValid = false;
+                } else {
+                    descInput.classList.remove('is-invalid-custom');
+                    document.getElementById('error-desc').style.display = 'none';
+                    charCount.classList.remove('text-danger', 'fw-bold');
+                }
+
+                // Image (Mandatory for new forum)
+                {% if not forum.forumId %}
+                if (!imgInput.files || imgInput.files.length === 0) {
+                    imgInput.classList.add('is-invalid-custom');
+                    document.getElementById('error-image').style.display = 'block';
+                    isValid = false;
+                } else {
+                    imgInput.classList.remove('is-invalid-custom');
+                    document.getElementById('error-image').style.display = 'none';
+                }
+                {% endif %}
+
+                return isValid;
+            };
+
+            nameInput.oninput = validate;
+            descInput.oninput = validate;
+            imgInput.onchange = validate;
+
+            // Run on load to show initial red borders
+            validate();
+
+            form.onsubmit = (e) => {
+                if (!validate()) {
+                    e.preventDefault();
+                    return false;
+                }
+            };
+        })();
+    </script>
+</div>
+
+<style>
+    .ls-1 { letter-spacing: 1px; }
+</style>

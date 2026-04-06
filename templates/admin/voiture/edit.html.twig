@@ -1,0 +1,134 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Éditer une Voiture - Admin{% endblock %}
+
+{% block page_title %}Éditer une Voiture{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow" style="border-radius: 24px; overflow: hidden;">
+                <div class="card-header border-0" style="background: linear-gradient(135deg, var(--admin-primary), var(--admin-secondary));">
+                    <h3 class="mb-0 text-white">
+                        <i class="bi bi-pencil-square"></i> Éditer Voiture - {{ voiture.matricule }}
+                    </h3>
+                </div>
+
+                <div class="card-body p-4">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.matricule, {'attr': {'class': 'form-control', 'readonly': 'readonly'}}) }}
+                            <small class="text-muted">Le matricule ne peut pas être modifié</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.statut, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.marque, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.modele, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form_row(form.annee, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form_row(form.typeCarburant, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form_row(form.prixJour, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_row(form.adresseAgence, {'attr': {'class': 'form-control', 'rows': 2}}) }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.latitude, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form_row(form.longitude, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_row(form.imageUrl, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_row(form.description, {'attr': {'class': 'form-control', 'rows': 4}}) }}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success btn-lg flex-grow-1">
+                            <i class="bi bi-check-circle"></i> Mettre à Jour
+                        </button>
+                        <a href="{{ path('admin_voiture_index') }}" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-arrow-left"></i> Annuler
+                        </a>
+                    </div>
+
+                    {{ form_end(form) }}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const agencySelect = document.querySelector('[name$="[adresseAgence]"]');
+                            const latInput = document.querySelector('[name$="[latitude]"]');
+                            const lngInput = document.querySelector('[name$="[longitude]"]');
+
+                            function syncCoordinates() {
+                                if (!agencySelect || !latInput || !lngInput) return;
+                                const option = agencySelect.options[agencySelect.selectedIndex];
+                                if (option && option.dataset.latitude && option.dataset.longitude) {
+                                    latInput.value = option.dataset.latitude;
+                                    lngInput.value = option.dataset.longitude;
+                                }
+                            }
+
+                            if (agencySelect) {
+                                agencySelect.addEventListener('change', syncCoordinates);
+                                syncCoordinates();
+                            }
+
+                            const form = document.querySelector('form.needs-validation');
+                            if (form) {
+                                form.addEventListener('submit', function (event) {
+                                    syncCoordinates();
+                                    if (!form.checkValidity()) {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                    }
+                                    form.classList.add('was-validated');
+                                }, false);
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+
+            <!-- Infos Système -->
+            <div class="alert alert-secondary mt-4 border-0" style="border-radius: 18px;">
+                <h6 class="mb-2">
+                    <i class="bi bi-info-circle"></i> Informations Système
+                </h6>
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">ID Voiture:</dt>
+                    <dd class="col-sm-9"><code>{{ voiture.idVoiture }}</code></dd>
+                    <dt class="col-sm-3">Créée le:</dt>
+                    <dd class="col-sm-9">{{ voiture.dateCreation ? voiture.dateCreation|date('d/m/Y H:i') : 'N/A' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

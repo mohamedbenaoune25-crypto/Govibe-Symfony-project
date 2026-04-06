@@ -1,0 +1,108 @@
+<h2 style="text-align: center; color: #013220; margin-bottom: 30px;">DÉTAILS DE LOCATION</h2>
+
+<table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+    <tr style="background-color: #013220; color: white;">
+        <td style="padding: 10px; font-weight: bold;">RÉFÉRENCE</td>
+        <td style="padding: 10px;">{{ location.reference }}</td>
+    </tr>
+    <tr style="background-color: #f5f3e7;">
+        <td style="padding: 10px; font-weight: bold;">STATUT</td>
+        <td style="padding: 10px;">{{ location.statut }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">DATE CRÉATION</td>
+        <td style="padding: 10px;">{{ location.dateCreation|date('d/m/Y H:i') }}</td>
+    </tr>
+    <tr style="background-color: #f5f3e7;">
+        <td style="padding: 10px; font-weight: bold;">DATE GÉNÉRATION</td>
+        <td style="padding: 10px;">{{ dateGeneration|date('d/m/Y H:i') }}</td>
+    </tr>
+</table>
+
+<h3 style="color: #013220; margin-top: 30px; margin-bottom: 15px;">VOITURE LOUÉE</h3>
+
+<table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+    {% set voiture = location.voiture %}
+    <tr style="background-color: #013220; color: white;">
+        <td style="padding: 10px; font-weight: bold;">MARQUE & MODÈLE</td>
+        <td style="padding: 10px;">{{ voiture.marque }} {{ voiture.modele }}</td>
+    </tr>
+    <tr style="background-color: #f5f3e7;">
+        <td style="padding: 10px; font-weight: bold;">MATRICULE</td>
+        <td style="padding: 10px;">{{ voiture.matricule }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">ANNÉE</td>
+        <td style="padding: 10px;">{{ voiture.annee }}</td>
+    </tr>
+    <tr style="background-color: #f5f3e7;">
+        <td style="padding: 10px; font-weight: bold;">TYPE CARBURANT</td>
+        <td style="padding: 10px;">{{ voiture.typeCarburant }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">ADRESSE AGENCE</td>
+        <td style="padding: 10px;">{{ voiture.adresseAgence }}</td>
+    </tr>
+</table>
+
+<h3 style="color: #013220; margin-top: 30px; margin-bottom: 15px;">PÉRIODE DE LOCATION</h3>
+
+<table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+    <tr style="background-color: #013220; color: white;">
+        <td style="padding: 10px; font-weight: bold;">DATE DÉBUT</td>
+        <td style="padding: 10px;">{{ location.dateDebut|date('d/m/Y') }}</td>
+    </tr>
+    <tr style="background-color: #f5f3e7;">
+        <td style="padding: 10px; font-weight: bold;">DATE FIN</td>
+        <td style="padding: 10px;">{{ location.dateFin|date('d/m/Y') }}</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px; font-weight: bold;">NOMBRE DE JOURS</td>
+        <td style="padding: 10px;">{{ location.nbJours }} jour(s)</td>
+    </tr>
+</table>
+
+<h3 style="color: #013220; margin-top: 30px; margin-bottom: 15px;">RÉSUMÉ FINANCIER</h3>
+
+<table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+    <tr style="background-color: #013220; color: white;">
+        <td style="padding: 10px; font-weight: bold;">PRIX JOURNALIER</td>
+        <td style="padding: 10px;">{{ '%0.2f'|format(voiture.prixJour) }} DT</td>
+    </tr>
+    <tr style="background-color: #f5f3e7;">
+        <td style="padding: 10px; font-weight: bold;">NOMBRE DE JOURS</td>
+        <td style="padding: 10px;">{{ location.nbJours }}</td>
+    </tr>
+    <tr style="background-color: #50C878; color: white; font-size: 1.2em; font-weight: bold;">
+        <td style="padding: 15px;">MONTANT TOTAL</td>
+        <td style="padding: 15px;">{{ '%0.2f'|format(stats.prixTotal) }} DT</td>
+    </tr>
+</table>
+
+<h3 style="color: #013220; margin-top: 30px; margin-bottom: 15px;">INFORMATIONS CLIENT</h3>
+
+<table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+    {% set user = location.user %}
+    <tr style="background-color: #013220; color: white;">
+        <td style="padding: 10px; font-weight: bold;">NOM COMPLET</td>
+        <td style="padding: 10px;">{{ user.prenom }} {{ user.nom }}</td>
+    </tr>
+    <tr style="background-color: #f5f3e7;">
+        <td style="padding: 10px; font-weight: bold;">EMAIL</td>
+        <td style="padding: 10px;">{{ user.email }}</td>
+    </tr>
+</table>
+
+<div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #013220; font-size: 0.9em; color: #666;">
+    <p style="margin-bottom: 5px;"><strong>Conditions de Location:</strong></p>
+    <ul style="margin: 10px 0; padding-left: 20px;">
+        <li>Le client est responsable du véhicule loué pendant toute la période de location</li>
+        <li>La location doit commencer à 09:00 et se terminer à 18:00</li>
+        <li>En cas de dégâts, le client devra assumer les frais de réparation</li>
+        <li>Le paiement doit être effectué avant le début de la location</li>
+    </ul>
+</div>
+
+<p style="text-align: center; margin-top: 40px; color: #666; font-style: italic;">
+    Document généré par GoVibe - {{ "now"|date('d/m/Y H:i') }}
+</p>
