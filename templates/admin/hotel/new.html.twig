@@ -1,0 +1,123 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Ajouter un hôtel{% endblock %}
+{% block page_title %}Ajouter un hôtel{% endblock %}
+
+{% block body %}
+<div class="go-form-page">
+    <div class="go-form-card hotel-form-card">
+        <div class="go-form-card-header hotel-form-header">
+            <h2 class="mb-1 fs-4"><i class="bi bi-building-add me-2"></i>Créer un nouvel hôtel</h2>
+            <p class="mb-0 opacity-75">Renseignez les informations principales de l’établissement pour l’ajouter au catalogue.</p>
+        </div>
+
+        <div class="go-form-card-body hotel-form-body">
+            {{ form_start(form) }}
+
+            <section class="form-section mb-4">
+                <h5 class="form-section-title"><i class="bi bi-card-heading me-2"></i>Identité de l’hôtel</h5>
+                <div class="row g-3">
+                    <div class="col-md-7">
+                        {{ form_row(form.nom, {
+                            'label': 'Nom de l’hôtel',
+                            'attr': {'class': 'form-control', 'placeholder': 'Ex: Hotel Azur Palace'}
+                        }) }}
+                    </div>
+                    <div class="col-md-5">
+                        {{ form_row(form.nombreEtoiles, {
+                            'label': 'Nombre d’étoiles',
+                            'attr': {'class': 'form-control', 'min': 1, 'max': 5, 'placeholder': 'Ex: 4'}
+                        }) }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section mb-4">
+                <h5 class="form-section-title"><i class="bi bi-geo-alt me-2"></i>Localisation</h5>
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        {{ form_row(form.adresse, {
+                            'label': 'Adresse complète',
+                            'attr': {'class': 'form-control', 'placeholder': 'Ex: 12 avenue Habib Bourguiba'}
+                        }) }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form_row(form.ville, {
+                            'label': 'Ville',
+                            'attr': {'class': 'form-control', 'placeholder': 'Ex: Tunis'}
+                        }) }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section mb-4">
+                <h5 class="form-section-title"><i class="bi bi-cash-coin me-2"></i>Tarif & présentation</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        {{ form_row(form.budget, {
+                            'label': 'Budget moyen / nuit',
+                            'attr': {'class': 'form-control', 'placeholder': 'Ex: 220', 'step': '0.01', 'min': 0}
+                        }) }}
+                    </div>
+                    <div class="col-md-8">
+                        {{ form_row(form.photoUrl, {
+                            'label': 'URL de la photo principale',
+                            'attr': {'class': 'form-control', 'placeholder': 'https://...'}
+                        }) }}
+                    </div>
+                    <div class="col-12">
+                        {{ form_row(form.description, {
+                            'label': 'Description de l’hôtel',
+                            'attr': {'class': 'form-control', 'rows': 6, 'placeholder': 'Décrivez les services, l’ambiance et les points forts de l’hôtel...'}
+                        }) }}
+                    </div>
+                </div>
+            </section>
+
+            <div class="mt-4 d-flex flex-wrap justify-content-end gap-2">
+                <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+                </a>
+                <button class="btn btn-primary-pro" type="submit">
+                    <i class="bi bi-check-circle me-1"></i>Créer l’hôtel
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.hotel-form-card {
+    max-width: 1040px;
+    margin: 0 auto;
+}
+
+.hotel-form-header {
+    background: linear-gradient(135deg, var(--admin-primary), #0a4d38);
+}
+
+.hotel-form-body {
+    background: linear-gradient(180deg, rgba(243, 244, 246, 0.45), #fff 35%);
+}
+
+.form-section {
+    padding: 18px;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.form-section-title {
+    color: var(--admin-primary);
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 14px;
+}
+</style>
+{% endblock %}

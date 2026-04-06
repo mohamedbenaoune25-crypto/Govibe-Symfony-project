@@ -97,6 +97,9 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
+                            <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="btn btn-info">
+                                <i class="bi bi-building me-2"></i>Retour à l'hôtel associé
+                            </a>
                             <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-emerald">
                                 <i class="bi bi-pencil me-2"></i>Modifier la réservation
                             </a>

@@ -102,18 +102,13 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <button class="btn btn-warning toggle-favorite-show" data-hotel-id="{{ hotel.id }}" type="button" id="favoriteBtn">
-                                <i class="bi bi-star{% if hotel.isFavoris() %}-fill{% endif %} me-2"></i>
-                                <span id="favoriteText">{% if hotel.isFavoris() %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}</span>
-                            </button>
-                            <a href="{{ path('app_hotel_edit', {'id': hotel.id}) }}" class="btn btn-emerald">
-                                <i class="bi bi-pencil me-2"></i>Modifier l'hôtel
-                            </a>
+                            {% if app.user and not is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('app_reservation_new', {'hotel': hotel.id}) }}" class="btn btn-emerald">
+                                    <i class="bi bi-calendar-plus me-2"></i>Ajouter une réservation
+                                </a>
+                            {% endif %}
                             <a href="{{ path('app_chambre_index') }}" class="btn btn-outline-emerald">
                                 <i class="bi bi-door-open me-2"></i>Voir les chambres
-                            </a>
-                            <a href="{{ path('app_reservation_new') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-calendar-plus me-2"></i>Nouvelle réservation
                             </a>
                             <a href="{{ path('app_hotel_index') }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-2"></i>Retour à la liste
@@ -123,16 +118,8 @@
                 </div>
 
                 <div class="card danger-card shadow-lg border-0">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-exclamation-triangle me-2"></i>Zone dangereuse
-                        </h5>
-                    </div>
                     <div class="card-body">
-                        <p class="text-muted mb-3">
-                            La suppression de cet hôtel est irréversible et supprimera également toutes les chambres associées.
-                        </p>
-                        {{ include('hotel/_delete_form.html.twig') }}
+                        <p class="text-muted mb-0">Interface en lecture seule pour les utilisateurs.</p>
                     </div>
                 </div>
             </div>
@@ -223,6 +210,7 @@
 .toggle-favorite-show.favorited {
     box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
 }
+
 </style>
 
 <script>

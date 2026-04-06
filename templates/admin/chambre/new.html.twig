@@ -1,0 +1,129 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Ajouter une chambre{% endblock %}
+{% block page_title %}Ajouter une chambre{% endblock %}
+
+{% block body %}
+<div class="go-form-page">
+    <div class="go-form-card chambre-form-card">
+        <div class="go-form-card-header chambre-form-header">
+            <h2 class="mb-1 fs-4"><i class="bi bi-door-open me-2"></i>Nouvelle chambre</h2>
+            <p class="mb-0 opacity-75">Complétez les informations de la chambre puis assignez-la à un hôtel.</p>
+        </div>
+        <div class="go-form-card-body chambre-form-body">
+            {{ form_start(form) }}
+
+            <section class="form-section mb-4">
+                <h5 class="form-section-title"><i class="bi bi-info-circle me-2"></i>Informations générales</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form_row(form.type, {
+                            'label': 'Type de chambre',
+                            'attr': {'class': 'form-control', 'placeholder': 'Ex: Suite Deluxe'}
+                        }) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.capacite, {
+                            'label': 'Capacité (personnes)',
+                            'attr': {'class': 'form-control', 'min': 1, 'placeholder': 'Ex: 2'}
+                        }) }}
+                    </div>
+                    <div class="col-12">
+                        {{ form_row(form.equipements, {
+                            'label': 'Équipements',
+                            'attr': {'class': 'form-control', 'placeholder': 'Wi-Fi, TV, Climatisation...'}
+                        }) }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section mb-4">
+                <h5 class="form-section-title"><i class="bi bi-cash-stack me-2"></i>Tarification</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        {{ form_row(form.prixStandard, {
+                            'label': 'Prix standard',
+                            'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
+                        }) }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form_row(form.prixHauteSaison, {
+                            'label': 'Prix haute saison',
+                            'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
+                        }) }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form_row(form.prixBasseSaison, {
+                            'label': 'Prix basse saison',
+                            'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
+                        }) }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section mb-4">
+                <h5 class="form-section-title"><i class="bi bi-building me-2"></i>Association</h5>
+                <div class="row g-3">
+                    {% if form.hotel is defined %}
+                        <div class="col-12">
+                            {{ form_row(form.hotel, {
+                                'label': 'Hôtel associé',
+                                'attr': {'class': 'form-select'}
+                            }) }}
+                        </div>
+                    {% elseif hotel is defined and hotel %}
+                        <div class="col-12">
+                            <label class="form-label">Hôtel associé</label>
+                            <input type="text" class="form-control" value="{{ hotel.nom }}" readonly>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <div class="mt-4 d-flex flex-wrap justify-content-end gap-2">
+                <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Retour hôtels
+                </a>
+                <button class="btn btn-primary-pro" type="submit">
+                    <i class="bi bi-check-circle me-1"></i>Enregistrer la chambre
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.chambre-form-card {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.chambre-form-header {
+    background: linear-gradient(135deg, var(--admin-primary), #0d5a42);
+}
+
+.chambre-form-body {
+    background: linear-gradient(180deg, rgba(243, 244, 246, 0.45), #fff 35%);
+}
+
+.form-section {
+    padding: 18px;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.form-section-title {
+    color: var(--admin-primary);
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 14px;
+}
+</style>
+{% endblock %}

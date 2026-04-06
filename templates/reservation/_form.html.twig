@@ -21,20 +21,15 @@
                 {{ form_errors(form.prixTotal) }}
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-floating">
-                {{ form_widget(form.statut, {'attr': {'class': 'form-select'}}) }}
-                {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.statut) }}
+        {% if form.statut is defined %}
+            <div class="col-md-6">
+                <div class="form-floating">
+                    {{ form_widget(form.statut, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_label(form.statut, 'Statut', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_errors(form.statut) }}
+                </div>
             </div>
-        </div>
-        <div class="col-12">
-            <div class="form-floating">
-                {{ form_widget(form.user, {'attr': {'class': 'form-select'}}) }}
-                {{ form_label(form.user, 'Utilisateur', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.user) }}
-            </div>
-        </div>
+        {% endif %}
         <div class="col-12">
             <div class="form-floating">
                 {{ form_widget(form.chambre, {'attr': {'class': 'form-select'}}) }}
@@ -42,13 +37,15 @@
                 {{ form_errors(form.chambre) }}
             </div>
         </div>
-        <div class="col-12">
-            <div class="form-floating">
-                {{ form_widget(form.hotel, {'attr': {'class': 'form-select'}}) }}
-                {{ form_label(form.hotel, 'Hôtel', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.hotel) }}
+        {% if form.hotel is defined %}
+            <div class="col-12">
+                <div class="form-floating">
+                    {{ form_widget(form.hotel, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_label(form.hotel, 'Hôtel', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_errors(form.hotel) }}
+                </div>
             </div>
-        </div>
+        {% endif %}
     </div>
     <div class="d-grid mt-4">
         <button class="btn btn-primary btn-lg">

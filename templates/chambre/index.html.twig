@@ -31,9 +31,7 @@
 
         <div class="row mb-4">
             <div class="col-12">
-                <a href="{{ path('app_chambre_new') }}" class="btn btn-emerald btn-lg">
-                    <i class="bi bi-plus-circle me-2"></i>Ajouter une Chambre
-                </a>
+                <div class="alert alert-light mb-0">Consultation uniquement</div>
             </div>
         </div>
 
@@ -149,8 +147,8 @@
                                 <a href="{{ path('app_chambre_show', {'id': chambre.id}) }}" class="btn btn-outline-emerald btn-sm">
                                     <i class="bi bi-eye me-1"></i>Voir Détails
                                 </a>
-                                <a href="{{ path('app_chambre_edit', {'id': chambre.id}) }}" class="btn btn-emerald btn-sm">
-                                    <i class="bi bi-pencil me-1"></i>Modifier
+                                <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="btn btn-info btn-sm">
+                                    <i class="bi bi-building me-1"></i>Hôtel associé
                                 </a>
                             </div>
                         </div>
@@ -162,9 +160,7 @@
                         <i class="bi bi-door-open text-muted" style="font-size: 4rem;"></i>
                         <h3 class="text-white mt-3">Aucune chambre trouvée</h3>
                         <p class="text-white-50">Soyez le premier à ajouter une chambre à notre plateforme.</p>
-                        <a href="{{ path('app_chambre_new') }}" class="btn btn-emerald btn-lg mt-3">
-                            <i class="bi bi-plus-circle me-2"></i>Créer la Première Chambre
-                        </a>
+                        <span class="text-white-50">Aucune opération de création n'est disponible dans cette interface.</span>
                     </div>
                 </div>
             {% endfor %}

@@ -1,0 +1,35 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Modifier une chambre{% endblock %}
+{% block page_title %}Modifier une chambre{% endblock %}
+
+{% block body %}
+<div class="admin-card mb-4">
+    <div class="admin-card-body">
+        {{ form_start(form) }}
+        <div class="row g-3">
+            {{ form_row(form.type, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.capacite, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.equipements, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.prixStandard, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.prixHauteSaison, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.prixBasseSaison, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.hotel, {'attr': {'class': 'form-select'}}) }}
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button class="btn btn-primary-pro" type="submit">Mettre à jour</button>
+            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro">Retour hôtels</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header text-danger">Suppression</div>
+    <div class="admin-card-body">
+        {{ form_start(delete_form) }}
+        <button class="btn btn-danger" type="submit">Supprimer</button>
+        {{ form_end(delete_form) }}
+    </div>
+</div>
+{% endblock %}

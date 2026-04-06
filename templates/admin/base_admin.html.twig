@@ -74,11 +74,21 @@
             list-style: none;
             margin: 0;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-height: 0;
         }
 
         .sidebar-nav-item {
             padding: 0 15px;
             margin-bottom: 5px;
+        }
+
+        .sidebar-nav-item.logout-item {
+            margin-top: auto;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .sidebar-nav-link {
@@ -419,6 +429,11 @@
                 </a>
             </li>
             <li class="sidebar-nav-item">
+                <a href="{{ path('app_admin_hotels_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_hotels' %}active{% endif %}">
+                    <i class="bi bi-building"></i> Hôtels
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_vols_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_vols' %}active{% endif %}">
                     <i class="bi bi-airplane"></i> Vols
                 </a>
@@ -448,7 +463,7 @@
                     <i class="bi bi-calendar-event"></i> Activités
                 </a>
             </li>
-            <li class="sidebar-nav-item pt-4">
+            <li class="sidebar-nav-item logout-item">
                 <a href="{{ path('app_logout') }}" class="sidebar-nav-link text-danger mt-2">
                     <i class="bi bi-box-arrow-right"></i> Déconnexion
                 </a>

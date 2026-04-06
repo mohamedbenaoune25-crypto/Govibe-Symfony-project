@@ -104,11 +104,8 @@
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2">
-                            <a href="{{ path('app_chambre_edit', {'id': chambre.id}) }}" class="btn btn-emerald">
-                                <i class="bi bi-pencil me-2"></i>Modifier la chambre
-                            </a>
                             <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="btn btn-info">
-                                <i class="bi bi-building me-2"></i>Voir l'hôtel
+                                <i class="bi bi-building me-2"></i>Retour à l'hôtel associé
                             </a>
                             <a href="{{ path('app_chambre_index') }}" class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-2"></i>Retour à la liste
@@ -118,16 +115,8 @@
                 </div>
 
                 <div class="card danger-card shadow-lg border-0">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-exclamation-triangle me-2"></i>Zone dangereuse
-                        </h5>
-                    </div>
                     <div class="card-body">
-                        <p class="text-muted mb-3">
-                            La suppression de cette chambre est irréversible.
-                        </p>
-                        {{ include('chambre/_delete_form.html.twig') }}
+                        <p class="text-muted mb-0">Interface en lecture seule pour les utilisateurs.</p>
                     </div>
                 </div>
             </div>

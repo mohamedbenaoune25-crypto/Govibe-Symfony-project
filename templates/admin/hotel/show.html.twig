@@ -1,0 +1,75 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Détail hôtel{% endblock %}
+{% block page_title %}Détail hôtel{% endblock %}
+
+{% block body %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="admin-card">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span>{{ hotel.nom }}</span>
+                <span class="badge bg-success">{{ hotel.chambres|length }} chambres</span>
+            </div>
+            <div class="admin-card-body">
+                <p><strong>Adresse:</strong> {{ hotel.adresse }}</p>
+                <p><strong>Ville:</strong> {{ hotel.ville }}</p>
+                <p><strong>Étoiles:</strong> {{ hotel.nombreEtoiles ?: '-' }}</p>
+                <p><strong>Budget:</strong> {{ hotel.budget ?: '-' }}</p>
+                <p><strong>Description:</strong><br>{{ hotel.description ?: '-' }}</p>
+
+                <h6 class="mt-4 mb-3">Chambres associées</h6>
+                <div class="table-responsive">
+                    <table class="table admin-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Capacité</th>
+                                <th>Prix</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for chambre in hotel.chambres %}
+                                <tr>
+                                    <td>{{ chambre.type }}</td>
+                                    <td>{{ chambre.capacite }}</td>
+                                    <td>{{ chambre.prixStandard ?: '-' }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="3" class="text-muted text-center py-4">Aucune chambre associée.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">Actions</div>
+            <div class="admin-card-body d-grid gap-2">
+                <a href="{{ path('app_admin_hotels_edit', {'id': hotel.id}) }}" class="btn btn-primary-pro">
+                    <i class="bi bi-pencil-square me-1"></i>Modifier l'hôtel
+                </a>
+                <a href="{{ path('app_admin_chambres_index', {'hotel': hotel.id}) }}" class="btn btn-pro">
+                    <i class="bi bi-door-open me-1"></i>Gérer les chambres
+                </a>
+                <a href="{{ path('app_admin_reservations_index', {'hotel': hotel.id}) }}" class="btn btn-pro">
+                    <i class="bi bi-calendar-check me-1"></i>Voir les réservations
+                </a>
+                <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+                </a>
+            </div>
+        </div>
+        <div class="admin-card">
+            <div class="admin-card-header text-danger">Suppression</div>
+            <div class="admin-card-body">
+                {{ form_start(delete_form) }}
+                <button class="btn btn-danger" type="submit" onclick="return confirm('Confirmer la suppression de cet hôtel ?');">Supprimer l'hôtel</button>
+                {{ form_end(delete_form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

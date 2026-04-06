@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Reservation;
-use App\Entity\Personne;
 use App\Entity\Chambre;
 use App\Entity\Hotel;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -13,11 +12,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Doctrine\ORM\EntityRepository;
 
 class ReservationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $hotel = $options['hotel'];
+
         $builder
             ->add('dateDebut', DateType::class, [
                 'label' => 'Date de début',
@@ -42,33 +44,45 @@ class ReservationType extends AbstractType
                 ],
                 'required' => true,
             ])
-            ->add('user', EntityType::class, [
-                'class' => Personne::class,
-                'choice_label' => 'email', // assuming Personne has email
-                'label' => 'Utilisateur',
-                'required' => true,
-            ])
             ->add('chambre', EntityType::class, [
                 'class' => Chambre::class,
+                'query_builder' => $hotel instanceof Hotel
+                    ? function (EntityRepository $repository) use ($hotel) {
+                        return $repository->createQueryBuilder('c')
+                            ->andWhere('c.hotel = :hotel')
+                            ->setParameter('hotel', $hotel)
+                            ->orderBy('c.type', 'ASC');
+                    }
+                    : null,
                 'choice_label' => function (Chambre $chambre) {
                     return $chambre->getType() . ' - ' . $chambre->getHotel()->getNom();
                 },
                 'label' => 'Chambre',
                 'required' => true,
             ])
-            ->add('hotel', EntityType::class, [
+        ;
+
+        if (!$hotel instanceof Hotel) {
+            $builder->add('hotel', EntityType::class, [
                 'class' => Hotel::class,
                 'choice_label' => 'nom',
                 'label' => 'Hôtel',
                 'required' => true,
-            ])
-        ;
+            ]);
+        }
+
+        if ($hotel instanceof Hotel) {
+            $builder->remove('statut');
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Reservation::class,
+            'hotel' => null,
         ]);
+
+        $resolver->setAllowedTypes('hotel', ['null', Hotel::class]);
     }
 }

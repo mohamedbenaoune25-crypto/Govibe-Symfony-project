@@ -1,0 +1,24 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Détail réservation{% endblock %}
+{% block page_title %}Détail réservation{% endblock %}
+
+{% block body %}
+<div class="admin-card">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <span>Réservation #{{ reservation.id }}</span>
+        <span class="badge bg-success">{{ reservation.statut }}</span>
+    </div>
+    <div class="admin-card-body">
+        <p><strong>Client:</strong> {{ reservation.user ? reservation.user.prenom ~ ' ' ~ reservation.user.nom : '-' }}</p>
+        <p><strong>Email:</strong> {{ reservation.user ? reservation.user.email : '-' }}</p>
+        <p><strong>Hôtel:</strong> {{ reservation.hotel ? reservation.hotel.nom : '-' }}</p>
+        <p><strong>Chambre:</strong> {{ reservation.chambre ? reservation.chambre.type : '-' }}</p>
+        <p><strong>Date début:</strong> {{ reservation.dateDebut|date('d/m/Y') }}</p>
+        <p><strong>Date fin:</strong> {{ reservation.dateFin|date('d/m/Y') }}</p>
+        <p><strong>Prix total:</strong> {{ reservation.prixTotal }}€</p>
+
+        <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro mt-3">Retour hôtels</a>
+    </div>
+</div>
+{% endblock %}

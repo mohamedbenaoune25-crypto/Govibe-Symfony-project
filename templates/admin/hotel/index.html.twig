@@ -1,0 +1,87 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Gestion des hôtels{% endblock %}
+{% block page_title %}Gestion des hôtels{% endblock %}
+
+{% block body %}
+<div class="admin-card mb-4">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-building me-2 text-muted"></i> Hôtels</span>
+        <a href="{{ path('app_admin_hotels_new') }}" class="btn btn-primary-pro py-1 px-3">
+            <i class="bi bi-plus-lg me-1"></i>Ajouter un hôtel
+        </a>
+    </div>
+    <div class="admin-card-body">
+        <form method="get" class="row g-3 align-items-end mb-4">
+            <div class="col-md-5">
+                <label class="form-label">Recherche</label>
+                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Nom, ville, adresse, description">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Trier par</label>
+                <select name="sortBy" class="form-select">
+                    <option value="nom" {% if sortBy == 'nom' %}selected{% endif %}>Nom</option>
+                    <option value="ville" {% if sortBy == 'ville' %}selected{% endif %}>Ville</option>
+                    <option value="budget" {% if sortBy == 'budget' %}selected{% endif %}>Budget</option>
+                    <option value="nombreEtoiles" {% if sortBy == 'nombreEtoiles' %}selected{% endif %}>Étoiles</option>
+                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>Création</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Ordre</label>
+                <select name="sortDir" class="form-select">
+                    <option value="asc" {% if sortDir|lower == 'asc' %}selected{% endif %}>ASC</option>
+                    <option value="desc" {% if sortDir|lower == 'desc' %}selected{% endif %}>DESC</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-pro w-100" type="submit">Filtrer</button>
+                <a class="btn btn-outline-secondary w-100" href="{{ path('app_admin_hotels_index') }}">Reset</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Ville</th>
+                        <th>Adresse</th>
+                        <th>Budget</th>
+                        <th>Chambres</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for hotel in hotels %}
+                        <tr>
+                            <td class="fw-semibold">{{ hotel.nom }}</td>
+                            <td>{{ hotel.ville }}</td>
+                            <td>{{ hotel.adresse }}</td>
+                            <td>{{ hotel.budget ?: '-' }}</td>
+                            <td>{{ hotel.chambres|length }}</td>
+                            <td class="text-end">
+                                <div class="d-inline-flex flex-wrap justify-content-end gap-1">
+                                    <a href="{{ path('app_admin_hotels_show', {'id': hotel.id}) }}" class="btn btn-sm btn-pro">
+                                        <i class="bi bi-eye me-1"></i>Voir
+                                    </a>
+                                    <a href="{{ path('app_admin_hotels_edit', {'id': hotel.id}) }}" class="btn btn-sm btn-primary-pro">
+                                        <i class="bi bi-pencil-square me-1"></i>Modifier
+                                    </a>
+                                    <a href="{{ path('app_admin_chambres_index', {'hotel': hotel.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-door-open me-1"></i>Chambres
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Aucun hôtel trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

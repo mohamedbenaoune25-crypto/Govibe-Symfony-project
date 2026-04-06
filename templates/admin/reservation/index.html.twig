@@ -1,0 +1,84 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Réservations{% endblock %}
+{% block page_title %}Réservations{% endblock %}
+
+{% block body %}
+<div class="admin-card mb-4">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-calendar-check me-2 text-muted"></i> Réservations</span>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-sm btn-pro">Retour hôtels</a>
+            {% if selectedHotel %}
+                <span class="badge bg-info-subtle text-dark">Hôtel: {{ selectedHotel.nom }}</span>
+                <a href="{{ path('app_admin_reservations_index') }}" class="btn btn-sm btn-outline-secondary">Voir toutes les réservations</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="admin-card-body">
+        <form method="get" class="row g-3 align-items-end mb-4">
+            {% if selectedHotel %}
+                <input type="hidden" name="hotel" value="{{ selectedHotel.id }}">
+            {% endif %}
+            <div class="col-md-5">
+                <label class="form-label">Recherche</label>
+                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Client, hôtel, chambre, statut">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Trier par</label>
+                <select name="sortBy" class="form-select">
+                    <option value="dateDebut" {% if sortBy == 'dateDebut' %}selected{% endif %}>Date début</option>
+                    <option value="dateFin" {% if sortBy == 'dateFin' %}selected{% endif %}>Date fin</option>
+                    <option value="prixTotal" {% if sortBy == 'prixTotal' %}selected{% endif %}>Prix total</option>
+                    <option value="statut" {% if sortBy == 'statut' %}selected{% endif %}>Statut</option>
+                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>Création</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Ordre</label>
+                <select name="sortDir" class="form-select">
+                    <option value="ASC" {% if sortDir|upper == 'ASC' %}selected{% endif %}>ASC</option>
+                    <option value="DESC" {% if sortDir|upper == 'DESC' %}selected{% endif %}>DESC</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-2">
+                <button class="btn btn-pro w-100" type="submit">Filtrer</button>
+                <a class="btn btn-outline-secondary w-100" href="{{ selectedHotel ? path('app_admin_reservations_index', {'hotel': selectedHotel.id}) : path('app_admin_reservations_index') }}">Reset</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table admin-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Hôtel</th>
+                        <th>Chambre</th>
+                        <th>Dates</th>
+                        <th>Statut</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in reservations %}
+                        <tr>
+                            <td>{{ reservation.user ? reservation.user.prenom ~ ' ' ~ reservation.user.nom : '-' }}</td>
+                            <td>{{ reservation.hotel ? reservation.hotel.nom : '-' }}</td>
+                            <td>{{ reservation.chambre ? reservation.chambre.type : '-' }}</td>
+                            <td>{{ reservation.dateDebut|date('d/m/Y') }} - {{ reservation.dateFin|date('d/m/Y') }}</td>
+                            <td>{{ reservation.statut }}</td>
+                            <td class="text-end">
+                                <a href="{{ path('app_admin_reservations_show', {'id': reservation.id}) }}" class="btn btn-sm btn-pro">Voir</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">Aucune réservation trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

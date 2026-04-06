@@ -33,9 +33,7 @@
                 </form>
             </div>
             <div class="col-lg-4">
-                <a href="{{ path('app_hotel_new') }}" class="btn btn-emerald btn-lg w-100">
-                    <i class="bi bi-plus-circle me-2"></i>Ajouter un Hôtel
-                </a>
+                <div class="alert alert-light mb-0">Consultation uniquement</div>
             </div>
         </div>
 
@@ -92,9 +90,6 @@
                         <div class="card-body d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 class="card-title fw-bold text-dark mb-0">{{ hotel.nom }}</h5>
-                                <button class="btn btn-favorite toggle-favorite" data-hotel-id="{{ hotel.id }}" type="button" title="{% if hotel.isFavoris() %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}">
-                                    <i class="bi bi-star{% if hotel.isFavoris() %}-fill{% endif %}"></i>
-                                </button>
                             </div>
                             <p class="card-text text-muted mb-2">
                                 <i class="bi bi-geo-alt me-1"></i>{{ hotel.adresse }}, {{ hotel.ville }}
@@ -113,9 +108,6 @@
                                 <a href="{{ path('app_hotel_show', {'id': hotel.id}) }}" class="btn btn-outline-emerald btn-sm">
                                     <i class="bi bi-eye me-1"></i>Voir Détails
                                 </a>
-                                <a href="{{ path('app_hotel_edit', {'id': hotel.id}) }}" class="btn btn-emerald btn-sm">
-                                    <i class="bi bi-pencil me-1"></i>Modifier
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -126,9 +118,7 @@
                         <i class="bi bi-building text-muted" style="font-size: 4rem;"></i>
                         <h3 class="text-white mt-3">Aucun hôtel trouvé</h3>
                         <p class="text-white-50">Soyez le premier à ajouter un hôtel à notre plateforme.</p>
-                        <a href="{{ path('app_hotel_new') }}" class="btn btn-emerald btn-lg mt-3">
-                            <i class="bi bi-plus-circle me-2"></i>Créer le Premier Hôtel
-                        </a>
+                        <span class="text-white-50">Aucune opération de création n'est disponible dans cette interface.</span>
                     </div>
                 </div>
             {% endfor %}

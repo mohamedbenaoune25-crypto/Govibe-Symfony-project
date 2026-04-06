@@ -3,13 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Hotel;
+use App\Entity\Reservation;
 use App\Form\HotelType;
+use App\Form\ReservationType;
 use App\Repository\HotelRepository;
+use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/hotel')]
 class HotelController extends AbstractController
@@ -36,6 +40,7 @@ class HotelController extends AbstractController
     }
 
     #[Route('/new', name: 'app_hotel_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $hotel = new Hotel();
@@ -56,7 +61,7 @@ class HotelController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_hotel_show', methods: ['GET'])]
-    public function show(Hotel $hotel): Response
+    public function show(Request $request, Hotel $hotel, EntityManagerInterface $entityManager, ReservationRepository $reservationRepository): Response
     {
         $deleteForm = $this->createFormBuilder([], [
             'csrf_protection' => true,
@@ -67,13 +72,47 @@ class HotelController extends AbstractController
             ->setMethod('POST')
             ->getForm();
 
+        $reservationForm = null;
+        $hotelReservations = [];
+
+        if ($this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            $reservation = new Reservation();
+            $reservationForm = $this->createForm(ReservationType::class, $reservation, [
+                'hotel' => $hotel,
+            ]);
+            $reservationForm->handleRequest($request);
+
+            if ($reservationForm->isSubmitted() && $reservationForm->isValid()) {
+                $reservation->setUser($this->getUser());
+                $reservation->setHotel($hotel);
+                $reservation->setStatut('EN_ATTENTE');
+
+                $entityManager->persist($reservation);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('app_hotel_show', ['id' => $hotel->getId()], Response::HTTP_SEE_OTHER);
+            }
+
+            $hotelReservations = $reservationRepository->createQueryBuilder('r')
+                ->andWhere('r.hotel = :hotel')
+                ->andWhere('r.user = :user')
+                ->setParameter('hotel', $hotel)
+                ->setParameter('user', $this->getUser())
+                ->orderBy('r.createdAt', 'DESC')
+                ->getQuery()
+                ->getResult();
+        }
+
         return $this->render('hotel/show.html.twig', [
             'hotel' => $hotel,
             'delete_form' => $deleteForm->createView(),
+            'reservation_form' => $reservationForm?->createView(),
+            'hotel_reservations' => $hotelReservations,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_hotel_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function edit(Request $request, Hotel $hotel, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(HotelType::class, $hotel);
@@ -102,6 +141,7 @@ class HotelController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_hotel_delete', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(Request $request, Hotel $hotel, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$hotel->getId(), $request->request->get('_token'))) {
@@ -113,6 +153,7 @@ class HotelController extends AbstractController
     }
 
     #[Route('/{id}/toggle-favoris', name: 'app_hotel_toggle_favoris', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function toggleFavoris(Hotel $hotel, EntityManagerInterface $entityManager): Response
     {
         $hotel->toggleFavoris();

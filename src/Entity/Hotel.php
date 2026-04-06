@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Chambre;
 use App\Repository\HotelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

@@ -1,0 +1,42 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Détail chambre{% endblock %}
+{% block page_title %}Détail chambre{% endblock %}
+
+{% block body %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="admin-card">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span>{{ chambre.type }}</span>
+                <span class="badge bg-success">{{ chambre.hotel ? chambre.hotel.nom : 'Sans hôtel' }}</span>
+            </div>
+            <div class="admin-card-body">
+                <p><strong>Capacité:</strong> {{ chambre.capacite ?: '-' }}</p>
+                <p><strong>Équipements:</strong> {{ chambre.equipements ?: '-' }}</p>
+                <p><strong>Prix standard:</strong> {{ chambre.prixStandard ?: '-' }}</p>
+                <p><strong>Prix haute saison:</strong> {{ chambre.prixHauteSaison ?: '-' }}</p>
+                <p><strong>Prix basse saison:</strong> {{ chambre.prixBasseSaison ?: '-' }}</p>
+                <p><strong>Hôtel:</strong> {{ chambre.hotel ? chambre.hotel.nom : '-' }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">Actions</div>
+            <div class="admin-card-body d-grid gap-2">
+                <a href="{{ path('app_admin_chambres_edit', {'id': chambre.id}) }}" class="btn btn-primary-pro">Modifier</a>
+                <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro">Retour hôtels</a>
+            </div>
+        </div>
+        <div class="admin-card">
+            <div class="admin-card-header text-danger">Suppression</div>
+            <div class="admin-card-body">
+                {{ form_start(delete_form) }}
+                <button class="btn btn-danger" type="submit">Supprimer</button>
+                {{ form_end(delete_form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

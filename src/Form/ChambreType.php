@@ -16,6 +16,8 @@ class ChambreType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $hotel = $options['hotel'];
+
         $builder
             ->add('type', TextType::class, [
                 'label' => 'Type de chambre',
@@ -41,19 +43,25 @@ class ChambreType extends AbstractType
                 'label' => 'Prix basse saison',
                 'required' => false,
             ])
-            ->add('hotel', EntityType::class, [
+        ;
+
+        if (!$hotel instanceof Hotel) {
+            $builder->add('hotel', EntityType::class, [
                 'class' => Hotel::class,
                 'choice_label' => 'nom',
                 'label' => 'Hôtel',
                 'required' => true,
-            ])
-        ;
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Chambre::class,
+            'hotel' => null,
         ]);
+
+        $resolver->setAllowedTypes('hotel', ['null', Hotel::class]);
     }
 }
