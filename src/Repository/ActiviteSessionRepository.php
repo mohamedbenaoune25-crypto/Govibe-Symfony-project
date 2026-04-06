@@ -15,4 +15,16 @@ class ActiviteSessionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ActiviteSession::class);
     }
+
+    /**
+     * @return ActiviteSession[] Returns an array of ActiviteSession objects sorted by Activity name
+     */
+    public function findAllSortedByActiviteName(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.activite', 'a')
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

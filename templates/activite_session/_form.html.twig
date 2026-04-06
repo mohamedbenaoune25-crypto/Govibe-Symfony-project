@@ -1,0 +1,22 @@
+<div class="row g-4">
+    <div class="col-12">
+        {{ form_row(form.activite) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.date) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.heure) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.capacite) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.nbrPlacesRestant) }}
+    </div>
+    <div class="col-12 text-center mt-5">
+        <button class="btn btn-success rounded-pill px-5 py-3 fw-bold shadow transition-all hover-lift-2 border-0" style="background-color: #52BE80; font-size: 1.1rem;">
+            {{ button_label|default('Enregistrer la session') }}
+        </button>
+    </div>
+</div>
