@@ -2,32 +2,32 @@
 {{ form_start(form, {'attr': {'id': 'publication-form', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
         
         <!-- FORMAT DE PUBLICATION -->
-        <div class="mb-5">
-            <label class="fw-bold mb-3 d-block text-uppercase letter-spacing-1" style="color: #2D3E50; font-size: 1.1rem;">Format de Publication</label>
+        <div class="mb-4">
+            <label class="gv-form-label mb-3 d-block">Format de Publication</label>
             <div class="d-flex gap-3">
-                <button type="button" id="btn-status-texte" class="btn btn-format active d-flex align-items-center gap-2 px-4 py-2 border rounded-3">
-                    <i class="bi bi-chat-fill"></i> Statut Texte
+                <button type="button" id="btn-status-texte" class="btn btn-format active d-flex align-items-center gap-2 px-4 py-2">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">chat</span> Statut Texte
                 </button>
-                <button type="button" id="btn-photo-video" class="btn btn-format d-flex align-items-center gap-2 px-4 py-2 border rounded-3">
-                    <i class="bi bi-camera-reels-fill"></i> Photo / Vidéo
+                <button type="button" id="btn-photo-video" class="btn btn-format d-flex align-items-center gap-2 px-4 py-2">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">photo_camera</span> Photo / Vidéo
                 </button>
             </div>
         </div>
 
         <!-- VOTRE MESSAGE -->
-        <div class="mb-5">
-            <label class="fw-bold mb-3 d-block text-uppercase letter-spacing-1" style="color: #2D3E50; font-size: 1.1rem;">Votre Message <span class="text-danger">*</span></label>
+        <div class="mb-4">
+            <label class="gv-form-label mb-2 d-block">Votre Message <span style="color:#ba1a1a;">*</span></label>
             <div class="textarea-container position-relative">
                 {{ form_widget(form.contenu, {
                     'attr': {
-                        'class': 'form-control border-secondary-subtle rounded-4 p-4 fs-5 validate-field',
-                        'style': 'height: 200px; resize: none;',
+                        'class': 'form-control gv-textarea validate-field',
+                        'style': 'height: 180px; resize: none;',
                         'placeholder': 'Exprimez-vous...',
                         'maxlength': '600',
                         'data-required': 'true'
                     }
                 }) }}
-                <div class="char-counter text-muted position-absolute bottom-0 end-0 m-3 small" style="opacity: 0.6;">
+                <div class="char-counter position-absolute bottom-0 end-0 m-3">
                     <span id="char-count">0</span> / 500
                 </div>
             </div>
@@ -38,43 +38,43 @@
         </div>
 
         <!-- SÉLECTION MÉDIA (Conditional) -->
-        <div id="media-section" class="mb-5" style="display: none;">
-            <label class="fw-bold mb-3 d-block text-uppercase letter-spacing-1" style="color: #2D3E50; font-size: 1.1rem;">Sélection Média <span class="text-danger" id="media-star">*</span></label>
+        <div id="media-section" class="mb-4" style="display: none;">
+            <label class="gv-form-label mb-2 d-block">Sélection Média <span style="color:#ba1a1a;" id="media-star">*</span></label>
             <div class="d-flex gap-2">
                 <div class="flex-grow-1 position-relative">
-                    <input type="text" id="fake-file-input" class="form-control border-secondary-subtle rounded-3 bg-light opacity-75 validate-field" readonly placeholder="Aucun fichier sélectionné" data-required="false">
+                    <input type="text" id="fake-file-input" class="form-control gv-input validate-field" readonly placeholder="Aucun fichier sélectionné" data-required="false">
                     <div class="invalid-feedback-custom text-danger small mt-2 fw-bold" id="error-file" style="display: none;">
                         Veuillez sélectionner une image pour une publication média.
                     </div>
                 </div>
                 {{ form_widget(form.imageFile, {'attr': {'class': 'd-none', 'id': 'poste_imageFile'}}) }}
-                <button type="button" onclick="document.getElementById('poste_imageFile').click()" class="btn btn-parcourir px-4 fw-bold text-white rounded-3 shadow-sm" style="background-color: #52BE80; min-width: 140px;">
-                    Parcourir...
+                <button type="button" onclick="document.getElementById('poste_imageFile').click()" class="gv-btn-browse">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">upload_file</span> Parcourir
                 </button>
             </div>
             
             <!-- Aperçu du média -->
-            <div class="media-preview-area mt-4 border border-dashed rounded-4 p-4 text-center bg-light bg-opacity-10 position-relative" style="border-width: 2px !important; border-style: dashed !important; border-color: #D5DBDB !important;">
-                <span class="text-muted opacity-50 small mb-3 d-block">Aperçu du média</span>
+            <div class="gv-media-preview mt-3">
+                <span class="text-muted small mb-2 d-block" style="opacity:0.6;">Aperçu du média</span>
                 <div id="preview-image-container" style="display: none;">
-                    <img id="image-preview" src="" class="img-fluid rounded-3 shadow-sm mx-auto" style="max-height: 350px;">
+                    <img id="image-preview" src="" class="img-fluid rounded-3 shadow-sm mx-auto d-block" style="max-height: 300px;">
                 </div>
-                <div id="no-preview" class="py-4">
-                    <i class="bi bi-image text-muted opacity-25" style="font-size: 3rem;"></i>
+                <div id="no-preview" class="py-4 text-center">
+                    <span class="material-symbols-outlined" style="font-size:3rem; color:#cde1db; font-variation-settings: 'FILL' 1;">image</span>
                 </div>
             </div>
         </div>
 
         <!-- LOCALISATION -->
-        <div class="mb-5">
-            <label class="fw-bold mb-3 d-block text-uppercase letter-spacing-1" style="color: #2D3E50; font-size: 1.1rem;">Localisation</label>
-            <div class="input-group input-group-lg">
-                <span class="input-group-text bg-white border-secondary-subtle rounded-start-4 px-4">
-                    <i class="bi bi-geo-alt-fill text-success"></i>
+        <div class="mb-4">
+            <label class="gv-form-label mb-2 d-block">Localisation</label>
+            <div class="gv-input-group">
+                <span class="gv-input-icon">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem; color:#10B981;">location_on</span>
                 </span>
                 {{ form_widget(form.localisation, {
                     'attr': {
-                        'class': 'form-control border-secondary-subtle border-start-0 rounded-end-4 p-4',
+                        'class': 'form-control gv-input gv-input-with-icon',
                         'placeholder': 'Où êtes-vous ? (ex: Paris, France)'
                     }
                 }) }}
@@ -90,9 +90,10 @@
         </div>
 
         <!-- Footer Actions -->
-        <div class="mt-5 pt-4 border-top d-flex justify-content-end align-items-center gap-4">
-            <button type="button" class="btn btn-link link-danger fw-bold text-decoration-none" data-bs-dismiss="modal">Annuler</button>
-            <button type="submit" class="btn btn-publier px-5 py-3 fw-bold text-white rounded-4 shadow-sm" style="background-color: #52BE80; font-size: 1.1rem;">
+        <div class="mt-4 pt-4 d-flex justify-content-end align-items-center gap-3" style="border-top:1px solid rgba(0,52,45,0.06);">
+            <button type="button" class="gv-btn-cancel-text" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="gv-btn-publish">
+                <span class="material-symbols-outlined" style="font-size:1.1rem;">send</span>
                 {{ poste.postId ? 'Modifier' : 'Publier maintenant' }}
             </button>
         </div>
@@ -100,34 +101,74 @@
 {{ form_end(form) }}
 
 <style>
+    .gv-form-label {
+        font-weight: 700; color: #00342d; font-size: 0.85rem;
+        text-transform: uppercase; letter-spacing: 0.06em;
+    }
     .btn-format {
-        background-color: #ffffff;
-        color: #717D7E;
-        font-weight: 500;
-        border-color: #EBEDEF !important;
-        transition: 0.2s;
+        background: #fff; color: #546067; font-weight: 600; font-size: 0.9rem;
+        border: 1.5px solid rgba(0,52,45,0.08) !important; border-radius: 0.75rem !important;
+        transition: all 0.25s; font-family: 'Manrope', sans-serif;
     }
     .btn-format.active {
-        background-color: #E9F7EF !important;
-        color: #1E8449 !important;
-        border-color: #52BE80 !important;
-        font-weight: 700;
-        box-shadow: 0 4px 6px rgba(82, 190, 128, 0.1);
+        background: rgba(0,52,45,0.04) !important; color: #00342d !important;
+        border-color: #10B981 !important; font-weight: 700;
+        box-shadow: 0 4px 12px rgba(16,185,129,0.1);
     }
-    .btn-format:hover:not(.active) {
-        background-color: #F4F6F7;
+    .btn-format:hover:not(.active) { background: rgba(0,52,45,0.02); }
+
+    .gv-textarea {
+        border: 1.5px solid rgba(0,52,45,0.08) !important; border-radius: 1rem !important;
+        padding: 1.25rem !important; padding-bottom: 2.5rem !important;
+        font-family: 'Manrope', sans-serif !important; font-size: 1rem !important;
+        font-weight: 500 !important; transition: all 0.25s !important; resize: none !important;
     }
-    .letter-spacing-1 { letter-spacing: 0.5px; }
-    .btn-publier:hover { background-color: #48C9B0 !important; cursor: pointer; }
-    
-    .is-invalid-custom {
-        border-color: #E74C3C !important;
-        box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.1) !important;
-        background-color: rgba(231, 76, 60, 0.02) !important;
+    .gv-textarea:focus { border-color: #10B981 !important; box-shadow: 0 0 0 3px rgba(16,185,129,0.12) !important; }
+
+    .char-counter { font-size: 0.75rem; color: #bfc9c4; font-weight: 600; }
+
+    .gv-input {
+        border: 1.5px solid rgba(0,52,45,0.08) !important; border-radius: 0.75rem !important;
+        padding: 0.85rem 1rem !important; font-family: 'Manrope', sans-serif !important;
+        font-weight: 500 !important; font-size: 0.95rem !important; transition: all 0.25s !important;
+    }
+    .gv-input:focus { border-color: #10B981 !important; box-shadow: 0 0 0 3px rgba(16,185,129,0.12) !important; }
+
+    .gv-input-group { display: flex; align-items: center; position: relative; }
+    .gv-input-icon { position: absolute; left: 1rem; z-index: 2; display: flex; align-items: center; }
+    .gv-input-with-icon { padding-left: 2.75rem !important; }
+
+    .gv-btn-browse {
+        padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #00342d, #046b5e);
+        color: #fff; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 0.85rem;
+        cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.4rem;
+        box-shadow: 0 4px 12px rgba(0,52,45,0.2); font-family: 'Manrope', sans-serif; white-space: nowrap;
+    }
+    .gv-btn-browse:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,52,45,0.3); }
+
+    .gv-media-preview {
+        border: 2px dashed rgba(0,52,45,0.08); border-radius: 1rem; padding: 1.25rem; text-align: center;
+        background: rgba(0,52,45,0.01);
     }
 
-    .ls-1 { letter-spacing: 1px; }
-    .textarea-container textarea { padding-bottom: 40px !important; }
+    .gv-btn-cancel-text {
+        background: none; border: none; color: #93000a; font-weight: 700; font-size: 0.9rem;
+        cursor: pointer; padding: 0.5rem 1rem; transition: all 0.2s; font-family: 'Manrope', sans-serif;
+    }
+    .gv-btn-cancel-text:hover { background: rgba(186,26,26,0.06); border-radius: 0.5rem; }
+
+    .gv-btn-publish {
+        padding: 0.85rem 2rem; background: linear-gradient(135deg, #e9c176, #ca9028);
+        color: #3d2a00; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem;
+        cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 20px -5px rgba(233,193,118,0.35);
+        font-family: 'Manrope', sans-serif; display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .gv-btn-publish:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -5px rgba(233,193,118,0.5); }
+
+    .is-invalid-custom {
+        border-color: #ba1a1a !important;
+        box-shadow: 0 0 0 2px rgba(186,26,26,0.1) !important;
+    }
 </style>
 
 <script>
@@ -150,7 +191,6 @@
         const validate = () => {
             let isValid = true;
             
-            // Validate Content
             if (textarea.value.trim() === '' || textarea.value.length > 500) {
                 textarea.classList.add('is-invalid-custom');
                 document.getElementById('error-contenu').style.display = 'block';
@@ -160,9 +200,8 @@
                 document.getElementById('error-contenu').style.display = 'none';
             }
 
-            // Validate Media if type is MEDIA
             if (typeInput.value === 'MEDIA') {
-                {% if not poste.postId %} // Only mandatory for new posts, for edit we assume old one is kept
+                {% if not poste.postId %}
                 if (!realInput.files || realInput.files.length === 0) {
                     fakeInput.classList.add('is-invalid-custom');
                     document.getElementById('error-file').style.display = 'block';
@@ -198,7 +237,6 @@
             validate();
         };
 
-        // Real-time char counter & validation
         textarea.oninput = () => {
             const len = textarea.value.length;
             charCount.textContent = len;
@@ -210,29 +248,22 @@
             validate();
         };
 
-        // Initial validation (to show red borders if empty)
         validate();
 
         form.onsubmit = (e) => {
-            if (!validate()) {
-                e.preventDefault();
-                return false;
-            }
+            if (!validate()) { e.preventDefault(); return false; }
         };
 
-        // Initial state logic
         {% if poste.postId and (poste.type == 'MEDIA' or poste.url) %}
             btnPhoto.click();
         {% else %}
-            btnText.style.display = 'block'; // Ensure trigger
+            btnText.style.display = 'block';
         {% endif %}
 
-        // Real File Upload Logic
         realInput.onchange = function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
                 fakeInput.value = this.files[0].name;
-                
                 reader.onload = function(e) {
                     imgPreview.src = e.target.result;
                     previewContainer.style.display = 'block';

@@ -1,356 +1,549 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hôtels - GoVibe{% endblock %}
+{% block title %}Hôtels — GoVibe | Séjours Premium{% endblock %}
 
-{% block body %}
-<div class="container-fluid py-5">
-    <div class="container">
-        <div class="row mb-4">
-            <div class="col-12">
-                <h1 class="display-4 fw-bold text-white mb-4">
-                    <i class="bi bi-building me-3"></i>Nos Hôtels
-                </h1>
-                <p class="lead text-white-50 mb-4">
-                    Découvrez notre sélection d'hôtels de qualité pour votre séjour idéal
-                </p>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-lg-8">
-                <form method="GET" action="{{ path('app_hotel_index') }}" class="search-form">
-                    <div class="input-group input-group-lg">
-                        <input type="text" name="search" class="form-control search-input" placeholder="Rechercher un hôtel par nom, ville ou description..." value="{{ search }}">
-                        <button class="btn btn-emerald" type="submit">
-                            <i class="bi bi-search me-2"></i>Rechercher
-                        </button>
-                        {% if search %}
-                            <a href="{{ path('app_hotel_index') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-x me-2"></i>Réinitialiser
-                            </a>
-                        {% endif %}
-                    </div>
-                </form>
-            </div>
-            <div class="col-lg-4">
-                <div class="alert alert-light mb-0">Consultation uniquement</div>
-            </div>
-        </div>
-
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="sort-controls d-flex gap-2 flex-wrap">
-                    <div class="btn-group" role="group">
-                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nom', 'sortDir': 'asc'}) }}" class="btn btn-sm {{ sortBy == 'nom' and sortDir == 'asc' ? 'btn-emerald' : 'btn-outline-secondary' }}">
-                            <i class="bi bi-sort-alpha-up me-1"></i>Nom (A-Z)
-                        </a>
-                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nom', 'sortDir': 'desc'}) }}" class="btn btn-sm {{ sortBy == 'nom' and sortDir == 'desc' ? 'btn-emerald' : 'btn-outline-secondary' }}">
-                            <i class="bi bi-sort-alpha-down me-1"></i>Nom (Z-A)
-                        </a>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'budget', 'sortDir': 'asc'}) }}" class="btn btn-sm {{ sortBy == 'budget' and sortDir == 'asc' ? 'btn-emerald' : 'btn-outline-secondary' }}">
-                            <i class="bi bi-sort-down me-1"></i>Prix (↑)
-                        </a>
-                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'budget', 'sortDir': 'desc'}) }}" class="btn btn-sm {{ sortBy == 'budget' and sortDir == 'desc' ? 'btn-emerald' : 'btn-outline-secondary' }}">
-                            <i class="bi bi-sort-up me-1"></i>Prix (↓)
-                        </a>
-                    </div>
-                    <div class="btn-group" role="group">
-                        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nombreEtoiles', 'sortDir': 'desc'}) }}" class="btn btn-sm {{ sortBy == 'nombreEtoiles' ? 'btn-emerald' : 'btn-outline-secondary' }}">
-                            <i class="bi bi-star-fill me-1"></i>Note
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            {% for hotel in hotels %}
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="card hotel-card h-100 shadow-lg border-0">
-                        <div class="card-img-wrapper">
-                            {% if hotel.photoUrl %}
-                                <img src="{{ hotel.photoUrl }}" class="card-img-top" alt="{{ hotel.nom }}">
-                            {% else %}
-                                <div class="card-img-top placeholder-img d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-building text-muted" style="font-size: 3rem;"></i>
-                                </div>
-                            {% endif %}
-                            <div class="card-img-overlay d-flex align-items-end">
-                                {% if hotel.nombreEtoiles %}
-                                    <div class="stars-rating mb-2">
-                                        {% for i in 1..5 %}
-                                            <i class="bi bi-star-fill {{ i <= hotel.nombreEtoiles ? 'text-warning' : 'text-muted' }}"></i>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title fw-bold text-dark mb-0">{{ hotel.nom }}</h5>
-                            </div>
-                            <p class="card-text text-muted mb-2">
-                                <i class="bi bi-geo-alt me-1"></i>{{ hotel.adresse }}, {{ hotel.ville }}
-                            </p>
-                            {% if hotel.description %}
-                                <p class="card-text flex-grow-1">{{ hotel.description|slice(0, 100) }}...</p>
-                            {% endif %}
-                            {% if hotel.budget %}
-                                <p class="card-text fw-semibold text-emerald">
-                                    À partir de {{ hotel.budget }}€
-                                </p>
-                            {% endif %}
-                        </div>
-                        <div class="card-footer bg-transparent border-0">
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ path('app_hotel_show', {'id': hotel.id}) }}" class="btn btn-outline-emerald btn-sm">
-                                    <i class="bi bi-eye me-1"></i>Voir Détails
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <div class="col-12">
-                    <div class="text-center py-5">
-                        <i class="bi bi-building text-muted" style="font-size: 4rem;"></i>
-                        <h3 class="text-white mt-3">Aucun hôtel trouvé</h3>
-                        <p class="text-white-50">Soyez le premier à ajouter un hôtel à notre plateforme.</p>
-                        <span class="text-white-50">Aucune opération de création n'est disponible dans cette interface.</span>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-</div>
-
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
-.btn-emerald {
-    background-color: var(--primary-emerald);
-    border-color: var(--primary-emerald);
-    color: white;
+/* ═══════════════════════════════════════════════════
+   GoVibe Hôtels — Ultra Premium Design
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: 'Manrope', sans-serif !important;
+    background: #fcf9f8 !important;
+    color: #1c1b1b !important;
+    overflow-x: hidden !important;
 }
 
-.btn-emerald:hover {
-    background-color: var(--accent-green);
-    border-color: var(--accent-green);
-    color: white;
-}
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
 
-.btn-outline-emerald {
-    border-color: var(--primary-emerald);
-    color: var(--primary-emerald);
-}
-
-.btn-outline-emerald:hover {
-    background-color: var(--primary-emerald);
-    border-color: var(--primary-emerald);
-    color: white;
-}
-
-.hotel-card {
-    background: var(--glass-card);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.hotel-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px var(--shadow-green);
-}
-
-.card-img-wrapper {
+/* ─── Hero Section ─── */
+.gv-hotel-hero {
     position: relative;
-    height: 200px;
+    padding: 180px 0 120px;
+    background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+    overflow: hidden;
+    text-align: center;
+    border-radius: 0 0 3rem 3rem;
+    box-shadow: 0 20px 50px rgba(0, 52, 45, 0.15);
+}
+
+.gv-hotel-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(233, 193, 118, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.gv-hotel-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(160, 242, 225, 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+}
+
+.gv-hero-icon-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22rem;
+    color: rgba(255, 255, 255, 0.02);
+    z-index: 0;
+    pointer-events: none;
+    font-variation-settings: 'FILL' 1;
+}
+
+.gv-hero-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease both;
+}
+.gv-hero-title em { color: #a0f2e1; font-style: italic; font-weight: 300; }
+
+.gv-hero-sub {
+    color: rgba(160, 242, 225, 0.7);
+    font-size: 1.15rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease 0.2s both;
+}
+
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Main Content Container ─── */
+.gv-hotel-container {
+    max-width: 1200px;
+    margin: -50px auto 80px;
+    position: relative;
+    z-index: 10;
+    padding: 0 2rem;
+}
+
+/* ─── Search Bar ─── */
+.gv-search-shell {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0, 52, 45, 0.06);
+    border-radius: 1.5rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 52, 45, 0.08);
+    margin-bottom: 2rem;
+}
+
+.gv-search-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.gv-search-inner .material-symbols-outlined { color: #546067; font-size: 1.3rem; }
+
+.gv-search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1c1b1b;
+    font-family: 'Manrope', sans-serif;
+    padding: 0.75rem 0;
+}
+.gv-search-input::placeholder { color: #bfc9c4; }
+
+.gv-search-btn {
+    padding: 0.85rem 1.75rem;
+    background: linear-gradient(135deg, #00342d 0%, #004d43 70%, #046b5e 100%);
+    color: #fff;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px -6px rgba(0, 52, 45, 0.4);
+    white-space: nowrap;
+}
+.gv-search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -6px rgba(0, 52, 45, 0.5);
+}
+
+.gv-search-reset {
+    padding: 0.5rem 1rem;
+    background: rgba(186, 26, 26, 0.06);
+    border: none;
+    border-radius: 0.6rem;
+    color: #93000a;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+.gv-search-reset:hover { background: rgba(186, 26, 26, 0.12); color: #93000a; }
+
+/* ─── Sort Controls ─── */
+.gv-sort-controls {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(0, 52, 45, 0.05);
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.gv-sort-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.6rem;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: #546067;
+    background: transparent;
+    border: 1.5px solid rgba(0, 52, 45, 0.08);
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.gv-sort-btn:hover { border-color: rgba(0, 52, 45, 0.2); color: #00342d; background: rgba(0, 52, 45, 0.04); }
+.gv-sort-btn.active {
+    background: linear-gradient(135deg, #00342d, #046b5e);
+    color: #fff;
+    border-color: transparent;
+}
+
+/* ─── Hotel Cards ─── */
+.gv-hotel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2rem;
+}
+@media (max-width: 768px) { .gv-hotel-grid { grid-template-columns: 1fr; } }
+
+.gv-hotel-card {
+    background: #fff;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+.gv-hotel-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #00342d, #046b5e, #10B981);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+.gv-hotel-card:hover::before { transform: scaleX(1); }
+.gv-hotel-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.12);
+}
+
+.gv-hotel-img-wrapper {
+    position: relative;
+    height: 220px;
     overflow: hidden;
 }
 
-.card-img-top {
+.gv-hotel-img-wrapper img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gv-hotel-card:hover .gv-hotel-img-wrapper img { transform: scale(1.08); }
+
+.gv-hotel-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #00342d 0%, #004d43 50%, #046b5e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.gv-hotel-placeholder .material-symbols-outlined {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.12);
+    font-variation-settings: 'FILL' 1;
 }
 
-.hotel-card:hover .card-img-top {
-    transform: scale(1.05);
+.gv-hotel-stars {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(12px);
+    padding: 0.35rem 0.75rem;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+}
+.gv-hotel-stars .material-symbols-outlined {
+    font-size: 0.9rem;
+    font-variation-settings: 'FILL' 1;
+}
+.gv-star-filled { color: #e9c176; }
+.gv-star-empty { color: rgba(255, 255, 255, 0.2); }
+
+.gv-hotel-card-body {
+    padding: 1.5rem;
 }
 
-.placeholder-img {
-    background: linear-gradient(135deg, var(--soft-green), var(--light-green));
-    height: 200px;
+.gv-hotel-name {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #00342d;
+    margin-bottom: 0.4rem;
 }
 
-.stars-rating {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 0.25rem 0.5rem;
-    border-radius: 20px;
+.gv-hotel-location {
+    font-size: 0.85rem;
+    color: #546067;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-bottom: 0.75rem;
+}
+.gv-hotel-location .material-symbols-outlined { font-size: 0.95rem; color: #10B981; }
+
+.gv-hotel-desc {
+    color: #707975;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-.text-emerald {
-    color: var(--primary-emerald) !important;
-}
-
-.search-form {
+.gv-hotel-price {
+    font-family: 'Noto Serif', serif;
+    font-weight: 700;
+    color: #10B981;
+    font-size: 1.15rem;
     margin-bottom: 1rem;
 }
-
-.search-input {
-    background-color: rgba(255, 255, 255, 0.95);
-    border: 2px solid var(--primary-emerald);
-    border-radius: 25px 0 0 25px;
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-}
-
-.search-input:focus {
-    background-color: white;
-    border-color: var(--primary-emerald);
-    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
-}
-
-.search-input::placeholder {
-    color: #999;
-}
-
-.search-form .input-group-lg > .btn {
-    border-radius: 0 25px 25px 0;
-    padding: 0.75rem 1.5rem;
-}
-
-.sort-controls {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    padding: 1rem;
-    border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-group .btn {
-    border-radius: 8px;
+.gv-hotel-price small {
+    font-size: 0.75rem;
     font-weight: 500;
-    transition: all 0.3s ease;
+    color: #546067;
+    font-family: 'Manrope', sans-serif;
 }
 
-.btn-outline-secondary {
-    border-color: rgba(255, 255, 255, 0.3);
-    color: rgba(255, 255, 255, 0.8);
+.gv-hotel-card-footer {
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    gap: 0.75rem;
 }
 
-.btn-outline-secondary:hover {
-    border-color: rgba(255, 255, 255, 0.6);
-    color: white;
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.btn-sm {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-}
-
-.btn-favorite {
-    background: none;
+.gv-btn-details {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    background: rgba(0, 52, 45, 0.06);
+    color: #00342d;
     border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
+    font-family: 'Manrope', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+.gv-btn-details:hover {
+    background: linear-gradient(135deg, #00342d, #046b5e);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+/* ─── Empty State ─── */
+.gv-empty {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+    grid-column: 1 / -1;
+}
+.gv-empty-icon {
+    font-size: 4rem;
+    color: #cde1db;
+    margin-bottom: 1.5rem;
+    font-variation-settings: 'FILL' 1;
+}
+.gv-empty h4 {
+    font-family: 'Noto Serif', serif;
     font-size: 1.5rem;
-    color: var(--primary-emerald);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 0.25rem;
+    color: #00342d;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
 }
+.gv-empty p { color: #546067; }
 
-.btn-favorite:hover {
-    color: var(--accent-green);
-    transform: scale(1.2);
+/* ─── Reveal ─── */
+.gv-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.btn-favorite i {
-    transition: all 0.3s ease;
-}
-
-.btn-favorite.favorited i {
-    color: #ffc107;
-    text-shadow: 0 0 8px rgba(255, 193, 7, 0.5);
-}
-
-.btn-favorite.favorited:hover {
-    color: #ffb300;
-    transform: scale(1.25);
-}
+.gv-reveal.is-visible { opacity: 1; transform: translateY(0); }
 </style>
+{% endblock %}
 
+{% block body %}
+<!-- ─── HERO ─── -->
+<div class="gv-hotel-hero">
+    <span class="material-symbols-outlined gv-hero-icon-bg">apartment</span>
+    <div class="container">
+        <h1 class="gv-hero-title">Nos <em>Hôtels</em></h1>
+        <p class="gv-hero-sub">Découvrez notre sélection d'hôtels d'exception pour un séjour inoubliable. Le luxe rencontre l'authenticité.</p>
+    </div>
+</div>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="gv-hotel-container">
+
+    <!-- Search Bar -->
+    <div class="gv-search-shell">
+        <form method="GET" action="{{ path('app_hotel_index') }}" class="gv-search-inner">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" name="search" class="gv-search-input" placeholder="Rechercher un hôtel par nom, ville ou description..." value="{{ search }}">
+            <button class="gv-search-btn" type="submit">
+                <span class="material-symbols-outlined" style="font-size:1.1rem;">search</span>
+                Rechercher
+            </button>
+            {% if search %}
+                <a href="{{ path('app_hotel_index') }}" class="gv-search-reset">
+                    <span class="material-symbols-outlined" style="font-size:0.9rem;">close</span> Effacer
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Sort Controls -->
+    <div class="gv-sort-controls">
+        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nom', 'sortDir': 'asc'}) }}" class="gv-sort-btn {{ sortBy == 'nom' and sortDir == 'asc' ? 'active' : '' }}">
+            <span class="material-symbols-outlined" style="font-size:1rem;">sort_by_alpha</span> Nom A→Z
+        </a>
+        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nom', 'sortDir': 'desc'}) }}" class="gv-sort-btn {{ sortBy == 'nom' and sortDir == 'desc' ? 'active' : '' }}">
+            <span class="material-symbols-outlined" style="font-size:1rem;">sort_by_alpha</span> Nom Z→A
+        </a>
+        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'budget', 'sortDir': 'asc'}) }}" class="gv-sort-btn {{ sortBy == 'budget' and sortDir == 'asc' ? 'active' : '' }}">
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_upward</span> Prix ↑
+        </a>
+        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'budget', 'sortDir': 'desc'}) }}" class="gv-sort-btn {{ sortBy == 'budget' and sortDir == 'desc' ? 'active' : '' }}">
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_downward</span> Prix ↓
+        </a>
+        <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nombreEtoiles', 'sortDir': 'desc'}) }}" class="gv-sort-btn {{ sortBy == 'nombreEtoiles' ? 'active' : '' }}">
+            <span class="material-symbols-outlined" style="font-size:1rem; font-variation-settings: 'FILL' 1; color: {{ sortBy == 'nombreEtoiles' ? '#fff' : '#e9c176' }};">star</span> Note
+        </a>
+    </div>
+
+    <!-- Hotel Grid -->
+    <div class="gv-hotel-grid">
+        {% for hotel in hotels %}
+            <div class="gv-hotel-card gv-reveal">
+                <div class="gv-hotel-img-wrapper">
+                    {% if hotel.photoUrl %}
+                        <img src="{{ hotel.photoUrl }}" alt="{{ hotel.nom }}">
+                    {% else %}
+                        <div class="gv-hotel-placeholder">
+                            <span class="material-symbols-outlined">apartment</span>
+                        </div>
+                    {% endif %}
+                    {% if hotel.nombreEtoiles %}
+                        <div class="gv-hotel-stars">
+                            {% for i in 1..5 %}
+                                <span class="material-symbols-outlined {{ i <= hotel.nombreEtoiles ? 'gv-star-filled' : 'gv-star-empty' }}">star</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="gv-hotel-card-body">
+                    <h3 class="gv-hotel-name">{{ hotel.nom }}</h3>
+                    <div class="gv-hotel-location">
+                        <span class="material-symbols-outlined">location_on</span>
+                        {{ hotel.adresse }}, {{ hotel.ville }}
+                    </div>
+                    {% if hotel.description %}
+                        <p class="gv-hotel-desc">{{ hotel.description|slice(0, 120) }}...</p>
+                    {% endif %}
+                    {% if hotel.budget %}
+                        <div class="gv-hotel-price">
+                            {{ hotel.budget }}€ <small>/ nuit</small>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="gv-hotel-card-footer">
+                    <a href="{{ path('app_hotel_show', {'id': hotel.id}) }}" class="gv-btn-details">
+                        <span class="material-symbols-outlined" style="font-size:1rem;">visibility</span>
+                        Voir Détails
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <div class="gv-empty">
+                <span class="material-symbols-outlined gv-empty-icon">apartment</span>
+                <h4>Aucun hôtel trouvé</h4>
+                <p>Nos partenaires hôteliers seront bientôt listés. Revenez plus tard.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const favoriteButtons = document.querySelectorAll('.toggle-favorite');
-    
-    favoriteButtons.forEach(button => {
-        // Set initial state
-        const hotelId = button.getAttribute('data-hotel-id');
-        if (button.querySelector('i').classList.contains('bi-star-fill')) {
+    // Scroll reveal
+    var reveals = document.querySelectorAll('.gv-reveal');
+    if (reveals.length) {
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+        reveals.forEach(function(el, i) {
+            el.style.transitionDelay = (i * 80) + 'ms';
+            observer.observe(el);
+        });
+    }
+
+    // Favorites toggle
+    var favoriteButtons = document.querySelectorAll('.toggle-favorite');
+    favoriteButtons.forEach(function(button) {
+        if (button.querySelector('i') && button.querySelector('i').classList.contains('bi-star-fill')) {
             button.classList.add('favorited');
         }
-        
         button.addEventListener('click', async function(e) {
             e.preventDefault();
-            const hotelId = this.getAttribute('data-hotel-id');
-            
+            var hotelId = this.getAttribute('data-hotel-id');
             try {
-                const response = await fetch(`/hotel/${hotelId}/toggle-favoris`, {
+                var response = await fetch('/hotel/' + hotelId + '/toggle-favoris', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+                    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                 });
-                
-                const data = await response.json();
-                
+                var data = await response.json();
                 if (data.success) {
-                    const icon = this.querySelector('i');
-                    
+                    var icon = this.querySelector('i');
                     if (data.isFavoris) {
                         icon.classList.remove('bi-star');
                         icon.classList.add('bi-star-fill');
                         this.classList.add('favorited');
-                        this.title = 'Retirer des favoris';
                     } else {
                         icon.classList.remove('bi-star-fill');
                         icon.classList.add('bi-star');
                         this.classList.remove('favorited');
-                        this.title = 'Ajouter aux favoris';
                     }
-                    
-                    // Show toast notification
-                    showNotification(data.message);
                 }
-            } catch (error) {
-                console.error('Erreur:', error);
-                showNotification('Une erreur est survenue', 'error');
-            }
+            } catch (error) { console.error('Erreur:', error); }
         });
     });
 });
-
-function showNotification(message, type = 'success') {
-    const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
-    const alertHTML = `
-        <div class="alert ${alertClass} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 300px;">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-    
-    const alertContainer = document.createElement('div');
-    alertContainer.innerHTML = alertHTML;
-    document.body.appendChild(alertContainer.firstElementChild);
-    
-    setTimeout(() => {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => alert.remove());
-    }, 3000);
-}
 </script>
 {% endblock %}

@@ -1,289 +1,295 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ hotel.nom }} - GoVibe{% endblock %}
+{% block title %}{{ hotel.nom }} — GoVibe | Détails Hôtel{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !important; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+/* ─── Hero ─── */
+.gv-hotel-show-hero {
+    position: relative; min-height: 400px; overflow: hidden;
+    border-radius: 0 0 3rem 3rem; box-shadow: 0 20px 50px rgba(0,52,45,0.15);
+}
+.gv-hotel-show-hero .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+}
+.gv-hotel-show-hero .hero-bg img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+.gv-hotel-show-hero .hero-bg-placeholder {
+    width: 100%; height: 100%;
+    background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+}
+.gv-hotel-show-hero .hero-overlay {
+    position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(180deg, rgba(0,52,45,0.5) 0%, rgba(0,26,18,0.85) 100%);
+}
+.gv-hotel-show-hero .hero-content {
+    position: relative; z-index: 2; padding: 160px 0 80px; color: #fff;
+}
+.gv-hotel-show-hero .hero-stars {
+    display: flex; align-items: center; gap: 0.2rem; margin-bottom: 0.75rem;
+}
+.gv-hotel-show-hero .hero-stars .material-symbols-outlined { font-size: 1.2rem; font-variation-settings: 'FILL' 1; }
+.gv-star-filled { color: #e9c176; }
+.gv-star-empty { color: rgba(255,255,255,0.2); }
+
+.gv-hotel-show-hero h1 {
+    font-family: 'Noto Serif', serif; font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+    font-weight: 700; margin-bottom: 0.5rem;
+}
+.gv-hotel-show-hero .hero-location {
+    display: flex; align-items: center; gap: 0.4rem;
+    color: rgba(160,242,225,0.8); font-size: 1.05rem;
+}
+.gv-hotel-show-hero .hero-location .material-symbols-outlined { font-size: 1.1rem; color: #a0f2e1; }
+.gv-hero-price-tag {
+    display: inline-flex; align-items: baseline; gap: 0.3rem; margin-top: 1rem;
+    font-family: 'Noto Serif', serif;
+}
+.gv-hero-price-tag .price { font-size: 2rem; font-weight: 700; color: #a0f2e1; }
+.gv-hero-price-tag .unit { font-size: 1rem; color: rgba(160,242,225,0.6); font-family: 'Manrope', sans-serif; }
+
+/* ─── Content ─── */
+.gv-hotel-show-container { max-width: 1200px; margin: -40px auto 80px; position: relative; z-index: 10; padding: 0 2rem; }
+
+.gv-hotel-show-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; }
+@media (max-width: 992px) { .gv-hotel-show-grid { grid-template-columns: 1fr; } }
+
+.gv-show-card {
+    background: rgba(255,255,255,0.97); backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0,52,45,0.06); border-radius: 1.5rem; padding: 2rem;
+    box-shadow: 0 20px 60px rgba(0,52,45,0.08); margin-bottom: 2rem;
+}
+
+.gv-show-section-title {
+    font-family: 'Noto Serif', serif; font-size: 1.1rem; font-weight: 700; color: #00342d;
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem; border-bottom: 2px solid rgba(16,185,129,0.15);
+}
+.gv-show-section-title .material-symbols-outlined { font-size: 1.15rem; color: #10B981; }
+
+.gv-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+@media (max-width: 576px) { .gv-info-grid { grid-template-columns: 1fr; } }
+.gv-info-item { padding: 1rem; background: rgba(0,52,45,0.02); border-radius: 1rem; border: 1px solid rgba(0,52,45,0.04); }
+.gv-info-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #546067; margin-bottom: 0.3rem; }
+.gv-info-value { font-weight: 700; color: #00342d; font-size: 1rem; }
+
+.gv-description { color: #546067; line-height: 1.7; font-size: 0.95rem; }
+
+/* Chambres */
+.gv-chambre-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+.gv-chambre-card {
+    padding: 1.25rem; border-radius: 1rem; background: rgba(0,52,45,0.02);
+    border: 1px solid rgba(0,52,45,0.05); transition: all 0.3s;
+}
+.gv-chambre-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.06); border-color: rgba(16,185,129,0.2); }
+.gv-chambre-type { font-family: 'Noto Serif', serif; font-weight: 700; color: #00342d; margin-bottom: 0.3rem; }
+.gv-chambre-cap { font-size: 0.85rem; color: #546067; margin-bottom: 0.3rem; }
+.gv-chambre-price { font-weight: 700; color: #10B981; font-size: 1.05rem; }
+
+/* Sidebar */
+.gv-sidebar-card {
+    background: rgba(255,255,255,0.97); backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0,52,45,0.06); border-radius: 1.5rem; padding: 1.5rem;
+    box-shadow: 0 20px 60px rgba(0,52,45,0.08); margin-bottom: 1.5rem;
+}
+.gv-sidebar-card h5 { font-family: 'Noto Serif', serif; font-weight: 700; color: #00342d; font-size: 1rem; margin-bottom: 1rem; }
+
+.gv-action-btn {
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%;
+    padding: 0.85rem; border-radius: 0.75rem; font-weight: 700; font-size: 0.9rem;
+    text-decoration: none; transition: all 0.3s; margin-bottom: 0.75rem;
+    font-family: 'Manrope', sans-serif; border: none; cursor: pointer;
+}
+.gv-action-btn:last-child { margin-bottom: 0; }
+
+.gv-action-primary {
+    background: linear-gradient(135deg, #e9c176, #ca9028); color: #3d2a00;
+    box-shadow: 0 8px 20px -5px rgba(233,193,118,0.35);
+}
+.gv-action-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -5px rgba(233,193,118,0.5); color: #3d2a00; }
+
+.gv-action-green {
+    background: linear-gradient(135deg, #00342d, #046b5e); color: #fff;
+    box-shadow: 0 8px 20px -5px rgba(0,52,45,0.3);
+}
+.gv-action-green:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -5px rgba(0,52,45,0.4); color: #fff; }
+
+.gv-action-outline {
+    background: transparent; color: #546067; border: 1.5px solid rgba(0,52,45,0.08);
+}
+.gv-action-outline:hover { border-color: rgba(0,52,45,0.2); background: rgba(0,52,45,0.03); color: #00342d; }
+
+.gv-note { color: #707975; font-size: 0.85rem; padding: 1rem; background: rgba(0,52,45,0.02); border-radius: 0.75rem; border: 1px solid rgba(0,52,45,0.04); }
+</style>
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-5">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card hotel-detail-card shadow-lg border-0 mb-4">
-                    <div class="card-header bg-emerald text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h2 class="mb-0">{{ hotel.nom }}</h2>
-                                {% if hotel.nombreEtoiles %}
-                                    <div class="stars-rating mt-2">
-                                        {% for i in 1..5 %}
-                                            <i class="bi bi-star-fill {{ i <= hotel.nombreEtoiles ? 'text-warning' : 'text-white-50' }}"></i>
-                                        {% endfor %}
-                                        <span class="ms-2">{{ hotel.nombreEtoiles }} étoiles</span>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="text-end">
-                                {% if hotel.budget %}
-                                    <div class="price-tag">
-                                        À partir de <strong>{{ hotel.budget }}€</strong>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
+<!-- ─── HERO ─── -->
+<div class="gv-hotel-show-hero">
+    <div class="hero-bg">
+        {% if hotel.photoUrl %}
+            <img src="{{ hotel.photoUrl }}" alt="{{ hotel.nom }}">
+        {% else %}
+            <div class="hero-bg-placeholder"></div>
+        {% endif %}
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="container">
+            {% if hotel.nombreEtoiles %}
+            <div class="hero-stars">
+                {% for i in 1..5 %}
+                    <span class="material-symbols-outlined {{ i <= hotel.nombreEtoiles ? 'gv-star-filled' : 'gv-star-empty' }}">star</span>
+                {% endfor %}
+                <span style="margin-left:0.5rem; font-size:0.85rem; color:rgba(255,255,255,0.6);">{{ hotel.nombreEtoiles }} étoiles</span>
+            </div>
+            {% endif %}
+            <h1>{{ hotel.nom }}</h1>
+            <div class="hero-location">
+                <span class="material-symbols-outlined">location_on</span>
+                {{ hotel.adresse }}, {{ hotel.ville }}
+            </div>
+            {% if hotel.budget %}
+            <div class="gv-hero-price-tag">
+                <span class="price">{{ hotel.budget }}€</span>
+                <span class="unit">/ nuit</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ─── CONTENT ─── -->
+<div class="gv-hotel-show-container">
+    <div class="gv-hotel-show-grid">
+        <!-- Main Column -->
+        <div>
+            <!-- Info Card -->
+            <div class="gv-show-card">
+                <div class="gv-show-section-title">
+                    <span class="material-symbols-outlined">info</span> Informations
+                </div>
+                <div class="gv-info-grid">
+                    <div class="gv-info-item">
+                        <div class="gv-info-label">Adresse</div>
+                        <div class="gv-info-value">{{ hotel.adresse }}</div>
                     </div>
-
-                    <div class="card-body">
-                        {% if hotel.photoUrl %}
-                            <div class="hotel-image mb-4">
-                                <img src="{{ hotel.photoUrl }}" class="img-fluid rounded" alt="{{ hotel.nom }}">
-                            </div>
-                        {% endif %}
-
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h5 class="text-emerald mb-3">
-                                    <i class="bi bi-geo-alt me-2"></i>Localisation
-                                </h5>
-                                <p class="mb-1"><strong>Adresse:</strong> {{ hotel.adresse }}</p>
-                                <p class="mb-0"><strong>Ville:</strong> {{ hotel.ville }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <h5 class="text-emerald mb-3">
-                                    <i class="bi bi-info-circle me-2"></i>Informations
-                                </h5>
-                                <p class="mb-1"><strong>ID:</strong> {{ hotel.id }}</p>
-                                {% if hotel.createdAt %}
-                                    <p class="mb-1"><strong>Créé le:</strong> {{ hotel.createdAt|date('d/m/Y à H:i') }}</p>
-                                {% endif %}
-                                {% if hotel.updatedAt %}
-                                    <p class="mb-0"><strong>Mis à jour le:</strong> {{ hotel.updatedAt|date('d/m/Y à H:i') }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        {% if hotel.description %}
-                            <div class="mb-4">
-                                <h5 class="text-emerald mb-3">
-                                    <i class="bi bi-file-text me-2"></i>Description
-                                </h5>
-                                <div class="description-content">
-                                    {{ hotel.description|nl2br }}
-                                </div>
-                            </div>
-                        {% endif %}
-
-                        {% if hotel.chambres|length > 0 %}
-                            <div class="mb-4">
-                                <h5 class="text-emerald mb-3">
-                                    <i class="bi bi-door-open me-2"></i>Chambres disponibles ({{ hotel.chambres|length }})
-                                </h5>
-                                <div class="row g-3">
-                                    {% for chambre in hotel.chambres %}
-                                        <div class="col-md-6 col-lg-4">
-                                            <div class="chambre-card p-3 border rounded">
-                                                <h6 class="mb-2">{{ chambre.type }}</h6>
-                                                <p class="mb-1"><small>Capacité: {{ chambre.capacite }} personne(s)</small></p>
-                                                {% if chambre.prixStandard %}
-                                                    <p class="mb-0 fw-semibold text-emerald">{{ chambre.prixStandard }}€/nuit</p>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        {% endif %}
+                    <div class="gv-info-item">
+                        <div class="gv-info-label">Ville</div>
+                        <div class="gv-info-value">{{ hotel.ville }}</div>
                     </div>
+                    {% if hotel.createdAt %}
+                    <div class="gv-info-item">
+                        <div class="gv-info-label">Créé le</div>
+                        <div class="gv-info-value">{{ hotel.createdAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+                    {% endif %}
+                    {% if hotel.updatedAt %}
+                    <div class="gv-info-item">
+                        <div class="gv-info-label">Mis à jour le</div>
+                        <div class="gv-info-value">{{ hotel.updatedAt|date('d/m/Y à H:i') }}</div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
-            <div class="col-lg-4">
-                <div class="card action-card shadow-lg border-0 mb-4">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0 text-dark">Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            {% if app.user and not is_granted('ROLE_ADMIN') %}
-                                <a href="{{ path('app_reservation_new', {'hotel': hotel.id}) }}" class="btn btn-emerald">
-                                    <i class="bi bi-calendar-plus me-2"></i>Ajouter une réservation
-                                </a>
-                            {% endif %}
-                            <a href="{{ path('app_chambre_index') }}" class="btn btn-outline-emerald">
-                                <i class="bi bi-door-open me-2"></i>Voir les chambres
-                            </a>
-                            <a href="{{ path('app_hotel_index') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
-                            </a>
-                        </div>
-                    </div>
+            <!-- Description Card -->
+            {% if hotel.description %}
+            <div class="gv-show-card">
+                <div class="gv-show-section-title">
+                    <span class="material-symbols-outlined">description</span> Description
                 </div>
+                <div class="gv-description">{{ hotel.description|nl2br }}</div>
+            </div>
+            {% endif %}
 
-                <div class="card danger-card shadow-lg border-0">
-                    <div class="card-body">
-                        <p class="text-muted mb-0">Interface en lecture seule pour les utilisateurs.</p>
+            <!-- Chambres Card -->
+            {% if hotel.chambres|length > 0 %}
+            <div class="gv-show-card">
+                <div class="gv-show-section-title">
+                    <span class="material-symbols-outlined">door_open</span> Chambres disponibles ({{ hotel.chambres|length }})
+                </div>
+                <div class="gv-chambre-grid">
+                    {% for chambre in hotel.chambres %}
+                    <div class="gv-chambre-card">
+                        <div class="gv-chambre-type">{{ chambre.type }}</div>
+                        <div class="gv-chambre-cap">
+                            <span class="material-symbols-outlined" style="font-size:0.9rem; vertical-align:-2px; color:#10B981;">group</span>
+                            {{ chambre.capacite }} personne(s)
+                        </div>
+                        {% if chambre.prixStandard %}
+                        <div class="gv-chambre-price">{{ chambre.prixStandard }}€/nuit</div>
+                        {% endif %}
                     </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+            <div class="gv-sidebar-card">
+                <h5>Actions</h5>
+                {% if app.user and not is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_reservation_new', {'hotel': hotel.id}) }}" class="gv-action-btn gv-action-primary">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">calendar_add_on</span>
+                    Réserver maintenant
+                </a>
+                {% endif %}
+                <a href="{{ path('app_chambre_index') }}" class="gv-action-btn gv-action-green">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">door_open</span>
+                    Voir les chambres
+                </a>
+                <a href="{{ path('app_hotel_index') }}" class="gv-action-btn gv-action-outline">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+                    Retour à la liste
+                </a>
+            </div>
+
+            <div class="gv-sidebar-card">
+                <div class="gv-note">
+                    <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:-2px; color:#10B981;">info</span>
+                    Interface en lecture seule pour les utilisateurs.
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-<style>
-.bg-emerald {
-    background-color: var(--primary-emerald) !important;
-}
-
-.btn-emerald {
-    background-color: var(--primary-emerald);
-    border-color: var(--primary-emerald);
-    color: white;
-}
-
-.btn-emerald:hover {
-    background-color: var(--accent-green);
-    border-color: var(--accent-green);
-    color: white;
-}
-
-.hotel-detail-card {
-    background: var(--glass-card);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-}
-
-.action-card, .danger-card {
-    background: var(--glass-card);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-}
-
-.hotel-image img {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    border-radius: 10px;
-}
-
-.stars-rating {
-    display: inline-flex;
-    align-items: center;
-}
-
-.price-tag {
-    font-size: 1.1rem;
-    color: white;
-}
-
-.description-content {
-    line-height: 1.6;
-    color: var(--text-secondary);
-}
-
-.chambre-card {
-    background: var(--soft-green);
-    transition: transform 0.2s ease;
-}
-
-.chambre-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px var(--shadow-green);
-}
-
-.text-emerald {
-    color: var(--primary-emerald) !important;
-}
-
-.btn-warning {
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #333;
-}
-
-.btn-warning:hover {
-    background-color: #ffb300;
-    border-color: #ffb300;
-}
-
-.toggle-favorite-show {
-    transition: all 0.3s ease;
-}
-
-.toggle-favorite-show.favorited {
-    box-shadow: 0 0 15px rgba(255, 193, 7, 0.4);
-}
-
-</style>
-
+{% block javascripts %}
+{{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const favoriteBtn = document.querySelector('.toggle-favorite-show');
-    
     if (favoriteBtn) {
         const hotelId = favoriteBtn.getAttribute('data-hotel-id');
-        
-        // Set initial state
         const icon = favoriteBtn.querySelector('i');
-        if (icon.classList.contains('bi-star-fill')) {
-            favoriteBtn.classList.add('favorited');
-        }
-        
+        if (icon && icon.classList.contains('bi-star-fill')) favoriteBtn.classList.add('favorited');
         favoriteBtn.addEventListener('click', async function(e) {
             e.preventDefault();
-            
             try {
-                const response = await fetch(`/hotel/${hotelId}/toggle-favoris`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
+                const response = await fetch('/hotel/' + hotelId + '/toggle-favoris', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
                 });
-                
                 const data = await response.json();
-                
                 if (data.success) {
                     const icon = this.querySelector('i');
                     const text = this.querySelector('#favoriteText');
-                    
-                    if (data.isFavoris) {
-                        icon.classList.remove('bi-star');
-                        icon.classList.add('bi-star-fill');
-                        text.textContent = 'Retirer des favoris';
-                        this.classList.add('favorited');
-                    } else {
-                        icon.classList.remove('bi-star-fill');
-                        icon.classList.add('bi-star');
-                        text.textContent = 'Ajouter aux favoris';
-                        this.classList.remove('favorited');
-                    }
-                    
-                    // Show toast notification
-                    showNotification(data.message);
+                    if (data.isFavoris) { icon.classList.remove('bi-star'); icon.classList.add('bi-star-fill'); if(text) text.textContent = 'Retirer des favoris'; this.classList.add('favorited'); }
+                    else { icon.classList.remove('bi-star-fill'); icon.classList.add('bi-star'); if(text) text.textContent = 'Ajouter aux favoris'; this.classList.remove('favorited'); }
                 }
-            } catch (error) {
-                console.error('Erreur:', error);
-                showNotification('Une erreur est survenue', 'error');
-            }
+            } catch (error) { console.error('Erreur:', error); }
         });
     }
 });
-
-function showNotification(message, type = 'success') {
-    const alertClass = type === 'error' ? 'alert-danger' : 'alert-success';
-    const alertHTML = `
-        <div class="alert ${alertClass} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" role="alert" style="z-index: 9999; min-width: 300px;">
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `;
-    
-    const alertContainer = document.createElement('div');
-    alertContainer.innerHTML = alertHTML;
-    document.body.appendChild(alertContainer.firstElementChild);
-    
-    setTimeout(() => {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => alert.remove());
-    }, 3000);
-}
 </script>
 {% endblock %}

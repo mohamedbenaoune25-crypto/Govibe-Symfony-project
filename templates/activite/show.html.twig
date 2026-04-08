@@ -1,80 +1,285 @@
 {% extends is_granted('ROLE_ADMIN') ? 'admin/base_admin.html.twig' : 'base.html.twig' %}
 
-{% block title %}{{ activite.name }} - Détails - GoVibe{% endblock %}
+{% block title %}{{ activite.name }} — GoVibe | Détails{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !important; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+/* ─── Hero ─── */
+.gv-act-hero {
+    position: relative; padding: 170px 0 120px;
+    background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+    overflow: hidden; text-align: center; border-radius: 0 0 3rem 3rem;
+    box-shadow: 0 20px 50px rgba(0,52,45,0.15);
+}
+.gv-act-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 25% 85%, rgba(16,185,129,0.18) 0%, transparent 55%), radial-gradient(ellipse at 75% 15%, rgba(233,193,118,0.1) 0%, transparent 45%); pointer-events:none; }
+.gv-act-hero::after { content:''; position:absolute; inset:0; background-image: radial-gradient(rgba(160,242,225,0.06) 1px, transparent 1px); background-size:24px 24px; pointer-events:none; }
+.gv-hero-icon-bg { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:22rem; color:rgba(255,255,255,0.015); pointer-events:none; font-variation-settings:'FILL' 1; }
+
+.gv-hero-badges { display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; position:relative; z-index:2; }
+.gv-hero-badge {
+    display:inline-flex; align-items:center; gap:0.3rem; padding:0.4rem 1rem;
+    border-radius:2rem; font-size:0.72rem; font-weight:800; letter-spacing:0.05em; text-transform:uppercase;
+    backdrop-filter:blur(8px); position:relative; z-index:2;
+}
+.gv-badge-type { background:rgba(16,185,129,0.15); color:#a0f2e1; border:1px solid rgba(160,242,225,0.25); }
+.gv-badge-status-active { background:rgba(233,193,118,0.15); color:#fde68a; border:1px solid rgba(233,193,118,0.25); }
+.gv-badge-status-pending { background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.25); }
+.gv-badge-status-rejected { background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.25); }
+
+.gv-act-hero h1 {
+    font-family:'Noto Serif',serif; font-size:clamp(2.2rem,4.5vw,3.5rem); color:#fff;
+    font-weight:700; margin-bottom:0.5rem; position:relative; z-index:2;
+    animation:heroFadeIn 0.8s ease both;
+}
+.gv-act-hero .hero-location {
+    display:inline-flex; align-items:center; gap:0.4rem; color:rgba(160,242,225,0.7);
+    font-size:1.05rem; position:relative; z-index:2; animation:heroFadeIn 0.8s ease 0.2s both;
+}
+.gv-act-hero .hero-location .material-symbols-outlined { font-size:1.1rem; color:#a0f2e1; }
+
+.gv-hero-price {
+    display:inline-flex; align-items:baseline; gap:0.3rem; margin-top:1.25rem;
+    font-family:'Noto Serif',serif; position:relative; z-index:2;
+    animation:heroFadeIn 0.8s ease 0.3s both;
+}
+.gv-hero-price .amount { font-size:2.5rem; font-weight:700; color:#a0f2e1; }
+.gv-hero-price .unit { font-size:1rem; color:rgba(160,242,225,0.5); font-family:'Manrope',sans-serif; }
+
+@keyframes heroFadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── Container ─── */
+.gv-act-container { max-width:1200px; margin:-50px auto 80px; position:relative; z-index:10; padding:0 2rem; }
+.gv-act-grid { display:grid; grid-template-columns:7fr 5fr; gap:2rem; }
+@media (max-width:992px) { .gv-act-grid { grid-template-columns:1fr; } }
+
+/* ─── Cards ─── */
+.gv-card {
+    background:rgba(255,255,255,0.97); backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(0,52,45,0.06); border-radius:1.5rem; padding:2rem;
+    box-shadow:0 20px 60px rgba(0,52,45,0.06); margin-bottom:2rem;
+}
+.gv-card-title {
+    font-family:'Noto Serif',serif; font-size:1.1rem; font-weight:700; color:#00342d;
+    display:flex; align-items:center; gap:0.5rem; margin-bottom:1.25rem;
+    padding-bottom:0.75rem; border-bottom:2px solid rgba(16,185,129,0.15);
+}
+.gv-card-title .material-symbols-outlined { font-size:1.15rem; color:#10B981; }
+
+.gv-description { color:#546067; line-height:1.8; font-size:0.95rem; }
+
+/* ─── Stat Chips ─── */
+.gv-stat-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1.5rem; }
+.gv-stat-chip {
+    padding:1.25rem; border-radius:1rem; text-align:center;
+    background:rgba(0,52,45,0.03); border:1px solid rgba(0,52,45,0.05);
+}
+.gv-stat-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#546067; margin-bottom:0.3rem; }
+.gv-stat-value { font-family:'Noto Serif',serif; font-size:1.4rem; font-weight:700; color:#00342d; }
+.gv-stat-value.emerald { color:#10B981; }
+
+/* ─── Sessions ─── */
+.gv-session-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:2px solid rgba(16,185,129,0.15); }
+.gv-session-title { font-family:'Noto Serif',serif; font-size:1.1rem; font-weight:700; color:#00342d; display:flex; align-items:center; gap:0.5rem; }
+.gv-session-title .material-symbols-outlined { font-size:1.15rem; color:#10B981; }
+
+.gv-btn-create-sm {
+    display:inline-flex; align-items:center; gap:0.3rem; padding:0.5rem 1rem; border-radius:0.6rem;
+    background:linear-gradient(135deg,#00342d,#046b5e); color:#fff; font-weight:700; font-size:0.8rem;
+    text-decoration:none; transition:all 0.3s; box-shadow:0 4px 12px rgba(0,52,45,0.2);
+    font-family:'Manrope',sans-serif;
+}
+.gv-btn-create-sm:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,52,45,0.3); color:#fff; }
+
+.gv-session-list { display:flex; flex-direction:column; gap:0.75rem; }
+
+.gv-session-item {
+    padding:1.25rem; border-radius:1rem; background:rgba(0,52,45,0.02);
+    border:1px solid rgba(0,52,45,0.05); transition:all 0.3s;
+    display:flex; justify-content:space-between; align-items:center; gap:1rem;
+}
+.gv-session-item:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,0,0,0.05); border-color:rgba(16,185,129,0.15); }
+
+.gv-session-date { font-weight:700; color:#00342d; display:flex; align-items:center; gap:0.4rem; }
+.gv-session-date .material-symbols-outlined { font-size:1rem; color:#10B981; }
+.gv-session-time { color:#707975; font-size:0.85rem; display:flex; align-items:center; gap:0.3rem; margin-top:0.15rem; }
+.gv-session-time .material-symbols-outlined { font-size:0.9rem; }
+
+.gv-session-right { display:flex; flex-direction:column; align-items:flex-end; gap:0.5rem; }
+
+.gv-places-badge {
+    display:inline-flex; align-items:center; gap:0.3rem; padding:0.35rem 0.85rem;
+    border-radius:2rem; font-size:0.75rem; font-weight:700;
+    background:rgba(0,52,45,0.04); color:#00342d; border:1px solid rgba(0,52,45,0.06);
+}
+
+.gv-btn-reserve {
+    padding:0.45rem 1rem; border-radius:2rem; font-weight:700; font-size:0.8rem;
+    text-decoration:none; transition:all 0.25s; display:inline-flex; align-items:center; gap:0.3rem;
+    font-family:'Manrope',sans-serif; border:none; cursor:pointer;
+}
+.gv-btn-reserve-active {
+    background:linear-gradient(135deg,#e9c176,#ca9028); color:#3d2a00;
+    box-shadow:0 4px 12px rgba(233,193,118,0.3);
+}
+.gv-btn-reserve-active:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(233,193,118,0.4); color:#3d2a00; }
+.gv-btn-reserve-full {
+    background:rgba(0,52,45,0.04); color:#bfc9c4; cursor:default;
+    border:1px solid rgba(0,52,45,0.05);
+}
+
+.gv-empty-sessions { text-align:center; padding:2rem 1rem; background:rgba(0,52,45,0.02); border-radius:1rem; }
+.gv-empty-sessions .material-symbols-outlined { font-size:2.5rem; color:#cde1db; font-variation-settings:'FILL' 1; margin-bottom:0.5rem; }
+.gv-empty-sessions p { color:#707975; font-size:0.9rem; }
+
+/* ─── Actions Bar ─── */
+.gv-actions-bar { display:flex; justify-content:center; gap:0.75rem; flex-wrap:wrap; margin-top:2.5rem; }
+
+.gv-btn-outline-back {
+    display:inline-flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.9rem;
+    color:#546067; text-decoration:none; padding:0.75rem 1.5rem; border-radius:0.75rem;
+    border:1.5px solid rgba(0,52,45,0.08); transition:all 0.25s; font-family:'Manrope',sans-serif;
+}
+.gv-btn-outline-back:hover { border-color:rgba(0,52,45,0.2); background:rgba(0,52,45,0.03); color:#00342d; }
+
+.gv-btn-edit {
+    display:inline-flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.9rem;
+    color:#fff; text-decoration:none; padding:0.75rem 1.5rem; border-radius:0.75rem;
+    background:linear-gradient(135deg,#00342d,#046b5e); transition:all 0.3s;
+    box-shadow:0 8px 20px -6px rgba(0,52,45,0.4); font-family:'Manrope',sans-serif;
+    border:none; cursor:pointer;
+}
+.gv-btn-edit:hover { transform:translateY(-2px); box-shadow:0 12px 30px -6px rgba(0,52,45,0.5); color:#fff; }
+
+.gv-btn-accept {
+    display:inline-flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.9rem;
+    color:#fff; padding:0.75rem 1.5rem; border-radius:0.75rem;
+    background:linear-gradient(135deg,#e9c176,#ca9028); color:#3d2a00;
+    transition:all 0.3s; box-shadow:0 8px 20px -6px rgba(233,193,118,0.4);
+    font-family:'Manrope',sans-serif; border:none; cursor:pointer;
+}
+.gv-btn-accept:hover { transform:translateY(-2px); box-shadow:0 12px 30px -6px rgba(233,193,118,0.5); }
+
+.gv-btn-reject {
+    display:inline-flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.9rem;
+    color:#93000a; padding:0.75rem 1.5rem; border-radius:0.75rem;
+    background:rgba(186,26,26,0.08); border:1.5px solid rgba(186,26,26,0.15);
+    transition:all 0.25s; font-family:'Manrope',sans-serif; cursor:pointer;
+}
+.gv-btn-reject:hover { background:#ba1a1a; color:#fff; border-color:transparent; }
+</style>
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-5 text-center mb-5 border-bottom rounded-bottom-5 px-lg-5 shadow-sm bg-white">
-    <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
-        <span class="badge rounded-pill bg-success px-3 fs-6" style="background-color: #52BE80;">{{ activite.type }}</span>
-        <span class="badge rounded-pill bg-light text-dark shadow-sm px-3 fs-6 border">{{ activite.status }}</span>
+<!-- ─── HERO ─── -->
+<div class="gv-act-hero">
+    <span class="material-symbols-outlined gv-hero-icon-bg">landscape</span>
+    <div class="container">
+        <div class="gv-hero-badges">
+            <span class="gv-hero-badge gv-badge-type">
+                <span class="material-symbols-outlined" style="font-size:0.85rem;">category</span> {{ activite.type }}
+            </span>
+            {% if activite.status == 'Accepted' or activite.status == 'Active' %}
+                <span class="gv-hero-badge gv-badge-status-active">
+                    <span class="material-symbols-outlined" style="font-size:0.85rem;">verified</span> {{ activite.status }}
+                </span>
+            {% elseif activite.status == 'Pending' %}
+                <span class="gv-hero-badge gv-badge-status-pending">
+                    <span class="material-symbols-outlined" style="font-size:0.85rem;">pending</span> {{ activite.status }}
+                </span>
+            {% else %}
+                <span class="gv-hero-badge gv-badge-status-rejected">
+                    <span class="material-symbols-outlined" style="font-size:0.85rem;">cancel</span> {{ activite.status }}
+                </span>
+            {% endif %}
+        </div>
+        <h1>{{ activite.name }}</h1>
+        <div class="hero-location">
+            <span class="material-symbols-outlined">location_on</span>
+            {{ activite.localisation }}
+        </div>
+        <div class="gv-hero-price">
+            <span class="amount">{{ activite.prix }}</span>
+            <span class="unit">TND</span>
+        </div>
     </div>
-    <h1 class="display-3 fw-bold text-dark mb-2">{{ activite.name }}</h1>
-    <p class="text-secondary fs-5"><i class="bi bi-pin-map me-2"></i>{{ activite.localisation }}</p>
 </div>
 
-<div class="container mb-5 px-lg-5">
-    <div class="row g-5">
-        <div class="col-lg-7">
-            <div class="card border-0 shadow-sm rounded-5 p-5 bg-white mb-5 animate-fade-in-up">
-                <h3 class="h4 fw-bold mb-4 border-bottom pb-2">Description de l'activité</h3>
-                <p class="text-muted fs-5 lh-lg">{{ activite.description|nl2br }}</p>
-                
-                <div class="pt-4 mt-4 border-top mt-5">
-                    <div class="row text-center g-4">
-                        <div class="col-6 col-md-4">
-                            <div class="p-3 rounded-4 bg-light shadow-sm border border-white">
-                                <h5 class="small text-uppercase text-secondary mb-1">Tarif</h5>
-                                <p class="h4 fw-bold mb-0" style="color: #52BE80;">{{ activite.prix }} TND</p>
-                            </div>
-                        </div>
-                        <div class="col-6 col-md-4">
-                            <div class="p-3 rounded-4 bg-light shadow-sm border border-white">
-                                <h5 class="small text-uppercase text-secondary mb-1">Type</h5>
-                                <p class="h4 fw-bold mb-0">{{ activite.type }}</p>
-                            </div>
-                        </div>
+<!-- ─── CONTENT ─── -->
+<div class="gv-act-container">
+    <div class="gv-act-grid">
+        <!-- Left Column: Description -->
+        <div>
+            <div class="gv-card">
+                <div class="gv-card-title">
+                    <span class="material-symbols-outlined">description</span> Description de l'activité
+                </div>
+                <div class="gv-description">{{ activite.description|nl2br }}</div>
+
+                <div class="gv-stat-row">
+                    <div class="gv-stat-chip">
+                        <div class="gv-stat-label">Tarif</div>
+                        <div class="gv-stat-value emerald">{{ activite.prix }} TND</div>
+                    </div>
+                    <div class="gv-stat-chip">
+                        <div class="gv-stat-label">Type</div>
+                        <div class="gv-stat-value">{{ activite.type }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-5">
-            <div class="card border-0 shadow rounded-5 p-4 bg-white mb-5">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 class="h4 fw-bold mb-0">Sessions de l'activité</h3>
-                    <a href="{{ path('app_activite_session_new') }}" class="btn btn-outline-success btn-sm rounded-pill px-3 border-2 fw-bold">
-                        <i class="bi bi-plus-lg"></i> Créer
+        <!-- Right Column: Sessions -->
+        <div>
+            <div class="gv-card">
+                <div class="gv-session-header">
+                    <div class="gv-session-title">
+                        <span class="material-symbols-outlined">event</span> Sessions
+                    </div>
+                    <a href="{{ path('app_activite_session_new') }}" class="gv-btn-create-sm">
+                        <span class="material-symbols-outlined" style="font-size:0.9rem;">add</span> Créer
                     </a>
                 </div>
                 
-                <div class="list-group list-group-flush gap-3 mt-3">
+                <div class="gv-session-list">
                     {% for session in activite.sessions %}
-                        <div class="list-group-item rounded-4 border p-3 shadow-sm hover-lift-2 transition-all">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <p class="fw-bold mb-1"><i class="bi bi-calendar-event me-2"></i> {{ session.date|date('d/m/Y') }}</p>
-                                    <p class="text-muted small mb-0"><i class="bi bi-clock me-2"></i> {{ session.heure|date('H:i') }}</p>
+                        <div class="gv-session-item">
+                            <div>
+                                <div class="gv-session-date">
+                                    <span class="material-symbols-outlined">calendar_month</span>
+                                    {{ session.date|date('d/m/Y') }}
                                 </div>
-                                <div class="text-end">
-                                    <span class="badge rounded-pill bg-light text-dark border mb-2 d-block">
-                                        {{ session.nbrPlacesRestant }}/{{ session.capacite }} places
+                                <div class="gv-session-time">
+                                    <span class="material-symbols-outlined">schedule</span>
+                                    {{ session.heure|date('H:i') }}
+                                </div>
+                            </div>
+                            <div class="gv-session-right">
+                                <span class="gv-places-badge">
+                                    {{ session.nbrPlacesRestant }}/{{ session.capacite }} places
+                                </span>
+                                {% if session.canReserve(1) %}
+                                    <a href="{{ path('app_reservation_session_booking', {'idSession': session.idSession}) }}" class="gv-btn-reserve gv-btn-reserve-active">
+                                        <span class="material-symbols-outlined" style="font-size:0.9rem;">confirmation_number</span>
+                                        Réserver
+                                    </a>
+                                {% else %}
+                                    <span class="gv-btn-reserve gv-btn-reserve-full">
+                                        <span class="material-symbols-outlined" style="font-size:0.9rem;">block</span>
+                                        Complet
                                     </span>
-                                    
-                                    {% if session.canReserve(1) %}
-                                        <a href="{{ path('app_reservation_session_booking', {'idSession': session.idSession}) }}" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm border-0 transition-all hover-lift-2" style="background-color: #2ECC71;">
-                                            Réserver
-                                        </a>
-                                    {% else %}
-                                        <button class="btn btn-secondary btn-sm rounded-pill px-3 shadow-sm border-0 disabled">
-                                            Complet
-                                        </button>
-                                    {% endif %}
-                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     {% else %}
-                        <div class="text-center py-4 bg-light rounded-4">
-                            <p class="text-muted mb-0">Aucune session programmée</p>
+                        <div class="gv-empty-sessions">
+                            <span class="material-symbols-outlined">event_busy</span>
+                            <p>Aucune session programmée</p>
                         </div>
                     {% endfor %}
                 </div>
@@ -82,37 +287,29 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-center gap-3 mt-5">
-        <a href="{{ path('app_activite_index') }}" class="btn btn-outline-secondary rounded-pill px-5 border-2 fw-bold d-flex align-items-center gap-2">
-            <i class="bi bi-arrow-left"></i> Liste des activités
+    <!-- ─── Actions ─── -->
+    <div class="gv-actions-bar">
+        <a href="{{ path('app_activite_index') }}" class="gv-btn-outline-back">
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+            Liste des activités
         </a>
         {% if is_granted('ROLE_ADMIN') %}
             {% if activite.status == 'Pending' %}
                 <form method="post" action="{{ path('app_activite_validate', {'id': activite.id}) }}" class="d-inline">
-                    <button class="btn btn-success rounded-pill px-4 border-0 shadow py-2 fw-bold transition-all hover-lift-2" style="background-color: #2ECC71;">
-                        <i class="bi bi-check-lg me-2"></i> Accepter
+                    <button class="gv-btn-accept">
+                        <span class="material-symbols-outlined" style="font-size:1rem;">check_circle</span> Accepter
                     </button>
                 </form>
                 <form method="post" action="{{ path('app_activite_reject', {'id': activite.id}) }}" class="d-inline">
-                    <button class="btn btn-danger rounded-pill px-4 border-0 shadow py-2 fw-bold transition-all hover-lift-2">
-                        <i class="bi bi-x-lg me-2"></i> Refuser
+                    <button class="gv-btn-reject">
+                        <span class="material-symbols-outlined" style="font-size:1rem;">cancel</span> Refuser
                     </button>
                 </form>
             {% endif %}
-            <a href="{{ path('app_activite_edit', {'id': activite.id}) }}" class="btn btn-success rounded-pill px-5 border-0 shadow py-2 fw-bold transition-all hover-lift-2" style="background-color: #52BE80;">
-                <i class="bi bi-pencil-square me-2"></i> Modifier
+            <a href="{{ path('app_activite_edit', {'id': activite.id}) }}" class="gv-btn-edit">
+                <span class="material-symbols-outlined" style="font-size:1rem;">edit</span> Modifier
             </a>
         {% endif %}
     </div>
 </div>
-{% endblock %}
-
-{% block stylesheets %}
-<style>
-    body { background-color: #F8F9F9 !important; }
-    .rounded-bottom-5 { border-bottom-left-radius: 4rem !important; border-bottom-right-radius: 4rem !important; }
-    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .hover-lift-2:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.05) !important; }
-</style>
 {% endblock %}

@@ -1,344 +1,110 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Modifier Location - GoVibe{% endblock %}
-
-{% block body %}
+{% block title %}Modifier Location — GoVibe{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --primary-emerald: #50C878;
-        --dark-green: #013220;
-        --light-green: #2E8B57;
-    }
-
-    .edit-hero {
-        background: linear-gradient(135deg, var(--dark-green) 0%, var(--light-green) 100%);
-        color: white;
-        padding: 50px 0;
-        margin-bottom: 40px;
-    }
-
-    .edit-hero h1 {
-        font-size: 2rem;
-        font-weight: 700;
-    }
-
-    .form-container {
-        max-width: 700px;
-        margin: 0 auto;
-    }
-
-    .form-card {
-        background: white;
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-    }
-
-    .form-section {
-        margin-bottom: 30px;
-    }
-
-    .form-section-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--dark-green);
-        margin-bottom: 15px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid var(--primary-emerald);
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        font-weight: 600;
-        color: var(--dark-green);
-        margin-bottom: 8px;
-        display: block;
-    }
-
-    .form-control, .form-select {
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 10px 12px;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: var(--primary-emerald);
-        box-shadow: 0 0 0 3px rgba(80, 200, 120, 0.1);
-        outline: none;
-    }
-
-    .form-help {
-        font-size: 0.85rem;
-        color: #666;
-        margin-top: 5px;
-    }
-
-    .form-error {
-        color: #dc3545;
-        font-size: 0.85rem;
-        margin-top: 5px;
-    }
-
-    .btn-primary-govibe {
-        background-color: var(--primary-emerald);
-        color: white;
-        padding: 12px 30px;
-        border: none;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        width: 100%;
-    }
-
-    .btn-primary-govibe:hover {
-        background-color: var(--light-green);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(80, 200, 120, 0.3);
-    }
-
-    .btn-secondary-govibe {
-        background-color: #6c757d;
-        color: white;
-        padding: 12px 30px;
-        border: none;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    .buttons-group {
-        display: flex;
-        gap: 15px;
-        margin-top: 30px;
-    }
-
-    .buttons-group .btn {
-        flex: 1;
-    }
-
-    .alert {
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-
-    .summary-box {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        margin-top: 20px;
-        border: 2px solid var(--primary-emerald);
-    }
-
-    .summary-title {
-        font-weight: 700;
-        color: var(--dark-green);
-        margin-bottom: 15px;
-    }
-
-    .summary-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-    }
-
-    .summary-item:last-child {
-        border-bottom: none;
-    }
-
-    .total-amount {
-        display: flex;
-        justify-content: space-between;
-        padding: 15px 0;
-        border-top: 2px solid var(--primary-emerald);
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: var(--primary-emerald);
-    }
+body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24}
+.gv-hero{position:relative;padding:160px 0 100px;background:linear-gradient(160deg,#00342d,#013220 40%,#001a12);overflow:hidden;text-align:center;border-radius:0 0 3rem 3rem;box-shadow:0 20px 50px rgba(0,52,45,.15)}
+.gv-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 80%,rgba(16,185,129,.15),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(233,193,118,.08),transparent 50%);pointer-events:none}
+.gv-hero::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(160,242,225,.06) 1px,transparent 1px);background-size:24px 24px;pointer-events:none}
+.gv-hib{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20rem;color:rgba(255,255,255,.02);pointer-events:none;font-variation-settings:'FILL' 1}
+.gv-ht{font-family:'Noto Serif',serif;font-size:clamp(2rem,4vw,3rem);color:#fff;font-weight:700;position:relative;z-index:2;margin-bottom:.3rem}
+.gv-ht em{color:#a0f2e1;font-style:italic;font-weight:300}
+.gv-hs{color:rgba(160,242,225,.7);font-size:1rem;position:relative;z-index:2}
+.gv-fc{max-width:700px;margin:-50px auto 80px;position:relative;z-index:10;padding:0 2rem}
+.gv-alert{padding:1rem 1.5rem;border-radius:1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.6rem;font-size:.9rem;font-weight:600;background:rgba(233,193,118,.08);border:1px solid rgba(233,193,118,.15);color:#92400e}
+.gv-card{background:rgba(255,255,255,.97);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(0,52,45,.06);border-radius:1.5rem;padding:2.5rem;box-shadow:0 20px 60px rgba(0,52,45,.08)}
+.gv-card .form-label,.gv-card label{font-weight:700!important;color:#00342d!important;font-size:.85rem!important;text-transform:uppercase;letter-spacing:.06em}
+.gv-card .form-control,.gv-card .form-select{border:1.5px solid rgba(0,52,45,.08)!important;border-radius:.75rem!important;padding:.85rem 1rem!important;font-family:'Manrope',sans-serif!important;font-weight:500!important;font-size:.95rem!important;transition:all .25s!important}
+.gv-card .form-control:focus,.gv-card .form-select:focus{border-color:#10B981!important;box-shadow:0 0 0 3px rgba(16,185,129,.12)!important}
+.gv-section{margin-bottom:2rem}
+.gv-st{font-family:'Noto Serif',serif;font-size:1rem;font-weight:700;color:#00342d;display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid rgba(16,185,129,.15)}
+.gv-st .material-symbols-outlined{font-size:1rem;color:#10B981}
+.gv-date-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.gv-summary{background:rgba(16,185,129,.06);border:1.5px solid rgba(16,185,129,.12);border-radius:1rem;padding:1.25rem;margin-top:1rem}
+.gv-summary-t{font-family:'Noto Serif',serif;font-weight:700;color:#00342d;font-size:.95rem;margin-bottom:.75rem}
+.gv-sr{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid rgba(16,185,129,.1);font-size:.9rem}
+.gv-sr:last-of-type{border-bottom:none}
+.gv-sr span:first-child{color:#546067}
+.gv-sr span:last-child{font-weight:700;color:#10B981}
+.gv-total{display:flex;justify-content:space-between;padding:.75rem 0 0;border-top:2px solid rgba(16,185,129,.2);margin-top:.3rem;font-weight:700;font-size:1.1rem}
+.gv-total span:last-child{font-family:'Noto Serif',serif;color:#10B981}
+.gv-form-error{color:#93000a;font-size:.85rem;margin-top:.3rem}
+.gv-btns{display:flex;gap:1rem;margin-top:2rem}
+.gv-btn-save{flex:1;padding:.9rem;background:linear-gradient(135deg,#e9c176,#ca9028);color:#3d2a00;border:none;border-radius:.75rem;font-weight:700;font-size:1rem;cursor:pointer;transition:all .3s;box-shadow:0 10px 25px -5px rgba(233,193,118,.4);font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.gv-btn-save:hover{transform:translateY(-2px);box-shadow:0 15px 35px -5px rgba(233,193,118,.5)}
+.gv-btn-cancel{flex:0 0 auto;padding:.9rem 1.5rem;border-radius:.75rem;font-weight:700;font-size:.9rem;text-decoration:none;border:1.5px solid rgba(0,52,45,.08);color:#546067;transition:all .25s;font-family:'Manrope',sans-serif;display:flex;align-items:center;gap:.4rem}
+.gv-btn-cancel:hover{border-color:rgba(0,52,45,.2);background:rgba(0,52,45,.03);color:#00342d}
 </style>
-
-<div class="edit-hero">
+{% endblock %}
+{% block body %}
+<div class="gv-hero">
+    <span class="material-symbols-outlined gv-hib">edit</span>
     <div class="container">
-        <h1><i class="bi bi-pencil-square"></i> Modifier Location</h1>
-        <p>{{ location.reference }}</p>
+        <h1 class="gv-ht">Modifier <em>Location</em></h1>
+        <p class="gv-hs">{{ location.reference }}</p>
     </div>
 </div>
-
-<div class="container form-container">
+<div class="gv-fc">
     {% if location.statut != 'EN_ATTENTE' %}
-    <div class="alert alert-warning">
-        <i class="bi bi-exclamation-triangle me-2"></i>
-        <strong>Attention:</strong> Vous ne pouvez modifier que les locations en attente de confirmation.
-    </div>
+    <div class="gv-alert"><span class="material-symbols-outlined" style="font-size:1.1rem">warning</span> Vous ne pouvez modifier que les locations en attente.</div>
     {% endif %}
 
-    {{ form_start(form, {'attr': {'class': 'form-card needs-validation', 'novalidate': 'novalidate'}}) }}
+    {{ form_start(form, {'attr': {'class': 'gv-card needs-validation', 'novalidate': 'novalidate'}}) }}
 
     {% if form.vars.errors|length > 0 %}
-    <div class="alert alert-danger">
-        <i class="bi bi-exclamation-circle me-2"></i>
-        <strong>Erreur:</strong> Veuillez vérifier les champs ci-dessous
-    </div>
+    <div style="padding:1rem 1.5rem;border-radius:1rem;margin-bottom:1.5rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);color:#b91c1c;display:flex;align-items:center;gap:.6rem;font-size:.9rem;font-weight:600"><span class="material-symbols-outlined" style="font-size:1.1rem">error</span> Veuillez vérifier les champs ci-dessous</div>
     {% endif %}
 
-    <!-- Section Voiture -->
-    <div class="form-section">
-        <div class="form-section-title">
-            <i class="bi bi-car-front-fill"></i> Voiture
-        </div>
-
-        <div class="form-group">
+    <div class="gv-section">
+        <div class="gv-st"><span class="material-symbols-outlined">directions_car</span> Voiture</div>
+        <div>
             {{ form_label(form.voiture) }}
             {{ form_widget(form.voiture) }}
-            {% if form.voiture.vars.errors|length %}
-            <div class="form-error">
-                {% for error in form.voiture.vars.errors %}
-                    {{ error.message }}
-                {% endfor %}
-            </div>
-            {% endif %}
+            {% if form.voiture.vars.errors|length %}<div class="gv-form-error">{% for error in form.voiture.vars.errors %}{{ error.message }}{% endfor %}</div>{% endif %}
         </div>
     </div>
 
-    <!-- Section Dates -->
-    <div class="form-section">
-        <div class="form-section-title">
-            <i class="bi bi-calendar-event"></i> Période de Location
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="form-group">
-                {{ form_label(form.dateDebut) }}
-                {{ form_widget(form.dateDebut) }}
-                {% if form.dateDebut.vars.errors|length %}
-                <div class="form-error">
-                    {% for error in form.dateDebut.vars.errors %}
-                        {{ error.message }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-
-            <div class="form-group">
-                {{ form_label(form.dateFin) }}
-                {{ form_widget(form.dateFin) }}
-                {% if form.dateFin.vars.errors|length %}
-                <div class="form-error">
-                    {% for error in form.dateFin.vars.errors %}
-                        {{ error.message }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
+    <div class="gv-section">
+        <div class="gv-st"><span class="material-symbols-outlined">date_range</span> Période</div>
+        <div class="gv-date-row">
+            <div>{{ form_label(form.dateDebut) }}{{ form_widget(form.dateDebut) }}{% if form.dateDebut.vars.errors|length %}<div class="gv-form-error">{% for error in form.dateDebut.vars.errors %}{{ error.message }}{% endfor %}</div>{% endif %}</div>
+            <div>{{ form_label(form.dateFin) }}{{ form_widget(form.dateFin) }}{% if form.dateFin.vars.errors|length %}<div class="gv-form-error">{% for error in form.dateFin.vars.errors %}{{ error.message }}{% endfor %}</div>{% endif %}</div>
         </div>
     </div>
 
-    <!-- Section Montant -->
-    <div class="form-section">
-        <div class="form-section-title">
-            <i class="bi bi-cash-coin"></i> Montant
-        </div>
+    <div class="gv-section">
+        <div class="gv-st"><span class="material-symbols-outlined">payments</span> Montant</div>
+        {{ form_label(form.montantTotal) }}
+        {{ form_widget(form.montantTotal) }}
+        {% if form.montantTotal.vars.errors|length %}<div class="gv-form-error">{% for error in form.montantTotal.vars.errors %}{{ error.message }}{% endfor %}</div>{% endif %}
 
-        <div class="form-group">
-            {{ form_label(form.montantTotal) }}
-            {{ form_widget(form.montantTotal) }}
-            {% if form.montantTotal.vars.errors|length %}
-            <div class="form-error">
-                {% for error in form.montantTotal.vars.errors %}
-                    {{ error.message }}
-                {% endfor %}
-            </div>
-            {% endif %}
-        </div>
-
-        <div class="summary-box">
-            <div class="summary-title">Résumé du Devis</div>
-            <div class="summary-item">
-                <span>Voiture:</span>
-                <span>{{ location.voiture.marque }} {{ location.voiture.modele }}</span>
-            </div>
-            <div class="summary-item">
-                <span>Nombre de jours:</span>
-                <span id="resume-jours">{{ location.nbJours }}</span>
-            </div>
-            <div class="summary-item">
-                <span>Prix journalier:</span>
-                <span>{{ '%0.2f'|format(location.voiture.prixJour) }} DT</span>
-            </div>
-            <div class="total-amount">
-                <span>Montant Total:</span>
-                <span id="resume-montant">{{ '%0.2f'|format(location.montantTotal) }} DT</span>
-            </div>
+        <div class="gv-summary">
+            <div class="gv-summary-t">Résumé du Devis</div>
+            <div class="gv-sr"><span>Voiture</span><span>{{ location.voiture.marque }} {{ location.voiture.modele }}</span></div>
+            <div class="gv-sr"><span>Jours</span><span id="resume-jours">{{ location.nbJours }}</span></div>
+            <div class="gv-sr"><span>Prix/jour</span><span>{{ '%0.2f'|format(location.voiture.prixJour) }} DT</span></div>
+            <div class="gv-total"><span>Total</span><span id="resume-montant">{{ '%0.2f'|format(location.montantTotal) }} DT</span></div>
         </div>
     </div>
 
-    <!-- Boutons -->
-    <div class="buttons-group">
-        <a href="{{ path('app_location_show', {id: location.idLocation}) }}" class="btn btn-secondary-govibe">
-            <i class="bi bi-x"></i> Annuler
-        </a>
-        <button type="submit" class="btn-primary-govibe">
-            <i class="bi bi-check"></i> Enregistrer les modifications
-        </button>
+    <div class="gv-btns">
+        <a href="{{ path('app_location_show', {id: location.idLocation}) }}" class="gv-btn-cancel"><span class="material-symbols-outlined" style="font-size:1rem">close</span> Annuler</a>
+        <button type="submit" class="gv-btn-save"><span class="material-symbols-outlined" style="font-size:1.1rem">save</span> Enregistrer</button>
     </div>
 
     {{ form_end(form) }}
 </div>
-
+{% endblock %}
+{% block javascripts %}
+{{ parent() }}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const dateDebutInput = document.querySelector('input[name*="dateDebut"]');
-    const dateFinInput = document.querySelector('input[name*="dateFin"]');
-    const montantTotalInput = document.querySelector('input[name*="montantTotal"]');
-    const prixJour = {{ location.voiture.prixJour }};
-    const form = document.querySelector('form.needs-validation');
-
-    function updateQuote() {
-        const dateDebut = new Date(dateDebutInput.value);
-        const dateFin = new Date(dateFinInput.value);
-
-        if (dateDebutInput.value && dateFinInput.value && dateFin > dateDebut) {
-            const timeDiff = dateFin.getTime() - dateDebut.getTime();
-            const nbJours = Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1;
-            
-            document.getElementById('resume-jours').innerText = nbJours;
-            
-            const montantTotal = prixJour * nbJours;
-            montantTotalInput.value = montantTotal.toFixed(2);
-            document.getElementById('resume-montant').innerText = montantTotal.toFixed(2) + ' DT';
-        }
-    }
-
-    dateDebutInput?.addEventListener('change', updateQuote);
-    dateFinInput?.addEventListener('change', updateQuote);
-
-    form?.addEventListener('submit', function(e) {
-        if (!form.checkValidity()) {
-            e.preventDefault();
-            e.stopPropagation();
-            form.classList.add('was-validated');
-            return;
-        }
-
-        const dateDebut = new Date(dateDebutInput.value);
-        const dateFin = new Date(dateFinInput.value);
-
-        if (dateFin <= dateDebut) {
-            e.preventDefault();
-            alert('La date de fin doit être après la date de début');
-            return;
-        }
-
-        form.classList.add('was-validated');
-    });
+document.addEventListener('DOMContentLoaded',function(){
+    var dd=document.querySelector('input[name*="dateDebut"]'),df=document.querySelector('input[name*="dateFin"]'),mt=document.querySelector('input[name*="montantTotal"]'),pj={{ location.voiture.prixJour }};
+    function upd(){if(dd.value&&df.value){var a=new Date(dd.value),b=new Date(df.value);if(b>a){var n=Math.ceil((b-a)/(864e5))+1,t=pj*n;document.getElementById('resume-jours').textContent=n;mt.value=t.toFixed(2);document.getElementById('resume-montant').textContent=t.toFixed(2)+' DT'}}}
+    dd&&dd.addEventListener('change',upd);df&&df.addEventListener('change',upd);
 });
 </script>
 {% endblock %}

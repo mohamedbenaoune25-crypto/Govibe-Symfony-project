@@ -45,7 +45,7 @@ class PasswordResetController extends AbstractController
 
                 // Envoi de l'email
                 $emailMessage = (new Email())
-                    ->from('noreply@govibe.com')
+                    ->from($this->getParameter('admin_email'))
                     ->to($email)
                     ->subject('Votre code de réinitialisation GoVibe')
                     ->html('<p>Voici votre code de réinitialisation : <strong>' . $token . '</strong>. Il expire dans 15 minutes.</p>');

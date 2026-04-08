@@ -1,486 +1,675 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Locations - GoVibe{% endblock %}
+{% block title %}Mes Locations — GoVibe | Location de Véhicules{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   GoVibe Locations — Ultra Premium Design
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+    font-family: 'Manrope', sans-serif !important;
+    background: #fcf9f8 !important;
+    color: #1c1b1b !important;
+    overflow-x: hidden !important;
+}
+
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+/* ─── Hero Section ─── */
+.gv-loc-hero {
+    position: relative;
+    padding: 180px 0 120px;
+    background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+    overflow: hidden;
+    text-align: center;
+    border-radius: 0 0 3rem 3rem;
+    box-shadow: 0 20px 50px rgba(0, 52, 45, 0.15);
+}
+
+.gv-loc-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 25% 75%, rgba(16, 185, 129, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 25%, rgba(233, 193, 118, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.gv-loc-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(160, 242, 225, 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+}
+
+.gv-hero-icon-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22rem;
+    color: rgba(255, 255, 255, 0.02);
+    z-index: 0;
+    pointer-events: none;
+    font-variation-settings: 'FILL' 1;
+}
+
+.gv-hero-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease both;
+}
+.gv-hero-title em { color: #a0f2e1; font-style: italic; font-weight: 300; }
+
+.gv-hero-sub {
+    color: rgba(160, 242, 225, 0.7);
+    font-size: 1.15rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease 0.2s both;
+}
+
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.gv-hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease 0.4s both;
+}
+
+.gv-btn-primary {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #e9c176 0%, #ca9028 100%);
+    color: #3d2a00;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px -5px rgba(233, 193, 118, 0.4);
+    font-family: 'Manrope', sans-serif;
+}
+.gv-btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 35px -5px rgba(233, 193, 118, 0.5);
+    color: #3d2a00;
+}
+
+/* ─── Main Content Container ─── */
+.gv-loc-container {
+    max-width: 1200px;
+    margin: -50px auto 80px;
+    position: relative;
+    z-index: 10;
+    padding: 0 2rem;
+}
+
+/* ─── Filter Bar ─── */
+.gv-filter-shell {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0, 52, 45, 0.06);
+    border-radius: 1.5rem;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 52, 45, 0.08);
+    margin-bottom: 2.5rem;
+}
+
+.gv-filter-form {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr 1fr auto;
+    gap: 0.75rem;
+    align-items: end;
+}
+@media (max-width: 992px) {
+    .gv-filter-form { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 576px) {
+    .gv-filter-form { grid-template-columns: 1fr; }
+}
+
+.gv-filter-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #546067;
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+.gv-filter-input {
+    border: 1.5px solid rgba(0, 52, 45, 0.08);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 500;
+    color: #1c1b1b;
+    background: #fff;
+    transition: all 0.25s ease;
+    width: 100%;
+    outline: none;
+}
+.gv-filter-input:focus {
+    border-color: #10B981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.gv-filter-btn {
+    padding: 0.75rem 1.75rem;
+    background: linear-gradient(135deg, #00342d 0%, #004d43 70%, #046b5e 100%);
+    color: #fff;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px -6px rgba(0, 52, 45, 0.4);
+    white-space: nowrap;
+    justify-content: center;
+}
+.gv-filter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -6px rgba(0, 52, 45, 0.5);
+}
+
+/* ─── Results Count ─── */
+.gv-results-info {
+    color: #546067;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+.gv-results-info strong { color: #00342d; }
+
+/* ─── Location Cards ─── */
+.gv-loc-card {
+    background: #fff;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    margin-bottom: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border-left: 5px solid transparent;
+    border-image: linear-gradient(180deg, #00342d, #10B981) 1;
+}
+.gv-loc-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, #00342d, #046b5e, #10B981);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+.gv-loc-card:hover::before { transform: scaleX(1); }
+.gv-loc-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.1);
+}
+
+.gv-loc-card-inner {
+    padding: 1.75rem;
+}
+
+.gv-loc-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(0, 52, 45, 0.06);
+}
+
+.gv-loc-ref {
+    font-family: 'Noto Serif', serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #00342d;
+}
+
+.gv-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.gv-badge-pending {
+    background: rgba(233, 193, 118, 0.15);
+    color: #92400e;
+    border: 1px solid rgba(233, 193, 118, 0.3);
+}
+.gv-badge-confirmed {
+    background: rgba(16, 185, 129, 0.1);
+    color: #005046;
+    border: 1px solid rgba(160, 242, 225, 0.5);
+}
+.gv-badge-canceled {
+    background: rgba(186, 26, 26, 0.08);
+    color: #93000a;
+    border: 1px solid rgba(186, 26, 26, 0.15);
+}
+.gv-badge-finished {
+    background: rgba(0, 52, 45, 0.08);
+    color: #00342d;
+    border: 1px solid rgba(0, 52, 45, 0.15);
+}
+
+.gv-loc-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.gv-detail-item {
+    padding: 1rem;
+    background: rgba(0, 52, 45, 0.02);
+    border-radius: 1rem;
+    border: 1px solid rgba(0, 52, 45, 0.04);
+}
+
+.gv-detail-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #546067;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.gv-detail-label .material-symbols-outlined { font-size: 1rem; color: #10B981; }
+
+.gv-detail-value {
+    font-weight: 700;
+    color: #00342d;
+    font-size: 1rem;
+}
+
+.gv-detail-sub {
+    font-size: 0.8rem;
+    color: #707975;
+    margin-top: 0.2rem;
+}
+
+.gv-loc-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.gv-action-btn {
+    padding: 0.6rem 1.1rem;
+    font-size: 0.8rem;
+    border-radius: 0.6rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.25s ease;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+}
+.gv-action-btn:hover { transform: translateY(-2px); }
+
+.gv-action-view {
+    background: linear-gradient(135deg, #00342d, #046b5e);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 52, 45, 0.2);
+}
+.gv-action-view:hover { color: white; box-shadow: 0 8px 20px rgba(0, 52, 45, 0.3); }
+
+.gv-action-edit {
+    background: rgba(0, 122, 196, 0.1);
+    color: #0c5460;
+}
+.gv-action-edit:hover { background: #17a2b8; color: white; }
+
+.gv-action-delete {
+    background: rgba(186, 26, 26, 0.08);
+    color: #93000a;
+}
+.gv-action-delete:hover { background: #ba1a1a; color: white; }
+
+.gv-action-download {
+    background: rgba(0, 52, 45, 0.06);
+    color: #546067;
+}
+.gv-action-download:hover { background: rgba(0, 52, 45, 0.12); color: #00342d; }
+
+/* ─── Pagination ─── */
+.gv-pagination {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.gv-page-btn {
+    padding: 0.6rem 1rem;
+    border-radius: 0.6rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-decoration: none;
+    color: #00342d;
+    background: rgba(0, 52, 45, 0.04);
+    border: 1px solid rgba(0, 52, 45, 0.08);
+    transition: all 0.25s ease;
+}
+.gv-page-btn:hover { background: rgba(0, 52, 45, 0.1); color: #00342d; }
+.gv-page-btn.active {
+    background: linear-gradient(135deg, #00342d, #046b5e);
+    color: #fff;
+    border-color: transparent;
+}
+
+/* ─── Export ─── */
+.gv-export-bar {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+/* ─── Empty State ─── */
+.gv-empty {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+}
+.gv-empty-icon {
+    font-size: 4rem;
+    color: #cde1db;
+    margin-bottom: 1.5rem;
+    font-variation-settings: 'FILL' 1;
+}
+.gv-empty h4 {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.5rem;
+    color: #00342d;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.gv-empty p {
+    color: #546067;
+    margin-bottom: 2rem;
+}
+
+/* ─── Reveal ─── */
+.gv-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gv-reveal.is-visible { opacity: 1; transform: translateY(0); }
+</style>
+{% endblock %}
 
 {% block body %}
-<style>
-    :root {
-        --primary-emerald: #50C878;
-        --dark-green: #013220;
-        --light-green: #2E8B57;
-        --bg-light: #F5F3E7;
-    }
-
-    .location-hero {
-        background: linear-gradient(135deg, var(--dark-green) 0%, var(--light-green) 100%);
-        color: white;
-        padding: 60px 0;
-        margin-bottom: 40px;
-        text-align: center;
-    }
-
-    .location-hero h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-        font-weight: 700;
-    }
-
-    .location-hero p {
-        font-size: 1.1rem;
-        opacity: 0.9;
-    }
-
-    .filter-section {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-    }
-
-    .location-card {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-left: 5px solid var(--primary-emerald);
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
-    }
-
-    .location-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 25px rgba(80, 200, 120, 0.2);
-    }
-
-    .location-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #eee;
-    }
-
-    .location-reference {
-        font-weight: 700;
-        font-size: 1.1rem;
-        color: var(--dark-green);
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .status-en_attente {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    .status-confirmee {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .status-annulee {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-
-    .status-terminee {
-        background-color: #d1ecf1;
-        color: #0c5460;
-    }
-
-    .location-details {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        margin-bottom: 15px;
-    }
-
-    .detail-item {
-        padding: 10px;
-        background: #f8f9fa;
-        border-radius: 8px;
-    }
-
-    .detail-label {
-        font-size: 0.85rem;
-        color: #666;
-        text-transform: uppercase;
-        font-weight: 600;
-    }
-
-    .detail-value {
-        font-size: 1.1rem;
-        color: var(--dark-green);
-        font-weight: 600;
-        margin-top: 5px;
-    }
-
-    .location-actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .btn-action {
-        padding: 8px 14px;
-        font-size: 0.85rem;
-        border-radius: 6px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.2s ease;
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-view {
-        background-color: var(--primary-emerald);
-        color: white;
-    }
-
-    .btn-view:hover {
-        background-color: var(--light-green);
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-edit {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-    .btn-edit:hover {
-        background-color: #138496;
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-download {
-        background-color: #6c757d;
-        color: white;
-        font-size: 0.8rem;
-        padding: 6px 10px;
-    }
-
-    .btn-download:hover {
-        background-color: #5a6268;
-        color: white;
-        text-decoration: none;
-    }
-
-    .btn-new-location {
-        background-color: var(--primary-emerald);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 8px;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        border: none;
-        cursor: pointer;
-    }
-
-    .btn-new-location:hover {
-        background-color: var(--light-green);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(80, 200, 120, 0.3);
-        text-decoration: none;
-        color: white;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-        color: #666;
-    }
-
-    .empty-state-icon {
-        font-size: 4rem;
-        color: var(--primary-emerald);
-        margin-bottom: 20px;
-        opacity: 0.5;
-    }
-
-    .pagination {
-        margin-top: 40px;
-        justify-content: center;
-    }
-
-    .pagination .page-link {
-        color: var(--primary-emerald);
-        border-color: var(--primary-emerald);
-    }
-
-    .pagination .page-link:hover {
-        color: white;
-        background-color: var(--primary-emerald);
-        border-color: var(--primary-emerald);
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: var(--primary-emerald);
-        border-color: var(--primary-emerald);
-    }
-
-    .voiture-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 600;
-        color: var(--dark-green);
-    }
-
-    .voiture-icon {
-        font-size: 1.5rem;
-        color: var(--primary-emerald);
-    }
-
-    .dates-section {
-        display: flex;
-        gap: 20px;
-        align-items: center;
-    }
-
-    .date-badge {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .date-label {
-        font-size: 0.75rem;
-        color: #999;
-        text-transform: uppercase;
-        margin-bottom: 3px;
-    }
-
-    .date-value {
-        font-size: 0.95rem;
-        font-weight: 700;
-        color: var(--dark-green);
-    }
-
-    .price-section {
-        background: linear-gradient(135deg, rgba(80, 200, 120, 0.1) 0%, rgba(46, 139, 87, 0.1) 100%);
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-    }
-
-    .price-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary-emerald);
-    }
-
-    .price-label {
-        font-size: 0.85rem;
-        color: #666;
-    }
-</style>
-
-<div class="location-hero">
+<!-- ─── HERO ─── -->
+<div class="gv-loc-hero">
+    <span class="material-symbols-outlined gv-hero-icon-bg">directions_car</span>
     <div class="container">
-        <h1><i class="bi bi-car-front-fill"></i> Mes Locations</h1>
-        <p>Gérez vos locations de voitures</p>
+        <h1 class="gv-hero-title">Mes <em>Locations</em></h1>
+        <p class="gv-hero-sub">Gérez vos locations de véhicules avec élégance. Chaque trajet est une nouvelle aventure.</p>
+        <div class="gv-hero-actions">
+            <a href="{{ path('app_location_new') }}" class="gv-btn-primary">
+                <span class="material-symbols-outlined" style="font-size:1.2rem;">add_circle</span>
+                Nouvelle Location
+            </a>
+        </div>
     </div>
 </div>
 
-<div class="container">
-    <!-- Bouton nouvelle location -->
-    <div style="margin-bottom: 30px;">
-        <a href="{{ path('app_location_new') }}" class="btn-new-location">
-            <i class="bi bi-plus-circle"></i> Nouvelle Location
-        </a>
-    </div>
+<!-- ─── MAIN CONTENT ─── -->
+<div class="gv-loc-container">
 
-    <!-- Section filtre -->
-    <div class="filter-section">
-        <form method="GET" class="row g-3">
-            <div class="col-md-3">
-                <input type="text" name="reference" class="form-control" placeholder="Rechercher par référence" value="{{ searchRef }}">
+    <!-- Filter Bar -->
+    <div class="gv-filter-shell">
+        <form method="GET" class="gv-filter-form">
+            <div>
+                <label class="gv-filter-label">Référence</label>
+                <input type="text" name="reference" class="gv-filter-input" placeholder="Rechercher par référence…" value="{{ searchRef }}">
             </div>
-            <div class="col-md-3">
-                <select name="statut" class="form-select">
+            <div>
+                <label class="gv-filter-label">Statut</label>
+                <select name="statut" class="gv-filter-input">
                     <option value="">Tous les statuts</option>
                     {% for s in statutes %}
                     <option value="{{ s }}" {% if statut == s %}selected{% endif %}>{{ s }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2">
-                <select name="sort" class="form-select">
+            <div>
+                <label class="gv-filter-label">Trier par</label>
+                <select name="sort" class="gv-filter-input">
                     <option value="dateDebut" {% if sortBy == 'dateDebut' %}selected{% endif %}>Date début</option>
                     <option value="montantTotal" {% if sortBy == 'montantTotal' %}selected{% endif %}>Montant</option>
                     <option value="dateCreation" {% if sortBy == 'dateCreation' %}selected{% endif %}>Récente</option>
                 </select>
             </div>
-            <div class="col-md-2">
-                <select name="order" class="form-select">
+            <div>
+                <label class="gv-filter-label">Ordre</label>
+                <select name="order" class="gv-filter-input">
                     <option value="DESC" {% if sortOrder == 'DESC' %}selected{% endif %}>DESC</option>
                     <option value="ASC" {% if sortOrder == 'ASC' %}selected{% endif %}>ASC</option>
                 </select>
             </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+            <div>
+                <button type="submit" class="gv-filter-btn">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">filter_alt</span>
+                    Filtrer
+                </button>
             </div>
         </form>
     </div>
 
-    <!-- Messages de flash -->
+    <!-- Flash Messages -->
     {% for message in app.flashes('success') %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle me-2"></i> {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert alert-success rounded-4 border-0 mb-4" style="background:#eafaf1; color:#005046; border:1px solid #a0f2e1!important; font-weight:600;">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ message }}
     </div>
     {% endfor %}
-
     {% for message in app.flashes('error') %}
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-circle me-2"></i> {{ message }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div class="alert alert-danger rounded-4 border-0 mb-4" style="background:#fef2f2; color:#93000a; border:1px solid rgba(186,26,26,0.15)!important; font-weight:600;">
+        <i class="bi bi-exclamation-circle-fill me-2"></i> {{ message }}
     </div>
     {% endfor %}
 
-    <!-- Liste des locations -->
+    <!-- Location List -->
     {% if locations|length > 0 %}
-    <div style="margin-bottom: 30px;">
-        <p style="color: #666; margin-bottom: 20px;">
-            Affichage <strong>{{ (page - 1) * 10 + 1 }}</strong> à <strong>{{ min(page * 10, total) }}</strong> sur <strong>{{ total }}</strong> locations
-        </p>
+    <p class="gv-results-info">
+        Affichage <strong>{{ (page - 1) * 10 + 1 }}</strong> à <strong>{{ min(page * 10, total) }}</strong> sur <strong>{{ total }}</strong> locations
+    </p>
 
-        {% for location in locations %}
-        <div class="location-card">
-            <div class="location-card-header">
-                <span class="location-reference">{{ location.reference }}</span>
-                <span class="status-badge status-{{ location.statut|lower|replace({'_': ''}) }}">
-                    {{ location.statut }}
-                </span>
+    {% for location in locations %}
+    <div class="gv-loc-card gv-reveal">
+        <div class="gv-loc-card-inner">
+            <div class="gv-loc-card-header">
+                <span class="gv-loc-ref">{{ location.reference }}</span>
+                {% set statusLower = location.statut|lower|replace({'_': '', ' ': ''}) %}
+                {% if statusLower == 'enattente' %}
+                    <span class="gv-badge gv-badge-pending">
+                        <span class="material-symbols-outlined" style="font-size:1rem;">pending</span> {{ location.statut }}
+                    </span>
+                {% elseif statusLower == 'confirmee' or statusLower == 'confirmée' %}
+                    <span class="gv-badge gv-badge-confirmed">
+                        <span class="material-symbols-outlined" style="font-size:1rem;">verified</span> {{ location.statut }}
+                    </span>
+                {% elseif statusLower == 'annulee' or statusLower == 'annulée' %}
+                    <span class="gv-badge gv-badge-canceled">
+                        <span class="material-symbols-outlined" style="font-size:1rem;">cancel</span> {{ location.statut }}
+                    </span>
+                {% elseif statusLower == 'terminee' or statusLower == 'terminée' %}
+                    <span class="gv-badge gv-badge-finished">
+                        <span class="material-symbols-outlined" style="font-size:1rem;">task_alt</span> {{ location.statut }}
+                    </span>
+                {% else %}
+                    <span class="gv-badge gv-badge-finished">{{ location.statut }}</span>
+                {% endif %}
             </div>
 
-            <div class="location-details">
-                <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-car-front-fill"></i> Voiture</div>
-                    <div class="detail-value">{{ location.voiture.marque }} {{ location.voiture.modele }}</div>
-                    <div style="font-size: 0.85rem; color: #999;">{{ location.voiture.matricule }}</div>
+            <div class="gv-loc-details">
+                <div class="gv-detail-item">
+                    <div class="gv-detail-label">
+                        <span class="material-symbols-outlined">directions_car</span> Voiture
+                    </div>
+                    <div class="gv-detail-value">{{ location.voiture.marque }} {{ location.voiture.modele }}</div>
+                    <div class="gv-detail-sub">{{ location.voiture.matricule }}</div>
                 </div>
-
-                <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-calendar-event"></i> Période</div>
-                    <div class="detail-value">{{ location.dateDebut|date('d/m/Y') }} → {{ location.dateFin|date('d/m/Y') }}</div>
-                    <div style="font-size: 0.85rem; color: #999;">{{ location.nbJours }} jour(s)</div>
+                <div class="gv-detail-item">
+                    <div class="gv-detail-label">
+                        <span class="material-symbols-outlined">date_range</span> Période
+                    </div>
+                    <div class="gv-detail-value">{{ location.dateDebut|date('d/m/Y') }} → {{ location.dateFin|date('d/m/Y') }}</div>
+                    <div class="gv-detail-sub">{{ location.nbJours }} jour(s)</div>
                 </div>
-
-                <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-cash-coin"></i> Montant</div>
-                    <div class="detail-value">{{ '%0.2f'|format(location.montantTotal) }} DT</div>
-                    <div style="font-size: 0.85rem; color: #999;">Prix/jour: {{ '%0.2f'|format(location.voiture.prixJour) }} DT</div>
+                <div class="gv-detail-item">
+                    <div class="gv-detail-label">
+                        <span class="material-symbols-outlined">payments</span> Montant
+                    </div>
+                    <div class="gv-detail-value">{{ '%0.2f'|format(location.montantTotal) }} DT</div>
+                    <div class="gv-detail-sub">Prix/jour: {{ '%0.2f'|format(location.voiture.prixJour) }} DT</div>
                 </div>
-
-                <div class="detail-item">
-                    <div class="detail-label"><i class="bi bi-clock-history"></i> Créé le</div>
-                    <div class="detail-value">{{ location.dateCreation|date('d/m/Y') }}</div>
-                    <div style="font-size: 0.85rem; color: #999;">{{ location.dateCreation|date('H:i') }}</div>
+                <div class="gv-detail-item">
+                    <div class="gv-detail-label">
+                        <span class="material-symbols-outlined">schedule</span> Créé le
+                    </div>
+                    <div class="gv-detail-value">{{ location.dateCreation|date('d/m/Y') }}</div>
+                    <div class="gv-detail-sub">{{ location.dateCreation|date('H:i') }}</div>
                 </div>
             </div>
 
-            <div class="location-actions">
-                <a href="{{ path('app_location_show', {id: location.idLocation}) }}" class="btn-action btn-view">
-                    <i class="bi bi-eye"></i> Voir détails
+            <div class="gv-loc-actions">
+                <a href="{{ path('app_location_show', {id: location.idLocation}) }}" class="gv-action-btn gv-action-view">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">visibility</span> Voir détails
                 </a>
                 {% if location.statut == 'EN_ATTENTE' %}
-                <a href="{{ path('app_location_edit', {id: location.idLocation}) }}" class="btn-action btn-edit">
-                    <i class="bi bi-pencil"></i> Modifier
+                <a href="{{ path('app_location_edit', {id: location.idLocation}) }}" class="gv-action-btn gv-action-edit">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">edit</span> Modifier
                 </a>
                 {% endif %}
                 <form method="POST" action="{{ path('app_location_delete', {id: location.idLocation}) }}" style="display: inline;">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ location.idLocation) }}">
-                    <button type="submit" class="btn-action btn-danger" onclick="return confirm('Cette action supprimera définitivement la location. Continuer ?');">
-                        <i class="bi bi-trash"></i> Supprimer
+                    <button type="submit" class="gv-action-btn gv-action-delete" onclick="return confirm('Cette action supprimera définitivement la location. Continuer ?');">
+                        <span class="material-symbols-outlined" style="font-size:1rem;">delete</span> Supprimer
                     </button>
                 </form>
                 {% if location.contratPdf %}
-                <a href="{{ path('app_location_contrat', {id: location.idLocation}) }}" class="btn-action btn-download">
-                    <i class="bi bi-file-pdf"></i> Contrat
+                <a href="{{ path('app_location_contrat', {id: location.idLocation}) }}" class="gv-action-btn gv-action-download">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">description</span> Contrat
                 </a>
                 {% endif %}
-                <a href="{{ path('app_location_pdf', {id: location.idLocation}) }}" class="btn-action btn-download">
-                    <i class="bi bi-file-earmark-pdf"></i> Détails PDF
+                <a href="{{ path('app_location_pdf', {id: location.idLocation}) }}" class="gv-action-btn gv-action-download">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">picture_as_pdf</span> PDF
                 </a>
-                <a href="{{ path('app_location_excel', {id: location.idLocation}) }}" class="btn-action btn-download">
-                    <i class="bi bi-file-earmark-spreadsheet"></i> Détails Excel
+                <a href="{{ path('app_location_excel', {id: location.idLocation}) }}" class="gv-action-btn gv-action-download">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">table_chart</span> Excel
                 </a>
             </div>
         </div>
-        {% endfor %}
     </div>
+    {% endfor %}
 
     <!-- Pagination -->
     {% if totalPages > 1 %}
-    <nav>
-        <ul class="pagination">
-            {% if page > 1 %}
-            <li class="page-item">
-                <a class="page-link" href="{{ path('app_location_index', {page: 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Première</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="{{ path('app_location_index', {page: page - 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Précédente</a>
-            </li>
-            {% endif %}
-
-            {% for p in range(max(1, page - 2), min(totalPages, page + 2)) %}
-            <li class="page-item {% if p == page %}active{% endif %}">
-                <a class="page-link" href="{{ path('app_location_index', {page: p, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">{{ p }}</a>
-            </li>
-            {% endfor %}
-
-            {% if page < totalPages %}
-            <li class="page-item">
-                <a class="page-link" href="{{ path('app_location_index', {page: page + 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Suivante</a>
-            </li>
-            <li class="page-item">
-                <a class="page-link" href="{{ path('app_location_index', {page: totalPages, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Dernière</a>
-            </li>
-            {% endif %}
-        </ul>
+    <nav class="gv-pagination">
+        {% if page > 1 %}
+            <a class="gv-page-btn" href="{{ path('app_location_index', {page: 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Première</a>
+            <a class="gv-page-btn" href="{{ path('app_location_index', {page: page - 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">‹</a>
+        {% endif %}
+        {% for p in range(max(1, page - 2), min(totalPages, page + 2)) %}
+            <a class="gv-page-btn {% if p == page %}active{% endif %}" href="{{ path('app_location_index', {page: p, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">{{ p }}</a>
+        {% endfor %}
+        {% if page < totalPages %}
+            <a class="gv-page-btn" href="{{ path('app_location_index', {page: page + 1, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">›</a>
+            <a class="gv-page-btn" href="{{ path('app_location_index', {page: totalPages, reference: searchRef, statut: statut, sort: sortBy, order: sortOrder}) }}">Dernière</a>
+        {% endif %}
     </nav>
     {% endif %}
 
     <!-- Export -->
-    <div style="margin-top: 30px; text-align: center;">
-        <a href="{{ path('app_location_stats_export') }}" class="btn btn-outline-primary">
-            <i class="bi bi-download"></i> Exporter en Excel
+    <div class="gv-export-bar">
+        <a href="{{ path('app_location_stats_export') }}" class="gv-btn-primary" style="background: linear-gradient(135deg, #00342d 0%, #004d43 70%, #046b5e 100%); color: #fff; box-shadow: 0 10px 25px -5px rgba(0, 52, 45, 0.4);">
+            <span class="material-symbols-outlined" style="font-size:1.2rem;">download</span>
+            Exporter en Excel
         </a>
     </div>
 
     {% else %}
-    <div class="empty-state">
-        <div class="empty-state-icon"><i class="bi bi-car-front-fill"></i></div>
-        <h3>Aucune location</h3>
-        <p>Vous n'avez pas encore effectué de location.</p>
-        <a href="{{ path('app_location_new') }}" class="btn-new-location" style="margin-top: 20px;">
-            <i class="bi bi-plus-circle"></i> Créer une nouvelle location
+    <div class="gv-empty">
+        <span class="material-symbols-outlined gv-empty-icon">directions_car</span>
+        <h4>Aucune location enregistrée</h4>
+        <p>Vous n'avez pas encore effectué de location. Commencez votre première aventure.</p>
+        <a href="{{ path('app_location_new') }}" class="gv-btn-primary">
+            <span class="material-symbols-outlined" style="font-size:1.2rem;">add_circle</span>
+            Créer une nouvelle location
         </a>
     </div>
     {% endif %}
 </div>
+{% endblock %}
 
+{% block javascripts %}
+{{ parent() }}
 <script>
-    // Animation du nombre de jours en temps réel
-    document.addEventListener('DOMContentLoaded', function() {
-        // Code pour interactivité supplémentaire si nécessaire
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    var reveals = document.querySelectorAll('.gv-reveal');
+    if (reveals.length) {
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+        reveals.forEach(function(el, i) {
+            el.style.transitionDelay = (i * 80) + 'ms';
+            observer.observe(el);
+        });
+    }
+});
 </script>
 {% endblock %}

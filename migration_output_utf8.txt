@@ -1,0 +1,78 @@
+﻿[notice] Migrating up to DoctrineMigrations\Version20260405122004
+symfony : [error] 
+Migration DoctrineMigrati
+ons\Version20260323204000
+ failed during 
+Execution. Error: "An 
+exception occurred while 
+executing a query: 
+SQLSTATE[42S01]: Base 
+table or view already 
+exists: 1050 La table 
+'activite' existe d├®j├á"
+Au caractère Ligne:1 : 1
++ symfony console doctrin
+e:migrations:migrate 
+--no-interaction > 
+migrat ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo       
+   : NotSpecified: 
+([error] Mig    rati... 
+existe d├®j├á":String) 
+[], RemoteException
+    + 
+FullyQualifiedErrorId : 
+NativeCommandError
+ 
+
+In 
+ExceptionConverter.php 
+line 49:
+                         
+  An exception occurred  
+   while executing a qu  
+  ery: SQLSTATE[42S01]:  
+   Base table or view a  
+  lready exists: 1050 L  
+  a table 'activite' ex  
+  iste d├®j├á            
+  
+                         
+
+In Exception.php line 24:
+                         
+  SQLSTATE[42S01]: Base  
+   table or view alread  
+  y exists: 1050 La tab  
+  le 'activite' existe   
+  d├®j├á                 
+  
+                         
+
+In Connection.php line 
+57:
+                         
+  SQLSTATE[42S01]: Base  
+   table or view alread  
+  y exists: 1050 La tab  
+  le 'activite' existe   
+  d├®j├á                 
+  
+                         
+
+doctrine:migrations:migra
+te [--write-sql 
+[WRITE-SQL]] [--dry-run] 
+[--query-time] 
+[--allow-no-migration] 
+[--all-or-nothing 
+[ALL-OR-NOTHING]] 
+[--no-all-or-nothing] 
+[--configuration 
+CONFIGURATION] [--em EM] 
+[--conn CONN] [--] 
+[<version>]
+

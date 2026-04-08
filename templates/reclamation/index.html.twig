@@ -1,288 +1,338 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Réclamations - GoVibe{% endblock %}
+{% block title %}Mes Réclamations — GoVibe | Service Client{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --glass-bg: rgba(255, 255, 255, 0.05);
-        --glass-border: rgba(255, 255, 255, 0.1);
-        --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        --emerald-glow: rgba(16, 185, 129, 0.4);
-    }
+/* ═══════════════════════════════════════════════════
+   GoVibe Reclamations — Ultra Premium Design
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
 
-    body {
-        background-color: #050505;
-        background-image: 
-            radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.15), transparent 25%),
-            radial-gradient(circle at 85% 30%, rgba(6, 78, 59, 0.2), transparent 25%);
-        color: #f3f4f6;
-        font-family: 'Inter', sans-serif;
-    }
+body {
+    font-family: 'Manrope', sans-serif !important;
+    background: #fcf9f8 !important;
+    color: #1c1b1b !important;
+    overflow-x: hidden !important;
+}
 
-    /* Hero header for reclamations */
-    .reclamation-hero {
-        position: relative;
-        padding: 150px 0 80px;
-        text-align: center;
-        overflow: hidden;
-    }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
 
-    .reclamation-hero::before {
-        content: '';
-        position: absolute;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(180deg, rgba(6, 78, 59, 0.8) 0%, #050505 100%);
-        z-index: -2;
-    }
+/* ─── Hero Section ─── */
+.gv-rec-hero {
+    position: relative;
+    padding: 180px 0 120px;
+    background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+    overflow: hidden;
+    text-align: center;
+    border-radius: 0 0 3rem 3rem;
+    box-shadow: 0 20px 50px rgba(0, 52, 45, 0.15);
+}
 
-    .hero-title {
-        font-size: 4rem;
-        font-weight: 900;
-        background: linear-gradient(to right, #ffffff, #A7F3D0);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 20px;
-        letter-spacing: -1px;
-    }
+.gv-rec-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(233, 193, 118, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
 
-    .hero-subtitle {
-        font-size: 1.2rem;
-        color: #9CA3AF;
-        max-width: 600px;
-        margin: 0 auto;
-    }
+.gv-rec-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(160, 242, 225, 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+}
 
-    /* Dashboard Glass Container */
-    .dashboard-glass {
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-        box-shadow: var(--glass-shadow);
-        padding: 40px;
-        margin-top: -40px;
-        position: relative;
-        z-index: 10;
-        margin-bottom: 100px;
-        transition: transform 0.4s ease, box-shadow 0.4s ease;
-    }
+.gv-hero-icon-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22rem;
+    color: rgba(255, 255, 255, 0.02);
+    z-index: 0;
+    pointer-events: none;
+    font-variation-settings: 'FILL' 1;
+}
 
-    .dashboard-glass:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 45px rgba(16, 185, 129, 0.15);
-        border-color: rgba(16, 185, 129, 0.3);
-    }
+.gv-hero-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease both;
+}
+.gv-hero-title em { color: #a0f2e1; font-style: italic; font-weight: 300; }
 
-    /* New Reclamation Button */
-    .btn-cyber {
-        background: linear-gradient(135deg, #10B981, #064E3B);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        padding: 12px 30px;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-        box-shadow: 0 10px 20px var(--emerald-glow);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-    }
+.gv-hero-sub {
+    color: rgba(160, 242, 225, 0.7);
+    font-size: 1.15rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease 0.2s both;
+}
 
-    .btn-cyber:hover {
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.6);
-        color: white;
-    }
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-    /* Glass Table */
-    .glass-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 15px;
-        margin-top: 20px;
-    }
+/* ─── Main Content Container ─── */
+.gv-rec-container {
+    max-width: 1200px;
+    margin: -50px auto 80px;
+    position: relative;
+    z-index: 10;
+    padding: 0 2rem;
+}
 
-    .glass-table th {
-        color: #9CA3AF;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        letter-spacing: 1px;
-        padding: 0 20px 10px;
-        border: none;
-    }
+/* ─── Header Action ─── */
+.gv-rec-header-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2.5rem;
+}
 
-    .glass-table td {
-        background: rgba(255, 255, 255, 0.03);
-        padding: 20px;
-        vertical-align: middle;
-        color: #E5E7EB;
-        transition: all 0.3s ease;
-        border-top: 1px solid rgba(255,255,255,0.05);
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
+.gv-btn-primary {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #e9c176 0%, #ca9028 100%);
+    color: #3d2a00;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px -5px rgba(233, 193, 118, 0.4);
+    font-family: 'Manrope', sans-serif;
+}
+.gv-btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 15px 35px -5px rgba(233, 193, 118, 0.5);
+    color: #3d2a00;
+}
 
-    .glass-table tr td:first-child {
-        border-radius: 16px 0 0 16px;
-        border-left: 1px solid rgba(255,255,255,0.05);
-    }
+/* ─── Reclamation List ─── */
+.gv-rec-list {
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    border: 1px solid rgba(0, 52, 45, 0.05);
+}
 
-    .glass-table tr td:last-child {
-        border-radius: 0 16px 16px 0;
-        border-right: 1px solid rgba(255,255,255,0.05);
-    }
+.gv-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-    .glass-table tbody tr {
-        transition: all 0.3s ease;
-    }
+.gv-table th {
+    background: #f8f7f5;
+    color: #3c494f;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    padding: 1.25rem 2rem;
+    border-bottom: 2px solid rgba(0, 52, 45, 0.04);
+    text-align: left;
+}
+.gv-table th.center { text-align: center; }
 
-    .glass-table tbody tr:hover td {
-        background: rgba(16, 185, 129, 0.08);
-        border-color: rgba(16, 185, 129, 0.3);
-        transform: scale(1.01);
-    }
+.gv-table td {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(0, 52, 45, 0.04);
+    vertical-align: middle;
+    transition: background 0.3s;
+}
 
-    /* Status Badges - Cyberpunk style */
-    .cyber-badge {
-        padding: 8px 16px;
-        border-radius: 50px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
+.gv-table tbody tr:hover td {
+    background: rgba(160, 242, 225, 0.04);
+}
 
-    .status-en-attente { 
-        background: rgba(245, 158, 11, 0.1); 
-        color: #FCD34D; 
-        border: 1px solid #F59E0B;
-        box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
-    }
-    
-    .status-traitee { 
-        background: rgba(16, 185, 129, 0.1); 
-        color: #6EE7B7; 
-        border: 1px solid #10B981;
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
-    }
-    
-    .status-refusee { 
-        background: rgba(239, 68, 68, 0.1); 
-        color: #FCA5A5; 
-        border: 1px solid #EF4444;
-        box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
-    }
+/* Data styling */
+.rec-date {
+    font-weight: 800;
+    color: #00342d;
+    font-size: 1.05rem;
+    line-height: 1.2;
+}
+.rec-time {
+    color: #707975;
+    font-size: 0.78rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-top: 0.3rem;
+}
 
-    /* Custom Scrollbar for table */
-    .table-responsive::-webkit-scrollbar {
-        height: 6px;
-    }
-    .table-responsive::-webkit-scrollbar-track {
-        background: rgba(255,255,255,0.05);
-        border-radius: 10px;
-    }
-    .table-responsive::-webkit-scrollbar-thumb {
-        background: rgba(16, 185, 129, 0.5);
-        border-radius: 10px;
-    }
+.rec-subject {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1c1b1b;
+    margin-bottom: 0.25rem;
+}
+.rec-desc {
+    color: #546067;
+    font-size: 0.88rem;
+    max-width: 450px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-    /* Empty State */
-    .empty-cyber {
-        text-align: center;
-        padding: 60px 20px;
-        background: rgba(255,255,255,0.02);
-        border-radius: 20px;
-        border: 1px dashed rgba(255,255,255,0.05);
-    }
+/* Status Badges */
+.gv-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    justify-content: center;
+    min-width: 120px;
+}
+.gv-badge-pending {
+    background: rgba(233, 193, 118, 0.15);
+    color: #92400e;
+    border: 1px solid rgba(233, 193, 118, 0.3);
+}
+.gv-badge-resolved {
+    background: rgba(16, 185, 129, 0.1);
+    color: #005046;
+    border: 1px solid rgba(160, 242, 225, 0.5);
+}
+.gv-badge-rejected {
+    background: rgba(186, 26, 26, 0.08);
+    color: #93000a;
+    border: 1px solid rgba(186, 26, 26, 0.15);
+}
 
-    .empty-cyber i {
-        font-size: 5rem;
-        background: linear-gradient(135deg, #10B981, #3B82F6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 20px;
-        display: inline-block;
-        animation: floatImg 4s ease-in-out infinite;
-    }
-    
-    @keyframes floatImg {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-    }
+/* ─── Empty State ─── */
+.gv-empty {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+}
+.gv-empty-icon {
+    font-size: 4rem;
+    color: #cde1db;
+    margin-bottom: 1.5rem;
+    font-variation-settings: 'FILL' 1;
+}
+.gv-empty h4 {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.5rem;
+    color: #00342d;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.gv-empty p {
+    color: #546067;
+    margin-bottom: 2rem;
+}
+
+/* ─── Reveal ─── */
+.gv-reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gv-reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+/* ─── Responsive table ─── */
+@media (max-width: 768px) {
+    .gv-table th, .gv-table td { padding: 1rem; }
+    .gv-table th:first-child, .gv-table td:first-child { display: none; }
+}
 </style>
 {% endblock %}
 
 {% block body %}
-    <!-- Hero Section -->
-    <div class="reclamation-hero">
-        <div class="container" data-aos="zoom-in" data-aos-duration="1000">
-            <h1 class="hero-title">Centre de Commande</h1>
-            <p class="hero-subtitle">Visualisez, suivez et gérez l'ensemble de vos requêtes avec transparence et fluidité dans notre écosystème Next-Gen.</p>
-        </div>
+<!-- ─── HERO ─── -->
+<div class="gv-rec-hero">
+    <span class="material-symbols-outlined gv-hero-icon-bg">support_agent</span>
+    <div class="container">
+        <h1 class="gv-hero-title">Vos <em>Réclamations</em></h1>
+        <p class="gv-hero-sub">Consultez l'état de vos requêtes. Notre équipe veille à l'excellence de votre odyssée à chaque instant.</p>
+    </div>
+</div>
+
+<!-- ─── MAIN CONTENT ─── -->
+<div class="gv-rec-container">
+    
+    <!-- Header Action -->
+    <div class="gv-rec-header-box gv-reveal">
+        <a href="{{ path('app_reclamation_new') }}" class="gv-btn-primary">
+            <span class="material-symbols-outlined" style="font-size:1.2rem;">add_circle</span>
+            Soumettre une réclamation
+        </a>
     </div>
 
-    <!-- Main Dashboard -->
-    <div class="container">
-        <div class="dashboard-glass" data-aos="fade-up" data-aos-delay="200" data-aos-duration="1000">
-            
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5">
-                <div>
-                    <h3 style="font-weight: 800; color: white; margin:0; letter-spacing: -0.5px;">Historique des Requêtes</h3>
-                    <p class="text-muted small mt-1 mb-0">Toutes vos interactions sécurisées au même endroit.</p>
-                </div>
-                <div class="mt-4 mt-md-0">
-                    <a href="{{ path('app_reclamation_new') }}" class="btn-cyber">
-                        <i class="bi bi-rocket-takeoff-fill"></i> Nouvelle Requête
-                    </a>
-                </div>
-            </div>
-            
-            {% for message in app.flashes('success') %}
-                <div class="alert alert-success border-0 rounded-4 mb-4" style="background: rgba(16, 185, 129, 0.2); color: #A7F3D0; border: 1px solid #10B981;" data-aos="fade-in">
-                    <i class="bi bi-check-circle-fill me-2"></i> {{ message }}
-                </div>
-            {% endfor %}
+    <!-- Alert Messages -->
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success border-0 rounded-4 mb-4 gv-reveal" style="background:#eafaf1; color:#005046; border:1px solid #a0f2e1!important; font-weight:600;">
+            <i class="bi bi-check-circle-fill me-2"></i> {{ message }}
+        </div>
+    {% endfor %}
 
-            {% if reclamations|length > 0 %}
+    <!-- Reclamations List -->
+    {% if reclamations|length > 0 %}
+        <div class="gv-rec-list gv-reveal">
             <div class="table-responsive">
-                <table class="glass-table">
+                <table class="gv-table">
                     <thead>
                         <tr>
                             <th>Chronologie</th>
-                            <th>Objet de la Requête</th>
-                            <th class="text-center">État du Traitement</th>
+                            <th>Objet & Détails de la Requête</th>
+                            <th class="center">Statut Actuel</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for rec in reclamations %}
-                        <tr data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                        <tr>
                             <td style="width: 20%;">
-                                <div style="color: #10B981; font-weight: 700; font-size: 1.1rem;">{{ rec.dateEnvoi ? rec.dateEnvoi|date('d M Y') : '' }}</div>
-                                <div class="text-muted small"><i class="bi bi-clock"></i> {{ rec.dateEnvoi ? rec.dateEnvoi|date('H:i') : '' }}</div>
+                                <div class="rec-date">{{ rec.dateEnvoi ? rec.dateEnvoi|date('d M Y') : '' }}</div>
+                                <div class="rec-time">
+                                    <span class="material-symbols-outlined" style="font-size:0.9rem;">schedule</span>
+                                    {{ rec.dateEnvoi ? rec.dateEnvoi|date('H:i') : '' }}
+                                </div>
                             </td>
                             <td style="width: 55%;">
-                                <div class="fw-bold mb-1" style="color: white; font-size: 1.1rem;">{{ rec.sujet }}</div>
-                                <div class="text-muted small text-truncate" style="max-width: 400px; line-height: 1.5;">{{ rec.message }}</div>
+                                <div class="rec-subject">{{ rec.sujet }}</div>
+                                <div class="rec-desc">{{ rec.message }}</div>
                             </td>
-                            <td class="text-center" style="width: 25%;">
+                            <td class="center" style="width: 25%;">
                                 {% if rec.status|lower == 'en attente' or rec.status|lower == 'en_attente' %}
-                                    <span class="cyber-badge status-en-attente">
-                                        <i class="bi bi-hourglass-split me-1"></i> En Attente
+                                    <span class="gv-badge gv-badge-pending">
+                                        <span class="material-symbols-outlined" style="font-size:1rem;">pending</span> En Attente
                                     </span>
                                 {% elseif rec.status|lower == 'traitee' or rec.status|lower == 'traitée' %}
-                                    <span class="cyber-badge status-traitee">
-                                        <i class="bi bi-check2-all me-1"></i> Traitée
+                                    <span class="gv-badge gv-badge-resolved">
+                                        <span class="material-symbols-outlined" style="font-size:1rem;">verified</span> Traitée
                                     </span>
                                 {% else %}
-                                    <span class="cyber-badge status-refusee">
-                                        <i class="bi bi-x-octagon me-1"></i> {{ rec.status }}
+                                    <span class="gv-badge gv-badge-rejected">
+                                        <span class="material-symbols-outlined" style="font-size:1rem;">cancel</span> {{ rec.status }}
                                     </span>
                                 {% endif %}
                             </td>
@@ -291,27 +341,42 @@
                     </tbody>
                 </table>
             </div>
-            {% else %}
-                <div class="empty-cyber" data-aos="zoom-in" data-aos-delay="300">
-                    <i class="bi bi-box-seam"></i>
-                    <h4 style="color: white; font-weight: 700;">Aucune anomalie détectée</h4>
-                    <p class="text-muted">Votre historique de requêtes est actuellement vierge.</p>
-                    <a href="{{ path('app_reclamation_new') }}" class="btn-cyber mt-3">Initier une requête</a>
-                </div>
-            {% endif %}
         </div>
-    </div>
+    {% else %}
+        <div class="gv-empty gv-reveal">
+            <span class="material-symbols-outlined gv-empty-icon">task_alt</span>
+            <h4>Aucune requête enregistrée</h4>
+            <p>Votre historique est vierge. Tout semble se dérouler à la perfection.</p>
+            <a href="{{ path('app_reclamation_new') }}" class="gv-btn-primary" style="margin-top: 1rem;">
+                <span class="material-symbols-outlined" style="font-size:1.2rem;">add_circle</span>
+                Contacter le Concierge
+            </a>
+        </div>
+    {% endif %}
+
+</div>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        AOS.init({
-            once: true,
-            offset: 50
+document.addEventListener('DOMContentLoaded', function() {
+    var reveals = document.querySelectorAll('.gv-reveal');
+    if (reveals.length) {
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+        reveals.forEach(function(el, i) {
+            el.style.transitionDelay = (i * 100) + 'ms';
+            observer.observe(el);
         });
-    });
+    }
+});
 </script>
 {% endblock %}

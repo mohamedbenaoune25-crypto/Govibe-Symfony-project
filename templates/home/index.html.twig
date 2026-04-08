@@ -1,768 +1,1209 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - GoVibe{% endblock %}
+{% block title %}GoVibe | Curated Odyssey — Voyages Premium{% endblock %}
 
 {% block stylesheets %}
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --primary-emerald: #10B981;
-        --dark-green: #064E3B;
-        --light-green: #D1FAE5;
-        --bg-creme: #F9FAFB;
-        --btn-hover: #059669;
-        --text-color: #1F2937;
-        --glass-bg: rgba(255, 255, 255, 0.15);
-        --glass-border: rgba(255, 255, 255, 0.2);
-        --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    }
-    
-    body {
-        background: linear-gradient(rgba(5, 35, 24, 0.50), rgba(5, 35, 24, 0.40)), url('{{ asset('images/home-hero5.png') }}') center/cover fixed no-repeat;
-        font-family: 'Inter', sans-serif;
-        color: var(--text-color);
-        overflow-x: hidden;
-    }
+/* ═══════════════════════════════════════════════════
+   GoVibe Homepage — Ultra Premium Futuristic Design
+   €20,000 level enterprise travel experience
+═══════════════════════════════════════════════════ */
 
-    /* Hero Section with Parallax & Glassmorphism */
-    .hero-section {
-        position: relative;
-        height: 100vh;
-        min-height: 700px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        background: radial-gradient(circle at top left, #064E3B 0%, #111827 50%, #000000 100%);
-    }
-    
-    .hero-bg {
-        display: none;
-    }
+/* ─── Reset & Base ─── */
+*, *::before, *::after { box-sizing: border-box; }
 
-    .hero-overlay {
-        position: absolute;
-        inset: 0;
-        background: transparent;
-        z-index: -1;
-    }
+body {
+    font-family: 'Manrope', sans-serif !important;
+    background: #fcf9f8 !important;
+    color: #1c1b1b !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding-top: 0 !important;
+}
 
-    /* Animated Cyber Grid Background */
-    .cyber-grid {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 200%;
-        height: 200%;
-        background-size: 50px 50px;
-        background-image: 
-            linear-gradient(to right, rgba(16, 185, 129, 0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
-        transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
-        animation: gridMove 20s linear infinite;
-        z-index: 0;
-    }
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}
 
-    @keyframes gridMove {
-        0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
-        100% { transform: perspective(500px) rotateX(60deg) translateY(50px) translateZ(-200px); }
-    }
+/* ─── Custom scrollbar ─── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 52, 45, 0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 52, 45, 0.4); }
 
-    /* Glowing Orbs */
-    .glow-orb {
-        position: absolute;
-        border-radius: 50%;
-        filter: blur(80px);
-        opacity: 0.5;
-        z-index: 0;
-        animation: orbFloat 10s infinite alternate;
-    }
-    .orb-1 { width: 400px; height: 400px; background: #10B981; top: 10%; left: 10%; }
-    .orb-2 { width: 300px; height: 300px; background: #064E3B; bottom: 20%; right: 10%; animation-delay: -5s; }
+/* ─── SCROLL-DRIVEN VIDEO HERO ─── */
+.gv-hero {
+    position: relative;
+    height: 300vh; /* 3x viewport to give long scroll room for the video */
+    overflow: visible;
+}
 
-    @keyframes orbFloat {
-        0% { transform: translate(0, 0) scale(1); }
-        100% { transform: translate(50px, 50px) scale(1.1); }
-    }
+.gv-hero-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    min-height: 600px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    .hero-content {
-        text-align: left;
-        z-index: 1;
-        color: white;
-        padding: 0 40px;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        max-width: 1400px;
-    }
+/* Canvas fills the entire sticky container */
+.gv-hero-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+.gv-hero-canvas canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
 
-    .hero-text-side {
-        max-width: 600px;
-    }
+/* Dark gradient overlay on top of the canvas */
+.gv-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 52, 45, 0.55) 0%,
+        rgba(0, 52, 45, 0.25) 25%,
+        rgba(0, 0, 0, 0.10) 50%,
+        rgba(252, 249, 248, 0.6) 85%,
+        rgba(252, 249, 248, 1) 100%
+    );
+    pointer-events: none;
+}
 
-    .hero-logo {
-        width: 120px;
-        margin-bottom: 20px;
-        animation: floatImg 6s ease-in-out infinite;
-        filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-    }
+/* Scroll progress bar at the bottom of hero */
+.gv-hero-progress {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #e9c176, #a0f2e1);
+    z-index: 20;
+    width: 0%;
+    transition: width 0.05s linear;
+}
 
-    @keyframes floatImg {
-        0% { transform: translateY(0px); }
-        50% { transform: translateY(-10px); }
-        100% { transform: translateY(0px); }
-    }
+/* ─── Hero text content ─── */
+.gv-hero-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 1200px;
+    padding: 0 2rem 5rem;
+    text-align: center;
+    will-change: transform, opacity;
+    align-self: flex-end;
+}
 
-    .hero-title {
-        font-size: 5.5rem;
-        font-weight: 900;
-        line-height: 1.1;
-        margin-bottom: 20px;
-        background: linear-gradient(to right, #ffffff, #A7F3D0);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        letter-spacing: -2px;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.4rem;
-        font-weight: 300;
-        margin-bottom: 40px;
-        color: #D1FAE5;
-        line-height: 1.6;
-    }
+.gv-hero-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    color: #fff;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: heroTextIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+}
+.gv-hero-title em {
+    font-style: italic;
+    font-weight: 300;
+    color: #e9c176;
+}
 
-    /* 3D Floating Elements */
-    .hero-visual-side {
-        position: relative;
-        width: 500px;
-        height: 500px;
-        perspective: 1000px;
-    }
+.gv-hero-sub {
+    font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+    max-width: 620px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroTextIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
+}
 
-    .glass-card-3d {
-        position: absolute;
-        width: 300px;
-        height: 400px;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 30px;
-        padding: 30px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        animation: float3D 8s ease-in-out infinite;
-    }
+@keyframes heroTextIn {
+    to { opacity: 1; transform: translateY(0); }
+}
 
-    .card-1 { right: 0; top: 50px; z-index: 2; transform: rotateY(-15deg) rotateX(10deg); }
-    .card-2 { left: 0; bottom: 0; z-index: 1; transform: rotateY(15deg) rotateX(-10deg); animation-delay: -4s; background: rgba(16, 185, 129, 0.1); }
+/* ─── Glass Search Bar ─── */
+.gv-search-glass {
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.5rem;
+    padding: 0.75rem;
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: heroTextIn 1s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+    max-width: 900px;
+    margin: 0 auto;
+}
 
-    .glass-card-img {
-        width: 100%;
-        height: 180px;
-        border-radius: 15px;
-        background: rgba(255,255,255,0.1);
-        margin-bottom: 20px;
-        overflow: hidden;
-    }
+.gv-search-inner {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 1rem;
+    padding: 0.5rem 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 0;
+    align-items: center;
+}
+@media (max-width: 768px) {
+    .gv-search-inner { grid-template-columns: 1fr; gap: 0.5rem; }
+}
 
-    .glass-card-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: 0.8;
-    }
+.gv-search-field {
+    padding: 0.75rem 1.25rem;
+    border-right: 1px solid rgba(191, 201, 196, 0.2);
+}
+.gv-search-field:last-of-type { border-right: none; }
+@media (max-width: 768px) { .gv-search-field { border-right: none; border-bottom: 1px solid rgba(191, 201, 196, 0.2); } }
 
-    .glass-card-title {
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: white;
-        margin-bottom: 10px;
-    }
+.gv-search-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #546067;
+    margin-bottom: 0.2rem;
+    display: block;
+}
+.gv-search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1c1b1b;
+    font-family: 'Manrope', sans-serif;
+}
+.gv-search-input::placeholder { color: #bfc9c4; }
 
-    .glass-card-pill {
-        display: inline-block;
-        padding: 5px 15px;
-        background: rgba(16, 185, 129, 0.2);
-        color: #10B981;
-        border-radius: 50px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-bottom: 10px;
-    }
+.gv-search-btn {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #00342d 0%, #004d43 70%, #046b5e 100%);
+    color: #fff;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px -6px rgba(0, 52, 45, 0.4);
+    white-space: nowrap;
+}
+.gv-search-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 30px -6px rgba(0, 52, 45, 0.5);
+}
 
-    @keyframes float3D {
-        0% { transform: translateY(0px) rotateY(-15deg) rotateX(10deg); }
-        50% { transform: translateY(-20px) rotateY(-5deg) rotateX(5deg); }
-        100% { transform: translateY(0px) rotateY(-15deg) rotateX(10deg); }
-    }
+/* ─── SCROLL INDICATOR ─── */
+.gv-scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255,255,255,0.7);
+    animation: bounceScroll 2s ease-in-out infinite;
+}
+.gv-scroll-indicator span { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; }
+.gv-scroll-indicator .material-symbols-outlined { font-size: 1.5rem; }
+@keyframes bounceScroll {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+}
 
-    /* Floating Particles in Hero */
-    .particle {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 50%;
-        animation: floatUp 15s infinite linear;
-        pointer-events: none;
-        z-index: 0;
-    }
+/* ═══ SECTION SHARED STYLES ═══ */
+.gv-section {
+    padding: 6rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
 
-    @keyframes floatUp {
-        0% { transform: translateY(100vh) scale(0); opacity: 0; }
-        50% { opacity: 1; }
-        100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
-    }
+.gv-section-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+    gap: 1.5rem;
+}
 
-    /* Search Bar - Glassmorphism */
-    .search-bar-wrapper {
-        position: relative;
-        margin-top: -80px;
-        z-index: 10;
-        padding: 0 20px;
-    }
+.gv-section-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    color: #00342d;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+.gv-section-desc {
+    color: #546067;
+    font-size: 1.1rem;
+    max-width: 500px;
+    line-height: 1.6;
+}
 
-    .search-bar-container {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        border-radius: 24px;
-        padding: 15px;
-        display: flex;
-        gap: 15px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-        align-items: center;
-        max-width: 1000px;
-        margin: 0 auto;
-        flex-wrap: wrap;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
+.gv-view-all {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: #3d2a00;
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 2px;
+    transition: all 0.2s ease;
+}
+.gv-view-all:hover { border-color: #3d2a00; color: #3d2a00; }
 
-    .search-bar-container:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
-    }
-    
-    .search-input-group {
-        flex: 1;
-        min-width: 200px;
-        display: flex;
-        align-items: center;
-        background: white;
-        padding: 12px 20px;
-        border-radius: 16px;
-        border: 1px solid rgba(0,0,0,0.05);
-        transition: all 0.3s ease;
-    }
+/* ═══ DESTINATIONS SECTION ═══ */
+.gv-dest-grid {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    gap: 2rem;
+}
+@media (max-width: 768px) { .gv-dest-grid { grid-template-columns: 1fr; } }
 
-    .search-input-group:focus-within {
-        border-color: var(--primary-emerald);
-        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-    }
-    
-    .search-input-group i {
-        font-size: 24px;
-        color: var(--primary-emerald);
-        margin-right: 15px;
-    }
-    
-    .search-input-group label {
-        display: block;
-        font-size: 12px;
-        text-transform: uppercase;
-        color: #6B7280;
-        font-weight: 700;
-        margin-bottom: 2px;
-        letter-spacing: 0.5px;
-    }
-    
-    .search-input-group input {
-        border: none;
-        outline: none;
-        width: 100%;
-        color: var(--dark-green);
-        font-size: 15px;
-        font-weight: 500;
-        background: transparent;
-    }
-    
-    .btn-search {
-        background: linear-gradient(135deg, var(--primary-emerald), var(--dark-green));
-        color: white;
-        border: none;
-        padding: 0 35px;
-        height: 60px;
-        border-radius: 16px;
-        font-weight: 600;
-        font-size: 16px;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-    
-    .btn-search:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 25px rgba(16, 185, 129, 0.4);
-    }
+.gv-dest-feature {
+    position: relative;
+    border-radius: 2.5rem 0.5rem 2.5rem 0.5rem;
+    overflow: hidden;
+    height: 500px;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.08);
+}
+.gv-dest-feature:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 30px 80px -15px rgba(0, 0, 0, 0.15);
+}
+.gv-dest-feature img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gv-dest-feature:hover img { transform: scale(1.08); }
 
-    /* Stats Section */
-    .stats-bar {
-        padding: 60px 0;
-        background: linear-gradient(180deg, var(--bg-creme) 0%, white 100%);
-        margin-top: 40px;
-    }
-    
-    .stat-item {
-        padding: 20px;
-        transition: transform 0.3s;
-    }
+.gv-dest-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 52, 45, 0.85) 100%);
+}
 
-    .stat-item:hover {
-        transform: translateY(-10px);
-    }
-    
-    .stat-number {
-        font-size: 3.5rem;
-        font-weight: 800;
-        color: var(--dark-green);
-        line-height: 1;
-        margin-bottom: 10px;
-        background: linear-gradient(135deg, var(--dark-green), var(--primary-emerald));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    
-    .stat-label {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #6B7280;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+.gv-dest-badge {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+.gv-dest-badge .material-symbols-outlined {
+    color: #e9c176;
+    font-size: 1rem;
+    font-variation-settings: 'FILL' 1;
+}
 
-    /* Categories Section */
-    .section-title {
-        font-size: 3rem;
-        font-weight: 800;
-        color: var(--dark-green);
-        text-align: center;
-        margin-bottom: 50px;
-        position: relative;
-    }
+.gv-dest-info {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 2.5rem;
+    color: #fff;
+}
+.gv-dest-info .gv-dest-region {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.gv-dest-info h3 {
+    font-family: 'Noto Serif', serif;
+    font-size: 2.25rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+.gv-dest-info p {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    max-width: 300px;
+    line-height: 1.5;
+}
 
-    .section-title::after {
-        content: '';
-        position: absolute;
-        bottom: -15px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80px;
-        height: 6px;
-        background: var(--primary-emerald);
-        border-radius: 3px;
-    }
+.gv-dest-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
 
-    .categories-section {
-        padding: 80px 0;
-        background-color: white;
-    }
-    
-    .category-bubbles {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 30px;
-    }
-    
-    .category-bubble {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: var(--dark-green);
-        width: 140px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    
-    .category-bubble:hover {
-        transform: translateY(-15px) scale(1.05);
-    }
-    
-    .bubble-icon {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        background: var(--light-green);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 35px;
-        color: var(--primary-emerald);
-        margin-bottom: 15px;
-        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15);
-        transition: all 0.3s;
-        border: 2px solid transparent;
-    }
-    
-    .category-bubble:hover .bubble-icon {
-        background: var(--primary-emerald);
-        color: white;
-        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.3);
-        border-color: rgba(255,255,255,0.5);
-    }
-    
-    .bubble-label {
-        font-weight: 700;
-        font-size: 1.1rem;
-        transition: color 0.3s;
-    }
+.gv-dest-mini {
+    position: relative;
+    border-radius: 1rem;
+    overflow: hidden;
+    flex: 1;
+    cursor: pointer;
+    transition: all 0.5s ease;
+    box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.08);
+}
+.gv-dest-mini:hover { transform: translateY(-4px); box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.15); }
+.gv-dest-mini img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; }
+.gv-dest-mini:hover img { transform: scale(1.08); }
+.gv-dest-mini::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+}
+.gv-dest-mini:hover::after { background: rgba(0, 0, 0, 0.4); }
+.gv-dest-mini-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    z-index: 2;
+    text-align: center;
+}
+.gv-dest-mini-label h3 { font-family: 'Noto Serif', serif; font-size: 1.5rem; }
+.gv-dest-mini-label span { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.7; }
 
-    .category-bubble:hover .bubble-label {
-        color: var(--primary-emerald);
-    }
+/* ═══ SERVICES SECTION ═══ */
+.gv-services-bg {
+    background: #f6f3f2;
+    padding: 6rem 2rem;
+}
+.gv-services-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.gv-services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+@media (max-width: 768px) { .gv-services-grid { grid-template-columns: 1fr; } }
 
-    /* Activities Grid */
-    .activities-section {
-        padding: 60px 0 100px;
-        background-color: white;
-    }
-    
-    .activity-card {
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-        transition: all 0.3s;
-        height: 100%;
-        background: var(--bg-creme);
-    }
-    .activity-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-    }
-    .activity-img {
-        height: 250px;
-        width: 100%;
-        background-color: #ddd; /* Skeleton bg */
-        object-fit: cover;
-    }
-    .activity-body {
-        padding: 25px;
-    }
-    .activity-category {
-        font-size: 12px;
-        text-transform: uppercase;
-        font-weight: 700;
-        color: var(--primary-emerald);
-        margin-bottom: 10px;
-        display: block;
-    }
-    .activity-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--dark-green);
-        margin-bottom: 15px;
-    }
-    .activity-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top: 1px solid rgba(0,0,0,0.1);
-        padding-top: 15px;
-        margin-top: 15px;
-    }
-    .activity-price {
-        font-weight: 700;
-        font-size: 18px;
-    }
+.gv-service-card {
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+.gv-service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #00342d, #046b5e, #10B981);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
+}
+.gv-service-card:hover::before { transform: scaleX(1); }
+.gv-service-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.1);
+}
+
+.gv-service-icon {
+    width: 4rem; height: 4rem;
+    background: rgba(0, 52, 45, 0.06);
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+.gv-service-icon .material-symbols-outlined { font-size: 1.75rem; color: #00342d; transition: color 0.3s; }
+.gv-service-card:hover .gv-service-icon {
+    background: linear-gradient(135deg, #00342d, #046b5e);
+}
+.gv-service-card:hover .gv-service-icon .material-symbols-outlined { color: #fff; }
+
+.gv-service-card h3 {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.5rem;
+    color: #00342d;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+}
+.gv-service-card p {
+    color: #546067;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+.gv-service-accent {
+    height: 3px;
+    width: 3rem;
+    background: #e9c176;
+    border-radius: 3px;
+}
+
+/* ═══ TESTIMONIAL SECTION ═══ */
+.gv-testimonial-section {
+    padding: 6rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+.gv-testimonial-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+}
+@media (max-width: 768px) { .gv-testimonial-grid { grid-template-columns: 1fr; gap: 3rem; } }
+
+.gv-testimonial-visual {
+    position: relative;
+}
+.gv-testimonial-img {
+    width: 80%;
+    border-radius: 2.5rem 0.5rem 2.5rem 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 2;
+}
+.gv-testimonial-img img { width: 100%; height: 500px; object-fit: cover; }
+
+.gv-testimonial-bg-shape {
+    position: absolute;
+    bottom: -2rem; right: -2rem;
+    width: 60%;
+    height: 350px;
+    background: rgba(0, 52, 45, 0.06);
+    border-radius: 1rem;
+    z-index: 0;
+}
+.gv-testimonial-quote-icon {
+    position: absolute;
+    top: -2rem; left: -2rem;
+    font-size: 10rem;
+    color: rgba(233, 193, 118, 0.15);
+    font-variation-settings: 'FILL' 1;
+    z-index: 1;
+}
+
+.gv-testimonial-text h2 {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    color: #00342d;
+    margin-bottom: 2rem;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+.gv-testimonial-quote {
+    border-left: 4px solid #e9c176;
+    padding-left: 2rem;
+    margin-bottom: 2rem;
+}
+.gv-testimonial-quote p {
+    font-style: italic;
+    font-size: 1.15rem;
+    color: #3f4945;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.gv-testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.gv-testimonial-author-img {
+    width: 3rem; height: 3rem;
+    border-radius: 50%;
+    overflow: hidden;
+}
+.gv-testimonial-author-img img { width: 100%; height: 100%; object-fit: cover; }
+.gv-testimonial-author-name { font-weight: 700; color: #00342d; }
+.gv-testimonial-author-role { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: #546067; }
+
+.gv-testimonial-nav {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+.gv-testimonial-nav button {
+    width: 3rem; height: 3rem;
+    border-radius: 50%;
+    border: 1.5px solid #bfc9c4;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3f4945;
+    transition: all 0.2s ease;
+}
+.gv-testimonial-nav button:hover {
+    background: #00342d;
+    color: #fff;
+    border-color: #00342d;
+}
+
+/* ═══ CTA SECTION ═══ */
+.gv-cta-section {
+    padding: 2rem 2rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.gv-cta-block {
+    background: linear-gradient(135deg, #00342d 0%, #004d43 50%, #013220 100%);
+    border-radius: 2.5rem;
+    padding: 5rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -20px rgba(0, 52, 45, 0.4);
+}
+.gv-cta-block::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(160, 242, 225, 0.08) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.5;
+}
+.gv-cta-block h2 {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: #a0f2e1;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
+    font-weight: 700;
+}
+.gv-cta-block p {
+    color: rgba(160, 242, 225, 0.6);
+    font-size: 1.15rem;
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+    position: relative;
+    z-index: 2;
+}
+.gv-cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+}
+.gv-cta-primary {
+    padding: 1rem 2.5rem;
+    background: #3d2a00;
+    color: #fff;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Manrope', sans-serif;
+    box-shadow: 0 8px 20px -5px rgba(61, 42, 0, 0.4);
+    text-decoration: none;
+}
+.gv-cta-primary:hover { transform: scale(1.05) translateY(-2px); }
+.gv-cta-secondary {
+    padding: 1rem 2.5rem;
+    background: transparent;
+    color: #a0f2e1;
+    border: 1.5px solid rgba(160, 242, 225, 0.25);
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Manrope', sans-serif;
+    text-decoration: none;
+}
+.gv-cta-secondary:hover { background: rgba(255, 255, 255, 0.08); color: #a0f2e1; }
+
+/* ═══ SCROLL REVEAL ANIMATIONS ═══ */
+.gv-reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gv-reveal.is-visible { opacity: 1; transform: translateY(0); }
+.gv-reveal-delay-1 { transition-delay: 0.1s; }
+.gv-reveal-delay-2 { transition-delay: 0.2s; }
+.gv-reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ═══ STATS COUNTER ═══ */
+.gv-stats-bar {
+    padding: 4rem 2rem;
+    background: linear-gradient(180deg, #fcf9f8 0%, #f6f3f2 100%);
+}
+.gv-stats-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+}
+@media (max-width: 768px) { .gv-stats-inner { grid-template-columns: repeat(2, 1fr); } }
+
+.gv-stat-item {
+    text-align: center;
+    padding: 1.5rem;
+    transition: transform 0.3s ease;
+}
+.gv-stat-item:hover { transform: translateY(-5px); }
+.gv-stat-number {
+    font-family: 'Noto Serif', serif;
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00342d, #046b5e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+    margin-bottom: 0.5rem;
+}
+.gv-stat-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #546067;
+}
+
+/* ═══ CATEGORIES ═══ */
+.gv-categories {
+    padding: 4rem 2rem 6rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.gv-cat-row {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+}
+.gv-cat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.gv-cat-item:hover { transform: translateY(-10px) scale(1.05); }
+.gv-cat-icon {
+    width: 5rem; height: 5rem;
+    border-radius: 50%;
+    background: rgba(0, 52, 45, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 52, 45, 0.08);
+}
+.gv-cat-icon .material-symbols-outlined { font-size: 1.75rem; color: #00342d; transition: color 0.3s; }
+.gv-cat-item:hover .gv-cat-icon {
+    background: linear-gradient(135deg, #00342d, #046b5e);
+    box-shadow: 0 10px 30px rgba(0, 52, 45, 0.2);
+}
+.gv-cat-item:hover .gv-cat-icon .material-symbols-outlined { color: #fff; }
+.gv-cat-label { font-weight: 700; color: #00342d; font-size: 0.95rem; }
+
+/* ═══ CUSTOM NAVBAR OVERRIDE ─── */
+.govibe-navbar {
+    position: fixed !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+}
+.govibe-navbar.scrolled {
+    background: rgba(1, 50, 32, 0.95) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ─── Remove base template margin for homepage ─── */
+body > .container.position-relative { margin-top: 0 !important; display: none; }
+
+/* ─── Footer spacing ─── */
+.govibe-footer { margin-top: 0 !important; }
 </style>
 {% endblock %}
 
 {% block body %}
 
-<!-- Hero Section -->
-<div class="hero-section">
-    <div class="cyber-grid"></div>
-    <div class="glow-orb orb-1"></div>
-    <div class="glow-orb orb-2"></div>
-    <div class="hero-overlay"></div>
-    
-    <!-- Particles -->
-    <div id="particles-container"></div>
-
-    <div class="hero-content container" data-aos="fade-in" data-aos-duration="1500">
-        
-        <div class="hero-text-side" data-aos="slide-right" data-aos-delay="200">
-            <!-- Sleek Left-aligned Logo -->
-            <img src="{{ asset('images/logo.png') }}" alt="GoVibe Logo" class="hero-logo">
-            
-            <h1 class="hero-title">L'Évasion<br>Next-Gen</h1>
-            <p class="hero-subtitle">Repoussez les horizons. GoVibe fusionne le monde physique avec une expérience numérique élégante et futuriste pour concevoir votre voyage idéal.</p>
+<!-- ═══ HERO — SCROLL-DRIVEN VIDEO (Canvas) ═══ -->
+<header class="gv-hero" id="heroSection">
+    <div class="gv-hero-sticky">
+        <!-- Canvas for frame-by-frame scroll video -->
+        <div class="gv-hero-canvas">
+            <canvas id="heroCanvas"></canvas>
         </div>
 
-        <div class="hero-visual-side d-none d-lg-block" data-aos="zoom-in-left" data-aos-delay="400">
-            <!-- Hovering 3D Glass Cards -->
-            <div class="glass-card-3d card-1">
-                <div class="glass-card-img">
-                    <div style="background: linear-gradient(135deg, #10B981, #064E3B); width: 100%; height: 100%;"></div>
-                </div>
-                <span class="glass-card-pill">Tendance Globale</span>
-                <div class="glass-card-title">Retraite Premium Cyberspace</div>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <span style="color: #A7F3D0; font-weight: 700;">★ 4.9/5</span>
-                    <button class="btn btn-sm btn-outline-light rounded-pill px-3">Découvrir</button>
-                </div>
-            </div>
+        <!-- Gradient overlay -->
+        <div class="gv-hero-overlay"></div>
 
-            <div class="glass-card-3d card-2">
-                <div class="glass-card-img" style="border-radius: 50% 15px 15px 15px;">
-                    <div style="background: linear-gradient(135deg, #3B82F6, #10B981); width: 100%; height: 100%;"></div>
-                </div>
-                <span class="glass-card-pill">Expérience VIP</span>
-                <div class="glass-card-title">Circuit Ultra Exclusif</div>
-                <div class="d-flex justify-content-between align-items-center mt-3">
-                    <span style="color: #A7F3D0; font-weight: 700;">★ 5.0/5</span>
-                    <button class="btn btn-sm btn-light rounded-pill px-3 text-dark">Réserver</button>
+        <!-- Scroll progress bar -->
+        <div class="gv-hero-progress" id="heroProgress"></div>
+
+        <!-- Search Bar Content -->
+        <div class="gv-hero-content" id="heroContent">
+
+            <!-- Glassmorphism Search Bar -->
+            <div class="gv-search-glass">
+                <div class="gv-search-inner">
+                    <div class="gv-search-field">
+                        <label class="gv-search-label">Destination</label>
+                        <input class="gv-search-input" type="text" placeholder="Où voulez-vous aller ?">
+                    </div>
+                    <div class="gv-search-field">
+                        <label class="gv-search-label">Date</label>
+                        <input class="gv-search-input" type="text" placeholder="Choisir les dates">
+                    </div>
+                    <div class="gv-search-field">
+                        <label class="gv-search-label">Voyageurs</label>
+                        <input class="gv-search-input" type="text" placeholder="Ajouter des invités">
+                    </div>
+                    <button class="gv-search-btn">
+                        <span class="material-symbols-outlined">travel_explore</span>
+                        Explorer
+                    </button>
                 </div>
             </div>
         </div>
 
-    </div>
-</div>
-
-<!-- Search Bar -->
-<div class="search-bar-wrapper">
-    <div class="search-bar-container" data-aos="fade-up" data-aos-delay="200">
-        <div class="search-input-group">
-            <i class="bi bi-geo-alt"></i>
-            <div>
-                <label>Destination</label>
-                <input type="text" placeholder="Où allez-vous ?">
-            </div>
-        </div>
-        <div class="search-input-group">
-            <i class="bi bi-calendar3"></i>
-            <div>
-                <label>Date</label>
-                <input type="date">
-            </div>
-        </div>
-        <div class="search-input-group">
-            <i class="bi bi-people"></i>
-            <div>
-                <label>Voyageurs</label>
-                <input type="number" placeholder="Combien ?" min="1">
-            </div>
-        </div>
-        <button class="btn-search"><i class="bi bi-search"></i> Explorer</button>
-    </div>
-</div>
-
-<!-- Stats Bar -->
-<div class="stats-bar">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-3 stat-item" data-aos="fade-up" data-aos-delay="100">
-                <div class="stat-number counters" data-target="150">0</div>
-                <div class="stat-label">Destinations Premium</div>
-            </div>
-            <div class="col-md-3 stat-item" data-aos="fade-up" data-aos-delay="200">
-                <div class="stat-number counters" data-target="2000">0</div>
-                <div class="stat-label">Activités Exclusives</div>
-            </div>
-            <div class="col-md-3 stat-item" data-aos="fade-up" data-aos-delay="300">
-                <div class="stat-number">4.9/5</div>
-                <div class="stat-label">Satisfaction Client</div>
-            </div>
-            <div class="col-md-3 stat-item" data-aos="fade-up" data-aos-delay="400">
-                <div class="stat-number counters" data-target="10000">0</div>
-                <div class="stat-label">Voyageurs VIP</div>
-            </div>
+        <!-- Scroll Indicator -->
+        <div class="gv-scroll-indicator" id="scrollIndicator">
+            <span>Scrollez pour découvrir</span>
+            <span class="material-symbols-outlined">expand_more</span>
         </div>
     </div>
-</div>
+</header>
 
-<!-- Categories Section -->
-<div class="categories-section container">
-    <h2 class="section-title" data-aos="fade-up">Concevez Votre Voyage</h2>
-    <div class="category-bubbles">
-        <a href="#" class="category-bubble" data-aos="zoom-in" data-aos-delay="100">
-            <div class="bubble-icon"><i class="bi bi-compass"></i></div>
-            <span class="bubble-label">Exploration</span>
-        </a>
-        <a href="#" class="category-bubble" data-aos="zoom-in" data-aos-delay="200">
-            <div class="bubble-icon"><i class="bi bi-bank"></i></div>
-            <span class="bubble-label">Héritage</span>
-        </a>
-        <a href="#" class="category-bubble" data-aos="zoom-in" data-aos-delay="300">
-            <div class="bubble-icon"><i class="bi bi-cup-hot"></i></div>
-            <span class="bubble-label">Gastronomie</span>
-        </a>
-        <a href="#" class="category-bubble" data-aos="zoom-in" data-aos-delay="400">
-            <div class="bubble-icon"><i class="bi bi-stars"></i></div>
-            <span class="bubble-label">Bien-être</span>
-        </a>
-        <a href="#" class="category-bubble" data-aos="zoom-in" data-aos-delay="500">
-            <div class="bubble-icon"><i class="bi bi-music-note-beamed"></i></div>
-            <span class="bubble-label">Événements</span>
+<!-- ═══ STATS BAR ═══ -->
+<section class="gv-stats-bar">
+    <div class="gv-stats-inner">
+        <div class="gv-stat-item gv-reveal">
+            <div class="gv-stat-number gv-counter" data-target="150">0</div>
+            <div class="gv-stat-label">Destinations Premium</div>
+        </div>
+        <div class="gv-stat-item gv-reveal gv-reveal-delay-1">
+            <div class="gv-stat-number gv-counter" data-target="2000">0</div>
+            <div class="gv-stat-label">Activités Exclusives</div>
+        </div>
+        <div class="gv-stat-item gv-reveal gv-reveal-delay-2">
+            <div class="gv-stat-number">4.9/5</div>
+            <div class="gv-stat-label">Satisfaction Client</div>
+        </div>
+        <div class="gv-stat-item gv-reveal gv-reveal-delay-3">
+            <div class="gv-stat-number gv-counter" data-target="10000">0</div>
+            <div class="gv-stat-label">Voyageurs VIP</div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ CURATED DESTINATIONS ═══ -->
+<section class="gv-section">
+    <div class="gv-section-header gv-reveal">
+        <div>
+            <h2 class="gv-section-title">Curated Destinies</h2>
+            <p class="gv-section-desc">Hand-picked escapes that offer more than just a place to stay—they offer a new perspective.</p>
+        </div>
+        <a href="{{ path('app_hotel_index') }}" class="gv-view-all">
+            Voir tous les hôtels <span class="material-symbols-outlined" style="font-size:1.1rem;">arrow_forward</span>
         </a>
     </div>
-</div>
 
-<!-- Activities Grid -->
-<div class="activities-section">
-    <div class="container">
-        <h2 class="section-title" data-aos="fade-up">Expériences Inoubliables</h2>
-        <div class="row g-5 mt-4">
-            
-            <!-- Activity 1 -->
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                <div class="activity-card">
-                    <div class="activity-img-wrapper">
-                        <div class="activity-badge">Plus Populaire</div>
-                        <div class="activity-img" style="background: linear-gradient(135deg, #1abc9c, #16a085);"></div>
-                    </div>
-                    <div class="activity-body">
-                        <span class="activity-category">Aventure Extrême</span>
-                        <h3 class="activity-title">Ascension Stellaire des Gorges</h3>
-                        <p class="activity-desc">Une immersion totale dans la nature sauvage avec un équipement de pointe et des guides d'élite.</p>
-                        <div class="activity-footer">
-                            <div class="activity-rating"><i class="bi bi-star-fill"></i> 4.9</div>
-                            <div class="activity-price"><span>Dès</span> 120€</div>
-                        </div>
-                    </div>
+    <div class="gv-dest-grid">
+        <!-- Feature Card -->
+        <div class="gv-dest-feature gv-reveal" id="destFeature">
+            <img src="{{ asset('images/dest-bali.png') }}" alt="Luxury villa in Bali with infinity pool" loading="lazy">
+            <div class="gv-dest-overlay"></div>
+            <div class="gv-dest-badge">
+                <span class="material-symbols-outlined">star</span>
+                4.9 Rare Find
+            </div>
+            <div class="gv-dest-info">
+                <span class="gv-dest-region">Indonésie</span>
+                <h3>Ubud Royal Escapes</h3>
+                <p>A sanctuary for the soul, hidden amidst the sacred valleys of Bali.</p>
+            </div>
+        </div>
+
+        <!-- Side Stack -->
+        <div class="gv-dest-stack">
+            <div class="gv-dest-mini gv-reveal gv-reveal-delay-1" id="destMaldives">
+                <img src="{{ asset('images/dest-maldives.png') }}" alt="Overwater villa in Maldives" loading="lazy">
+                <div class="gv-dest-mini-label">
+                    <h3>Les Maldives</h3>
+                    <span>Sanctuaire sur l'eau</span>
                 </div>
             </div>
-
-            <!-- Activity 2 -->
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                <div class="activity-card">
-                    <div class="activity-img-wrapper">
-                        <div class="activity-badge">Nouveau</div>
-                        <div class="activity-img" style="background: linear-gradient(135deg, #e67e22, #d35400);"></div>
-                    </div>
-                    <div class="activity-body">
-                        <span class="activity-category">Culture Digitale</span>
-                        <h3 class="activity-title">Visite Virtuelle des Temples</h3>
-                        <p class="activity-desc">Plongez dans l'histoire avec notre technologie de réalité augmentée au cœur des ruines antiques.</p>
-                        <div class="activity-footer">
-                            <div class="activity-rating"><i class="bi bi-star-fill"></i> 5.0</div>
-                            <div class="activity-price"><span>Dès</span> 85€</div>
-                        </div>
-                    </div>
+            <div class="gv-dest-mini gv-reveal gv-reveal-delay-2" id="destParis">
+                <img src="{{ asset('images/dest-paris.png') }}" alt="Luxury hotel in Paris" loading="lazy">
+                <div class="gv-dest-mini-label">
+                    <h3>Nuits Parisiennes</h3>
+                    <span>Héritage Iconique</span>
                 </div>
             </div>
-
-            <!-- Activity 3 -->
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                <div class="activity-card">
-                    <div class="activity-img-wrapper">
-                        <div class="activity-badge">VIP</div>
-                        <div class="activity-img" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);"></div>
-                    </div>
-                    <div class="activity-body">
-                        <span class="activity-category">Gastronomie Luxe</span>
-                        <h3 class="activity-title">Dîner Sensoriel Suspendu</h3>
-                        <p class="activity-desc">Dégustez des mets étoilés dans une structure futuriste offrant une vue à 360° sur la ville.</p>
-                        <div class="activity-footer">
-                            <div class="activity-rating"><i class="bi bi-star-fill"></i> 4.9</div>
-                            <div class="activity-price"><span>Dès</span> 250€</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
-</div>
+</section>
 
-<!-- Call to Action -->
-<div class="cta-section" style="padding: 100px 0; background: linear-gradient(135deg, #064E3B, #10B981); color: white; text-align: center; position: relative; overflow: hidden; margin-top: 50px;">
-    <div class="cta-content" data-aos="zoom-in" style="position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 0 20px;">
-        <h2 class="cta-title" style="font-size: 3.5rem; font-weight: 800; margin-bottom: 20px;">Prêt pour le Futur du Voyage ?</h2>
-        <p class="cta-text" style="font-size: 1.2rem; margin-bottom: 40px; opacity: 0.9;">Rejoignez la communauté GoVibe et accédez à des offres holographiques exclusives et des expériences hors du commun.</p>
-        <a href="{{ path('app_register') }}" class="btn-cta" style="background: white; color: #064E3B; padding: 15px 40px; border-radius: 30px; font-weight: 800; font-size: 1.1rem; text-decoration: none; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">Créer un Compte Premium</a>
+<!-- ═══ CATEGORIES ═══ -->
+<section class="gv-categories">
+    <div class="gv-section-header gv-reveal" style="justify-content:center; text-align:center;">
+        <div>
+            <h2 class="gv-section-title">Concevez Votre Voyage</h2>
+        </div>
     </div>
-</div>
+    <div class="gv-cat-row">
+        <a href="{{ path('app_activite_index') }}" class="gv-cat-item gv-reveal">
+            <div class="gv-cat-icon"><span class="material-symbols-outlined">explore</span></div>
+            <span class="gv-cat-label">Exploration</span>
+        </a>
+        <a href="{{ path('app_hotel_index') }}" class="gv-cat-item gv-reveal gv-reveal-delay-1">
+            <div class="gv-cat-icon"><span class="material-symbols-outlined">apartment</span></div>
+            <span class="gv-cat-label">Hôtels</span>
+        </a>
+        <a href="{{ path('app_vols_index') }}" class="gv-cat-item gv-reveal gv-reveal-delay-2">
+            <div class="gv-cat-icon"><span class="material-symbols-outlined">flight_takeoff</span></div>
+            <span class="gv-cat-label">Vols</span>
+        </a>
+        <a href="{{ path('app_location_index') }}" class="gv-cat-item gv-reveal gv-reveal-delay-3">
+            <div class="gv-cat-icon"><span class="material-symbols-outlined">directions_car</span></div>
+            <span class="gv-cat-label">Voitures</span>
+        </a>
+        <a href="{{ path('app_poste_index') }}" class="gv-cat-item gv-reveal">
+            <div class="gv-cat-icon"><span class="material-symbols-outlined">forum</span></div>
+            <span class="gv-cat-label">Publications</span>
+        </a>
+    </div>
+</section>
 
-<!-- Scripts for Animations -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<!-- ═══ SERVICES ═══ -->
+<section class="gv-services-bg">
+    <div class="gv-services-inner">
+        <div class="gv-section-header gv-reveal" style="text-align:center; justify-content:center;">
+            <div style="text-align:center;">
+                <h2 class="gv-section-title">Concierge Excellence</h2>
+                <p class="gv-section-desc" style="margin: 0.75rem auto 0;">We handle the intricate details so you can focus on the extraordinary.</p>
+            </div>
+        </div>
+
+        <div class="gv-services-grid">
+            <div class="gv-service-card gv-reveal">
+                <div class="gv-service-icon">
+                    <span class="material-symbols-outlined">flight_takeoff</span>
+                </div>
+                <h3>Aviation Privée</h3>
+                <p>Voyagez sans frontières avec embarquement prioritaire et services cabine sur mesure adaptés à vos goûts.</p>
+                <div class="gv-service-accent"></div>
+            </div>
+            <div class="gv-service-card gv-reveal gv-reveal-delay-1">
+                <div class="gv-service-icon">
+                    <span class="material-symbols-outlined">bed</span>
+                </div>
+                <h3>Résidences d'Élite</h3>
+                <p>Accès aux villas les plus exclusives et hôtels boutique, validés pour un confort suprême et une intimité totale.</p>
+                <div class="gv-service-accent"></div>
+            </div>
+            <div class="gv-service-card gv-reveal gv-reveal-delay-2">
+                <div class="gv-service-icon">
+                    <span class="material-symbols-outlined">map</span>
+                </div>
+                <h3>Circuits Signature</h3>
+                <p>Des expéditions culturelles dirigées par des experts et des odyssées culinaires révélant l'âme de chaque destination.</p>
+                <div class="gv-service-accent"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ TESTIMONIALS ═══ -->
+<section class="gv-testimonial-section">
+    <div class="gv-testimonial-grid">
+        <div class="gv-testimonial-visual gv-reveal">
+            <div class="gv-testimonial-img">
+                <img src="{{ asset('images/testimonial-portrait.png') }}" alt="Client satisfaite GoVibe" loading="lazy">
+            </div>
+            <div class="gv-testimonial-bg-shape"></div>
+            <span class="material-symbols-outlined gv-testimonial-quote-icon">format_quote</span>
+        </div>
+
+        <div class="gv-testimonial-text gv-reveal gv-reveal-delay-1">
+            <h2>Shared Tales of<br>Curated Wonder.</h2>
+
+            <div class="gv-testimonial-quote">
+                <p>"GoVibe n'a pas simplement réservé un vol; ils ont orchestré une symphonie d'expériences. Du circuit privé dans les vignobles de Toscane à la balade en bateau à minuit à Venise, chaque détail était la perfection."</p>
+
+                <div class="gv-testimonial-author">
+                    <div class="gv-testimonial-author-img">
+                        <img src="{{ asset('images/logo.png') }}" alt="Julian Montgomery avatar">
+                    </div>
+                    <div>
+                        <div class="gv-testimonial-author-name">Julian Montgomery</div>
+                        <div class="gv-testimonial-author-role">Venture Capitalist</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gv-testimonial-nav">
+                <button type="button" aria-label="Précédent">
+                    <span class="material-symbols-outlined">chevron_left</span>
+                </button>
+                <button type="button" aria-label="Suivant">
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="gv-cta-section">
+    <div class="gv-cta-block gv-reveal">
+        <h2>Prêt pour votre prochaine <em style="font-style:italic;">odyssée</em> ?</h2>
+        <p>Connectez-vous avec nos consultants luxe aujourd'hui et commencez à planifier votre voyage sur mesure à travers le globe.</p>
+        <div class="gv-cta-buttons">
+            <a href="{{ path('app_reclamation_index') }}" class="gv-cta-primary">Contacter un Concierge</a>
+            <a href="{{ path('app_activite_index') }}" class="gv-cta-secondary">Explorer les Destinations</a>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ SCROLL-DRIVEN VIDEO ENGINE ═══ -->
 <script>
-    // Initialize Animate on Scroll
-    AOS.init({
-        once: true,
-        offset: 100,
-        duration: 800,
-        easing: 'ease-out-cubic'
-    });
+document.addEventListener('DOMContentLoaded', () => {
 
-    // Particle Generation
-    document.addEventListener('DOMContentLoaded', () => {
-        const container = document.getElementById('particles-container');
-        if (container) {
-            const particleCount = 20;
+    // ═══ CANVAS SCROLL-VIDEO ENGINE ═══
+    const canvas = document.getElementById('heroCanvas');
+    const ctx = canvas.getContext('2d');
+    const heroSection = document.getElementById('heroSection');
+    const heroContent = document.getElementById('heroContent');
+    const heroProgress = document.getElementById('heroProgress');
+    const scrollIndicator = document.getElementById('scrollIndicator');
 
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // Random properties
-                const size = Math.random() * 15 + 5;
-                const left = Math.random() * 100;
-                const delay = Math.random() * 15;
-                const duration = Math.random() * 10 + 10;
-                
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${left}vw`;
-                particle.style.animationDelay = `${delay}s`;
-                particle.style.animationDuration = `${duration}s`;
-                
-                container.appendChild(particle);
-            }
-        }
+    const TOTAL_FRAMES = 240;
+    const frames = [];
+    let imagesLoaded = 0;
+    let currentFrame = 0;
 
-        // Counter Animation
-        const counters = document.querySelectorAll('.counters');
-        const speed = 200;
+    // Set canvas resolution to match container
+    function resizeCanvas() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        canvas.width = rect.width * window.devicePixelRatio;
+        canvas.height = rect.height * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        drawFrame(currentFrame);
+    }
 
-        counters.forEach(counter => {
-            const updateCount = () => {
-                const target = +counter.getAttribute('data-target');
-                const count = +counter.innerText.replace(/\+/g, '').replace(/K/g, '000');
-                
-                const inc = target / speed;
+    // Draw a single frame on the canvas (cover fit)
+    function drawFrame(index) {
+        const img = frames[index];
+        if (!img || !img.complete) return;
 
-                if (count < target) {
-                    let nextVal = Math.ceil(count + inc);
-                    if(target >= 1000) {
-                        counter.innerText = (nextVal/1000).toFixed(1) + 'K+';
-                    } else {
-                        counter.innerText = nextVal + '+';
-                    }
-                    setTimeout(updateCount, 10);
-                } else {
-                    if(target >= 1000) {
-                       counter.innerText = (target/1000) + 'K+';
-                    } else {
-                        counter.innerText = target + '+';
-                    }
+        const cw = canvas.width / window.devicePixelRatio;
+        const ch = canvas.height / window.devicePixelRatio;
+        const iw = img.naturalWidth;
+        const ih = img.naturalHeight;
+
+        // "object-fit: cover" logic
+        const scale = Math.max(cw / iw, ch / ih);
+        const sw = iw * scale;
+        const sh = ih * scale;
+        const sx = (cw - sw) / 2;
+        const sy = (ch - sh) / 2;
+
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.drawImage(img, sx, sy, sw, sh);
+    }
+
+    // Preload all frames
+    function preloadFrames() {
+        for (let i = 1; i <= TOTAL_FRAMES; i++) {
+            const img = new Image();
+            const num = String(i).padStart(3, '0');
+            img.src = `/images/wireframes/ezgif-frame-${num}.png`;
+            img.onload = () => {
+                imagesLoaded++;
+                // Draw the first frame immediately when it loads
+                if (i === 1) {
+                    drawFrame(0);
                 }
             };
-            
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    updateCount();
-                    observer.disconnect();
-                }
-            });
-            observer.observe(counter);
+            frames.push(img);
+        }
+    }
+
+    // ═══ SCROLL HANDLER ═══
+    let ticking = false;
+
+    function onScroll() {
+        const scrollY = window.pageYOffset;
+        const heroTop = heroSection.offsetTop;
+        const heroHeight = heroSection.offsetHeight;
+        const viewH = window.innerHeight;
+
+        // scrollable range = heroHeight - viewH (sticky takes one viewport)
+        const scrollRange = heroHeight - viewH;
+        const rawProgress = (scrollY - heroTop) / scrollRange;
+        const progress = Math.max(0, Math.min(1, rawProgress));
+
+        // ── Calculate which frame to show ──
+        const frameIndex = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * (TOTAL_FRAMES - 1)));
+        if (frameIndex !== currentFrame) {
+            currentFrame = frameIndex;
+            drawFrame(currentFrame);
+        }
+
+        // ── Progress bar ──
+        if (heroProgress) {
+            heroProgress.style.width = (progress * 100) + '%';
+        }
+
+        // ── Fade out hero content (between 0% and 40% of progress) ──
+        if (heroContent) {
+            const contentProgress = Math.min(1, progress * 2.5);
+            heroContent.style.opacity = Math.max(0, 1 - contentProgress);
+            heroContent.style.transform = `translateY(${-contentProgress * 60}px)`;
+        }
+
+        // ── Scroll indicator — hide quickly ──
+        if (scrollIndicator) {
+            const indOpacity = Math.max(0, 1 - progress * 8);
+            scrollIndicator.style.opacity = indOpacity;
+            scrollIndicator.style.pointerEvents = progress > 0.05 ? 'none' : 'auto';
+        }
+
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(onScroll);
+            ticking = true;
+        }
+    }, { passive: true });
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initialize
+    resizeCanvas();
+    preloadFrames();
+    onScroll();
+
+    // ─── Scroll Reveal ───
+    const reveals = document.querySelectorAll('.gv-reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+            }
         });
-    });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => revealObserver.observe(el));
+
+    // ─── Counter Animation ───
+    const counters = document.querySelectorAll('.gv-counter');
+    const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                const target = +el.dataset.target;
+                const speed = 150;
+                const inc = target / speed;
+
+                const updateCount = () => {
+                    const current = +el.innerText.replace(/[^0-9]/g, '');
+                    if (current < target) {
+                        let next = Math.ceil(current + inc);
+                        if (next > target) next = target;
+                        if (target >= 1000) {
+                            el.innerText = (next / 1000).toFixed(next >= target ? 0 : 1) + 'K+';
+                        } else {
+                            el.innerText = next + '+';
+                        }
+                        requestAnimationFrame(updateCount);
+                    } else {
+                        if (target >= 1000) {
+                            el.innerText = (target / 1000) + 'K+';
+                        } else {
+                            el.innerText = target + '+';
+                        }
+                    }
+                };
+                updateCount();
+                counterObserver.unobserve(el);
+            }
+        });
+    }, { threshold: 0.3 });
+    counters.forEach(el => counterObserver.observe(el));
+
+    // ─── Smooth navbar transition ───
+    const navbar = document.getElementById('mainNav');
+    if (navbar) {
+        const checkScroll = () => {
+            if (window.scrollY > 80) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        };
+        checkScroll();
+        window.addEventListener('scroll', checkScroll, { passive: true });
+    }
+});
 </script>
 
 {% endblock %}

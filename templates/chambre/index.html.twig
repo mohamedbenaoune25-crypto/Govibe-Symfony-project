@@ -1,263 +1,246 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Chambres - GoVibe{% endblock %}
+{% block title %}Chambres — GoVibe{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !important; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+/* ─── Hero ─── */
+.gv-ch-hero {
+    position: relative; padding: 170px 0 110px;
+    background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+    overflow: hidden; text-align: center; border-radius: 0 0 3rem 3rem;
+    box-shadow: 0 20px 50px rgba(0,52,45,0.15);
+}
+.gv-ch-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 30% 80%, rgba(16,185,129,0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(233,193,118,0.08) 0%, transparent 50%); pointer-events:none; }
+.gv-ch-hero::after { content:''; position:absolute; inset:0; background-image: radial-gradient(rgba(160,242,225,0.06) 1px, transparent 1px); background-size:24px 24px; pointer-events:none; }
+.gv-hero-icon-bg { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:20rem; color:rgba(255,255,255,0.02); pointer-events:none; font-variation-settings:'FILL' 1; }
+
+.gv-hero-breadcrumb { display:inline-flex; align-items:center; gap:0.5rem; padding:0.4rem 1rem; border-radius:2rem; font-size:0.72rem; font-weight:700; color:rgba(255,255,255,0.9); background:rgba(160,242,225,0.1); border:1px solid rgba(160,242,225,0.15); backdrop-filter:blur(8px); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:1rem; position:relative; z-index:2; }
+.gv-hero-breadcrumb a { color:rgba(255,255,255,0.8); text-decoration:none; }
+.gv-hero-breadcrumb a:hover { color:#a0f2e1; }
+.gv-hero-breadcrumb .accent { color:#a0f2e1; }
+
+.gv-hero-title { font-family:'Noto Serif',serif; font-size:clamp(2.2rem,4.5vw,3.5rem); color:#fff; font-weight:700; margin-bottom:0.75rem; position:relative; z-index:2; animation:heroFadeIn 0.8s ease both; }
+.gv-hero-title em { color:#a0f2e1; font-style:italic; font-weight:300; }
+.gv-hero-sub { color:rgba(160,242,225,0.7); font-size:1.05rem; position:relative; z-index:2; animation:heroFadeIn 0.8s ease 0.2s both; max-width:550px; margin:0 auto; }
+@keyframes heroFadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── Container ─── */
+.gv-container { max-width:1200px; margin:-45px auto 80px; position:relative; z-index:10; padding:0 2rem; }
+
+/* ─── Search ─── */
+.gv-search-card {
+    background:rgba(255,255,255,0.97); backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(0,52,45,0.06); border-radius:1.25rem; padding:1.5rem 2rem;
+    box-shadow:0 15px 40px rgba(0,52,45,0.06); margin-bottom:2rem;
+}
+.gv-search-card .form-label { font-weight:700; color:#00342d; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.06em; }
+.gv-search-card .form-control, .gv-search-card .form-select {
+    border:1.5px solid rgba(0,52,45,0.08); border-radius:0.7rem; padding:0.7rem 1rem;
+    font-family:'Manrope',sans-serif; font-weight:500; font-size:0.9rem; transition:all 0.25s;
+}
+.gv-search-card .form-control:focus, .gv-search-card .form-select:focus { border-color:#10B981; box-shadow:0 0 0 3px rgba(16,185,129,0.12); }
+.gv-search-btn { padding:0.7rem 1.25rem; background:linear-gradient(135deg,#00342d,#046b5e); color:#fff; border:none; border-radius:0.7rem; cursor:pointer; transition:all 0.3s; box-shadow:0 4px 12px rgba(0,52,45,0.2); }
+.gv-search-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,52,45,0.3); }
+.gv-reset-link { padding:0.7rem 1.25rem; border-radius:0.7rem; border:1.5px solid rgba(0,52,45,0.08); color:#546067; text-decoration:none; font-weight:700; font-size:0.85rem; display:inline-flex; align-items:center; gap:0.3rem; transition:all 0.25s; }
+.gv-reset-link:hover { border-color:rgba(0,52,45,0.2); background:rgba(0,52,45,0.03); color:#00342d; }
+
+/* ─── Cards ─── */
+.gv-card-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1.75rem; }
+@media (max-width:768px) { .gv-card-grid { grid-template-columns:1fr; } }
+
+.gv-ch-card {
+    background:rgba(255,255,255,0.97); backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(0,52,45,0.06); border-radius:1.25rem; overflow:hidden;
+    box-shadow:0 12px 35px rgba(0,52,45,0.06); transition:all 0.35s;
+    display:flex; flex-direction:column;
+}
+.gv-ch-card:hover { transform:translateY(-6px); box-shadow:0 24px 50px rgba(0,52,45,0.12); }
+
+.gv-ch-card-body { padding:1.5rem; flex:1; display:flex; flex-direction:column; }
+
+.gv-ch-card-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; }
+.gv-ch-type { font-family:'Noto Serif',serif; font-weight:700; color:#00342d; font-size:1.15rem; }
+.gv-hotel-badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.35rem 0.85rem; border-radius:2rem; font-size:0.72rem; font-weight:700; background:linear-gradient(135deg,#00342d,#046b5e); color:#fff; text-decoration:none; transition:all 0.25s; }
+.gv-hotel-badge:hover { transform:translateY(-1px); box-shadow:0 4px 10px rgba(0,52,45,0.2); color:#fff; }
+
+.gv-ch-detail { display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem; font-size:0.9rem; color:#3c494f; }
+.gv-ch-detail .material-symbols-outlined { font-size:1rem; color:#10B981; }
+
+.gv-ch-prices { margin-top:auto; padding-top:1rem; border-top:1px solid rgba(0,52,45,0.05); }
+.gv-ch-price-row { display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0; }
+.gv-ch-price-label { font-size:0.82rem; color:#546067; }
+.gv-ch-price-val { font-weight:700; font-size:0.95rem; }
+.gv-ch-price-standard { color:#10B981; }
+.gv-ch-price-high { color:#e9c176; }
+.gv-ch-price-low { color:#5aa7cc; }
+
+.gv-ch-card-footer { padding:0 1.5rem 1.5rem; display:flex; justify-content:space-between; gap:0.5rem; }
+.gv-action-sm { padding:0.5rem 1rem; border-radius:0.6rem; font-weight:700; font-size:0.8rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.3rem; transition:all 0.25s; font-family:'Manrope',sans-serif; }
+.gv-action-view { background:rgba(0,52,45,0.06); color:#00342d; }
+.gv-action-view:hover { background:#00342d; color:#fff; }
+.gv-action-hotel-link { background:rgba(16,185,129,0.08); color:#005046; }
+.gv-action-hotel-link:hover { background:#10B981; color:#fff; }
+
+/* ─── Empty ─── */
+.gv-empty { text-align:center; padding:5rem 2rem; background:#fff; border-radius:1.5rem; box-shadow:0 20px 50px rgba(0,0,0,0.04); grid-column:1/-1; }
+.gv-empty-icon { font-size:4rem; color:#cde1db; margin-bottom:1rem; font-variation-settings:'FILL' 1; }
+.gv-empty h4 { font-family:'Noto Serif',serif; font-size:1.4rem; color:#00342d; font-weight:700; margin-bottom:0.5rem; }
+.gv-empty p { color:#546067; }
+
+/* ─── Reveal ─── */
+.gv-reveal { opacity:0; transform:translateY(25px); transition:opacity 0.6s ease, transform 0.6s ease; }
+.gv-reveal.is-visible { opacity:1; transform:translateY(0); }
+</style>
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-5">
+<div class="gv-ch-hero">
+    <span class="material-symbols-outlined gv-hero-icon-bg">door_open</span>
     <div class="container">
-        <!-- Breadcrumb Navigation -->
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb bg-transparent p-0">
-                <li class="breadcrumb-item">
-                    <a href="{{ path('app_hotel_index') }}" class="text-emerald text-decoration-none">
-                        <i class="bi bi-house me-2"></i>Hôtels
-                    </a>
-                </li>
-                <li class="breadcrumb-item active" aria-current="page">
-                    Chambres
-                </li>
-            </ol>
-        </nav>
-        <div class="row mb-4">
-            <div class="col-12">
-                <h1 class="display-4 fw-bold text-white mb-4">
-                    <i class="bi bi-door-open me-3"></i>Nos Chambres
-                </h1>
-                <p class="lead text-white-50 mb-4">
-                    Découvrez notre sélection de chambres confortables pour votre séjour
-                </p>
-            </div>
+        <div class="gv-hero-breadcrumb">
+            <a href="{{ path('app_hotel_index') }}">
+                <span class="material-symbols-outlined" style="font-size:0.9rem;">apartment</span> Hôtels
+            </a>
+            <span class="material-symbols-outlined" style="font-size:0.7rem; opacity:0.5;">chevron_right</span>
+            <span class="accent">Chambres</span>
         </div>
-
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="alert alert-light mb-0">Consultation uniquement</div>
-            </div>
-        </div>
-
-        <!-- Search and Sort Section -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card search-card shadow-lg border-0">
-                    <div class="card-body p-4">
-                        <form method="GET" action="{{ path('app_chambre_index') }}" class="row g-3 align-items-end">
-                            <!-- Search Bar -->
-                            <div class="col-md-6">
-                                <label for="search" class="form-label fw-bold text-dark">
-                                    <i class="bi bi-search me-2 text-emerald"></i>Rechercher
-                                </label>
-                                <input type="text" class="form-control form-control-lg" id="search" name="search" placeholder="Rechercher par type, hôtel ou équipements..." value="{{ search }}">
-                            </div>
-
-                            <!-- Sort By -->
-                            <div class="col-md-3">
-                                <label for="sortBy" class="form-label fw-bold text-dark">
-                                    <i class="bi bi-sort-down me-2 text-emerald"></i>Trier par
-                                </label>
-                                <select class="form-select form-select-lg" id="sortBy" name="sortBy">
-                                    <option value="type" {% if sortBy == 'type' %}selected{% endif %}>Type de chambre</option>
-                                    <option value="capacite" {% if sortBy == 'capacite' %}selected{% endif %}>Capacité</option>
-                                    <option value="prixStandard" {% if sortBy == 'prixStandard' %}selected{% endif %}>Prix standard</option>
-                                    <option value="prixHauteSaison" {% if sortBy == 'prixHauteSaison' %}selected{% endif %}>Prix haute saison</option>
-                                    <option value="prixBasseSaison" {% if sortBy == 'prixBasseSaison' %}selected{% endif %}>Prix basse saison</option>
-                                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>Date de création</option>
-                                </select>
-                            </div>
-
-                            <!-- Sort Direction -->
-                            <div class="col-md-2">
-                                <label for="sortDir" class="form-label fw-bold text-dark">
-                                    <i class="bi bi-arrow-up-down me-2 text-emerald"></i>Ordre
-                                </label>
-                                <select class="form-select form-select-lg" id="sortDir" name="sortDir">
-                                    <option value="ASC" {% if sortDir == 'ASC' %}selected{% endif %}>Croissant ↑</option>
-                                    <option value="DESC" {% if sortDir == 'DESC' %}selected{% endif %}>Décroissant ↓</option>
-                                </select>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div class="col-md-1">
-                                <button type="submit" class="btn btn-emerald btn-lg w-100">
-                                    <i class="bi bi-search"></i>
-                                </button>
-                            </div>
-
-                            <!-- Reset Button -->
-                            {% if search or sortBy != 'type' or sortDir != 'ASC' %}
-                                <div class="col-md-2">
-                                    <a href="{{ path('app_chambre_index') }}" class="btn btn-outline-secondary btn-lg w-100">
-                                        <i class="bi bi-arrow-clockwise me-2"></i>Réinitialiser
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            {% for chambre in chambres %}
-                <div class="col-lg-4 col-md-6 col-sm-12">
-                    <div class="card chambre-card h-100 shadow-lg border-0">
-                        <div class="card-body d-flex flex-column">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h5 class="card-title fw-bold text-dark mb-0">{{ chambre.type }}</h5>
-                                <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="badge bg-emerald text-decoration-none" title="Voir l'hôtel associé">
-                                {{ chambre.hotel.nom }}
-                            </a>
-                            </div>
-
-                            <div class="chambre-details mb-3">
-                                <p class="mb-2">
-                                    <i class="bi bi-people me-2 text-emerald"></i>
-                                    Capacité: {{ chambre.capacite }} personne(s)
-                                </p>
-                                {% if chambre.equipements %}
-                                    <p class="mb-2">
-                                        <i class="bi bi-gear me-2 text-emerald"></i>
-                                        {{ chambre.equipements }}
-                                    </p>
-                                {% endif %}
-                            </div>
-
-                            <div class="prix-section mt-auto">
-                                {% if chambre.prixStandard %}
-                                    <div class="prix-item mb-1">
-                                        <small class="text-muted">Prix standard:</small>
-                                        <span class="fw-bold text-emerald">{{ chambre.prixStandard }}€</span>
-                                    </div>
-                                {% endif %}
-                                {% if chambre.prixHauteSaison %}
-                                    <div class="prix-item mb-1">
-                                        <small class="text-muted">Haute saison:</small>
-                                        <span class="fw-bold text-warning">{{ chambre.prixHauteSaison }}€</span>
-                                    </div>
-                                {% endif %}
-                                {% if chambre.prixBasseSaison %}
-                                    <div class="prix-item">
-                                        <small class="text-muted">Basse saison:</small>
-                                        <span class="fw-bold text-info">{{ chambre.prixBasseSaison }}€</span>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="card-footer bg-transparent border-0">
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ path('app_chambre_show', {'id': chambre.id}) }}" class="btn btn-outline-emerald btn-sm">
-                                    <i class="bi bi-eye me-1"></i>Voir Détails
-                                </a>
-                                <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="btn btn-info btn-sm">
-                                    <i class="bi bi-building me-1"></i>Hôtel associé
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <div class="col-12">
-                    <div class="text-center py-5">
-                        <i class="bi bi-door-open text-muted" style="font-size: 4rem;"></i>
-                        <h3 class="text-white mt-3">Aucune chambre trouvée</h3>
-                        <p class="text-white-50">Soyez le premier à ajouter une chambre à notre plateforme.</p>
-                        <span class="text-white-50">Aucune opération de création n'est disponible dans cette interface.</span>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
+        <h1 class="gv-hero-title">Nos <em>Chambres</em></h1>
+        <p class="gv-hero-sub">Découvrez notre sélection de chambres confortables pour votre séjour</p>
     </div>
 </div>
 
-<style>
-.btn-emerald {
-    background-color: var(--primary-emerald);
-    border-color: var(--primary-emerald);
-    color: white;
-}
+<div class="gv-container">
+    <!-- Search -->
+    <div class="gv-search-card">
+        <form method="GET" action="{{ path('app_chambre_index') }}" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label for="search" class="form-label">
+                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">search</span> Rechercher
+                </label>
+                <input type="text" class="form-control" id="search" name="search" placeholder="Type, hôtel ou équipements..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <label for="sortBy" class="form-label">
+                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">sort</span> Trier par
+                </label>
+                <select class="form-select" id="sortBy" name="sortBy">
+                    <option value="type" {% if sortBy == 'type' %}selected{% endif %}>Type de chambre</option>
+                    <option value="capacite" {% if sortBy == 'capacite' %}selected{% endif %}>Capacité</option>
+                    <option value="prixStandard" {% if sortBy == 'prixStandard' %}selected{% endif %}>Prix standard</option>
+                    <option value="prixHauteSaison" {% if sortBy == 'prixHauteSaison' %}selected{% endif %}>Prix haute saison</option>
+                    <option value="prixBasseSaison" {% if sortBy == 'prixBasseSaison' %}selected{% endif %}>Prix basse saison</option>
+                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>Date de création</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="sortDir" class="form-label">
+                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">swap_vert</span> Ordre
+                </label>
+                <select class="form-select" id="sortDir" name="sortDir">
+                    <option value="ASC" {% if sortDir == 'ASC' %}selected{% endif %}>Croissant ↑</option>
+                    <option value="DESC" {% if sortDir == 'DESC' %}selected{% endif %}>Décroissant ↓</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="gv-search-btn w-100">
+                    <span class="material-symbols-outlined" style="font-size:1.2rem;">search</span>
+                </button>
+            </div>
+            {% if search or sortBy != 'type' or sortDir != 'ASC' %}
+            <div class="col-md-1">
+                <a href="{{ path('app_chambre_index') }}" class="gv-reset-link w-100 text-center">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">refresh</span>
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
 
-.btn-emerald:hover {
-    background-color: var(--accent-green);
-    border-color: var(--accent-green);
-    color: white;
-}
+    <!-- Cards -->
+    <div class="gv-card-grid">
+        {% for chambre in chambres %}
+        <div class="gv-ch-card gv-reveal">
+            <div class="gv-ch-card-body">
+                <div class="gv-ch-card-top">
+                    <span class="gv-ch-type">{{ chambre.type }}</span>
+                    <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="gv-hotel-badge" title="Voir l'hôtel">
+                        <span class="material-symbols-outlined" style="font-size:0.85rem;">apartment</span>
+                        {{ chambre.hotel.nom }}
+                    </a>
+                </div>
 
-.btn-outline-emerald {
-    border-color: var(--primary-emerald);
-    color: var(--primary-emerald);
-}
+                <div class="gv-ch-detail">
+                    <span class="material-symbols-outlined">group</span>
+                    Capacité : <strong>{{ chambre.capacite }} personne(s)</strong>
+                </div>
+                {% if chambre.equipements %}
+                <div class="gv-ch-detail">
+                    <span class="material-symbols-outlined">build</span>
+                    {{ chambre.equipements }}
+                </div>
+                {% endif %}
 
-.btn-outline-emerald:hover {
-    background-color: var(--primary-emerald);
-    border-color: var(--primary-emerald);
-    color: white;
-}
+                <div class="gv-ch-prices">
+                    {% if chambre.prixStandard %}
+                    <div class="gv-ch-price-row">
+                        <span class="gv-ch-price-label">Prix standard</span>
+                        <span class="gv-ch-price-val gv-ch-price-standard">{{ chambre.prixStandard }}€</span>
+                    </div>
+                    {% endif %}
+                    {% if chambre.prixHauteSaison %}
+                    <div class="gv-ch-price-row">
+                        <span class="gv-ch-price-label">Haute saison</span>
+                        <span class="gv-ch-price-val gv-ch-price-high">{{ chambre.prixHauteSaison }}€</span>
+                    </div>
+                    {% endif %}
+                    {% if chambre.prixBasseSaison %}
+                    <div class="gv-ch-price-row">
+                        <span class="gv-ch-price-label">Basse saison</span>
+                        <span class="gv-ch-price-val gv-ch-price-low">{{ chambre.prixBasseSaison }}€</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="gv-ch-card-footer">
+                <a href="{{ path('app_chambre_show', {'id': chambre.id}) }}" class="gv-action-sm gv-action-view">
+                    <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span> Voir Détails
+                </a>
+                <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="gv-action-sm gv-action-hotel-link">
+                    <span class="material-symbols-outlined" style="font-size:0.9rem;">apartment</span> Hôtel associé
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="gv-empty">
+            <span class="material-symbols-outlined gv-empty-icon">door_open</span>
+            <h4>Aucune chambre trouvée</h4>
+            <p>Aucune chambre ne correspond à votre recherche.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
 
-.chambre-card {
-    background: var(--glass-card);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.chambre-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px var(--shadow-green);
-}
-
-.badge.bg-emerald {
-    background-color: var(--primary-emerald) !important;
-}
-
-.chambre-details p {
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.prix-section {
-    border-top: 1px solid #e9ecef;
-    padding-top: 1rem;
-}
-
-.prix-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.text-emerald {
-    color: var(--primary-emerald) !important;
-}
-
-.search-card {
-    background: var(--glass-card);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-}
-
-.search-card .form-control,
-.search-card .form-select {
-    background-color: rgba(255, 255, 255, 0.95);
-    border: 2px solid #e9ecef;
-    color: #333;
-    border-radius: 10px;
-    transition: border-color 0.3s ease;
-}
-
-.search-card .form-control:focus,
-.search-card .form-select:focus {
-    border-color: var(--primary-emerald);
-    box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.15);
-    background-color: rgba(255, 255, 255, 0.99);
-}
-
-.search-card .form-control::placeholder {
-    color: #999;
-}
-
-.search-card .form-label {
-    color: #333 !important;
-    margin-bottom: 0.5rem;
-}
-</style>
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var reveals = document.querySelectorAll('.gv-reveal');
+    if (reveals.length) {
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) { entry.target.classList.add('is-visible'); observer.unobserve(entry.target); }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+        reveals.forEach(function(el, i) { el.style.transitionDelay = (i * 80) + 'ms'; observer.observe(el); });
+    }
+});
+</script>
 {% endblock %}

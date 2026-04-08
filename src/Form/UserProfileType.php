@@ -22,6 +22,7 @@ class UserProfileType extends AbstractType
         $builder
             ->add('prenom', TextType::class, [
                 'label' => 'Prénom',
+                'empty_data' => '',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez saisir votre prénom.']),
                     new Length(['min' => 2])
@@ -29,6 +30,7 @@ class UserProfileType extends AbstractType
             ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
+                'empty_data' => '',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez saisir votre nom.']),
                     new Length(['min' => 2])
@@ -36,6 +38,7 @@ class UserProfileType extends AbstractType
             ])
             ->add('email', EmailType::class, [
                 'label' => 'Adresse email',
+                'empty_data' => '',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez saisir une adresse email.']),
                     new \Symfony\Component\Validator\Constraints\Email()

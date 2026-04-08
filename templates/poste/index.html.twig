@@ -2,189 +2,490 @@
 
 {% block page_title %}Gestion des Publications{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   GoVibe Publications — Ultra Premium Design
+═══════════════════════════════════════════════════ */
+body {
+    font-family: 'Manrope', sans-serif !important;
+    background: #fcf9f8 !important;
+    color: #1c1b1b !important;
+}
+
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+/* ─── Hero Section ─── */
+.gv-pub-hero {
+    position: relative;
+    padding: 180px 0 100px;
+    background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+    overflow: hidden;
+    text-align: center;
+    border-radius: 0 0 3rem 3rem;
+    box-shadow: 0 20px 50px rgba(0, 52, 45, 0.15);
+}
+
+.gv-pub-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 75%, rgba(16, 185, 129, 0.15) 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 25%, rgba(233, 193, 118, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.gv-pub-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(160, 242, 225, 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    pointer-events: none;
+}
+
+.gv-hero-icon-bg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22rem;
+    color: rgba(255, 255, 255, 0.02);
+    z-index: 0;
+    pointer-events: none;
+    font-variation-settings: 'FILL' 1;
+}
+
+.gv-hero-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease both;
+}
+.gv-hero-title em { color: #a0f2e1; font-style: italic; font-weight: 300; }
+
+.gv-hero-sub {
+    color: rgba(160, 242, 225, 0.7);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 0.5rem;
+    line-height: 1.6;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease 0.2s both;
+}
+
+.gv-hero-stat {
+    color: rgba(160, 242, 225, 0.5);
+    font-size: 0.9rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+    animation: heroFadeIn 0.8s ease 0.3s both;
+}
+
+@keyframes heroFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Main Content Container ─── */
+.gv-pub-container {
+    max-width: 1200px;
+    margin: -40px auto 80px;
+    position: relative;
+    z-index: 10;
+    padding: 0 2rem;
+}
+
+/* ─── Toolbar ─── */
+.gv-pub-toolbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0, 52, 45, 0.06);
+    border-radius: 1.25rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 52, 45, 0.08);
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.gv-toolbar-search {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    max-width: 500px;
+}
+.gv-toolbar-search .material-symbols-outlined { color: #546067; font-size: 1.2rem; }
+.gv-toolbar-search-input {
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1c1b1b;
+    font-family: 'Manrope', sans-serif;
+    padding: 0.5rem 0;
+}
+.gv-toolbar-search-input::placeholder { color: #bfc9c4; }
+.gv-toolbar-search-clear {
+    color: #546067;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+.gv-toolbar-search-clear:hover { color: #ba1a1a; }
+
+.gv-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.gv-btn-ghost {
+    background: #fff;
+    border: 1.5px solid rgba(0, 52, 45, 0.08);
+    border-radius: 0.75rem;
+    padding: 0.5rem 0.85rem;
+    color: #546067;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: all 0.25s ease;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+}
+.gv-btn-ghost:hover {
+    border-color: rgba(0, 52, 45, 0.2);
+    background: rgba(0, 52, 45, 0.03);
+    color: #00342d;
+}
+
+.gv-btn-new-post {
+    padding: 0.65rem 1.5rem;
+    background: linear-gradient(135deg, #e9c176 0%, #ca9028 100%);
+    color: #3d2a00;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 20px -5px rgba(233, 193, 118, 0.35);
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+}
+.gv-btn-new-post:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -5px rgba(233, 193, 118, 0.5);
+    color: #3d2a00;
+}
+
+.gv-vr {
+    width: 1px;
+    height: 24px;
+    background: rgba(0, 52, 45, 0.1);
+    margin: 0 0.25rem;
+}
+
+/* ─── Layout: Sidebar + Feed ─── */
+.gv-pub-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 2rem;
+}
+@media (max-width: 992px) {
+    .gv-pub-layout { grid-template-columns: 1fr; }
+    .gv-pub-sidebar { display: none; }
+}
+
+/* ─── Sidebar ─── */
+.gv-pub-sidebar-inner {
+    position: sticky;
+    top: 2rem;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 52, 45, 0.05);
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+}
+
+.gv-sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+.gv-sidebar-header h5 {
+    font-family: 'Noto Serif', serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #00342d;
+    margin: 0;
+}
+.gv-sidebar-header a {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #10B981;
+    text-decoration: none;
+}
+.gv-sidebar-header a:hover { text-decoration: underline; }
+
+.gv-forum-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.gv-forum-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.gv-forum-item:hover { background: rgba(0, 52, 45, 0.03); }
+
+.gv-forum-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.gv-forum-avatar img {
+    width: 100%; height: 100%; object-fit: cover;
+}
+.gv-forum-avatar-placeholder {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 52, 45, 0.08);
+    color: #00342d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+.gv-forum-name {
+    font-weight: 700;
+    color: #00342d;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.gv-forum-members {
+    font-size: 0.7rem;
+    color: #707975;
+}
+
+/* ─── Sort Dropdown (inherit existing) ─── */
+.dropdown-menu {
+    border: 1px solid rgba(0, 52, 45, 0.06) !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08) !important;
+    padding: 0.5rem !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+}
+.dropdown-item {
+    border-radius: 0.5rem !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+}
+.dropdown-item:hover { background: rgba(0, 52, 45, 0.04) !important; }
+
+/* ─── Posts Empty State ─── */
+.gv-empty {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: #fff;
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+    max-width: 600px;
+    margin: 2rem auto 0;
+}
+.gv-empty-icon {
+    font-size: 4rem;
+    color: #cde1db;
+    margin-bottom: 1.5rem;
+    font-variation-settings: 'FILL' 1;
+}
+.gv-empty h4 {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.3rem;
+    color: #00342d;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+.gv-empty p { color: #546067; font-size: 0.9rem; }
+
+/* ─── Custom Scrollbar ─── */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 52, 45, 0.15); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 52, 45, 0.3); }
+
+.modal-body { max-height: 80vh; }
+</style>
+{% endblock %}
+
 {% block body %}
-    <!-- Professional Header Section -->
-    <div class="{% if is_granted('ROLE_ADMIN') %}mb-4{% else %}pt-5 pb-4 px-4{% endif %} animate-fade-in">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-4 {% if not is_granted('ROLE_ADMIN') %}publications-header-card{% endif %}">
-            <div class="d-flex align-items-center gap-3">
-                <div class="d-none d-sm-flex align-items-center justify-content-center bg-success bg-opacity-10 rounded-3 text-success p-3" style="width: 56px; height: 56px;">
-                    <i class="bi bi-chat-square-text-fill fs-3"></i>
-                </div>
-                <div>
-                    <h1 class="h2 fw-bold text-dark mb-1" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;">Publications</h1>
-                    <div class="d-flex align-items-center gap-2 text-secondary opacity-75">
-                        <i class="bi bi-people-fill small"></i>
-                        <span class="small fw-medium">Communauté GoVibe</span>
-                        <span class="mx-1">•</span>
-                        <span class="small">{{ postes|length }} Publication(s)</span>
-                    </div>
-                </div>
+    <!-- ─── HERO (only for non-admin) ─── -->
+    {% if not is_granted('ROLE_ADMIN') %}
+    <div class="gv-pub-hero">
+        <span class="material-symbols-outlined gv-hero-icon-bg">forum</span>
+        <div class="container">
+            <h1 class="gv-hero-title">Nos <em>Publications</em></h1>
+            <p class="gv-hero-sub">Partagez vos expériences, inspirez la communauté GoVibe et découvrez les récits de voyageurs passionnés.</p>
+            <p class="gv-hero-stat">{{ postes|length }} publication{{ postes|length > 1 ? 's' : '' }} dans la communauté</p>
+        </div>
+    </div>
+    {% else %}
+    <div class="mb-4">
+        <div class="d-flex align-items-center gap-3 p-3">
+            <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px; height:48px; background: rgba(0,52,45,0.08);">
+                <span class="material-symbols-outlined" style="color:#00342d;">forum</span>
             </div>
-            
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" class="btn btn-new-post px-4 py-2 fw-bold shadow-sm d-flex align-items-center gap-2 transition-all hover-lift" onclick="openPostModal('{{ path('app_poste_new') }}')">
-                    <i class="bi bi-plus-circle-fill"></i>
-                    <span>Nouvelle Publication</span>
-                </button>
+            <div>
+                <h1 class="h3 fw-bold mb-0" style="font-family:'Noto Serif',serif; color:#00342d;">Publications</h1>
+                <span class="text-muted" style="font-size:0.85rem;">{{ postes|length }} publication{{ postes|length > 1 ? 's' : '' }}</span>
             </div>
         </div>
     </div>
+    {% endif %}
 
-    <style>
-        .publications-header-card {
-            background-color: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 1rem;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        }
-        
-        .animate-fade-in { animation: fadeIn 0.5s ease-out both; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .btn-new-post {
-            background: linear-gradient(135deg, #16a34a, #22c55e);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .btn-new-post:hover {
-            background: linear-gradient(135deg, #15803d, #16a34a);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3) !important;
-        }
-        .btn-new-post:active { transform: translateY(0); }
-        
-        .hover-lift { transition: transform 0.2s ease; }
-        .hover-lift:hover { transform: translateY(-2px); }
-        .backdrop-blur { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
-    </style>
+    <!-- ─── MAIN CONTENT ─── -->
+    <div class="{% if not is_granted('ROLE_ADMIN') %}gv-pub-container{% else %}px-3{% endif %}">
 
-    <!-- Main Layout: Sidebar + Content -->
-    <div class="px-4">
-        <div class="row g-4">
-            <!-- Left Sidebar: Forums List -->
-            <div class="col-lg-3 d-none d-lg-block">
-                <div class="sticky-top" style="top: 2rem; z-index: 10;">
-                    <div class="rounded-4 border p-4 shadow-sm backdrop-blur" style="background-color: rgba(255, 255, 255, 0.82); border: 1px solid rgba(0,0,0,0.05) !important;">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h5 class="fw-bold text-dark mb-0" style="font-family: 'Outfit', sans-serif;">Communautés</h5>
-                            <a href="{{ path('app_forum_index') }}" class="text-success small text-decoration-none fw-bold">Tout voir</a>
-                        </div>
-                        
-                        <div class="d-flex flex-column gap-3">
-                            {% for forum in forums|slice(0, 5) %}
-                            <a href="{{ path('app_forum_show', {'forumId': forum.forumId}) }}" class="text-decoration-none group">
-                                <div class="d-flex align-items-center gap-3 p-2 rounded-3 transition-all hover-bg-light">
-                                    <div class="flex-shrink-0">
-                                        {% if forum.image %}
-                                            <img src="{{ forum.image }}" alt="{{ forum.name }}" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover; border: 1px solid rgba(0,0,0,0.05);">
-                                        {% else %}
-                                            <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 14px;">
-                                                {{ forum.name|first|upper }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                    <div class="overflow-hidden">
-                                        <div class="text-dark fw-bold text-truncate small">{{ forum.name }}</div>
-                                        <div class="text-muted x-small text-truncate">{{ forum.nbrMembers }} membres</div>
-                                    </div>
-                                </div>
+        <!-- Toolbar -->
+        <div class="gv-pub-toolbar">
+            <form action="{{ path('app_poste_index') }}" method="GET" class="gv-toolbar-search">
+                <input type="hidden" name="sort" value="{{ current_sort }}">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" name="q" value="{{ current_query }}" placeholder="Rechercher une publication..." class="gv-toolbar-search-input">
+                {% if current_query %}
+                    <a href="{{ path('app_poste_index', {'sort': current_sort}) }}" class="gv-toolbar-search-clear">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">close</span>
+                    </a>
+                {% endif %}
+            </form>
+
+            <div class="gv-toolbar-actions">
+                <!-- Sort Dropdown -->
+                <div class="dropdown">
+                    <button class="gv-btn-ghost dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">filter_list</span>
+                        {% if current_sort == 'popular' %}Plus populaires
+                        {% elseif current_sort == 'mine' %}Mes Publications
+                        {% else %}Nouveautés{% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end mt-2">
+                        {% if app.user %}
+                            <li>
+                                <a class="dropdown-item {{ current_sort == 'mine' ? 'fw-bold' : '' }}" href="{{ path('app_poste_index', {'q': current_query, 'sort': 'mine'}) }}">
+                                    <span class="material-symbols-outlined me-2" style="font-size:1rem;">person</span>Mes Publications
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                        {% endif %}
+                        <li>
+                            <a class="dropdown-item {{ current_sort == 'newest' ? 'fw-bold' : '' }}" href="{{ path('app_poste_index', {'q': current_query, 'sort': 'newest'}) }}">
+                                <span class="material-symbols-outlined me-2" style="font-size:1rem;">schedule</span>Nouveautés
                             </a>
-                            {% endfor %}
-                        </div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item {{ current_sort == 'popular' ? 'fw-bold' : '' }}" href="{{ path('app_poste_index', {'q': current_query, 'sort': 'popular'}) }}">
+                                <span class="material-symbols-outlined me-2" style="font-size:1rem;">local_fire_department</span>Plus populaires
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="gv-vr d-none d-md-block"></div>
+
+                <!-- Export -->
+                <a href="{{ path('app_poste_export_pdf') }}" class="gv-btn-ghost" style="color: #ba1a1a;" title="Exporter en PDF">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">picture_as_pdf</span>
+                    <span class="d-none d-md-inline">PDF</span>
+                </a>
+                <a href="{{ path('app_poste_export_excel') }}" class="gv-btn-ghost" style="color: #046b5e;" title="Exporter en Excel">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">table_chart</span>
+                    <span class="d-none d-md-inline">Excel</span>
+                </a>
+
+                <div class="gv-vr d-none d-md-block"></div>
+
+                <button type="button" class="gv-btn-new-post" onclick="openPostModal('{{ path('app_poste_new') }}')">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">add_circle</span>
+                    Publier
+                </button>
+            </div>
+        </div>
+
+        <!-- Layout: Sidebar + Feed -->
+        <div class="gv-pub-layout">
+            <!-- Sidebar -->
+            {% if not is_granted('ROLE_ADMIN') %}
+            <div class="gv-pub-sidebar">
+                <div class="gv-pub-sidebar-inner">
+                    <div class="gv-sidebar-header">
+                        <h5>Communautés</h5>
+                        <a href="{{ path('app_forum_index') }}">Tout voir</a>
+                    </div>
+                    <div class="gv-forum-list">
+                        {% for forum in forums|slice(0, 5) %}
+                        <a href="{{ path('app_forum_show', {'forumId': forum.forumId}) }}" class="gv-forum-item">
+                            {% if forum.image %}
+                                <div class="gv-forum-avatar"><img src="{{ forum.image }}" alt="{{ forum.name }}"></div>
+                            {% else %}
+                                <div class="gv-forum-avatar-placeholder">{{ forum.name|first|upper }}</div>
+                            {% endif %}
+                            <div style="overflow:hidden;">
+                                <div class="gv-forum-name">{{ forum.name }}</div>
+                                <div class="gv-forum-members">{{ forum.nbrMembers }} membres</div>
+                            </div>
+                        </a>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
+            {% endif %}
 
-            <!-- Main Feed Area -->
-            <div class="col-lg-9">
-                <!-- Filters and Actions Bar -->
-                <div class="rounded-4 border p-3 shadow-sm mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 backdrop-blur position-relative" style="z-index: 20; background-color: rgba(255, 255, 255, 0.82); border: 1px solid rgba(0,0,0,0.05) !important;">
-                    <!-- Search -->
-                    <form action="{{ path('app_poste_index') }}" method="GET" class="flex-grow-1" style="max-width: 500px;">
-                        <input type="hidden" name="sort" value="{{ current_sort }}">
-                        <div class="input-group">
-                            <span class="input-group-text bg-transparent border-0 pe-0 text-muted">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input type="text" name="q" value="{{ current_query }}" placeholder="Rechercher une publication..." 
-                                   class="form-control border-0 bg-transparent shadow-none" style="font-size: 14px;">
-                            {% if current_query %}
-                                <a href="{{ path('app_poste_index', {'sort': current_sort}) }}" class="btn border-0 text-muted">
-                                    <i class="bi bi-x-lg"></i>
-                                </a>
-                            {% endif %}
-                        </div>
-                    </form>
-
-                    <div class="d-flex align-items-center gap-2">
-                        <!-- Sort Dropdown -->
-                        <div class="dropdown">
-                            <button class="btn btn-pro d-flex align-items-center gap-2 px-3 shadow-none overflow-visible" type="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-filter-right fs-5"></i>
-                                <span class="small fw-bold">Trier par : 
-                                    {% if current_sort == 'popular' %}Plus populaires
-                                    {% elseif current_sort == 'mine' %}Mes Publications
-                                    {% else %}Nouveautés{% endif %}
-                                </span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-2" style="z-index: 1060;">
-                                {% if app.user %}
-                                    <li>
-                                        <a class="dropdown-item rounded-3 mb-1 {{ current_sort == 'mine' ? 'bg-success bg-opacity-10 text-success fw-bold' : '' }}" 
-                                           href="{{ path('app_poste_index', {'q': current_query, 'sort': 'mine'}) }}">
-                                            <i class="bi bi-person-fill me-2"></i>Mes Publications
-                                        </a>
-                                    </li>
-                                    <li><hr class="dropdown-divider opacity-10"></li>
-                                {% endif %}
-                                <li>
-                                    <a class="dropdown-item rounded-3 mb-1 {{ current_sort == 'newest' ? 'bg-success bg-opacity-10 text-success fw-bold' : '' }}" 
-                                       href="{{ path('app_poste_index', {'q': current_query, 'sort': 'newest'}) }}">
-                                        <i class="bi bi-clock me-2"></i>Nouveautés
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item rounded-3 {{ current_sort == 'popular' ? 'bg-success bg-opacity-10 text-success fw-bold' : '' }}" 
-                                       href="{{ path('app_poste_index', {'q': current_query, 'sort': 'popular'}) }}">
-                                        <i class="bi bi-fire me-2"></i>Plus populaires
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- Sep -->
-                        <div class="vr mx-2 d-none d-md-block opacity-10"></div>
-
-                        <!-- Export PDF -->
-                        <a href="{{ path('app_poste_export_pdf') }}" class="btn btn-pro text-danger d-flex align-items-center gap-2 px-3 transition-all hover-lift" title="Exporter en PDF">
-                            <i class="bi bi-file-earmark-pdf-fill"></i>
-                            <span class="d-none d-md-inline small fw-bold">PDF</span>
-                        </a>
-
-                        <!-- Export Excel -->
-                        <a href="{{ path('app_poste_export_excel') }}" class="btn btn-pro text-success d-flex align-items-center gap-2 px-3 transition-all hover-lift" title="Exporter en Excel">
-                            <i class="bi bi-file-earmark-spreadsheet-fill"></i>
-                            <span class="d-none d-md-inline small fw-bold">Excel</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Posts Feed -->
+            <!-- Main Feed -->
+            <div>
                 <div class="posts-container">
                     {% for poste in postes %}
                         {{ include('poste/postitem.html.twig', {'poste': poste}) }}
                     {% else %}
-                        <!-- Empty state with improved design -->
-                        <div class="bg-white border rounded-5 p-5 text-center shadow-sm mx-auto" style="max-width: 600px; margin-top: 50px;">
-                            <div class="display-3 text-success opacity-10 mb-4"><i class="bi bi-chat-dots-fill"></i></div>
-                            <h3 class="fw-bold h4">{% if current_query %}Aucun résultat pour "{{ current_query }}"{% else %}Flux de communauté vide{% endif %}</h3>
-                            <p class="text-secondary opacity-75 small">Prêt à partager quelque chose avec la communauté ?</p>
-                            <button type="button" class="btn btn-new-post mt-3 shadow-sm px-4" onclick="openPostModal('{{ path('app_poste_new') }}')">
+                        <div class="gv-empty">
+                            <span class="material-symbols-outlined gv-empty-icon">chat_bubble</span>
+                            <h4>{% if current_query %}Aucun résultat pour "{{ current_query }}"{% else %}Flux de communauté vide{% endif %}</h4>
+                            <p>Prêt à partager quelque chose avec la communauté ?</p>
+                            <button type="button" class="gv-btn-new-post" style="margin-top: 1rem;" onclick="openPostModal('{{ path('app_poste_new') }}')">
+                                <span class="material-symbols-outlined" style="font-size:1.1rem;">add_circle</span>
                                 Commencer maintenant
                             </button>
                         </div>
@@ -194,64 +495,28 @@
         </div>
     </div>
 
-    <style>
-        .hover-bg-light:hover { background-color: rgba(0, 0, 0, 0.02); }
-        .x-small { font-size: 11px; }
-        .uppercase { text-transform: uppercase; }
-        .ls-1 { letter-spacing: 0.5px; }
-        .group:hover .hover-bg-light { background-color: rgba(34, 197, 94, 0.05); }
-        .btn-pro {
-            background: #fff;
-            border: 1.5px solid rgba(0,0,0,0.06);
-            border-radius: 12px;
-            color: #475569;
-            transition: all 0.2s;
-        }
-        .btn-pro:hover {
-            border-color: rgba(34, 197, 94, 0.3);
-            background: rgba(34, 197, 94, 0.02);
-            color: #16a34a;
-        }
-    </style>
-
-    <!-- Global Post Modal -->
-    <div class="modal fade" id="postModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(5px);">
+    <!-- ─── Post Modal ─── -->
+    <div class="modal fade" id="postModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px);">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-            <div class="modal-content border-0 rounded-5 shadow-lg">
-                <!-- High-end Modal Header -->
+            <div class="modal-content border-0 rounded-4 shadow-lg" style="border-radius:1.5rem!important;">
                 <div class="modal-header border-0 pb-0 px-4 pt-4 d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-2">
-                        <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                            <i class="bi bi-pencil-square fs-5"></i>
+                        <div class="d-flex align-items-center justify-content-center rounded-3" style="width:40px; height:40px; background:rgba(0,52,45,0.08);">
+                            <span class="material-symbols-outlined" style="color:#00342d;">edit_square</span>
                         </div>
-                        <h5 class="modal-title fw-bold" style="font-family: 'Outfit', sans-serif;">Publication</h5>
+                        <h5 class="modal-title fw-bold" style="font-family: 'Noto Serif', serif; color:#00342d;">Publication</h5>
                     </div>
                     <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                
                 <div id="modalBody" class="modal-body p-4 custom-scrollbar">
                     <div class="text-center py-5">
-                        <div class="spinner-border text-success" role="status"></div>
+                        <div class="spinner-border" role="status" style="color:#10B981;"></div>
                         <p class="mt-3 text-muted small">Chargement du formulaire...</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <style>
-        /* Modern & Jolie Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { 
-            background: rgba(22, 163, 74, 0.2); 
-            border-radius: 10px; 
-            transition: all 0.2s;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(22, 163, 74, 0.4); }
-        
-        .modal-body { max-height: 80vh; }
-    </style>
 {% endblock %}
 
 {% block javascripts %}
@@ -274,10 +539,9 @@
             modalBody = document.getElementById('modalBody');
         }
 
-        // Reset body to loading state
         modalBody.innerHTML = `
             <div class="text-center py-5">
-                <div class="spinner-border text-success" role="status"></div>
+                <div class="spinner-border" role="status" style="color:#10B981;"></div>
                 <p class="mt-3 text-muted small">Connexion au serveur...</p>
             </div>
         `;
@@ -298,7 +562,7 @@
                 }, 20);
             })
             .catch(error => {
-                modalBody.innerHTML = '<div class="alert alert-danger m-4">Erreur de chargement.</div>';
+                modalBody.innerHTML = '<div class="alert alert-danger m-4 rounded-4">Erreur de chargement.</div>';
             });
     }
 </script>

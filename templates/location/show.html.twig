@@ -1,432 +1,122 @@
 {% extends 'base.html.twig' %}
-
-{% block title %}Détails Location - GoVibe{% endblock %}
-
-{% block body %}
+{% block title %}Location {{ location.reference }} — GoVibe{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --primary-emerald: #50C878;
-        --dark-green: #013220;
-        --light-green: #2E8B57;
-    }
-
-    .detail-hero {
-        background: linear-gradient(135deg, var(--dark-green) 0%, var(--light-green) 100%);
-        color: white;
-        padding: 50px 0;
-        margin-bottom: 40px;
-    }
-
-    .detail-hero h1 {
-        font-size: 2rem;
-        font-weight: 700;
-    }
-
-    .detail-container {
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
-    .detail-card {
-        background: white;
-        border-radius: 12px;
-        padding: 30px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .card-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--dark-green);
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 2px solid var(--primary-emerald);
-    }
-
-    .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-    }
-
-    .detail-item {
-        padding: 15px;
-        background: #f8f9fa;
-        border-radius: 8px;
-        border-left: 4px solid var(--primary-emerald);
-    }
-
-    .detail-label {
-        font-size: 0.85rem;
-        color: #666;
-        text-transform: uppercase;
-        font-weight: 600;
-        margin-bottom: 5px;
-    }
-
-    .detail-value {
-        font-size: 1.2rem;
-        color: var(--dark-green);
-        font-weight: 700;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-
-    .status-en_attente {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    .status-confirmee {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .status-annulee {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-
-    .status-terminee {
-        background-color: #d1ecf1;
-        color: #0c5460;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 20px;
-    }
-
-    .btn-action {
-        padding: 10px 16px;
-        border: none;
-        border-radius: 6px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-primary {
-        background-color: var(--primary-emerald);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background-color: var(--light-green);
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(80, 200, 120, 0.3);
-    }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background-color: #5a6268;
-    }
-
-    .btn-danger {
-        background-color: #dc3545;
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background-color: #c82333;
-    }
-
-    .btn-info {
-        background-color: #17a2b8;
-        color: white;
-    }
-
-    .btn-info:hover {
-        background-color: #138496;
-    }
-
-    .stats-box {
-        background: linear-gradient(135deg, rgba(80, 200, 120, 0.1) 0%, rgba(46, 139, 87, 0.1) 100%);
-        padding: 20px;
-        border-radius: 8px;
-        border: 2px solid var(--primary-emerald);
-    }
-
-    .stat-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-        border-bottom: 1px solid rgba(80, 200, 120, 0.2);
-    }
-
-    .stat-row:last-child {
-        border-bottom: none;
-    }
-
-    .stat-label {
-        color: #666;
-        font-size: 0.95rem;
-    }
-
-    .stat-value {
-        font-weight: 700;
-        color: var(--primary-emerald);
-        font-size: 1.1rem;
-    }
-
-    .total-stat {
-        display: flex;
-        justify-content: space-between;
-        padding: 15px 0;
-        border-top: 2px solid var(--primary-emerald);
-        margin-top: 10px;
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: var(--primary-emerald);
-    }
-
-    .document-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        padding: 8px 14px;
-        background-color: #f0f0f0;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        text-decoration: none;
-        color: #333;
-        transition: all 0.2s ease;
-        margin: 5px;
-    }
-
-    .document-link:hover {
-        background-color: var(--primary-emerald);
-        color: white;
-        border-color: var(--primary-emerald);
-        text-decoration: none;
-    }
-
-    .alert {
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-
-    .back-button {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        color: var(--primary-emerald);
-        font-weight: 600;
-        margin-bottom: 20px;
-        transition: all 0.2s ease;
-    }
-
-    .back-button:hover {
-        color: var(--light-green);
-        text-decoration: none;
-    }
+body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24}
+.gv-hero{position:relative;padding:170px 0 110px;background:linear-gradient(160deg,#00342d,#013220 40%,#001a12);overflow:hidden;text-align:center;border-radius:0 0 3rem 3rem;box-shadow:0 20px 50px rgba(0,52,45,.15)}
+.gv-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 80%,rgba(16,185,129,.15),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(233,193,118,.08),transparent 50%);pointer-events:none}
+.gv-hero::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(160,242,225,.06) 1px,transparent 1px);background-size:24px 24px;pointer-events:none}
+.gv-hib{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20rem;color:rgba(255,255,255,.015);pointer-events:none;font-variation-settings:'FILL' 1}
+.gv-ht{font-family:'Noto Serif',serif;font-size:clamp(2rem,4vw,3rem);color:#fff;font-weight:700;position:relative;z-index:2;margin-bottom:.3rem}
+.gv-ht em{color:#a0f2e1;font-style:italic;font-weight:300}
+.gv-hs{color:rgba(160,242,225,.7);font-size:1rem;position:relative;z-index:2}
+.gv-sb-hero{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem 1.25rem;border-radius:2rem;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;backdrop-filter:blur(8px);position:relative;z-index:2;margin-bottom:1rem}
+.st-wait{background:rgba(233,193,118,.15);color:#fde68a;border:1px solid rgba(233,193,118,.25)}
+.st-conf{background:rgba(160,242,225,.15);color:#a0f2e1;border:1px solid rgba(160,242,225,.25)}
+.st-cancel{background:rgba(239,68,68,.15);color:#fca5a5;border:1px solid rgba(239,68,68,.25)}
+.st-done{background:rgba(96,165,250,.15);color:#93c5fd;border:1px solid rgba(96,165,250,.25)}
+.gv-c{max-width:900px;margin:-45px auto 80px;position:relative;z-index:10;padding:0 2rem}
+.gv-alert{padding:1rem 1.5rem;border-radius:1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.6rem;font-size:.9rem;font-weight:600}
+.gv-alert-info{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.15);color:#2563eb}
+.gv-alert-ok{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.15);color:#047857}
+.gv-alert-err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);color:#b91c1c}
+.gv-card{background:rgba(255,255,255,.97);backdrop-filter:blur(20px) saturate(180%);border:1px solid rgba(0,52,45,.06);border-radius:1.5rem;padding:2rem;box-shadow:0 20px 60px rgba(0,52,45,.06);margin-bottom:2rem}
+.gv-ct{font-family:'Noto Serif',serif;font-size:1.05rem;font-weight:700;color:#00342d;display:flex;align-items:center;gap:.5rem;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:2px solid rgba(16,185,129,.15)}
+.gv-ct .material-symbols-outlined{font-size:1.1rem;color:#10B981}
+.gv-ig{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+.gv-ii{padding:1rem;background:rgba(0,52,45,.02);border-radius:.75rem;border:1px solid rgba(0,52,45,.04)}
+.gv-il{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#546067;margin-bottom:.25rem}
+.gv-iv{font-weight:700;color:#00342d;font-size:.95rem}
+.gv-fb{background:rgba(16,185,129,.06);border:1.5px solid rgba(16,185,129,.12);border-radius:1rem;padding:1.25rem}
+.gv-fr{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px solid rgba(16,185,129,.1)}
+.gv-fr:last-child{border-bottom:none}
+.gv-fl{color:#546067;font-size:.9rem}
+.gv-fv{font-weight:700;color:#10B981;font-size:.95rem}
+.gv-ft{display:flex;justify-content:space-between;padding:.75rem 0 0;border-top:2px solid rgba(16,185,129,.2);margin-top:.5rem;font-size:1.15rem;font-weight:700}
+.gv-ft span:last-child{font-family:'Noto Serif',serif;color:#10B981}
+.gv-docs{display:flex;flex-wrap:wrap;gap:.75rem}
+.gv-doc{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.25rem;border-radius:.75rem;font-weight:700;font-size:.85rem;text-decoration:none;transition:all .25s;border:1.5px solid rgba(0,52,45,.08);color:#00342d;font-family:'Manrope',sans-serif}
+.gv-doc:hover{border-color:#10B981;background:rgba(16,185,129,.06);color:#047857}
+.gv-actions{display:flex;flex-wrap:wrap;gap:.75rem}
+.gv-ab{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.5rem;border-radius:.75rem;font-weight:700;font-size:.88rem;text-decoration:none;transition:all .3s;font-family:'Manrope',sans-serif;border:none;cursor:pointer}
+.gv-ao{background:transparent;color:#546067;border:1.5px solid rgba(0,52,45,.08)}.gv-ao:hover{border-color:rgba(0,52,45,.2);background:rgba(0,52,45,.03);color:#00342d}
+.gv-ag{background:linear-gradient(135deg,#00342d,#046b5e);color:#fff;box-shadow:0 6px 15px rgba(0,52,45,.25)}.gv-ag:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,52,45,.35);color:#fff}
+.gv-ad{background:rgba(186,26,26,.06);color:#93000a;border:1px solid rgba(186,26,26,.1)}.gv-ad:hover{background:#ba1a1a;color:#fff;border-color:transparent}
 </style>
-
-<div class="detail-hero">
+{% endblock %}
+{% block body %}
+<div class="gv-hero">
+    <span class="material-symbols-outlined gv-hib">directions_car</span>
     <div class="container">
-        <h1><i class="bi bi-file-earmark-text"></i> Détails de Location</h1>
-        <p>{{ location.reference }}</p>
+        {% if location.statut == 'EN_ATTENTE' %}<span class="gv-sb-hero st-wait"><span class="material-symbols-outlined" style="font-size:.85rem">pending</span> En attente</span>
+        {% elseif location.statut == 'CONFIRMEE' %}<span class="gv-sb-hero st-conf"><span class="material-symbols-outlined" style="font-size:.85rem">verified</span> Confirmée</span>
+        {% elseif location.statut == 'ANNULEE' %}<span class="gv-sb-hero st-cancel"><span class="material-symbols-outlined" style="font-size:.85rem">cancel</span> Annulée</span>
+        {% elseif location.statut == 'TERMINEE' %}<span class="gv-sb-hero st-done"><span class="material-symbols-outlined" style="font-size:.85rem">task_alt</span> Terminée</span>
+        {% endif %}
+        <h1 class="gv-ht">Détails de <em>Location</em></h1>
+        <p class="gv-hs">{{ location.reference }}</p>
     </div>
 </div>
+<div class="gv-c">
+    {% if location.statut == 'EN_ATTENTE' %}<div class="gv-alert gv-alert-info"><span class="material-symbols-outlined" style="font-size:1.1rem">info</span> En attente de confirmation par l'administrateur.</div>
+    {% elseif location.statut == 'CONFIRMEE' %}<div class="gv-alert gv-alert-ok"><span class="material-symbols-outlined" style="font-size:1.1rem">check_circle</span> Location confirmée.</div>
+    {% elseif location.statut == 'ANNULEE' %}<div class="gv-alert gv-alert-err"><span class="material-symbols-outlined" style="font-size:1.1rem">error</span> Location annulée.</div>{% endif %}
 
-<div class="container detail-container">
-    <a href="{{ path('app_location_index') }}" class="back-button">
-        <i class="bi bi-arrow-left"></i> Retour à mes locations
-    </a>
-
-    <!-- Alerte info -->
-    {% if location.statut == 'EN_ATTENTE' %}
-    <div class="alert alert-info">
-        <i class="bi bi-info-circle me-2"></i>
-        Cette location est en attente de confirmation par l'administrateur.
-    </div>
-    {% elseif location.statut == 'CONFIRMEE' %}
-    <div class="alert alert-success">
-        <i class="bi bi-check-circle me-2"></i>
-        Cette location a été confirmée.
-    </div>
-    {% elseif location.statut == 'ANNULEE' %}
-    <div class="alert alert-danger">
-        <i class="bi bi-exclamation-circle me-2"></i>
-        Cette location a été annulée.
-    </div>
-    {% endif %}
-
-    <!-- Infos principales -->
-    <div class="detail-card">
-        <div class="card-title">
-            <i class="bi bi-info-circle" style="color: var(--primary-emerald);"></i> Informations Principales
-        </div>
-
-        <div class="detail-grid">
-            <div class="detail-item">
-                <div class="detail-label">Référence</div>
-                <div class="detail-value">{{ location.reference }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Statut</div>
-                <div> 
-                    <span class="status-badge status-{{ location.statut|lower|replace({'_': ''}) }}">
-                        {{ location.statut }}
-                    </span>
-                </div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Date de création</div>
-                <div class="detail-value">{{ location.dateCreation|date('d/m/Y H:i') }}</div>
-            </div>
+    <div class="gv-card">
+        <div class="gv-ct"><span class="material-symbols-outlined">info</span> Informations Principales</div>
+        <div class="gv-ig">
+            <div class="gv-ii"><div class="gv-il">Référence</div><div class="gv-iv">{{ location.reference }}</div></div>
+            <div class="gv-ii"><div class="gv-il">Statut</div><div class="gv-iv">{{ location.statut }}</div></div>
+            <div class="gv-ii"><div class="gv-il">Date de création</div><div class="gv-iv">{{ location.dateCreation|date('d/m/Y H:i') }}</div></div>
         </div>
     </div>
-
-    <!-- Infos voiture -->
-    <div class="detail-card">
-        <div class="card-title">
-            <i class="bi bi-car-front-fill" style="color: var(--primary-emerald);"></i> Voiture Louée
-        </div>
-
-        {% set voiture = location.voiture %}
-        <div class="detail-grid">
-            <div class="detail-item">
-                <div class="detail-label">Marque & Modèle</div>
-                <div class="detail-value">{{ voiture.marque }} {{ voiture.modele }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Matricule</div>
-                <div class="detail-value">{{ voiture.matricule }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Année</div>
-                <div class="detail-value">{{ voiture.annee }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Type Carburant</div>
-                <div class="detail-value">{{ voiture.typeCarburant }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Prix/Jour</div>
-                <div class="detail-value">{{ '%0.2f'|format(voiture.prixJour) }} DT</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Adresse Agence</div>
-                <div style="font-size: 0.95rem; color: var(--dark-green);">{{ voiture.adresseAgence }}</div>
-            </div>
+    {% set voiture = location.voiture %}
+    <div class="gv-card">
+        <div class="gv-ct"><span class="material-symbols-outlined">directions_car</span> Voiture Louée</div>
+        <div class="gv-ig">
+            <div class="gv-ii"><div class="gv-il">Marque & Modèle</div><div class="gv-iv">{{ voiture.marque }} {{ voiture.modele }}</div></div>
+            <div class="gv-ii"><div class="gv-il">Matricule</div><div class="gv-iv">{{ voiture.matricule }}</div></div>
+            <div class="gv-ii"><div class="gv-il">Année</div><div class="gv-iv">{{ voiture.annee }}</div></div>
+            <div class="gv-ii"><div class="gv-il">Carburant</div><div class="gv-iv">{{ voiture.typeCarburant }}</div></div>
+            <div class="gv-ii"><div class="gv-il">Prix/Jour</div><div class="gv-iv">{{ '%0.2f'|format(voiture.prixJour) }} DT</div></div>
+            <div class="gv-ii"><div class="gv-il">Adresse Agence</div><div class="gv-iv">{{ voiture.adresseAgence }}</div></div>
         </div>
     </div>
-
-    <!-- Infos location -->
-    <div class="detail-card">
-        <div class="card-title">
-            <i class="bi bi-calendar-event" style="color: var(--primary-emerald);"></i> Période de Location
-        </div>
-
-        <div class="detail-grid">
-            <div class="detail-item">
-                <div class="detail-label">Date de début</div>
-                <div class="detail-value">{{ location.dateDebut|date('d/m/Y') }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Date de fin</div>
-                <div class="detail-value">{{ location.dateFin|date('d/m/Y') }}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Nombre de jours</div>
-                <div class="detail-value">{{ location.nbJours }} jour(s)</div>
-            </div>
+    <div class="gv-card">
+        <div class="gv-ct"><span class="material-symbols-outlined">date_range</span> Période de Location</div>
+        <div class="gv-ig">
+            <div class="gv-ii"><div class="gv-il">Date de début</div><div class="gv-iv">{{ location.dateDebut|date('d/m/Y') }}</div></div>
+            <div class="gv-ii"><div class="gv-il">Date de fin</div><div class="gv-iv">{{ location.dateFin|date('d/m/Y') }}</div></div>
+            <div class="gv-ii"><div class="gv-il">Nombre de jours</div><div class="gv-iv">{{ location.nbJours }} jour(s)</div></div>
         </div>
     </div>
-
-    <!-- Statistiques financières -->
-    <div class="detail-card">
-        <div class="card-title">
-            <i class="bi bi-cash-coin" style="color: var(--primary-emerald);"></i> Résumé Financier
-        </div>
-
-        <div class="stats-box">
-            <div class="stat-row">
-                <span class="stat-label">Prix journalier</span>
-                <span class="stat-value">{{ '%0.2f'|format(stats.prixJournier) }} DT</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Nombre de jours</span>
-                <span class="stat-value">× {{ stats.nbJours }}</span>
-            </div>
-            <div class="total-stat">
-                <span>Montant Total</span>
-                <span>{{ '%0.2f'|format(stats.prixTotal) }} DT</span>
-            </div>
+    <div class="gv-card">
+        <div class="gv-ct"><span class="material-symbols-outlined">payments</span> Résumé Financier</div>
+        <div class="gv-fb">
+            <div class="gv-fr"><span class="gv-fl">Prix journalier</span><span class="gv-fv">{{ '%0.2f'|format(stats.prixJournier) }} DT</span></div>
+            <div class="gv-fr"><span class="gv-fl">Nombre de jours</span><span class="gv-fv">× {{ stats.nbJours }}</span></div>
+            <div class="gv-ft"><span>Montant Total</span><span>{{ '%0.2f'|format(stats.prixTotal) }} DT</span></div>
         </div>
     </div>
-
-    <!-- Documents -->
-    <div class="detail-card">
-        <div class="card-title">
-            <i class="bi bi-file-earmark" style="color: var(--primary-emerald);"></i> Documents
-        </div>
-
-        <div style="display: flex; flex-wrap: wrap;">
-            {% if location.contratPdf %}
-            <a href="{{ path('app_location_contrat', {id: location.idLocation}) }}" class="document-link">
-                <i class="bi bi-file-pdf"></i> Télécharger Contrat
-            </a>
-            {% endif %}
-
-
-            <a href="{{ path('app_location_pdf', {id: location.idLocation}) }}" class="document-link">
-                <i class="bi bi-file-earmark-pdf"></i> Détails PDF
-            </a>
-
-            <a href="{{ path('app_location_excel', {id: location.idLocation}) }}" class="document-link">
-                <i class="bi bi-file-earmark-spreadsheet"></i> Détails Excel
-            </a>
+    <div class="gv-card">
+        <div class="gv-ct"><span class="material-symbols-outlined">description</span> Documents</div>
+        <div class="gv-docs">
+            {% if location.contratPdf %}<a href="{{ path('app_location_contrat', {id: location.idLocation}) }}" class="gv-doc"><span class="material-symbols-outlined" style="font-size:1rem">picture_as_pdf</span> Contrat PDF</a>{% endif %}
+            <a href="{{ path('app_location_pdf', {id: location.idLocation}) }}" class="gv-doc"><span class="material-symbols-outlined" style="font-size:1rem">picture_as_pdf</span> Détails PDF</a>
+            <a href="{{ path('app_location_excel', {id: location.idLocation}) }}" class="gv-doc"><span class="material-symbols-outlined" style="font-size:1rem">table_chart</span> Détails Excel</a>
         </div>
     </div>
-
-    <!-- Actions -->
-    <div class="detail-card">
-        <div class="action-buttons">
-            <a href="{{ path('app_location_index') }}" class="btn-action btn-secondary">
-                <i class="bi bi-arrow-left"></i> Retour
-            </a>
-
+    <div class="gv-card">
+        <div class="gv-actions">
+            <a href="{{ path('app_location_index') }}" class="gv-ab gv-ao"><span class="material-symbols-outlined" style="font-size:1rem">arrow_back</span> Retour</a>
             {% if location.statut == 'EN_ATTENTE' %}
-            <a href="{{ path('app_location_edit', {id: location.idLocation}) }}" class="btn-action btn-info">
-                <i class="bi bi-pencil"></i> Modifier
-            </a>
-
-            <form method="POST" action="{{ path('app_location_cancel', {id: location.idLocation}) }}" style="display: inline;">
-                <input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ location.idLocation) }}">
-                <button type="submit" class="btn-action btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette location?');">
-                    <i class="bi bi-x-circle"></i> Annuler
-                </button>
-            </form>
+            <a href="{{ path('app_location_edit', {id: location.idLocation}) }}" class="gv-ab gv-ag"><span class="material-symbols-outlined" style="font-size:1rem">edit</span> Modifier</a>
+            <form method="POST" action="{{ path('app_location_cancel', {id: location.idLocation}) }}" style="display:inline"><input type="hidden" name="_token" value="{{ csrf_token('cancel' ~ location.idLocation) }}"><button type="submit" class="gv-ab gv-ad" onclick="return confirm('Annuler cette location ?')"><span class="material-symbols-outlined" style="font-size:1rem">close</span> Annuler</button></form>
             {% endif %}
-
-            <form method="POST" action="{{ path('app_location_delete', {id: location.idLocation}) }}" style="display: inline;">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ location.idLocation) }}">
-                <button type="submit" class="btn-action btn-danger" onclick="return confirm('Cette action supprimera définitivement la location. Continuer ?');">
-                    <i class="bi bi-trash"></i> Supprimer
-                </button>
-            </form>
+            <form method="POST" action="{{ path('app_location_delete', {id: location.idLocation}) }}" style="display:inline"><input type="hidden" name="_token" value="{{ csrf_token('delete' ~ location.idLocation) }}"><button type="submit" class="gv-ab gv-ad" onclick="return confirm('Supprimer définitivement ?')"><span class="material-symbols-outlined" style="font-size:1rem">delete</span> Supprimer</button></form>
         </div>
     </div>
 </div>

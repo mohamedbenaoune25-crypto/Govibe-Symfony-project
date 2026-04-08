@@ -1,76 +1,115 @@
 {% extends is_granted('ROLE_ADMIN') ? 'admin/base_admin.html.twig' : 'base.html.twig' %}
 
-{% block title %}Détails de la Session - GoVibe{% endblock %}
+{% block title %}Détails de la Session — GoVibe{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !important; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+.gv-show-hero {
+    position: relative; padding: 160px 0 100px;
+    background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+    overflow: hidden; text-align: center; border-radius: 0 0 3rem 3rem;
+    box-shadow: 0 20px 50px rgba(0,52,45,0.15);
+}
+.gv-show-hero::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 30% 80%, rgba(16,185,129,0.15) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(233,193,118,0.08) 0%, transparent 50%); pointer-events:none; }
+.gv-show-hero::after { content:''; position:absolute; inset:0; background-image: radial-gradient(rgba(160,242,225,0.06) 1px, transparent 1px); background-size:24px 24px; pointer-events:none; }
+.gv-hero-icon-bg { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:20rem; color:rgba(255,255,255,0.02); pointer-events:none; font-variation-settings:'FILL' 1; }
+
+.gv-show-hero h1 { font-family:'Noto Serif',serif; font-size:clamp(2rem,4vw,3rem); color:#fff; font-weight:700; margin-bottom:0.5rem; position:relative; z-index:2; }
+.gv-show-hero h1 em { color:#a0f2e1; font-style:italic; font-weight:300; }
+.gv-show-hero p { color:rgba(160,242,225,0.7); font-size:1.05rem; position:relative; z-index:2; }
+.gv-show-hero .gv-badge { display:inline-flex; align-items:center; gap:0.3rem; padding:0.4rem 1rem; border-radius:2rem; font-size:0.75rem; font-weight:800; background:rgba(160,242,225,0.15); color:#a0f2e1; border:1px solid rgba(160,242,225,0.25); position:relative; z-index:2; margin-bottom:1rem; text-transform:uppercase; letter-spacing:0.06em; }
+
+.gv-show-container { max-width:700px; margin:-50px auto 80px; position:relative; z-index:10; padding:0 2rem; }
+
+.gv-show-card {
+    background:rgba(255,255,255,0.97); backdrop-filter:blur(20px) saturate(180%);
+    border:1px solid rgba(0,52,45,0.06); border-radius:1.5rem; padding:2.5rem;
+    box-shadow:0 20px 60px rgba(0,52,45,0.08);
+}
+
+.gv-detail-row { display:flex; align-items:center; gap:1.25rem; padding:1.25rem 0; border-bottom:1px solid rgba(0,52,45,0.05); }
+.gv-detail-row:last-of-type { border-bottom:none; }
+.gv-detail-icon { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.gv-detail-icon .material-symbols-outlined { font-size:1.5rem; }
+.gv-detail-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#546067; margin-bottom:0.2rem; }
+.gv-detail-value { font-family:'Noto Serif',serif; font-size:1.25rem; font-weight:700; color:#00342d; }
+
+.gv-stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:1rem; }
+.gv-stat-box { padding:1.25rem; border-radius:1rem; text-align:center; background:rgba(0,52,45,0.03); border:1px solid rgba(0,52,45,0.05); }
+.gv-stat-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#546067; margin-bottom:0.3rem; }
+.gv-stat-value { font-family:'Noto Serif',serif; font-size:1.5rem; font-weight:700; color:#00342d; }
+.gv-stat-value.emerald { color:#10B981; }
+
+.gv-show-actions { display:flex; justify-content:center; gap:1rem; margin-top:2rem; padding-top:1.5rem; border-top:1px solid rgba(0,52,45,0.06); }
+.gv-btn-outline { display:inline-flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.9rem; color:#546067; text-decoration:none; padding:0.75rem 1.5rem; border-radius:0.75rem; border:1.5px solid rgba(0,52,45,0.08); transition:all 0.25s; }
+.gv-btn-outline:hover { border-color:rgba(0,52,45,0.2); background:rgba(0,52,45,0.03); color:#00342d; }
+.gv-btn-emerald { display:inline-flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.9rem; color:#fff; text-decoration:none; padding:0.75rem 1.5rem; border-radius:0.75rem; background:linear-gradient(135deg,#00342d,#046b5e); transition:all 0.3s; box-shadow:0 8px 20px -6px rgba(0,52,45,0.4); }
+.gv-btn-emerald:hover { transform:translateY(-2px); box-shadow:0 12px 30px -6px rgba(0,52,45,0.5); color:#fff; }
+</style>
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-5 text-center mb-5 border-bottom rounded-bottom-5 px-lg-5 shadow-sm bg-white">
-    <div class="d-flex align-items-center justify-content-center gap-3 mb-3">
-        <span class="badge rounded-pill bg-light text-dark border px-3">Session programmée</span>
+<div class="gv-show-hero">
+    <span class="material-symbols-outlined gv-hero-icon-bg">event</span>
+    <div class="container">
+        <span class="gv-badge">
+            <span class="material-symbols-outlined" style="font-size:0.9rem;">event_available</span>
+            Session programmée
+        </span>
+        <h1>Détails de la <em>Session</em></h1>
+        <p>Activité : <strong>{{ session.activite.name }}</strong></p>
     </div>
-    <h1 class="display-3 fw-bold text-dark mb-2">Détails de la <span style="color: #52BE80;">Session</span></h1>
-    <p class="text-secondary fs-5">Activité : <strong>{{ session.activite.name }}</strong></p>
 </div>
 
-<div class="container mb-5 pb-5 px-lg-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-lg rounded-5 p-5 bg-white animate-fade-in-up">
-                <div class="d-flex flex-column gap-4">
-                    <div class="d-flex align-items-center gap-4 border-bottom pb-4">
-                        <div class="p-3 bg-light rounded-circle text-success d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                            <i class="bi bi-calendar-check fs-2"></i>
-                        </div>
-                        <div>
-                            <h5 class="text-secondary small text-uppercase mb-1">Date planifiée</h5>
-                            <p class="h4 fw-bold mb-0">{{ session.date|date('d/m/Y') }}</p>
-                        </div>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-4 border-bottom pb-4">
-                        <div class="p-3 bg-light rounded-circle text-primary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                            <i class="bi bi-clock-history fs-2"></i>
-                        </div>
-                        <div>
-                            <h5 class="text-secondary small text-uppercase mb-1">Heure de début</h5>
-                            <p class="h4 fw-bold mb-0">{{ session.heure|date('H:i') }}</p>
-                        </div>
-                    </div>
-
-                    <div class="row text-center g-3 mt-2">
-                        <div class="col-6">
-                            <div class="p-3 rounded-4 bg-light">
-                                <h5 class="small text-uppercase text-secondary mb-1">Capacité</h5>
-                                <p class="h4 fw-bold mb-0" style="color: #52BE80;">{{ session.capacite }}</p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="p-3 rounded-4 bg-light">
-                                <h5 class="small text-uppercase text-secondary mb-1">Libres</h5>
-                                <p class="h4 fw-bold mb-0">{{ session.nbrPlacesRestant }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-center gap-3 mt-5 pt-4">
-                    <a href="{{ path('app_activite_session_index') }}" class="btn btn-outline-secondary rounded-pill px-4 border-2 fw-bold">
-                        Planning complet
-                    </a>
-                    <a href="{{ path('app_activite_session_edit', {'idSession': session.idSession}) }}" class="btn btn-success rounded-pill px-4 border-0 shadow fw-bold transition-all hover-lift-2" style="background-color: #52BE80;">
-                        Modifier
-                    </a>
-                </div>
+<div class="gv-show-container">
+    <div class="gv-show-card">
+        <div class="gv-detail-row">
+            <div class="gv-detail-icon" style="background:rgba(16,185,129,0.1);">
+                <span class="material-symbols-outlined" style="color:#10B981;">calendar_month</span>
             </div>
+            <div>
+                <div class="gv-detail-label">Date planifiée</div>
+                <div class="gv-detail-value">{{ session.date|date('d/m/Y') }}</div>
+            </div>
+        </div>
+
+        <div class="gv-detail-row">
+            <div class="gv-detail-icon" style="background:rgba(0,52,45,0.06);">
+                <span class="material-symbols-outlined" style="color:#00342d;">schedule</span>
+            </div>
+            <div>
+                <div class="gv-detail-label">Heure de début</div>
+                <div class="gv-detail-value">{{ session.heure|date('H:i') }}</div>
+            </div>
+        </div>
+
+        <div class="gv-stat-grid">
+            <div class="gv-stat-box">
+                <div class="gv-stat-label">Capacité</div>
+                <div class="gv-stat-value emerald">{{ session.capacite }}</div>
+            </div>
+            <div class="gv-stat-box">
+                <div class="gv-stat-label">Places libres</div>
+                <div class="gv-stat-value">{{ session.nbrPlacesRestant }}</div>
+            </div>
+        </div>
+
+        <div class="gv-show-actions">
+            <a href="{{ path('app_activite_session_index') }}" class="gv-btn-outline">
+                <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
+                Planning complet
+            </a>
+            <a href="{{ path('app_activite_session_edit', {'idSession': session.idSession}) }}" class="gv-btn-emerald">
+                <span class="material-symbols-outlined" style="font-size:1rem;">edit</span>
+                Modifier
+            </a>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block stylesheets %}
-<style>
-    body { background-color: #F8F9F9 !important; }
-    .rounded-bottom-5 { border-bottom-left-radius: 4rem !important; border-bottom-right-radius: 4rem !important; }
-    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out; }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-</style>
 {% endblock %}

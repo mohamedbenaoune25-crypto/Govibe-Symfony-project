@@ -1,186 +1,141 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réservation #{{ reservation.id }} - GoVibe{% endblock %}
+{% block title %}Réservation #{{ reservation.id }} — GoVibe{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !important; }
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+
+.gv-show-hero { position:relative; padding:170px 0 110px; background:linear-gradient(160deg,#00342d 0%,#013220 40%,#001a12 100%); overflow:hidden; text-align:center; border-radius:0 0 3rem 3rem; box-shadow:0 20px 50px rgba(0,52,45,0.15); }
+.gv-show-hero::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 80%,rgba(16,185,129,0.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(233,193,118,0.08) 0%,transparent 50%); pointer-events:none; }
+.gv-show-hero::after { content:''; position:absolute; inset:0; background-image:radial-gradient(rgba(160,242,225,0.06) 1px,transparent 1px); background-size:24px 24px; pointer-events:none; }
+.gv-hero-icon-bg { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:20rem; color:rgba(255,255,255,0.015); pointer-events:none; font-variation-settings:'FILL' 1; }
+.gv-hero-title { font-family:'Noto Serif',serif; font-size:clamp(2rem,4vw,3rem); color:#fff; font-weight:700; position:relative; z-index:2; margin-bottom:0.5rem; }
+.gv-hero-title em { color:#a0f2e1; font-style:italic; font-weight:300; }
+.gv-hero-sub { color:rgba(160,242,225,0.7); font-size:1.05rem; position:relative; z-index:2; }
+.gv-status-hero { display:inline-flex; align-items:center; gap:0.3rem; padding:0.45rem 1.25rem; border-radius:2rem; font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; backdrop-filter:blur(8px); position:relative; z-index:2; margin-bottom:1rem; }
+.gv-status-confirmed { background:rgba(160,242,225,0.15); color:#a0f2e1; border:1px solid rgba(160,242,225,0.25); }
+.gv-status-pending { background:rgba(233,193,118,0.15); color:#fde68a; border:1px solid rgba(233,193,118,0.25); }
+.gv-status-cancelled { background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.25); }
+.gv-hero-price { font-family:'Noto Serif',serif; font-size:2.2rem; font-weight:700; color:#a0f2e1; position:relative; z-index:2; margin-top:0.75rem; }
+.gv-hero-price small { font-size:1rem; color:rgba(160,242,225,0.5); font-family:'Manrope',sans-serif; }
+
+.gv-container { max-width:1200px; margin:-45px auto 80px; position:relative; z-index:10; padding:0 2rem; }
+.gv-grid { display:grid; grid-template-columns:2fr 1fr; gap:2rem; }
+@media (max-width:992px) { .gv-grid { grid-template-columns:1fr; } }
+
+.gv-card { background:rgba(255,255,255,0.97); backdrop-filter:blur(20px) saturate(180%); border:1px solid rgba(0,52,45,0.06); border-radius:1.5rem; padding:2rem; box-shadow:0 20px 60px rgba(0,52,45,0.06); margin-bottom:2rem; }
+.gv-card-title { font-family:'Noto Serif',serif; font-size:1.05rem; font-weight:700; color:#00342d; display:flex; align-items:center; gap:0.5rem; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:2px solid rgba(16,185,129,0.15); }
+.gv-card-title .material-symbols-outlined { font-size:1.1rem; color:#10B981; }
+
+.gv-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media (max-width:576px) { .gv-info-grid { grid-template-columns:1fr; } }
+.gv-info-item { padding:1rem; background:rgba(0,52,45,0.02); border-radius:0.75rem; border:1px solid rgba(0,52,45,0.04); }
+.gv-info-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#546067; margin-bottom:0.25rem; }
+.gv-info-value { font-weight:700; color:#00342d; font-size:0.95rem; }
+
+.gv-date-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.gv-date-box { background:rgba(0,52,45,0.03); border:1px solid rgba(0,52,45,0.05); padding:1rem; border-radius:0.75rem; text-align:center; }
+.gv-date-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#546067; margin-bottom:0.2rem; }
+.gv-date-value { font-weight:700; color:#00342d; font-size:1.05rem; }
+
+.gv-price-box { background:rgba(16,185,129,0.06); border:1.5px solid rgba(16,185,129,0.12); padding:1.25rem; border-radius:1rem; text-align:center; margin-top:1rem; }
+.gv-price-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#546067; margin-bottom:0.2rem; }
+.gv-price-value { font-family:'Noto Serif',serif; font-size:1.5rem; font-weight:700; color:#10B981; }
+
+.gv-sidebar-card { background:rgba(255,255,255,0.97); backdrop-filter:blur(20px) saturate(180%); border:1px solid rgba(0,52,45,0.06); border-radius:1.5rem; padding:1.5rem; box-shadow:0 15px 40px rgba(0,52,45,0.06); margin-bottom:1.5rem; }
+.gv-sidebar-card h5 { font-family:'Noto Serif',serif; font-weight:700; color:#00342d; font-size:1rem; margin-bottom:1rem; }
+
+.gv-action-btn { display:flex; align-items:center; justify-content:center; gap:0.5rem; width:100%; padding:0.8rem; border-radius:0.75rem; font-weight:700; font-size:0.88rem; text-decoration:none; transition:all 0.3s; margin-bottom:0.6rem; font-family:'Manrope',sans-serif; border:none; cursor:pointer; }
+.gv-action-btn:last-child { margin-bottom:0; }
+.gv-action-primary { background:linear-gradient(135deg,#e9c176,#ca9028); color:#3d2a00; box-shadow:0 6px 15px rgba(233,193,118,0.3); }
+.gv-action-primary:hover { transform:translateY(-2px); box-shadow:0 10px 25px rgba(233,193,118,0.4); color:#3d2a00; }
+.gv-action-green { background:linear-gradient(135deg,#00342d,#046b5e); color:#fff; box-shadow:0 6px 15px rgba(0,52,45,0.25); }
+.gv-action-green:hover { transform:translateY(-2px); box-shadow:0 10px 25px rgba(0,52,45,0.35); color:#fff; }
+.gv-action-outline { background:transparent; color:#546067; border:1.5px solid rgba(0,52,45,0.08); }
+.gv-action-outline:hover { border-color:rgba(0,52,45,0.2); background:rgba(0,52,45,0.03); color:#00342d; }
+
+.gv-danger-card { background:rgba(186,26,26,0.03); border:1.5px solid rgba(186,26,26,0.1); border-radius:1.25rem; padding:1.25rem; }
+.gv-danger-card h5 { font-weight:700; color:#93000a; font-size:0.9rem; display:flex; align-items:center; gap:0.4rem; margin-bottom:0.75rem; }
+.gv-danger-card p { color:#707975; font-size:0.85rem; margin-bottom:0.75rem; }
+.gv-danger-card .btn-danger { background:#ba1a1a; color:#fff; border:none; border-radius:0.6rem; padding:0.6rem 1.25rem; font-weight:700; font-size:0.85rem; cursor:pointer; transition:all 0.25s; font-family:'Manrope',sans-serif; display:inline-flex; align-items:center; gap:0.3rem; }
+.gv-danger-card .btn-danger:hover { background:#93000a; transform:translateY(-1px); }
+</style>
+{% endblock %}
 
 {% block body %}
-<div class="container-fluid py-5">
+<div class="gv-show-hero">
+    <span class="material-symbols-outlined gv-hero-icon-bg">hotel</span>
     <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card reservation-detail-card shadow-lg border-0 mb-4">
-                    <div class="card-header bg-emerald text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h2 class="mb-0">Réservation #{{ reservation.id }}</h2>
-                                <span class="badge status-badge {{ reservation.statut == 'CONFIRMEE' ? 'bg-success' : reservation.statut == 'ANNULEE' ? 'bg-danger' : 'bg-warning' }} mt-2">
-                                    {{ reservation.statut }}
-                                </span>
-                            </div>
-                            <div class="text-end">
-                                <div class="price-tag">
-                                    Total: {{ reservation.prixTotal }}€
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        {% if reservation.statut == 'CONFIRMEE' %}
+            <span class="gv-status-hero gv-status-confirmed"><span class="material-symbols-outlined" style="font-size:0.85rem;">verified</span> Confirmée</span>
+        {% elseif reservation.statut == 'ANNULEE' %}
+            <span class="gv-status-hero gv-status-cancelled"><span class="material-symbols-outlined" style="font-size:0.85rem;">cancel</span> Annulée</span>
+        {% else %}
+            <span class="gv-status-hero gv-status-pending"><span class="material-symbols-outlined" style="font-size:0.85rem;">pending</span> {{ reservation.statut }}</span>
+        {% endif %}
+        <h1 class="gv-hero-title">Réservation <em>#{{ reservation.id }}</em></h1>
+        <p class="gv-hero-sub">{{ reservation.hotel.nom }} — {{ reservation.chambre.type }}</p>
+        <div class="gv-hero-price">{{ reservation.prixTotal }}€</div>
+    </div>
+</div>
 
-                    <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h5 class="text-emerald mb-3">
-                                    <i class="bi bi-person me-2"></i>Client
-                                </h5>
-                                <p class="mb-1"><strong>Nom:</strong> {{ reservation.user.prenom }} {{ reservation.user.nom }}</p>
-                                <p class="mb-0"><strong>Email:</strong> {{ reservation.user.email }}</p>
-                            </div>
-                            <div class="col-md-6">
-                                <h5 class="text-emerald mb-3">
-                                    <i class="bi bi-building me-2"></i>Hôtel & Chambre
-                                </h5>
-                                <p class="mb-1"><strong>Hôtel:</strong> {{ reservation.hotel.nom }}</p>
-                                <p class="mb-1"><strong>Chambre:</strong> {{ reservation.chambre.type }}</p>
-                                <p class="mb-0"><strong>Adresse:</strong> {{ reservation.hotel.adresse }}, {{ reservation.hotel.ville }}</p>
-                            </div>
-                        </div>
-
-                        <div class="dates-section mb-4">
-                            <h5 class="text-emerald mb-3">
-                                <i class="bi bi-calendar me-2"></i>Dates de séjour
-                            </h5>
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <div class="date-box">
-                                        <small class="text-muted d-block">Arrivée</small>
-                                        <strong class="fs-5">{{ reservation.dateDebut|date('d/m/Y') }}</strong>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="date-box">
-                                        <small class="text-muted d-block">Départ</small>
-                                        <strong class="fs-5">{{ reservation.dateFin|date('d/m/Y') }}</strong>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h5 class="text-emerald mb-3">
-                                    <i class="bi bi-info-circle me-2"></i>Informations
-                                </h5>
-                                <p class="mb-1"><strong>ID Réservation:</strong> {{ reservation.id }}</p>
-                                {% if reservation.createdAt %}
-                                    <p class="mb-1"><strong>Réservé le:</strong> {{ reservation.createdAt|date('d/m/Y à H:i') }}</p>
-                                {% endif %}
-                                {% if reservation.updatedAt %}
-                                    <p class="mb-0"><strong>Mis à jour le:</strong> {{ reservation.updatedAt|date('d/m/Y à H:i') }}</p>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                <h5 class="text-emerald mb-3">
-                                    <i class="bi bi-cash me-2"></i>Paiement
-                                </h5>
-                                <div class="prix-total-card p-3 text-center">
-                                    <small class="text-muted d-block">Montant total</small>
-                                    <span class="fw-bold text-emerald fs-4">{{ reservation.prixTotal }}€</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+<div class="gv-container">
+    <div class="gv-grid">
+        <div>
+            <div class="gv-card">
+                <div class="gv-card-title"><span class="material-symbols-outlined">person</span> Client</div>
+                <div class="gv-info-grid">
+                    <div class="gv-info-item"><div class="gv-info-label">Nom</div><div class="gv-info-value">{{ reservation.user.prenom }} {{ reservation.user.nom }}</div></div>
+                    <div class="gv-info-item"><div class="gv-info-label">Email</div><div class="gv-info-value">{{ reservation.user.email }}</div></div>
                 </div>
             </div>
-
-            <div class="col-lg-4">
-                <div class="card action-card shadow-lg border-0 mb-4">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0 text-dark">Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-grid gap-2">
-                            <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="btn btn-info">
-                                <i class="bi bi-building me-2"></i>Retour à l'hôtel associé
-                            </a>
-                            <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="btn btn-emerald">
-                                <i class="bi bi-pencil me-2"></i>Modifier la réservation
-                            </a>
-                            <a href="{{ path('app_reservation_index') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left me-2"></i>Retour à la liste
-                            </a>
-                        </div>
-                    </div>
+            <div class="gv-card">
+                <div class="gv-card-title"><span class="material-symbols-outlined">apartment</span> Hôtel & Chambre</div>
+                <div class="gv-info-grid">
+                    <div class="gv-info-item"><div class="gv-info-label">Hôtel</div><div class="gv-info-value">{{ reservation.hotel.nom }}</div></div>
+                    <div class="gv-info-item"><div class="gv-info-label">Chambre</div><div class="gv-info-value">{{ reservation.chambre.type }}</div></div>
+                    <div class="gv-info-item" style="grid-column:1/-1;"><div class="gv-info-label">Adresse</div><div class="gv-info-value">{{ reservation.hotel.adresse }}, {{ reservation.hotel.ville }}</div></div>
                 </div>
-
-                <div class="card danger-card shadow-lg border-0">
-                    <div class="card-header bg-danger text-white">
-                        <h5 class="mb-0">
-                            <i class="bi bi-exclamation-triangle me-2"></i>Zone dangereuse
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted mb-3">
-                            La suppression de cette réservation est irréversible.
-                        </p>
-                        {{ include('reservation/_delete_form.html.twig') }}
-                    </div>
+            </div>
+            <div class="gv-card">
+                <div class="gv-card-title"><span class="material-symbols-outlined">date_range</span> Dates de séjour</div>
+                <div class="gv-date-grid">
+                    <div class="gv-date-box"><div class="gv-date-label">Arrivée</div><div class="gv-date-value">{{ reservation.dateDebut|date('d/m/Y') }}</div></div>
+                    <div class="gv-date-box"><div class="gv-date-label">Départ</div><div class="gv-date-value">{{ reservation.dateFin|date('d/m/Y') }}</div></div>
                 </div>
+                <div class="gv-price-box">
+                    <div class="gv-price-label">Montant total</div>
+                    <div class="gv-price-value">{{ reservation.prixTotal }}€</div>
+                </div>
+            </div>
+            {% if reservation.createdAt or reservation.updatedAt %}
+            <div class="gv-card">
+                <div class="gv-card-title"><span class="material-symbols-outlined">info</span> Informations</div>
+                <div class="gv-info-grid">
+                    {% if reservation.createdAt %}<div class="gv-info-item"><div class="gv-info-label">Réservé le</div><div class="gv-info-value">{{ reservation.createdAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
+                    {% if reservation.updatedAt %}<div class="gv-info-item"><div class="gv-info-label">Mis à jour le</div><div class="gv-info-value">{{ reservation.updatedAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div>
+            <div class="gv-sidebar-card">
+                <h5>Actions</h5>
+                <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="gv-action-btn gv-action-green"><span class="material-symbols-outlined" style="font-size:1rem;">apartment</span> Voir l'hôtel</a>
+                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="gv-action-btn gv-action-primary"><span class="material-symbols-outlined" style="font-size:1rem;">edit</span> Modifier</a>
+                <a href="{{ path('app_reservation_index') }}" class="gv-action-btn gv-action-outline"><span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span> Retour</a>
+            </div>
+            <div class="gv-danger-card">
+                <h5><span class="material-symbols-outlined" style="font-size:1rem;">warning</span> Zone dangereuse</h5>
+                <p>La suppression est irréversible.</p>
+                {{ include('reservation/_delete_form.html.twig') }}
             </div>
         </div>
     </div>
 </div>
-
-<style>
-.bg-emerald {
-    background-color: var(--primary-emerald) !important;
-}
-
-.reservation-detail-card {
-    background: var(--glass-card);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-}
-
-.action-card, .danger-card {
-    background: var(--glass-card);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-}
-
-.btn-emerald {
-    background-color: var(--primary-emerald);
-    border-color: var(--primary-emerald);
-    color: white;
-}
-
-.btn-emerald:hover {
-    background-color: var(--accent-green);
-    border-color: var(--accent-green);
-    color: white;
-}
-
-.status-badge {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-}
-
-.price-tag {
-    font-size: 1.1rem;
-    color: white;
-}
-
-.dates-section .date-box {
-    background: var(--soft-green);
-    padding: 1rem;
-    border-radius: 10px;
-    margin: 0.25rem 0;
-}
-
-.prix-total-card {
-    background: linear-gradient(135deg, var(--soft-green), var(--light-green));
-    border-radius: 10px;
-}
-
-.text-emerald {
-    color: var(--primary-emerald) !important;
-}
-</style>
 {% endblock %}

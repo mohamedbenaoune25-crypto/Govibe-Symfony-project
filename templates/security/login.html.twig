@@ -1,357 +1,675 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}S'authentifier | GoVibe{% endblock %}
+{% block title %}Connexion | GoVibe — Curated Odyssey{% endblock %}
 
 {% block header %}{% endblock %}
 {% block footer %}{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --primary-emerald: #10B981;
-        --dark-green: #064E3B;
-        --light-green: #D1FAE5;
-        --bg-main: #020617; /* Very dark blue/black */
-        --card-bg: rgba(6, 78, 59, 0.15); /* Dark green glass */
-        --card-border: rgba(16, 185, 129, 0.3);
-        --input-bg: rgba(0, 0, 0, 0.4);
-        --input-focus-border: #10B981;
-        --primary-btn: #10B981;
-        --primary-hover: #059669;
-        --primary-glow: rgba(16, 185, 129, 0.3);
-        --text-main: #F8FAFC;
-        --text-muted: #94A3B8;
-        --accent: #10B981;
-    }
+    /* ═══════════════════════════════════════════════════
+       GoVibe Auth — Ultra Futuristic 3D Design
+       Premium luxury travel login experience
+    ═══════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-        font-family: 'Inter', sans-serif;
-        background: radial-gradient(circle at top left, #064E3B 0%, #111827 50%, #000000 100%);
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow-x: hidden;
-        color: var(--text-main);
-        margin: 0;
+        font-family: 'Manrope', sans-serif !important;
+        background: linear-gradient(135deg, #0a1a14 0%, #00261c 50%, #0d0d0d 100%) !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 1rem !important;
+        overflow-x: hidden !important;
+        margin: 0 !important;
     }
 
-    .auth-wrapper {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 4rem 1rem;
-        position: relative;
-        z-index: 10;
-        min-height: 100vh;
-    }
-
-    /* Cyber Grid */
-    .cyber-grid {
+    /* ─── Animated Background Grid ─── */
+    .auth-bg-grid {
         position: fixed;
         top: 0; left: 0; width: 200%; height: 200%;
-        background-size: 50px 50px;
+        background-size: 60px 60px;
         background-image:
-            linear-gradient(to right, rgba(16, 185, 129, 0.05) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
-        transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
-        animation: gridMove 20s linear infinite;
+            linear-gradient(to right, rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+        transform: perspective(600px) rotateX(55deg) translateY(-80px) translateZ(-300px);
+        animation: authGridFlow 25s linear infinite;
         z-index: 0;
         pointer-events: none;
     }
-
-    @keyframes gridMove {
-        0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
-        100% { transform: perspective(500px) rotateX(60deg) translateY(50px) translateZ(-200px); }
+    @keyframes authGridFlow {
+        0% { transform: perspective(600px) rotateX(55deg) translateY(0) translateZ(-300px); }
+        100% { transform: perspective(600px) rotateX(55deg) translateY(60px) translateZ(-300px); }
     }
 
-    /* Glowing Orbs */
-    .glow-orb {
+    /* ─── Floating Orbs ─── */
+    .auth-orb {
         position: fixed;
         border-radius: 50%;
-        filter: blur(80px);
-        opacity: 0.4;
+        filter: blur(100px);
+        opacity: 0.35;
         z-index: 0;
-        animation: orbFloat 10s infinite alternate;
         pointer-events: none;
     }
-    .orb-1 { width: 400px; height: 400px; background: #10B981; top: 10%; left: 10%; }
-    .orb-2 { width: 300px; height: 300px; background: #064E3B; bottom: 20%; right: 10%; animation-delay: -5s; }
+    .auth-orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #10B981, #064E3B); top: -5%; left: -5%; animation: orbDrift1 12s ease-in-out infinite alternate; }
+    .auth-orb-2 { width: 350px; height: 350px; background: radial-gradient(circle, #fbbf24, #92400e); bottom: -10%; right: -5%; animation: orbDrift2 15s ease-in-out infinite alternate; }
+    .auth-orb-3 { width: 200px; height: 200px; background: radial-gradient(circle, #06b6d4, #0e7490); top: 50%; right: 20%; animation: orbDrift3 10s ease-in-out infinite alternate; }
+    @keyframes orbDrift1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 30px) scale(1.08); } }
+    @keyframes orbDrift2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-30px, -40px) scale(1.12); } }
+    @keyframes orbDrift3 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(20px, -20px) scale(0.9); } }
 
-    @keyframes orbFloat {
-        0% { transform: translate(0, 0) scale(1); }
-        100% { transform: translate(50px, 50px) scale(1.1); }
-    }
-
-    /* Auth Card */
-    .auth-card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 20px;
-        padding: 3rem;
+    /* ─── Main Container ─── */
+    .auth-main {
         width: 100%;
-        max-width: 480px;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        transform: translateY(20px);
-        opacity: 0;
-        animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        max-width: 1100px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-radius: 2rem;
+        overflow: hidden;
+        box-shadow:
+            0 50px 100px -20px rgba(0, 0, 0, 0.6),
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
         position: relative;
         z-index: 10;
-        color: white;
+        transform: translateY(20px);
+        opacity: 0;
+        animation: authCardReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
     }
-    
-    .register-card, .auth-card[style*="max-width"] {
-        max-width: 550px !important;
-    }
-
-    @keyframes slideUpFade {
+    @keyframes authCardReveal {
         to { transform: translateY(0); opacity: 1; }
     }
-
-    .auth-header {
-        text-align: center;
-        margin-bottom: 2.5rem;
+    @media (max-width: 768px) {
+        .auth-main { grid-template-columns: 1fr; max-width: 480px; }
     }
 
-    .auth-title {
-        color: white;
-        font-family: 'Outfit', sans-serif;
+    /* ─── Left Panel: Editorial ─── */
+    .auth-editorial {
+        background: linear-gradient(160deg, #00342d 0%, #013220 40%, #001a12 100%);
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+    @media (max-width: 768px) { .auth-editorial { display: none; } }
+
+    .auth-editorial::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 30% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 20%, rgba(251, 191, 36, 0.08) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .editorial-brand {
+        position: relative; z-index: 2;
+        font-family: 'Noto Serif', serif;
         font-weight: 700;
-        font-size: 2.25rem;
-        margin-bottom: 0.5rem;
+        font-style: italic;
+        font-size: 1.75rem;
+        color: #fff;
         letter-spacing: -0.02em;
     }
 
-    .auth-subtitle {
-        color: #D1FAE5;
-        font-size: 1rem;
-        font-weight: 400;
+    .editorial-content {
+        position: relative; z-index: 2;
+    }
+    .editorial-title {
+        font-family: 'Noto Serif', serif;
+        font-size: 2.75rem;
+        line-height: 1.15;
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    .editorial-title em {
+        color: #a0f2e1;
+        font-style: italic;
+    }
+    .editorial-desc {
+        color: rgba(160, 242, 225, 0.6);
+        font-size: 1.05rem;
+        line-height: 1.6;
+        max-width: 320px;
+    }
+
+    .editorial-hero-img {
+        position: absolute;
+        right: -15%;
+        top: 15%;
+        width: 130%;
+        height: 75%;
+        object-fit: cover;
+        mix-blend-mode: luminosity;
+        opacity: 0.25;
+        border-radius: 0 0 0 8rem;
+        pointer-events: none;
+        mask-image: linear-gradient(to left, black 30%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to left, black 30%, transparent 100%);
+    }
+
+    .editorial-dots {
+        position: relative; z-index: 2;
+        display: flex; gap: 0.5rem;
+    }
+    .editorial-dots span {
+        height: 4px; border-radius: 4px; background: rgba(160, 242, 225, 0.25); transition: all 0.3s ease;
+    }
+    .editorial-dots span:first-child { width: 3rem; background: #a0f2e1; }
+    .editorial-dots span:nth-child(2) { width: 1rem; }
+    .editorial-dots span:nth-child(3) { width: 1rem; }
+
+    /* ─── Right Panel: Form ─── */
+    .auth-form-panel {
+        background: rgba(252, 249, 248, 0.97);
+        padding: 3rem 3.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+    }
+    @media (max-width: 768px) {
+        .auth-form-panel { padding: 2rem 1.5rem; }
+    }
+
+    .auth-form-inner {
+        max-width: 400px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .auth-form-title {
+        font-family: 'Noto Serif', serif;
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #1c1b1b;
+        margin-bottom: 0.5rem;
+    }
+    .auth-form-subtitle {
+        color: #707975;
+        font-size: 0.95rem;
+        margin-bottom: 2.5rem;
         line-height: 1.5;
     }
 
-    /* Forms */
-    .form-group {
-        margin-bottom: 1.5rem;
-        position: relative;
-        width: 100%;
-    }
-
-    .form-row {
-        display: flex; gap: 15px; margin-bottom: 0; width: 100%;
-    }
-    .form-row .form-group { width: 50%; }
-
-    .form-label, label {
-        display: block;
-        color: var(--light-green);
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: color 0.3s ease;
-    }
-
-    .input-wrapper {
-        position: relative;
+    /* ─── Form Fields ─── */
+    .gv-field { margin-bottom: 1.5rem; }
+    .gv-field-label {
         display: flex;
         align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #3f4945;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
     }
+    .gv-field-label .material-symbols-outlined { font-size: 1.1rem; color: #707975; }
 
-    .input-icon {
-        position: absolute;
-        left: 1rem;
-        color: rgba(255,255,255,0.5);
-        font-size: 1.2rem;
-        transition: color 0.3s ease;
-        z-index: 2;
-    }
-
-    .form-control, .form-group input, input[type="email"], input[type="password"], input[type="text"] {
+    .gv-input {
         width: 100%;
-        background: rgba(0, 0, 0, 0.3);
-        border: 2px solid rgba(16, 185, 129, 0.2);
-        border-radius: 12px;
-        padding: 0.875rem 1rem 0.875rem 1rem;
-        color: white;
+        padding: 1rem 1.25rem;
+        background: #e5e2e1;
+        border: 2px solid transparent;
+        border-radius: 0.75rem;
         font-size: 1rem;
+        color: #1c1b1b;
+        font-family: 'Manrope', sans-serif;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: none;
-    }
-
-    /* Override padding if there's an icon wrapper */
-    .input-wrapper .form-control, .input-wrapper input {
-        padding-left: 3rem;
-    }
-
-    .form-control:focus, .form-group input:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus {
         outline: none;
-        border-color: var(--primary-emerald);
-        background: rgba(0, 0, 0, 0.6);
-        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    }
+    .gv-input::placeholder { color: rgba(112, 121, 117, 0.5); }
+    .gv-input:focus {
+        background: #fff;
+        border-color: rgba(0, 52, 45, 0.15);
+        box-shadow: 0 0 0 4px rgba(0, 52, 45, 0.06);
     }
 
-    .form-control:focus + .input-icon {
-        color: var(--primary-emerald);
+    .gv-input-wrap {
+        position: relative;
     }
-
-    .form-control::placeholder, input::placeholder { color: rgba(255,255,255,0.4); }
-
-    .password-toggle {
+    .gv-pwd-toggle {
         position: absolute;
         right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
         background: none;
         border: none;
-        color: rgba(255,255,255,0.5);
+        color: #707975;
         cursor: pointer;
         padding: 0;
         display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: color 0.3s ease;
+        transition: color 0.2s ease;
     }
-    .password-toggle:hover { color: var(--primary-emerald); }
+    .gv-pwd-toggle:hover { color: #00342d; }
 
-    /* Buttons */
-    .btn-submit, button[type="submit"], .btn-login, .auth-btn {
-        width: 100%;
-        background: linear-gradient(135deg, var(--light-green), var(--primary-emerald));
-        color: #064E3B;
-        border: none;
-        border-radius: 12px;
-        padding: 1rem;
-        font-size: 1.1rem;
+    .gv-field-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 0.5rem;
+    }
+    .gv-forgot-link {
+        font-size: 0.8rem;
         font-weight: 700;
+        color: #00342d;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .gv-forgot-link:hover { color: #046b5e; text-decoration: underline; }
+
+    /* ─── Checkbox ─── */
+    .gv-check-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    .gv-check-row input[type="checkbox"] {
+        width: 1.15rem; height: 1.15rem;
+        border-radius: 0.25rem;
+        border: 2px solid #bfc9c4;
+        accent-color: #00342d;
+        cursor: pointer;
+    }
+    .gv-check-row label {
+        font-size: 0.85rem;
+        color: #3f4945;
+        cursor: pointer;
+        margin-bottom: 0;
+    }
+
+    /* ─── Primary Button ─── */
+    .gv-btn-primary {
+        width: 100%;
+        padding: 1.1rem;
+        background: linear-gradient(135deg, #00342d 0%, #004d43 70%, #046b5e 100%);
+        color: #fff;
+        border: none;
+        border-radius: 0.75rem;
+        font-size: 1.05rem;
+        font-weight: 700;
+        font-family: 'Manrope', sans-serif;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.75rem;
+        gap: 0.5rem;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 10px 20px -10px rgba(16, 185, 129, 0.5);
-        margin-top: 1rem;
+        box-shadow:
+            0 12px 28px -8px rgba(0, 52, 45, 0.4),
+            inset 0 1px 0 0 rgba(160, 242, 225, 0.15);
+        position: relative;
+        overflow: hidden;
     }
-    .btn-submit:hover, button[type="submit"]:hover, .btn-login:hover, .auth-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 25px -10px rgba(16, 185, 129, 0.6);
+    .gv-btn-primary::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+    .gv-btn-primary:hover::before { transform: translateX(100%); }
+    .gv-btn-primary:hover {
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 18px 40px -10px rgba(0, 52, 45, 0.5);
+    }
+    .gv-btn-primary:active { transform: translateY(0) scale(0.99); }
+
+    /* ─── Divider ─── */
+    .gv-divider {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 2rem 0;
+    }
+    .gv-divider::before, .gv-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(191, 201, 196, 0.4);
+    }
+    .gv-divider span {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #bfc9c4;
     }
 
-    /* Links */
-    .auth-footer { margin-top: 2rem; text-align: center; color: var(--text-muted); font-size: 0.95rem; }
-    .auth-link { color: var(--primary-emerald); font-weight: 600; text-decoration: none; transition: color 0.3s ease; }
-    .auth-link:hover { color: var(--light-green); text-decoration: underline; }
-    
-    .forgot-link {
-        display: block; text-align: right; color: var(--light-green); font-size: 0.85rem; 
-        font-weight: 500; text-decoration: none; margin-top: 0.5rem; transition: color 0.3s ease;
+    /* ─── Social Buttons ─── */
+    .gv-social-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
     }
-    .forgot-link:hover { color: var(--primary-emerald); text-decoration: underline; }
-
-    /* Checkboxes/Role Select */
-    .role-selector {
-        display: flex; gap: 20px; align-items: center; background: rgba(0,0,0,0.3); padding: 10px 16px; border-radius: 12px; border: 1px solid rgba(16,185,129,0.2); width: 100%; justify-content: space-around;
-        margin-bottom: 25px;
+    .gv-social-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        padding: 0.9rem;
+        border: 1.5px solid rgba(191, 201, 196, 0.4);
+        border-radius: 0.75rem;
+        background: transparent;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #1c1b1b;
+        font-family: 'Manrope', sans-serif;
+        transition: all 0.2s ease;
     }
-    .form-check { display: flex; align-items: center; gap: 8px; cursor: pointer; margin-bottom: 0; }
-    .form-check input { cursor: pointer; accent-color: var(--primary-btn); width: 16px; height: 16px; }
-    .form-check label { margin-bottom: 0; font-size: 0.9rem; text-transform: none; color: #fff; font-weight: 500; letter-spacing: 0; }
+    .gv-social-btn:hover {
+        background: rgba(0, 52, 45, 0.04);
+        border-color: rgba(0, 52, 45, 0.2);
+    }
+    .gv-social-btn .material-symbols-outlined {
+        font-size: 1.2rem;
+        font-variation-settings: 'FILL' 1;
+    }
 
+    /* ─── Footer Links ─── */
+    .gv-auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        font-size: 0.9rem;
+        color: #707975;
+    }
+    .gv-auth-footer a {
+        color: #00342d;
+        font-weight: 800;
+        text-decoration: none;
+        margin-left: 0.25rem;
+        transition: color 0.2s ease;
+    }
+    .gv-auth-footer a:hover { text-decoration: underline; color: #046b5e; }
 
-    /* Error / Success Alerts */
-    .error-box, .alert-danger { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: #fca5a5; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
-    .success-box, .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #86efac; padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; }
-    ul.form-errors { list-style: none; margin-bottom: 15px; padding: 0; }
-    ul.form-errors li { background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.3); color: #fca5a5; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 5px; }
+    .gv-bottom-links {
+        position: absolute;
+        bottom: 1.5rem;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+    }
+    .gv-bottom-links a {
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #bfc9c4;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .gv-bottom-links a:hover { color: #00342d; }
 
-    /* Floating elements cleanup for new dark background (disabling old script's items) */
+    /* ─── Alerts ─── */
+    .gv-alert {
+        padding: 0.85rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.85rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .gv-alert-error {
+        background: rgba(186, 26, 26, 0.08);
+        border: 1px solid rgba(186, 26, 26, 0.2);
+        color: #93000a;
+    }
+    .gv-alert-success {
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: #005046;
+    }
+
+    /* ─── Particle Canvas ─── */
+    #authParticles {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    /* Override base template form styles */
+    .auth-form-panel form { animation: none !important; }
+    .auth-form-panel form .form-label { all: unset; }
+    .auth-form-panel form .form-control { all: unset; }
+    .auth-form-panel form input[type="email"],
+    .auth-form-panel form input[type="password"] {
+        all: unset;
+        width: 100%;
+        padding: 1rem 1.25rem;
+        background: #e5e2e1;
+        border: 2px solid transparent;
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        color: #1c1b1b;
+        font-family: 'Manrope', sans-serif;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-sizing: border-box;
+    }
+    .auth-form-panel form input[type="email"]:focus,
+    .auth-form-panel form input[type="password"]:focus {
+        background: #fff;
+        border-color: rgba(0, 52, 45, 0.15);
+        box-shadow: 0 0 0 4px rgba(0, 52, 45, 0.06);
+        outline: none;
+    }
+    .auth-form-panel form input::placeholder { color: rgba(112, 121, 117, 0.5); }
+
+    /* Hide base template navbar stuff */
+    .govibe-navbar, .govibe-footer, .container.position-relative { display: none !important; }
     .floating-element { display: none !important; }
 </style>
-
-
 {% endblock %}
 
 {% block body %}
-<div class="geo-shapes">
-    <div class="shape-circle" style="width: 400px; height: 400px; top: -100px; left: -100px;"></div>
-    <div class="shape-circle" style="width: 300px; height: 300px; bottom: -50px; right: -50px; animation-delay: -3s;"></div>
-</div>
+<!-- Background Effects -->
+<div class="auth-bg-grid"></div>
+<div class="auth-orb auth-orb-1"></div>
+<div class="auth-orb auth-orb-2"></div>
+<div class="auth-orb auth-orb-3"></div>
+<canvas id="authParticles"></canvas>
 
-<div class="cyber-grid"></div>
-    <div class="glow-orb orb-1"></div>
-    <div class="glow-orb orb-2"></div>
-    <div class="auth-wrapper">
-    <i class="bi bi-airplane floating-element el-1"></i>
-    <i class="bi bi-globe-americas floating-element el-2"></i>
-    <i class="bi bi-compass floating-element el-3"></i>
+<main class="auth-main">
+    <!-- Left Side: Editorial 3D Illustration -->
+    <div class="auth-editorial">
+        <div class="editorial-brand">GoVibe</div>
 
-    <div class="auth-card">
-        <div class="auth-header">
-            <h1 class="auth-title">Bon Retour parmi nous !</h1>
-            <p class="auth-subtitle">Votre prochaine aventure vous attend. Connectez-vous pour explorer nos meilleures destinations.</p>
+        <div class="editorial-content">
+            <h2 class="editorial-title">Your next <em>odyssey</em> begins here.</h2>
+            <p class="editorial-desc">Curated experiences for the sophisticated traveler. Step into a world of seamless luxury.</p>
         </div>
-        {% for message in app.flashes('success') %}
-            <div class="success-box">{{ message }}</div>
-        {% endfor %}
-        {% for message in app.flashes('error') %}
-            <div class="error-box">{{ message }}</div>
-        {% endfor %}
-        {% if error %}
-            <div class="alert-container">
-                <div class="alert">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    {{ error.messageKey|trans(error.messageData, 'security') }}
-                </div>
-            </div>
-        {% endif %}
 
-        <form method="post" action="{{ path('app_login') }}">
-            <div class="form-group">
-                <label for="inputEmail" class="form-label">Adresse Email</label>
-                <div class="input-wrapper">
-                    <i class="bi bi-envelope input-icon"></i>
-                    <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="form-control" autocomplete="email" required autofocus placeholder="votre@email.com">
-                </div>
-            </div>
+        <img src="{{ asset('images/auth-hero-3d.png') }}" alt="Luxury travel 3D illustration" class="editorial-hero-img">
 
-            <div class="form-group">
-                <label for="inputPassword" class="form-label">Mot de passe</label>
-                <div class="input-wrapper">
-                    <i class="bi bi-lock input-icon"></i>
-                    <input type="password" name="_password" id="inputPassword" class="form-control" autocomplete="current-password" required placeholder="••••••••">
-                    <button type="button" class="password-toggle" onclick="togglePwd('inputPassword')">
-                        <i class="bi bi-eye" id="toggleIcon"></i>
-                    </button>
-                </div>
-                <a href="{{ path('app_forgot_password') }}" class="forgot-link">Mot de passe oublié ?</a>
-            </div>
-
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-            <button type="submit" class="btn-submit">
-                Démarrer l'Aventure <i class="bi bi-arrow-right"></i>
-            </button>
-        </form>
-
-        <div class="auth-footer">
-            Nouveau voyageur ? <a href="{{ path('app_register') }}">Créer un compte</a>
+        <div class="editorial-dots">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
     </div>
-</div>
+
+    <!-- Right Side: Login Form -->
+    <div class="auth-form-panel">
+        <div class="auth-form-inner">
+            <h3 class="auth-form-title">Bon Retour</h3>
+            <p class="auth-form-subtitle">Veuillez entrer vos identifiants pour accéder à votre espace.</p>
+
+            {% for message in app.flashes('success') %}
+                <div class="gv-alert gv-alert-success">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">check_circle</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% for message in app.flashes('error') %}
+                <div class="gv-alert gv-alert-error">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">error</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+            {% if error %}
+                <div class="gv-alert gv-alert-error">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">warning</span>
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{{ path('app_login') }}">
+                <div class="gv-field">
+                    <label class="gv-field-label" for="inputEmail">
+                        <span class="material-symbols-outlined">mail</span> Adresse Email
+                    </label>
+                    <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="gv-input" autocomplete="email" required autofocus placeholder="voyageur@govibe.com">
+                </div>
+
+                <div class="gv-field">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <label class="gv-field-label" for="inputPassword" style="margin-bottom:0;">
+                            <span class="material-symbols-outlined">lock</span> Mot de passe
+                        </label>
+                        <a href="{{ path('app_forgot_password') }}" class="gv-forgot-link">Mot de passe oublié ?</a>
+                    </div>
+                    <div class="gv-input-wrap" style="margin-top:0.5rem;">
+                        <input type="password" name="_password" id="inputPassword" class="gv-input" autocomplete="current-password" required placeholder="••••••••">
+                        <button type="button" class="gv-pwd-toggle" onclick="togglePwd('inputPassword', this)">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="gv-check-row">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">Rester connecté pendant 30 jours</label>
+                </div>
+
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                <button type="submit" class="gv-btn-primary">
+                    Connexion à GoVibe
+                    <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_forward</span>
+                </button>
+            </form>
+
+            <div class="gv-divider"><span>Ou continuer avec</span></div>
+
+            <div class="gv-social-row">
+                <button class="gv-social-btn" type="button">
+                    <span class="material-symbols-outlined">google</span> Google
+                </button>
+                <button class="gv-social-btn" type="button">
+                    <span class="material-symbols-outlined">smartphone</span> Apple
+                </button>
+            </div>
+
+            <div class="gv-auth-footer">
+                Pas encore de compte ?
+                <a href="{{ path('app_register') }}">Créer un compte GoVibe</a>
+            </div>
+        </div>
+
+        <div class="gv-bottom-links">
+            <a href="#">Confidentialité</a>
+            <a href="#">Conditions</a>
+            <a href="#">Centre d'aide</a>
+        </div>
+    </div>
+</main>
+
+<!-- Floating Decorative Blurs -->
+<div style="position:fixed;top:-10%;left:-10%;width:24rem;height:24rem;background:rgba(0,52,45,0.1);border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;"></div>
+<div style="position:fixed;bottom:-10%;right:-10%;width:24rem;height:24rem;background:rgba(61,42,0,0.1);border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;"></div>
 
 <script>
-    function togglePwd(inputId) {
+    // Password toggle
+    function togglePwd(inputId, btn) {
         const input = document.getElementById(inputId);
-        const icon = document.getElementById('toggleIcon');
+        const icon = btn.querySelector('.material-symbols-outlined');
         if (input.type === 'password') {
             input.type = 'text';
-            icon.classList.replace('bi-eye', 'bi-eye-slash');
+            icon.textContent = 'visibility_off';
         } else {
             input.type = 'password';
-            icon.classList.replace('bi-eye-slash', 'bi-eye');
+            icon.textContent = 'visibility';
         }
     }
+
+    // Particle system
+    (function() {
+        const canvas = document.getElementById('authParticles');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const PARTICLE_COUNT = 50;
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        class Particle {
+            constructor() { this.reset(); }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.4 + 0.1;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(160, 242, 225, ${this.opacity})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+
+            // Draw connections
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = `rgba(160, 242, 225, ${0.06 * (1 - dist / 120)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })();
 </script>
 {% endblock %}

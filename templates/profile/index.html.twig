@@ -1,293 +1,889 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon Profil - GoVibe{% endblock %}
+{% block title %}Mon Profil — GoVibe{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
-    body {
-        background-color: #f8faf9;
-    }
-    .profile-hero {
-        height: 280px;
-        position: relative;
-        background: url('{{ asset("images/home-hero5.png") }}') center center/cover fixed;
-        border-bottom-left-radius: 40px;
-        border-bottom-right-radius: 40px;
-        overflow: hidden;
-    }
-    .profile-hero-overlay {
-        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-        background: linear-gradient(to bottom, rgba(1, 50, 32, 0.4), rgba(1, 50, 32, 0.8));
-    }
-    
-    .profile-container {
-        margin-top: -100px;
-        position: relative;
-        z-index: 10;
-        max-width: 900px;
-    }
-    
-    .profile-card {
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 24px;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
-        padding: 50px;
-        margin-bottom: 40px;
-    }
+/* ═══════════════════════════════════════════════════
+   Profile Page — Matching GoVibe Homepage Design
+   Light, editorial, premium travel aesthetic
+═══════════════════════════════════════════════════ */
 
-    .profile-avatar-wrapper {
-        text-align: center;
-        margin-bottom: 40px;
-        margin-top: -100px;
-    }
-    
-    .profile-avatar {
-        width: 140px; height: 140px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #10b981, #059669);
-        border: 6px solid #f8faf9;
-        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
-        display: inline-flex;
-        align-items: center; justify-content: center;
-        color: white; font-size: 56px; font-weight: 700; font-family: 'Outfit', sans-serif;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .profile-avatar:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 20px 45px rgba(16, 185, 129, 0.5);
-    }
-    
-    .profile-name {
-        font-size: 32px; font-weight: 700; color: #1f2937; margin-top: 20px; font-family: 'Outfit', sans-serif;
-    }
-    .profile-role {
-        display: inline-block;
-        padding: 6px 16px;
-        background: rgba(16, 185, 129, 0.1);
-        border: 1px solid rgba(16, 185, 129, 0.2);
-        border-radius: 30px;
-        color: #059669;
-        font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;
-        margin-top: 5px;
-    }
+*, *::before, *::after { box-sizing: border-box; }
 
-    .section-title {
-        font-family: 'Outfit', sans-serif;
-        font-weight: 700;
-        font-size: 20px;
-        color: #111827;
-        margin-bottom: 25px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    .section-title i {
-        color: #10b981;
-    }
+body {
+    font-family: 'Manrope', sans-serif !important;
+    background: #fcf9f8 !important;
+    color: #1c1b1b !important;
+    overflow-x: hidden !important;
+    padding-top: 0 !important;
+}
 
-    .form-group {
-        margin-bottom: 24px;
-        position: relative;
-    }
-    .form-group label {
-        display: block; font-size: 13px; font-weight: 600; color: #4b5563; margin-bottom: 8px; letter-spacing: 0.5px;
-    }
-    .form-control {
-        border-radius: 14px; padding: 15px 20px; border: 1.5px solid #e5e7eb; background-color: #f9fafb;
-        color: #1f2937; font-size: 15px; font-family: 'Inter', sans-serif;
-        transition: all 0.3s ease; box-shadow: none;
-    }
-    .form-control::placeholder {
-        color: #9ca3af;
-    }
-    .form-control:focus {
-        background-color: white; border-color: #10b981;
-        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
-        outline: none;
-    }
-    
-    .divider {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
-        margin: 40px 0;
-    }
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+}
 
-    .security-section {
-        background: rgba(249, 250, 251, 0.6);
-        border-radius: 20px;
-        padding: 30px;
-        border: 1px dashed #e5e7eb;
-    }
+/* ─── Hero Banner ─── */
+.pf-hero {
+    position: relative;
+    height: 340px;
+    background: url('{{ asset("images/home-hero5.png") }}') center center/cover fixed;
+    overflow: hidden;
+}
+.pf-hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+        rgba(0, 52, 45, 0.6) 0%,
+        rgba(0, 52, 45, 0.35) 50%,
+        rgba(252, 249, 248, 0.7) 85%,
+        rgba(252, 249, 248, 1) 100%);
+}
+.pf-hero-content {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 10;
+    padding: 0 2rem 3.5rem;
+    text-align: center;
+}
+.pf-hero-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    margin: 0 0 0.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: pf-fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+.pf-hero-sub {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.85);
+    font-weight: 400;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(15px);
+    animation: pf-fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+}
+@keyframes pf-fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
 
-    .btn-save {
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white; border: none; border-radius: 14px;
-        padding: 16px 35px; font-weight: 600; font-size: 16px; font-family: 'Outfit', sans-serif;
-        letter-spacing: 0.5px; transition: all 0.3s ease; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px;
-        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
-    }
-    .btn-save:hover {
-        transform: translateY(-3px); box-shadow: 0 12px 35px rgba(16, 185, 129, 0.45); color: white;
-    }
+/* ─── Layout ─── */
+.pf-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 2.5rem;
+    max-width: 1200px;
+    margin: -80px auto 4rem;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 10;
+}
+@media (max-width: 960px) {
+    .pf-layout { grid-template-columns: 1fr; margin-top: -60px; }
+}
 
-    .alert { padding: 16px 20px; border-radius: 14px; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 30px;}
-    .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #059669; }
-    .alert-error, .alert-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: #b91c1c; }
+/* ─── Sidebar Card ─── */
+.pf-sidebar {
+    background: #fff;
+    border-radius: 2rem;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 8px 40px -10px rgba(0, 52, 45, 0.08);
+    text-align: center;
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: pf-fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+}
+.pf-avatar {
+    width: 110px; height: 110px;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00342d 0%, #046b5e 70%, #10B981 100%);
+    display: flex;
+    align-items: center; justify-content: center;
+    color: white;
+    font-size: 42px;
+    font-weight: 800;
+    font-family: 'Manrope', sans-serif;
+    box-shadow: 0 12px 35px -8px rgba(0, 52, 45, 0.3);
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.pf-avatar:hover { transform: scale(1.06); }
+.pf-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: 4px; right: 4px;
+    width: 16px; height: 16px;
+    background: #10B981;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.5);
+}
+.pf-name {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #00342d;
+    margin-bottom: 0.25rem;
+}
+.pf-email {
+    font-size: 0.8rem;
+    color: #546067;
+    margin-bottom: 1rem;
+    word-break: break-all;
+}
+.pf-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.4rem 1rem;
+    background: rgba(0, 52, 45, 0.06);
+    border-radius: 2rem;
+    color: #00342d;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1.5rem;
+}
+.pf-badge .material-symbols-outlined {
+    font-size: 0.9rem;
+    font-variation-settings: 'FILL' 1;
+    color: #046b5e;
+}
 
-    /* Validation UI */
-    .form-control.is-invalid { border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
-    .invalid-feedback { color: #ef4444; font-size: 13px; margin-top: 6px; font-weight: 500; display: block;}
+.pf-stats {
+    border-top: 1px solid rgba(0, 52, 45, 0.06);
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.pf-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    border-radius: 0.75rem;
+    transition: background 0.2s ease;
+}
+.pf-stat:hover { background: rgba(0, 52, 45, 0.03); }
+.pf-stat-label {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.8rem;
+    color: #546067;
+}
+.pf-stat-label .material-symbols-outlined {
+    font-size: 1.1rem;
+    color: #046b5e;
+}
+.pf-stat-value {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #00342d;
+}
+
+/* ─── Main Card ─── */
+.pf-main {
+    background: #fff;
+    border-radius: 2rem;
+    padding: 3rem;
+    box-shadow: 0 8px 40px -10px rgba(0, 52, 45, 0.08);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: pf-fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+}
+@media (max-width: 640px) {
+    .pf-main { padding: 2rem 1.5rem; }
+}
+
+/* ─── Section Header ─── */
+.pf-section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+.pf-section-icon {
+    width: 3.5rem; height: 3.5rem;
+    border-radius: 1rem;
+    background: rgba(0, 52, 45, 0.06);
+    display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+.pf-section-icon .material-symbols-outlined {
+    font-size: 1.5rem;
+    color: #00342d;
+}
+.pf-section-info h2 {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #00342d;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+.pf-section-info p {
+    font-size: 0.85rem;
+    color: #546067;
+    margin: 0.15rem 0 0;
+}
+
+/* ─── Form Fields ─── */
+.pf-field {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+.pf-field label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #546067;
+    margin-bottom: 0.5rem;
+}
+.pf-input-wrap {
+    position: relative;
+}
+.pf-input-wrap .pf-icon {
+    position: absolute;
+    left: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: #bfc9c4;
+    z-index: 2;
+    pointer-events: none;
+    transition: color 0.3s ease;
+}
+.pf-input-wrap .form-control {
+    padding-left: 3.2rem !important;
+}
+
+.pf-main .form-control {
+    border-radius: 0.85rem !important;
+    padding: 0.95rem 1.25rem !important;
+    border: 1.5px solid rgba(0, 52, 45, 0.1) !important;
+    background: rgba(252, 249, 248, 0.6) !important;
+    color: #1c1b1b !important;
+    font-size: 0.95rem !important;
+    font-family: 'Manrope', sans-serif !important;
+    font-weight: 500 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 1px 3px rgba(0, 52, 45, 0.04) !important;
+}
+.pf-main .form-control::placeholder {
+    color: #bfc9c4 !important;
+    font-weight: 400 !important;
+}
+.pf-main .form-control:focus {
+    border-color: #046b5e !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 4px rgba(4, 107, 94, 0.1), 0 2px 8px rgba(4, 107, 94, 0.06) !important;
+    transform: translateY(-1px) !important;
+    outline: none !important;
+}
+.pf-main .form-control:focus ~ .pf-icon {
+    color: #046b5e;
+}
+
+/* Validation */
+.pf-main .form-control.is-valid {
+    border-color: rgba(16, 185, 129, 0.5) !important;
+}
+.pf-main .form-control.is-invalid {
+    border-color: rgba(220, 38, 38, 0.5) !important;
+    background: rgba(220, 38, 38, 0.02) !important;
+}
+.pf-main .form-control.is-invalid:focus {
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.08), 0 2px 8px rgba(220, 38, 38, 0.04) !important;
+}
+
+.pf-validation {
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: all 0.25s ease;
+    font-weight: 600;
+}
+.pf-validation.show { opacity: 1; transform: translateY(0); }
+.pf-validation.error { color: #dc2626; }
+.pf-validation.success { color: #059669; }
+.pf-validation .material-symbols-outlined { font-size: 1rem; }
+
+/* Twig Server-Side Errors */
+.pf-main ul { list-style: none; padding: 0; margin: 0.4rem 0 0; }
+.pf-main ul li { font-size: 0.75rem; color: #dc2626; font-weight: 600; }
+.pf-main .invalid-feedback { color: #dc2626; font-size: 0.75rem; font-weight: 600; margin-top: 0.4rem; display: block; }
+
+/* ─── Divider ─── */
+.pf-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 52, 45, 0.08), transparent);
+    margin: 2.5rem 0;
+}
+
+/* ─── Security Block ─── */
+.pf-security {
+    background: #f6f3f2;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+.pf-security::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, #00342d, #046b5e, #10B981);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s ease;
+}
+.pf-security:hover::before { transform: scaleX(1); }
+
+/* ─── Password Strength ─── */
+.pf-pwd-strength {
+    margin-top: 0.75rem;
+    display: none;
+}
+.pf-pwd-strength.show { display: block; }
+.pf-str-bar-bg {
+    height: 4px;
+    background: rgba(0, 52, 45, 0.06);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+.pf-str-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    transition: width 0.4s ease, background 0.4s ease;
+}
+.pf-str-text {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #bfc9c4;
+    margin-bottom: 0.5rem;
+}
+.pf-criteria {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+}
+.pf-crit {
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #bfc9c4;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+.pf-crit.met { color: #059669; }
+.pf-crit .material-symbols-outlined { font-size: 0.85rem; }
+
+/* ─── Password Toggle ─── */
+.pf-pwd-toggle {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #bfc9c4;
+    padding: 4px;
+    z-index: 2;
+    transition: color 0.2s;
+}
+.pf-pwd-toggle:hover { color: #046b5e; }
+.pf-pwd-toggle .material-symbols-outlined { font-size: 1.25rem; }
+
+/* ─── Submit Button ─── */
+.pf-submit {
+    margin-top: 2rem;
+}
+.pf-btn-save {
+    width: 100%;
+    padding: 1.1rem 2.5rem;
+    background: linear-gradient(135deg, #00342d 0%, #004d43 70%, #046b5e 100%);
+    color: #fff;
+    border: none;
+    border-radius: 0.85rem;
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 25px -6px rgba(0, 52, 45, 0.35);
+    position: relative;
+    overflow: hidden;
+}
+.pf-btn-save::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s ease;
+}
+.pf-btn-save:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 14px 40px -8px rgba(0, 52, 45, 0.45);
+}
+.pf-btn-save:hover::before { left: 100%; }
+.pf-btn-save:active { transform: translateY(-1px); }
+.pf-btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+.pf-btn-save .pf-spinner {
+    display: none;
+    width: 1.2rem; height: 1.2rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: pf-spin 0.6s linear infinite;
+}
+@keyframes pf-spin { to { transform: rotate(360deg); } }
+
+/* ─── Alerts ─── */
+.pf-alert {
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: pf-fadeUp 0.5s ease 0.1s forwards;
+}
+.pf-alert.success {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    color: #059669;
+}
+.pf-alert.error {
+    background: rgba(220, 38, 38, 0.06);
+    border: 1px solid rgba(220, 38, 38, 0.12);
+    color: #dc2626;
+}
+.pf-alert .material-symbols-outlined { font-size: 1.3rem; font-variation-settings: 'FILL' 1; }
+
+/* ─── Gold Accent Bar ─── */
+.pf-accent-bar {
+    height: 3px;
+    width: 3rem;
+    background: #e9c176;
+    border-radius: 3px;
+    margin-bottom: 1.5rem;
+}
+
+/* ─── Navbar Fix ─── */
+.govibe-navbar {
+    position: fixed !important;
+}
 </style>
 {% endblock %}
 
 {% block body %}
-    <div class="profile-hero">
-        <div class="profile-hero-overlay"></div>
+    <!-- ═══ Hero Banner ═══ -->
+    <div class="pf-hero">
+        <div class="pf-hero-content">
+            <h1 class="pf-hero-title">Mon Profil</h1>
+            <p class="pf-hero-sub">Gérez vos informations personnelles et vos paramètres de sécurité</p>
+        </div>
     </div>
-    
-    <div class="container profile-container">
-        <div class="profile-card">
-            <div class="profile-avatar-wrapper">
-                <div class="profile-avatar">{{ user.prenom|first|upper }}</div>
-                <h1 class="profile-name">{{ user.prenom }} {{ user.nom }}</h1>
-                <div class="profile-role"><i class="bi bi-shield-check me-1"></i> {{ user.role|replace({'ROLE_': ''}) }}</div>
+
+    <!-- ═══ Main Layout ═══ -->
+    <div class="pf-layout">
+
+        <!-- ─── Sidebar ─── -->
+        <aside class="pf-sidebar">
+            <div class="pf-avatar" id="avatar-display">{{ user.prenom|first|upper }}</div>
+            <div class="pf-name" id="name-display">{{ user.prenom }} {{ user.nom }}</div>
+            <div class="pf-email">{{ user.email }}</div>
+            <div class="pf-badge">
+                <span class="material-symbols-outlined">verified_user</span>
+                {{ user.role|upper }}
             </div>
-            
+
+            <div class="pf-stats">
+                <div class="pf-stat">
+                    <span class="pf-stat-label"><span class="material-symbols-outlined">calendar_month</span> Membre depuis</span>
+                    <span class="pf-stat-value">{{ user.createdAt ? user.createdAt|date('d/m/Y') : 'N/A' }}</span>
+                </div>
+
+            </div>
+        </aside>
+
+        <!-- ─── Main Content ─── -->
+        <main class="pf-main">
+
             {% for message in app.flashes('success') %}
-                <div class="alert alert-success mb-4 text-center"><i class="bi bi-check-circle-fill"></i> {{ message }}</div>
+                <div class="pf-alert success">
+                    <span class="material-symbols-outlined">check_circle</span> {{ message }}
+                </div>
             {% endfor %}
             {% for message in app.flashes('error') %}
-                <div class="alert alert-error mb-4 text-center"><i class="bi bi-exclamation-triangle-fill"></i> {{ message }}</div>
+                <div class="pf-alert error">
+                    <span class="material-symbols-outlined">error</span> {{ message }}
+                </div>
             {% endfor %}
 
-            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'ultra-profile-form'}}) }}
-                
-                <!-- Section Informations -->
-                <div class="section-title">
-                    <i class="bi bi-person-lines-fill fs-4"></i> Informations Personnelles
-                </div>
-                <div class="row g-4">
-                    <div class="col-md-6 form-group">
-                        {{ form_label(form.prenom) }}
-                        {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.prenom) }}
-                    </div>
-                    <div class="col-md-6 form-group">
-                        {{ form_label(form.nom) }}
-                        {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.nom) }}
-                    </div>
-                    <div class="col-md-12 form-group">
-                        {{ form_label(form.email) }}
-                        {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
-                        {{ form_errors(form.email) }}
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'id': 'profile-form', 'autocomplete': 'off'}}) }}
+
+                <!-- ═══ Personal Info ═══ -->
+                <div class="pf-section-header">
+                    <div class="pf-section-icon"><span class="material-symbols-outlined">person</span></div>
+                    <div class="pf-section-info">
+                        <h2>Informations Personnelles</h2>
+                        <p>Mettez à jour vos informations de profil</p>
                     </div>
                 </div>
+                <div class="pf-accent-bar"></div>
 
-                <div class="divider"></div>
-
-                <!-- Section Sécurité -->
-                <div class="security-section">
-                    <div class="section-title">
-                        <i class="bi bi-shield-lock-fill fs-4"></i> Sécurité & Mot de passe
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="pf-field">
+                            <label for="field-prenom">Prénom</label>
+                            <div class="pf-input-wrap">
+                                <span class="material-symbols-outlined pf-icon">badge</span>
+                                {{ form_widget(form.prenom, {'attr': {'class': 'form-control', 'id': 'field-prenom', 'placeholder': 'Votre prénom', 'data-validate': 'name'}}) }}
+                            </div>
+                            {{ form_errors(form.prenom) }}
+                            <div class="pf-validation" id="msg-prenom"></div>
+                        </div>
                     </div>
-                    <p class="text-muted mb-4" style="font-size: 13px;">Vous pouvez modifier votre mot de passe ci-dessous. Si vous ne souhaitez pas le changer, laissez ces champs vides.</p>
-                    
-                    <div class="row g-4">
-                        <div class="col-md-12 form-group">
-                            {{ form_label(form.currentPassword, 'Mot de passe actuel') }}
-                            {{ form_widget(form.currentPassword, {'attr': {'class': 'form-control', 'placeholder': 'Nécessaire uniquement pour changer de mot de passe', 'id': 'current-pwd'}}) }}
-                            {{ form_errors(form.currentPassword) }}
-                            <div class="invalid-feedback js-pwd-error"></div>
+                    <div class="col-md-6">
+                        <div class="pf-field">
+                            <label for="field-nom">Nom</label>
+                            <div class="pf-input-wrap">
+                                <span class="material-symbols-outlined pf-icon">badge</span>
+                                {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'id': 'field-nom', 'placeholder': 'Votre nom', 'data-validate': 'name'}}) }}
+                            </div>
+                            {{ form_errors(form.nom) }}
+                            <div class="pf-validation" id="msg-nom"></div>
                         </div>
-
-                        <div class="col-md-6 form-group">
-                            {{ form_label(form.newPassword.first) }}
-                            {{ form_widget(form.newPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'Nouveau mot de passe', 'id': 'new-pwd'}}) }}
-                            {{ form_errors(form.newPassword.first) }}
-                        </div>
-                        <div class="col-md-6 form-group">
-                            {{ form_label(form.newPassword.second) }}
-                            {{ form_widget(form.newPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Confirmez le nouveau mot de passe', 'id': 'confirm-pwd'}}) }}
-                            {{ form_errors(form.newPassword.second) }}
+                    </div>
+                    <div class="col-12">
+                        <div class="pf-field">
+                            <label for="field-email">Adresse email</label>
+                            <div class="pf-input-wrap">
+                                <span class="material-symbols-outlined pf-icon">mail</span>
+                                {{ form_widget(form.email, {'attr': {'class': 'form-control', 'id': 'field-email', 'placeholder': 'votre@email.com', 'data-validate': 'email'}}) }}
+                            </div>
+                            {{ form_errors(form.email) }}
+                            <div class="pf-validation" id="msg-email"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-5">
-                    <button type="submit" class="btn-save" id="btn-update">
-                        <i class="bi bi-cloud-arrow-up-fill"></i> Sauvegarder les modifications
+                <div class="pf-divider"></div>
+
+                <!-- ═══ Security ═══ -->
+                <div class="pf-security">
+                    <div class="pf-section-header">
+                        <div class="pf-section-icon"><span class="material-symbols-outlined">lock</span></div>
+                        <div class="pf-section-info">
+                            <h2>Sécurité & Mot de passe</h2>
+                            <p>Laissez vide si vous ne souhaitez pas le modifier</p>
+                        </div>
+                    </div>
+                    <div class="pf-accent-bar"></div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="pf-field">
+                                <label for="field-current-pwd">Mot de passe actuel</label>
+                                <div class="pf-input-wrap">
+                                    <span class="material-symbols-outlined pf-icon">key</span>
+                                    {{ form_widget(form.currentPassword, {'attr': {'class': 'form-control', 'id': 'field-current-pwd', 'placeholder': 'Requis pour changer de mot de passe', 'autocomplete': 'current-password'}}) }}
+                                    <button type="button" class="pf-pwd-toggle" data-target="field-current-pwd" tabindex="-1">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                    </button>
+                                </div>
+                                {{ form_errors(form.currentPassword) }}
+                                <div class="pf-validation" id="msg-current-pwd"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pf-field">
+                                <label for="field-new-pwd">Nouveau mot de passe</label>
+                                <div class="pf-input-wrap">
+                                    <span class="material-symbols-outlined pf-icon">lock</span>
+                                    {{ form_widget(form.newPassword.first, {'attr': {'class': 'form-control', 'id': 'field-new-pwd', 'placeholder': '8 caractères minimum', 'autocomplete': 'new-password'}}) }}
+                                    <button type="button" class="pf-pwd-toggle" data-target="field-new-pwd" tabindex="-1">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                    </button>
+                                </div>
+                                {{ form_errors(form.newPassword.first) }}
+
+                                <div class="pf-pwd-strength" id="pwd-strength-wrap">
+                                    <div class="pf-str-bar-bg"><div class="pf-str-bar" id="pwd-str-bar"></div></div>
+                                    <div class="pf-str-text" id="pwd-str-text"></div>
+                                    <div class="pf-criteria">
+                                        <div class="pf-crit" id="crit-len"><span class="material-symbols-outlined">radio_button_unchecked</span> 8+ caractères</div>
+                                        <div class="pf-crit" id="crit-upper"><span class="material-symbols-outlined">radio_button_unchecked</span> Majuscule</div>
+                                        <div class="pf-crit" id="crit-num"><span class="material-symbols-outlined">radio_button_unchecked</span> Chiffre</div>
+                                        <div class="pf-crit" id="crit-spec"><span class="material-symbols-outlined">radio_button_unchecked</span> Caractère spécial</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pf-field">
+                                <label for="field-confirm-pwd">Confirmer le mot de passe</label>
+                                <div class="pf-input-wrap">
+                                    <span class="material-symbols-outlined pf-icon">lock</span>
+                                    {{ form_widget(form.newPassword.second, {'attr': {'class': 'form-control', 'id': 'field-confirm-pwd', 'placeholder': 'Retapez le mot de passe', 'autocomplete': 'new-password'}}) }}
+                                    <button type="button" class="pf-pwd-toggle" data-target="field-confirm-pwd" tabindex="-1">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                    </button>
+                                </div>
+                                {{ form_errors(form.newPassword.second) }}
+                                <div class="pf-validation" id="msg-confirm-pwd"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Submit ═══ -->
+                <div class="pf-submit">
+                    <button type="submit" class="pf-btn-save" id="btn-save">
+                        <span class="pf-spinner" id="save-spinner"></span>
+                        <span class="material-symbols-outlined" id="save-icon">cloud_upload</span>
+                        <span id="save-text">Enregistrer les modifications</span>
                     </button>
                 </div>
+
             {{ form_end(form) }}
-        </div>
+        </main>
     </div>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const form = document.getElementById('ultra-profile-form');
-        const currentPwd = document.getElementById('current-pwd');
-        const newPwd = document.getElementById('new-pwd');
-        const confirmPwd = document.getElementById('confirm-pwd');
-        const btnSubmit = document.getElementById('btn-update');
+document.addEventListener('DOMContentLoaded', () => {
+    const form         = document.getElementById('profile-form');
+    const prenomField  = document.getElementById('field-prenom');
+    const nomField     = document.getElementById('field-nom');
+    const emailField   = document.getElementById('field-email');
+    const currentPwd   = document.getElementById('field-current-pwd');
+    const newPwd       = document.getElementById('field-new-pwd');
+    const confirmPwd   = document.getElementById('field-confirm-pwd');
+    const btnSave      = document.getElementById('btn-save');
+    const nameDisplay  = document.getElementById('name-display');
+    const avatarDisplay= document.getElementById('avatar-display');
 
-        function checkPasswords() {
-            let isValid = true;
-            let errorText = '';
-            
-            // Si on tente de changer le mot de passe (via nouveau)
-            if (newPwd.value.trim() !== '' || confirmPwd.value.trim() !== '') {
-                if (currentPwd.value.trim() === '') {
-                    isValid = false;
-                    errorText = 'Vous devez indiquer votre mot de passe actuel.';
-                    currentPwd.classList.add('is-invalid');
-                } else {
-                    currentPwd.classList.remove('is-invalid');
-                }
+    /* ─── Show / Hide Validation Message ─── */
+    function showMsg(id, text, type) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const icon = type === 'error' ? 'error' : 'check_circle';
+        el.innerHTML = `<span class="material-symbols-outlined">${icon}</span> ${text}`;
+        el.className = `pf-validation show ${type}`;
+    }
+    function hideMsg(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.className = 'pf-validation';
+    }
 
-                if (newPwd.value.trim() !== confirmPwd.value.trim()) {
-                    isValid = false;
-                    confirmPwd.classList.add('is-invalid');
-                    newPwd.classList.add('is-invalid');
-                } else {
-                    confirmPwd.classList.remove('is-invalid');
-                    if(newPwd.value.trim() !== '') newPwd.classList.remove('is-invalid');
-                }
-            } else {
-                currentPwd.classList.remove('is-invalid');
-                newPwd.classList.remove('is-invalid');
-                confirmPwd.classList.remove('is-invalid');
-            }
-
-            const errorContainer = currentPwd.parentElement.querySelector('.js-pwd-error');
-            if(errorContainer) errorContainer.textContent = errorText;
-
-            return isValid;
+    /* ─── Name Validation ─── */
+    function validateName(field, msgId) {
+        const val = field.value.trim();
+        if (val.length === 0) {
+            field.classList.add('is-invalid'); field.classList.remove('is-valid');
+            showMsg(msgId, 'Ce champ est requis', 'error');
+            return false;
         }
+        if (val.length < 2) {
+            field.classList.add('is-invalid'); field.classList.remove('is-valid');
+            showMsg(msgId, 'Minimum 2 caractères', 'error');
+            return false;
+        }
+        if (!/^[a-zA-ZÀ-ÿ\s'\-]+$/.test(val)) {
+            field.classList.add('is-invalid'); field.classList.remove('is-valid');
+            showMsg(msgId, 'Caractères invalides détectés', 'error');
+            return false;
+        }
+        field.classList.remove('is-invalid'); field.classList.add('is-valid');
+        hideMsg(msgId);
+        return true;
+    }
 
-        [currentPwd, newPwd, confirmPwd].forEach(el => {
-            if(el) {
-                el.addEventListener('input', checkPasswords);
-                el.addEventListener('blur', checkPasswords);
-            }
+    /* ─── Email Validation ─── */
+    function validateEmail() {
+        const val = emailField.value.trim();
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        if (val.length === 0) {
+            emailField.classList.add('is-invalid'); emailField.classList.remove('is-valid');
+            showMsg('msg-email', 'L\'adresse email est requise', 'error');
+            return false;
+        }
+        if (!re.test(val)) {
+            emailField.classList.add('is-invalid'); emailField.classList.remove('is-valid');
+            showMsg('msg-email', 'Format d\'email invalide', 'error');
+            return false;
+        }
+        emailField.classList.remove('is-invalid'); emailField.classList.add('is-valid');
+        hideMsg('msg-email');
+        return true;
+    }
+
+    /* ─── Password Strength Meter ─── */
+    const strengthWrap = document.getElementById('pwd-strength-wrap');
+    const strBar       = document.getElementById('pwd-str-bar');
+    const strText      = document.getElementById('pwd-str-text');
+
+    function updateStrength() {
+        const val = newPwd.value;
+        if (!val.length) { strengthWrap.classList.remove('show'); return; }
+        strengthWrap.classList.add('show');
+
+        let score = 0;
+        const checks = {
+            'crit-len':   val.length >= 8,
+            'crit-upper': /[A-Z]/.test(val),
+            'crit-num':   /\d/.test(val),
+            'crit-spec':  /[^A-Za-z0-9]/.test(val)
+        };
+        Object.entries(checks).forEach(([id, met]) => {
+            const el = document.getElementById(id);
+            if (met) { score++; el.classList.add('met'); el.querySelector('.material-symbols-outlined').textContent = 'check_circle'; }
+            else { el.classList.remove('met'); el.querySelector('.material-symbols-outlined').textContent = 'radio_button_unchecked'; }
         });
 
-        form.addEventListener('submit', (e) => {
-            if (!checkPasswords()) {
-                e.preventDefault();
-            } else {
-                btnSubmit.innerHTML = '<i class="bi bi-hourglass-split"></i> Sauvegarde...';
-                btnSubmit.style.opacity = '0.8';
+        const levels = [
+            { w: '25%', c: '#dc2626', t: 'Faible' },
+            { w: '50%', c: '#f59e0b', t: 'Modéré' },
+            { w: '75%', c: '#046b5e', t: 'Bon' },
+            { w: '100%', c: '#059669', t: 'Excellent' }
+        ];
+        const L = levels[Math.max(0, score - 1)] || levels[0];
+        strBar.style.width = L.w;
+        strBar.style.background = `linear-gradient(90deg, ${L.c}, ${L.c}cc)`;
+        strText.textContent = L.t;
+        strText.style.color = L.c;
+    }
+
+    /* ─── Password Validation ─── */
+    function validatePasswords() {
+        const nv = newPwd.value.trim(), cv = confirmPwd.value.trim(), cur = currentPwd.value.trim();
+        let ok = true;
+        if (nv !== '' || cv !== '') {
+            if (cur === '') {
+                currentPwd.classList.add('is-invalid'); currentPwd.classList.remove('is-valid');
+                showMsg('msg-current-pwd', 'Mot de passe actuel requis', 'error'); ok = false;
+            } else { currentPwd.classList.remove('is-invalid'); currentPwd.classList.add('is-valid'); hideMsg('msg-current-pwd'); }
+
+            if (nv.length > 0 && nv.length < 8) { newPwd.classList.add('is-invalid'); newPwd.classList.remove('is-valid'); ok = false; }
+            else if (nv.length >= 8) {
+                if (!/^(?=.*[A-Z])(?=.*\d).+$/.test(nv)) { newPwd.classList.add('is-invalid'); newPwd.classList.remove('is-valid'); ok = false; }
+                else { newPwd.classList.remove('is-invalid'); newPwd.classList.add('is-valid'); }
             }
+
+            if (cv !== '' && nv !== cv) {
+                confirmPwd.classList.add('is-invalid'); confirmPwd.classList.remove('is-valid');
+                showMsg('msg-confirm-pwd', 'Les mots de passe ne correspondent pas', 'error'); ok = false;
+            } else if (cv !== '' && nv === cv && nv.length >= 8) {
+                confirmPwd.classList.remove('is-invalid'); confirmPwd.classList.add('is-valid');
+                showMsg('msg-confirm-pwd', 'Les mots de passe correspondent', 'success');
+            } else { confirmPwd.classList.remove('is-invalid', 'is-valid'); hideMsg('msg-confirm-pwd'); }
+        } else {
+            [currentPwd, newPwd, confirmPwd].forEach(f => f.classList.remove('is-invalid', 'is-valid'));
+            hideMsg('msg-current-pwd'); hideMsg('msg-confirm-pwd');
+        }
+        return ok;
+    }
+
+    /* ─── Password Toggle ─── */
+    document.querySelectorAll('.pf-pwd-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const t = document.getElementById(btn.dataset.target);
+            if (!t) return;
+            const show = t.type === 'password';
+            t.type = show ? 'text' : 'password';
+            btn.querySelector('.material-symbols-outlined').textContent = show ? 'visibility_off' : 'visibility';
         });
     });
+
+    /* ─── Live Sidebar Update ─── */
+    function updateSidebar() {
+        const p = prenomField.value.trim() || 'Prénom', n = nomField.value.trim() || 'Nom';
+        if (nameDisplay) nameDisplay.textContent = p + ' ' + n;
+        if (avatarDisplay) avatarDisplay.textContent = p.charAt(0).toUpperCase();
+    }
+
+    /* ─── Event Listeners ─── */
+    prenomField.addEventListener('input', () => { validateName(prenomField, 'msg-prenom'); updateSidebar(); });
+    prenomField.addEventListener('blur', () => validateName(prenomField, 'msg-prenom'));
+    nomField.addEventListener('input', () => { validateName(nomField, 'msg-nom'); updateSidebar(); });
+    nomField.addEventListener('blur', () => validateName(nomField, 'msg-nom'));
+    emailField.addEventListener('input', validateEmail);
+    emailField.addEventListener('blur', validateEmail);
+    newPwd.addEventListener('input', () => { updateStrength(); validatePasswords(); });
+    newPwd.addEventListener('blur', validatePasswords);
+    confirmPwd.addEventListener('input', validatePasswords);
+    confirmPwd.addEventListener('blur', validatePasswords);
+    currentPwd.addEventListener('input', validatePasswords);
+    currentPwd.addEventListener('blur', validatePasswords);
+
+    /* ─── Submit ─── */
+    form.addEventListener('submit', (e) => {
+        let valid = true;
+        if (!validateName(prenomField, 'msg-prenom')) valid = false;
+        if (!validateName(nomField, 'msg-nom')) valid = false;
+        if (!validateEmail()) valid = false;
+        if (!validatePasswords()) valid = false;
+
+        if (!valid) {
+            e.preventDefault();
+            const first = form.querySelector('.is-invalid');
+            if (first) { first.scrollIntoView({ behavior: 'smooth', block: 'center' }); first.focus(); }
+            btnSave.style.animation = 'pf-shake 0.4s ease';
+            setTimeout(() => btnSave.style.animation = '', 400);
+            return;
+        }
+        document.getElementById('save-spinner').style.display = 'block';
+        document.getElementById('save-icon').style.display = 'none';
+        document.getElementById('save-text').textContent = 'Enregistrement…';
+        btnSave.disabled = true;
+    });
+
+    /* Shake animation */
+    const s = document.createElement('style');
+    s.textContent = `@keyframes pf-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`;
+    document.head.appendChild(s);
+});
 </script>
 {% endblock %}
