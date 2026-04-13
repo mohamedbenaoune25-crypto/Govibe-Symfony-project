@@ -66,7 +66,7 @@
         </div>
 
         <!-- LOCALISATION -->
-        <div class="mb-4">
+        <div class="mb-4 position-relative">
             <label class="gv-form-label mb-2 d-block">Localisation</label>
             <div class="gv-input-group">
                 <span class="gv-input-icon">
@@ -75,10 +75,13 @@
                 {{ form_widget(form.localisation, {
                     'attr': {
                         'class': 'form-control gv-input gv-input-with-icon',
-                        'placeholder': 'Où êtes-vous ? (ex: Paris, France)'
+                        'id': 'localisation-search',
+                        'placeholder': 'Rechercher un lieu...',
+                        'autocomplete' : 'off'
                     }
                 }) }}
             </div>
+            <div id="location-results" class="location-results-dropdown shadow-lg"></div>
             {{ form_errors(form.localisation) }}
         </div>
 
@@ -86,6 +89,7 @@
         <div class="d-none">
             {{ form_widget(form.type, {'id': 'poste_type'}) }}
             {{ form_widget(form.forum) }}
+            <input type="hidden" name="externalImageUrl" id="poste_externalImageUrl">
             {{ form_rest(form) }}
         </div>
 
@@ -138,6 +142,21 @@
     .gv-input-icon { position: absolute; left: 1rem; z-index: 2; display: flex; align-items: center; }
     .gv-input-with-icon { padding-left: 2.75rem !important; }
 
+    .location-results-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0; z-index: 9999 !important;
+        background: #fff; border-radius: 1rem; margin-top: 0.5rem;
+        max-height: 250px; overflow-y: auto; display: none;
+        border: 2px solid #10B981; padding: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+    }
+    .location-item {
+        padding: 0.75rem 1rem; cursor: pointer; border-radius: 0.75rem;
+        transition: all 0.2s; font-size: 0.9rem; color: #546067;
+        display: flex; align-items: center; gap: 0.75rem;
+    }
+    .location-item:hover { background: rgba(16,185,129,0.06); color: #00342d; }
+    .location-item i { color: #10B981; font-size: 1.1rem; }
+
     .gv-btn-browse {
         padding: 0.75rem 1.25rem; background: linear-gradient(135deg, #00342d, #046b5e);
         color: #fff; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 0.85rem;
@@ -182,6 +201,7 @@
         const realInput = document.getElementById('poste_imageFile');
         const fakeInput = document.getElementById('fake-file-input');
         const typeInput = document.getElementById('poste_type');
+        const externalInput = document.getElementById('poste_externalImageUrl');
         const imgPreview = document.getElementById('image-preview');
         const previewContainer = document.getElementById('preview-image-container');
         const noPreview = document.getElementById('no-preview');
@@ -201,16 +221,22 @@
             }
 
             if (typeInput.value === 'MEDIA') {
-                {% if not poste.postId %}
-                if (!realInput.files || realInput.files.length === 0) {
+                const hasFile = realInput.files && realInput.files.length > 0;
+                const hasExternal = externalInput && externalInput.value.trim() !== '';
+                const hasExisting = imgPreview && imgPreview.getAttribute('src') && imgPreview.getAttribute('src') !== '';
+
+                if (!hasFile && !hasExternal && !hasExisting) {
                     fakeInput.classList.add('is-invalid-custom');
                     document.getElementById('error-file').style.display = 'block';
                     isValid = false;
                 } else {
                     fakeInput.classList.remove('is-invalid-custom');
                     document.getElementById('error-file').style.display = 'none';
+                    
+                    if (hasExternal && !hasFile) {
+                        fakeInput.value = "Image suggérée par l'IA";
+                    }
                 }
-                {% endif %}
             } else {
                 fakeInput.classList.remove('is-invalid-custom');
                 document.getElementById('error-file').style.display = 'none';
@@ -279,6 +305,66 @@
             previewContainer.style.display = 'block';
             noPreview.style.display = 'none';
         {% endif %}
+
+
+        // --- LocationIQ Autocomplete Logic ---
+        console.log('Initializing Location Search...');
+        const locationInput = document.getElementById('localisation-search') || document.querySelector('input[name*="[localisation]"]');
+        const resultsDiv = document.getElementById('location-results');
+        const apiKey = '{{ locationiq_key }}'; 
+        let timeout = null;
+
+        if (locationInput) {
+            locationInput.addEventListener('input', function() {
+                const query = this.value;
+                clearTimeout(timeout);
+                
+                if (query.length < 1) {
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+
+                // Show loading state
+                resultsDiv.innerHTML = '<div class="location-item text-muted small"><span class="spinner-border spinner-border-sm me-2"></span> Recherche en cours...</div>';
+                resultsDiv.style.display = 'block';
+
+                timeout = setTimeout(() => {
+                    fetch(`https://us1.locationiq.com/v1/autocomplete?key=${apiKey}&q=${query}&format=json&limit=5`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('API Error');
+                            return response.json();
+                        })
+                        .then(data => {
+                            resultsDiv.innerHTML = '';
+                            if (data && data.length > 0) {
+                                data.forEach(item => {
+                                    const div = document.createElement('div');
+                                    div.className = 'location-item';
+                                    div.innerHTML = `<span class="material-symbols-outlined" style="font-size:1.1rem;">location_on</span> ${item.display_name}`;
+                                    div.onclick = () => {
+                                        locationInput.value = item.display_name;
+                                        resultsDiv.style.display = 'none';
+                                    };
+                                    resultsDiv.appendChild(div);
+                                });
+                                resultsDiv.style.display = 'block';
+                            } else {
+                                resultsDiv.innerHTML = '<div class="location-item text-muted small">Aucun résultat trouvé</div>';
+                            }
+                        })
+                        .catch(err => {
+                            console.error('LocationIQ Error:', err);
+                            resultsDiv.innerHTML = '<div class="location-item text-danger small">Erreur de recherche. Vérifiez votre clé API.</div>';
+                        });
+                }, 400); // 400ms debounce
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target !== locationInput && e.target !== resultsDiv) {
+                    resultsDiv.style.display = 'none';
+                }
+            });
+        }
     }
 
     if (typeof isAjax === 'undefined') {

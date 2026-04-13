@@ -59,12 +59,15 @@
     <!-- Post Footer -->
     <div class="card-footer bg-transparent border-top p-4 d-flex align-items-center justify-content-between">
         <div class="d-flex gap-4">
-            <button class="btn btn-link link-dark text-decoration-none fw-bold p-0 d-flex align-items-center gap-2 group transition-all">
-                <div class="icon-sq bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                    <i class="bi bi-heart-fill small"></i>
-                </div>
-                <span>{{ poste.likes|default(0) }} <span class="d-none d-sm-inline">Likes</span></span>
-            </button>
+            {% set isLikedPost = poste.postId in app.request.session.get('liked_posts', []) %}
+            <form method="post" action="{{ path('app_poste_like', {'postId': poste.postId}) }}" class="d-inline">
+                <button type="submit" class="btn btn-link text-decoration-none fw-bold p-0 d-flex align-items-center gap-2 group transition-all {{ isLikedPost ? 'text-danger' : 'link-dark' }}">
+                    <div class="icon-sq {{ isLikedPost ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success' }} rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <i class="bi {{ isLikedPost ? 'bi-heart-fill' : 'bi-heart' }} small"></i>
+                    </div>
+                    <span>{{ poste.likes|default(0) }} <span class="d-none d-sm-inline">Likes</span></span>
+                </button>
+            </form>
             <button class="btn btn-link link-dark text-decoration-none fw-bold p-0 d-flex align-items-center gap-2" onclick="toggleComments({{ poste.postId }})">
                 <div class="icon-sq bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                     <i class="bi bi-chat-dots-fill small"></i>
@@ -127,22 +130,30 @@
 
                                 <!-- Comment Actions -->
                                 <div class="d-flex align-items-center gap-3 mt-3">
+                                    {% set isLikedComment = comment.commentaireId in app.request.session.get('liked_comments', []) %}
                                     <form method="post" action="{{ path('app_commentaire_like', {'commentaireId': comment.commentaireId}) }}" class="d-inline">
-                                        <button class="btn btn-link p-0 text-muted small text-decoration-none hover-mint d-flex align-items-center gap-1">
-                                            <i class="bi bi-hand-thumbs-up"></i><span>{{ comment.likes }}</span>
+                                        <button class="btn btn-link p-0 small text-decoration-none hover-mint d-flex align-items-center gap-1 {{ isLikedComment ? 'text-success fw-bold' : 'text-muted' }}">
+                                            <i class="bi {{ isLikedComment ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up' }}"></i><span>{{ comment.likes }}</span>
                                         </button>
                                     </form>
                                     <button type="button" onclick="toggleReplyForm({{ comment.commentaireId }})" class="btn btn-link p-0 text-secondary fw-bold small text-decoration-none hover-mint" style="font-size: 0.75rem;">
                                         Répondre
                                     </button>
+                                    
+                                    {% set replies = poste.commentaires|filter(r => r.parentId == comment.commentaireId) %}
+                                    {% if replies|length > 0 %}
+                                        <button type="button" onclick="toggleReplies({{ comment.commentaireId }})" class="btn btn-link p-0 text-primary fw-bold small text-decoration-none hover-mint d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                            <span id="replies-count-text-{{ comment.commentaireId }}">Voir les {{ replies|length }} réponses</span>
+                                            <i class="bi bi-chevron-down small" id="replies-chevron-{{ comment.commentaireId }}"></i>
+                                        </button>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
 
                         <!-- Replies Container -->
-                        {% set replies = poste.commentaires|filter(r => r.parentId == comment.commentaireId) %}
                         {% if replies|length > 0 or is_granted('ROLE_USER') %}
-                            <div class="replies-container ms-5 mt-3 border-start ps-4">
+                            <div class="replies-container ms-5 mt-3 border-start ps-4" id="replies-container-{{ comment.commentaireId }}" style="{% if replies|length > 0 %}display: none;{% endif %}">
                                 {% for reply in replies %}
                                     <div class="reply mb-3 d-flex gap-2 animate-fade-in">
                                         <div class="avatar-xs rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-sm" 
@@ -231,6 +242,25 @@
             const isHidden = el.style.display === 'none';
             el.style.display = isHidden ? 'block' : 'none';
             chev.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+    }
+
+    function toggleReplies(id) {
+        const el = document.getElementById('replies-container-' + id);
+        const chev = document.getElementById('replies-chevron-' + id);
+        const textSpan = document.getElementById('replies-count-text-' + id);
+        
+        if (el) {
+            const isHidden = el.style.display === 'none';
+            el.style.display = isHidden ? 'block' : 'none';
+            chev.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+            
+            if (isHidden) {
+                textSpan.dataset.originalText = textSpan.innerText;
+                textSpan.innerText = 'Masquer les réponses';
+            } else {
+                textSpan.innerText = textSpan.dataset.originalText || 'Voir les réponses';
+            }
         }
     }
 

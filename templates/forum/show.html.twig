@@ -310,6 +310,59 @@
         </div>
     </div>
 </div>
+
+<!-- ─── Gemini Chatbot HTML ─── -->
+<button type="button" class="gv-chatbot-fab" onclick="openChatModal()">
+    <span class="material-symbols-outlined">smart_toy</span>
+</button>
+
+<div class="modal fade" id="chatModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px); z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 overflow-hidden shadow-lg" style="border-radius:1.5rem;">
+            <div class="modal-header border-0 p-4" style="background: linear-gradient(135deg, #00342d 0%, #013220 100%); color: white;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center justify-content-center rounded-3" style="width:45px; height:45px; background:rgba(255,255,255,0.1);">
+                        <span class="material-symbols-outlined" style="color:#a0f2e1;">robot_2</span>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold mb-0">AI Assistant</h5>
+                        <div class="gv-ai-selector-container mt-1" id="aiSelector">
+                            <div class="gv-ai-selector-btn" onclick="toggleAISelector()">
+                                <span id="selectedAIName">Gemini (Google)</span>
+                                <span class="material-symbols-outlined arrow">expand_more</span>
+                            </div>
+                            <div class="gv-ai-selector-menu" id="aiMenu">
+                                <div class="gv-ai-selector-item active" onclick="selectAI('gemini', 'Gemini (Google)')">
+                                    <span class="material-symbols-outlined gv-icon-gemini">auto_awesome</span>
+                                    <span>Gemini</span>
+                                </div>
+                                <div class="gv-ai-selector-item" onclick="selectAI('groq', 'Groq (Grok Speed)')">
+                                    <span class="material-symbols-outlined gv-icon-groq">bolt</span>
+                                    <span>Groq</span>
+                                </div>
+                            </div>
+                            <input type="hidden" id="aiModelSelectorValue" value="gemini">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="chat-container">
+                <div id="chatMessages" class="chat-messages custom-scrollbar">
+                    <div class="chat-message ai">
+                        Bonjour ! Je suis Gemini, votre assistant voyage personnel. Comment puis-je vous aider dans ce forum aujourd'hui ?
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Posez votre question sur un voyage..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                    <button class="chat-send-btn" onclick="sendMessage()">
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
@@ -346,6 +399,323 @@
             for (let s of scripts) { eval(s.innerText); }
         });
     }
+
+    // --- Mentions Manager ---
+    const MentionsManager = {
+        activeInput: null,
+        listEl: null,
+        query: '',
+        selectedIndex: -1,
+        users: [],
+
+        init() {
+            document.addEventListener('input', (e) => {
+                const tag = e.target.tagName;
+                if (tag === 'TEXTAREA' || (tag === 'INPUT' && e.target.type === 'text')) {
+                    this.handleInput(e);
+                }
+            }, true);
+
+            document.addEventListener('keydown', (e) => this.handleKeyDown(e), true);
+            document.addEventListener('click', (e) => {
+                if (this.listEl && !this.listEl.contains(e.target)) this.close();
+            });
+        },
+
+        handleInput(e) {
+            const input = e.target;
+            const cursor = input.selectionStart;
+            const text = input.value.substring(0, cursor);
+            const match = text.match(/@(\w*)$/);
+
+            if (match) {
+                this.activeInput = input;
+                this.query = match[1];
+                this.showList();
+                this.fetchUsers(this.query);
+            } else {
+                if (this.listEl) this.close();
+            }
+        },
+
+        async fetchUsers(q) {
+            try {
+                const res = await fetch(`{{ path('api_users_search') }}?q=${q}`);
+                this.users = await res.json();
+                this.renderList();
+            } catch (err) { console.error('Mentions fetch error:', err); }
+        },
+
+        showList() {
+            if (!this.listEl) {
+                this.listEl = document.createElement('div');
+                this.listEl.className = 'gv-mentions-list';
+                document.body.appendChild(this.listEl);
+            }
+            this.positionList();
+        },
+
+        positionList() {
+            if (!this.activeInput || !this.listEl) return;
+            const rect = this.activeInput.getBoundingClientRect();
+            this.listEl.style.top = `${window.scrollY + rect.bottom + 8}px`;
+            this.listEl.style.left = `${window.scrollX + rect.left}px`;
+            const listRect = this.listEl.getBoundingClientRect();
+            if (listRect.right > window.innerWidth) {
+                this.listEl.style.left = `${window.innerWidth - listRect.width - 20}px`;
+            }
+        },
+
+        renderList() {
+            if (!this.listEl) return;
+            if (this.users.length === 0) {
+                this.listEl.innerHTML = '<div class="p-3 text-muted small text-center">Aucun utilisateur trouvé</div>';
+                return;
+            }
+            this.listEl.innerHTML = this.users.map((u, i) => `
+                <div class="gv-mention-item ${i === this.selectedIndex ? 'active' : ''}" data-index="${i}">
+                    <img src="${u.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.name)}" class="gv-mention-avatar">
+                    <div class="gv-mention-info">
+                        <span class="gv-mention-name">${u.name}</span>
+                        <span class="gv-mention-tag">@${u.tag}</span>
+                    </div>
+                </div>
+            `).join('');
+            this.listEl.querySelectorAll('.gv-mention-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectUser(parseInt(item.dataset.index));
+                });
+            });
+        },
+
+        handleKeyDown(e) {
+            if (!this.listEl) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.selectedIndex = (this.selectedIndex + 1) % this.users.length;
+                this.renderList();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.selectedIndex = (this.selectedIndex - 1 + this.users.length) % this.users.length;
+                this.renderList();
+            } else if (e.key === 'Enter' && this.selectedIndex >= 0) {
+                e.preventDefault();
+                this.selectUser(this.selectedIndex);
+            } else if (e.key === 'Escape') { this.close(); }
+        },
+
+        selectUser(index) {
+            const user = this.users[index];
+            if (!user || !this.activeInput) return;
+            const cursor = this.activeInput.selectionStart;
+            const text = this.activeInput.value;
+            const before = text.substring(0, cursor).replace(/@\w*$/, `@${user.tag} `);
+            const after = text.substring(cursor);
+            this.activeInput.value = before + after;
+            this.activeInput.focus();
+            this.activeInput.setSelectionRange(before.length, before.length);
+            this.activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+            this.close();
+        },
+
+        close() {
+            if (this.listEl) { this.listEl.remove(); this.listEl = null; }
+            this.activeInput = null; this.users = []; this.selectedIndex = -1;
+        }
+    };
+
+    /* --- Mentions Highlighting --- */
+    function highlightMentions() {
+        const elements = document.querySelectorAll('.post-text, .comment-bubble p');
+        elements.forEach(el => {
+            if (el.dataset.mentionsProcessed) return;
+            el.innerHTML = el.innerHTML.replace(/(@[a-zA-Z0-9_]+)/g, '<span class="text-primary fw-bold" style="color: #2563eb !important;">$1</span>');
+            el.dataset.mentionsProcessed = 'true';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        MentionsManager.init();
+        highlightMentions();
+        const observer = new MutationObserver(() => highlightMentions());
+        observer.observe(document.body, { childList: true, subtree: true });
+    });
+
+    // --- Gemini Chatbot Logic ---
+    let chatModalObj;
+    document.addEventListener('DOMContentLoaded', () => {
+        chatModalObj = new bootstrap.Modal(document.getElementById('chatModal'));
+        
+        // Close AI menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!document.getElementById('aiSelector').contains(e.target)) {
+                closeAISelector();
+            }
+        });
+    });
+
+    function toggleAISelector() {
+        const container = document.getElementById('aiSelector');
+        const menu = document.getElementById('aiMenu');
+        container.classList.toggle('open');
+        menu.style.display = container.classList.contains('open') ? 'block' : 'none';
+    }
+
+    function closeAISelector() {
+        const container = document.getElementById('aiSelector');
+        const menu = document.getElementById('aiMenu');
+        container.classList.remove('open');
+        if(menu) menu.style.display = 'none';
+    }
+
+    function selectAI(value, name) {
+        document.getElementById('aiModelSelectorValue').value = value;
+        document.getElementById('selectedAIName').innerText = name;
+        
+        // Update active class
+        document.querySelectorAll('.gv-ai-selector-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.innerText.includes(value === 'gemini' ? 'Gemini' : 'Groq')) {
+                item.classList.add('active');
+            }
+        });
+        
+        closeAISelector();
+    }
+
+    function openChatModal() {
+        chatModalObj.show();
+    }
+
+    function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendMessage('user', text);
+        input.value = '';
+
+        const indicator = showTypingIndicator();
+        const model = document.getElementById('aiModelSelectorValue').value;
+        const route = model === 'groq' ? '{{ path('app_groq_chat') }}' : '{{ path('app_gemini_chat') }}';
+
+        fetch(route, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ message: text })
+        })
+        .then(response => response.json())
+        .then(data => {
+            indicator.remove();
+            if (data.error) {
+                appendMessage('ai', "Erreur : " + data.error);
+            } else {
+                appendMessage('ai', data.response);
+            }
+        })
+        .catch(error => {
+            indicator.remove();
+            appendMessage('ai', "Désolé, une erreur de connexion est survenue.");
+        });
+    }
+
+    function appendMessage(type, text) {
+        const container = document.getElementById('chatMessages');
+        const msg = document.createElement('div');
+        msg.className = `chat-message ${type}`;
+
+        if (type === 'ai' && text.includes('[POST_SUGGESTION]')) {
+            const parts = text.split('[POST_SUGGESTION]');
+            const normalText = parts[0];
+            let suggestionBlock = parts[1].split('[/POST_SUGGESTION]')[0];
+            
+            try {
+                const suggestion = JSON.parse(suggestionBlock);
+                const safeSuggestion = suggestionBlock.replace(/'/g, "&apos;");
+                msg.innerHTML = `
+                    <div>${normalText}</div>
+                    <div class="mt-3 p-3 bg-white border rounded-3 shadow-sm" style="color:#00342d;">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="material-symbols-outlined text-success" style="font-size:1.1rem;">auto_awesome</span>
+                            <span class="fw-bold small">Suggestion de Sujet</span>
+                        </div>
+                        <div class="small mb-3 text-muted" style="font-style:italic;">"${suggestion.contenu.substring(0, 80)}..."</div>
+                        <button class="btn btn-sm btn-success w-100 rounded-pill py-2 fw-bold" 
+                                onclick='fillPostForm(${safeSuggestion})'>
+                            Remplir le formulaire
+                        </button>
+                    </div>
+                `;
+            } catch (e) {
+                msg.textContent = text;
+            }
+        } else {
+            msg.textContent = text;
+        }
+
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    function fillPostForm(data) {
+        // En mode Forum, on utilise le forumId actuel pour le nouveau post
+        openPostModal('{{ path('app_poste_new', {'forumId': forum.forumId}) }}');
+        chatModalObj.hide();
+
+        const checkExist = setInterval(() => {
+            const form = document.getElementById('publication-form');
+            if (form) {
+                clearInterval(checkExist);
+                const textarea = form.querySelector('textarea');
+                const locSearch = document.getElementById('localisation-search') || document.querySelector('input[name*="[localisation]"]');
+                
+                if (textarea) textarea.value = data.contenu;
+                if (locSearch) locSearch.value = data.localisation || '';
+                
+                if (data.type === 'MEDIA') {
+                    const btnPhoto = document.getElementById('btn-photo-video');
+                    if (btnPhoto) btnPhoto.click();
+                    if (data.imageUrl) {
+                        const extInput = document.getElementById('poste_externalImageUrl');
+                        if (extInput) extInput.value = data.imageUrl;
+                        const imgPreview = document.getElementById('image-preview');
+                        const previewContainer = document.getElementById('preview-image-container');
+                        const noPreview = document.getElementById('no-preview');
+                        if (imgPreview) {
+                            imgPreview.src = data.imageUrl;
+                            if (previewContainer) previewContainer.style.display = 'block';
+                            if (noPreview) noPreview.style.display = 'none';
+                        }
+                    }
+                } else {
+                    const btnText = document.getElementById('btn-status-texte');
+                    if (btnText) btnText.click();
+                }
+                if (textarea) textarea.dispatchEvent(new Event('input'));
+            }
+        }, 100);
+    }
+
+    function showTypingIndicator() {
+        const container = document.getElementById('chatMessages');
+        const div = document.createElement('div');
+        div.className = 'chat-message ai';
+        div.innerHTML = `
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        `;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+        return div;
+    }
 </script>
 {% endblock %}
 
@@ -362,5 +732,256 @@
     .btn-light-success { background-color: #F0FDF4; color: #16A34A; }
     .btn-light-success:hover { background-color: #DCFCE7; color: #15803D; }
     .btn-action { font-size: 0.85rem; font-weight: 500; }
+
+    /* --- Mentions --- */
+    .gv-mentions-list {
+        position: absolute;
+        z-index: 10000;
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(0, 52, 45, 0.08);
+        border-radius: 1rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        min-width: 220px;
+        max-height: 260px;
+        overflow-y: auto;
+        padding: 0.5rem;
+        backdrop-filter: blur(10px);
+    }
+    .gv-mention-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        border-radius: 0.75rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+    .gv-mention-item:hover, .gv-mention-item.active {
+        background: rgba(16, 185, 129, 0.08);
+        color: #00342d;
+    }
+    .gv-mention-avatar {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #eee;
+    }
+    .gv-mention-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .gv-mention-name { font-weight: 700; font-size: 0.9rem; }
+    .gv-mention-tag { font-size: 0.75rem; color: #64748b; }
+
+    /* ─── Gemini Chatbot Styles ─── */
+    .gv-chatbot-fab {
+        position: fixed;
+        bottom: 2rem;
+        right: 2.5rem;
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+        cursor: pointer;
+        z-index: 9999;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .gv-chatbot-fab:hover {
+        transform: scale(1.1) translateY(-5px);
+        box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+    }
+    .gv-chatbot-fab .material-symbols-outlined {
+        font-size: 2rem;
+        font-variation-settings: 'FILL' 1;
+    }
+
+    .chat-container {
+        height: 500px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+    }
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        background: #fcf9f8;
+    }
+    .chat-message {
+        max-width: 80%;
+        padding: 0.85rem 1.15rem;
+        border-radius: 1.25rem;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        position: relative;
+        animation: messageIn 0.3s ease both;
+    }
+    @keyframes messageIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .chat-message.ai {
+        align-self: flex-start;
+        background: #fff;
+        color: #1c1b1b;
+        border-bottom-left-radius: 0.25rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(0, 52, 45, 0.05);
+    }
+    /* ─── AI Selector Professional Design ─── */
+    .gv-ai-selector-container {
+        position: relative;
+        display: inline-block;
+    }
+    .gv-ai-selector-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+    .gv-ai-selector-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    .gv-ai-selector-btn .arrow {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+    .gv-ai-selector-container.open .gv-ai-selector-btn .arrow {
+        transform: rotate(180deg);
+    }
+    .gv-ai-selector-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background: rgba(255, 255, 255, 0.98);
+        min-width: 160px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        padding: 6px;
+        z-index: 100;
+        display: none;
+        animation: slideInUp 0.2s ease forwards;
+        border: 1px solid rgba(0, 52, 45, 0.05);
+    }
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .gv-ai-selector-item {
+        padding: 8px 12px;
+        border-radius: 8px;
+        color: #1c1b1b;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .gv-ai-selector-item:hover {
+        background: rgba(16, 185, 129, 0.08);
+        color: #00342d;
+    }
+    .gv-ai-selector-item.active {
+        background: #00342d;
+        color: white;
+    }
+    .gv-ai-selector-item i {
+        font-size: 1.1rem;
+    }
+    .gv-icon-gemini {
+        background: linear-gradient(135deg, #4285f4 0%, #9b72f3 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+    }
+    .gv-icon-groq {
+        color: #f59e0b;
+    }
+    .gv-ai-selector-item .model-desc {
+        font-size: 0.65rem;
+        opacity: 0.7;
+        font-weight: 500;
+        display: block;
+    }
+
+    .chat-input-area {
+        padding: 1.25rem;
+        background: #fff;
+        border-top: 1px solid rgba(0, 52, 45, 0.06);
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+    }
+    .chat-input {
+        flex: 1;
+        border: 1.5px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 0.65rem 1rem;
+        font-size: 0.95rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .chat-input:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+    .chat-send-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 0.75rem;
+        background: #00342d;
+        color: #fff;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .chat-send-btn:hover {
+        background: #10b981;
+        transform: scale(1.05);
+    }
+
+    .typing-indicator {
+        display: flex;
+        gap: 4px;
+        padding: 4px 8px;
+    }
+    .typing-dot {
+        width: 6px;
+        height: 6px;
+        background: #bfc9c4;
+        border-radius: 50%;
+        animation: typing 1.4s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+        0%, 60%, 100% { transform: translateY(0); }
+        30% { transform: translateY(-4px); }
+    }
 </style>
 {% endblock %}

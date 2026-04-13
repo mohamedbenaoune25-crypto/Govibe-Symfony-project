@@ -45,10 +45,10 @@
                         {% if p.type == 'MEDIA' and p.url %}
                             <div class="d-flex align-items-center gap-2">
                                 <img src="{{ p.url }}" alt="Post image" style="width:40px;height:40px;border-radius:6px;object-fit:cover;border:1px solid var(--border-color);">
-                                <span class="text-truncate" style="font-size:13px;">{{ p.legende|default('Sans légende') }}</span>
+                                <span class="text-truncate" style="font-size:13px;">{{ p.contenu|default('Sans contenu') }}</span>
                             </div>
                         {% else %}
-                            <div class="text-truncate" style="font-size:13px; color:var(--text-main);">{{ p.legende }}</div>
+                            <div class="text-truncate" style="font-size:13px; color:var(--text-main);">{{ p.contenu }}</div>
                         {% endif %}
                     </td>
                     <td style="font-size:13px; color:var(--text-muted);">
@@ -57,7 +57,7 @@
                     <td>
                         {% if p.forum %}
                             <span class="badge" style="background:rgba(245, 158, 11, 0.1);color:#d97706;border:1px solid rgba(245, 158, 11, 0.2);padding:4px 8px;font-size:11px;">
-                                {{ p.forum.titre }}
+                                {{ p.forum.name }}
                             </span>
                         {% else %}
                             <span class="text-muted small">Global</span>

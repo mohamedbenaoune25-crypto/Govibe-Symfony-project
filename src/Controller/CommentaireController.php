@@ -60,12 +60,25 @@ class CommentaireController extends AbstractController
 
     #[Route('/like/{commentaireId}', name: 'app_commentaire_like', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function like(Commentaire $commentaire, EntityManagerInterface $entityManager): Response
+    public function like(Commentaire $commentaire, EntityManagerInterface $entityManager, Request $request): Response
     {
-        $commentaire->setLikes($commentaire->getLikes() + 1);
+        $session = $request->getSession();
+        $likedComments = $session->get('liked_comments', []);
+        
+        $isAlreadyLiked = in_array($commentaire->getCommentaireId(), $likedComments);
+        $commentaire->toggleLike($isAlreadyLiked);
+        
+        if ($isAlreadyLiked) {
+            $likedComments = array_diff($likedComments, [$commentaire->getCommentaireId()]);
+        } else {
+            $likedComments[] = $commentaire->getCommentaireId();
+        }
+        
+        $session->set('liked_comments', $likedComments);
         $entityManager->flush();
 
-        return $this->redirectToRoute('app_poste_index');
+        $referer = $request->headers->get('referer');
+        return $referer ? $this->redirect($referer) : $this->redirectToRoute('app_poste_index');
     }
 
     #[Route('/dislike/{commentaireId}', name: 'app_commentaire_dislike', methods: ['POST'])]

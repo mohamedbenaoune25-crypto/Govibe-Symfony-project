@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 #[Route('/forums')]
 class ForumController extends AbstractController
@@ -158,18 +160,33 @@ class ForumController extends AbstractController
 
     #[Route('/{forumId}/accept/{userId}', name: 'app_forum_member_accept', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function acceptMember(Forum $forum, int $userId, EntityManagerInterface $em, MembreForumRepository $mfr): Response
+    public function acceptMember(Forum $forum, int $userId, EntityManagerInterface $em, MembreForumRepository $mfr, MailerInterface $mailer): Response
     {
         if ($this->getUser() !== $forum->getCreatedBy() && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException();
         }
-
+    
         $membership = $mfr->findOneBy(['forum' => $forum, 'user' => $userId, 'status' => 'PENDING']);
         if ($membership) {
             $membership->setStatus('ACCEPTED');
             $forum->setNbrMembers($forum->getNbrMembers() + 1);
             $em->flush();
-            $this->addFlash('success', 'Membre accepté.');
+    
+            // Envoyer un mail d'acceptation
+            $user = $membership->getUser();
+            $email = (new TemplatedEmail())
+                ->from('no-reply@govibe.tn')
+                ->to($user->getEmail())
+                ->subject('Félicitations ! Votre demande d\'adhésion a été acceptée')
+                ->htmlTemplate('emails/forum_accepted.html.twig')
+                ->context([
+                    'user' => $user,
+                    'forum' => $forum
+                ]);
+    
+            $mailer->send($email);
+    
+            $this->addFlash('success', 'Membre accepté et email de notification envoyé.');
         }
 
         return $this->redirectToRoute('app_forum_show', ['forumId' => $forum->getForumId()]);

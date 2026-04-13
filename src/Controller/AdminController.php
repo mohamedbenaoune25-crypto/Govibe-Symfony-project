@@ -6,6 +6,7 @@ use App\Entity\Personne;
 use App\Entity\Reclamation;
 use App\Entity\Poste;
 use App\Entity\Forum;
+use App\Entity\Commentaire;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -177,15 +178,6 @@ class AdminController extends AbstractController
         return $this->redirectToRoute('app_admin_reclamations');
     }
 
-    #[Route('/publications', name: 'app_admin_postes')]
-    public function postes(EntityManagerInterface $entityManager): Response
-    {
-        $postes = $entityManager->getRepository(Poste::class)->findBy([], ['dateCreation' => 'DESC']);
-        
-        return $this->render('admin/postes.html.twig', [
-            'postes' => $postes,
-        ]);
-    }
 
     #[Route('/forums_admin', name: 'app_admin_forums')]
     public function forums(EntityManagerInterface $entityManager): Response
@@ -206,7 +198,7 @@ class AdminController extends AbstractController
             $this->addFlash('success', 'Publication supprimée avec succès.');
         }
 
-        return $this->redirectToRoute('app_admin_postes');
+        return $this->redirectToRoute('app_admin_attention');
     }
 
     #[Route('/forums_admin/{id}/delete', name: 'app_admin_forum_delete', methods: ['POST'])]
@@ -219,5 +211,52 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_forums');
+    }
+
+    #[Route('/attention', name: 'app_admin_attention')]
+    public function attention(EntityManagerInterface $entityManager): Response
+    {
+        $badWords = ['con', 'salope', 'merde', 'putain', 'connard', 'encule', 'débile', 'pute', 'btch', 'fck'];
+        
+        $postes = $entityManager->getRepository(Poste::class)->findAll();
+        $commentaires = $entityManager->getRepository(Commentaire::class)->findAll();
+        
+        $flaggedPostes = [];
+        foreach ($postes as $p) {
+            foreach ($badWords as $w) {
+                if ($p->getContenu() && stripos($p->getContenu(), $w) !== false) {
+                    $flaggedPostes[] = $p;
+                    break;
+                }
+            }
+        }
+        
+        $flaggedCommentaires = [];
+        foreach ($commentaires as $c) {
+            foreach ($badWords as $w) {
+                if ($c->getContenu() && stripos($c->getContenu(), $w) !== false) {
+                    $flaggedCommentaires[] = $c;
+                    break;
+                }
+            }
+        }
+
+        return $this->render('admin/attention.html.twig', [
+            'postes' => $flaggedPostes,
+            'commentaires' => $flaggedCommentaires,
+            'bad_words' => $badWords
+        ]);
+    }
+
+    #[Route('/admin/commentaire/{id}/delete', name: 'app_admin_commentaire_delete', methods: ['POST'])]
+    public function deleteCommentaire(Request $request, Commentaire $commentaire, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete' . $commentaire->getCommentaireId(), $request->request->get('_token'))) {
+            $entityManager->remove($commentaire);
+            $entityManager->flush();
+            $this->addFlash('success', 'Commentaire supprimé avec succès.');
+        }
+
+        return $this->redirectToRoute('app_admin_attention');
     }
 }

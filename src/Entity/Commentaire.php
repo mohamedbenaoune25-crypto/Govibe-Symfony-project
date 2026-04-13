@@ -134,6 +134,16 @@ class Commentaire
         return $this;
     }
 
+    public function toggleLike(bool $isAlreadyLiked): self
+    {
+        if ($isAlreadyLiked) {
+            $this->likes = max(0, ($this->likes ?? 0) - 1);
+        } else {
+            $this->likes = ($this->likes ?? 0) + 1;
+        }
+        return $this;
+    }
+
     public function getPoste(): ?Poste
     {
         return $this->poste;
