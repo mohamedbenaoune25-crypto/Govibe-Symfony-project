@@ -96,4 +96,61 @@ class GeminiController extends AbstractController
 
         return new JsonResponse(['response' => $aiText]);
     }
+
+    #[Route('/gemini/suggest', name: 'app_gemini_suggest', methods: ['POST'])]
+    public function suggest(Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        $context = $data['context'] ?? '';
+        $type = $data['type'] ?? 'comment'; // 'comment' or 'reply'
+
+        if (empty($context)) {
+            return new JsonResponse(['error' => 'Context text cannot be empty'], 400);
+        }
+
+        $apiKey = $this->getParameter('gemini_api_key');
+        if (!$apiKey || $apiKey === 'YOUR_GEMINI_API_KEY') {
+            return new JsonResponse(['error' => 'Gemini API key not configured.'], 500);
+        }
+
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" . $apiKey;
+
+        $promptType = $type === 'reply' ? 'répondre au commentaire suivant' : 'commenter la publication suivante';
+        
+        $prompt = "Tu es un assistant IA pour 'GoVibe' (réseau social de voyage).
+        Génère 3 suggestions courtes, engageantes et orientées voyage pour $promptType.
+        Texte d'origine : \"$context\"
+        Format de réponse OBLIGATOIRE : Un JSON contenant un tableau de 3 chaînes de caractères (ex: [\"Super !\", \"Génial !\", \"Magnifique !\"]). Ne renvoie RIEN D'AUTRE que le JSON valide.";
+
+        $payload = [
+            'contents' => [
+                ['role' => 'user', 'parts' => [['text' => $prompt]]]
+            ],
+            'generationConfig' => ['temperature' => 0.8]
+        ];
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$response) {
+            return new JsonResponse(['error' => 'Erreur API Gemini'], 500);
+        }
+
+        $result = json_decode($response, true);
+        $aiText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '[]';
+        
+        // Clean markdown backticks if AI added them
+        $aiText = preg_replace('/```json\s*|\s*```/', '', $aiText);
+        $suggestions = json_decode($aiText, true) ?? ["Super photo !", "Magnifique endroit !", "Ça donne envie de voyager !"];
+
+        return new JsonResponse(['suggestions' => $suggestions]);
+    }
 }

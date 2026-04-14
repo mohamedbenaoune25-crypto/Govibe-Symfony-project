@@ -47,6 +47,7 @@ class Commentaire
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Personne $user = null;
 
+
     public function __construct()
     {
         $this->dateCommentaire = new \DateTime();
@@ -165,4 +166,5 @@ class Commentaire
         $this->user = $user;
         return $this;
     }
+
 }
