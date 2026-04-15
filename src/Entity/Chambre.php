@@ -6,6 +6,7 @@ use App\Repository\ChambreRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: ChambreRepository::class)]
 #[ORM\Table(name: 'chambre')]
@@ -29,11 +30,21 @@ class Chambre
     #[ORM\Column(nullable: true)]
     #[Assert\NotNull(message: "La capacite est obligatoire.")]
     #[Assert\Positive(message: "La capacite doit etre superieure a 0.")]
+    #[Assert\Range(
+        min: 1,
+        max: 20,
+        notInRangeMessage: "La capacite doit etre comprise entre {{ min }} et {{ max }}."
+    )]
     private ?int $capacite = null;
 
     #[ORM\Column(nullable: true)]
     #[Assert\NotNull(message: "Le nombre de chambres est obligatoire.")]
     #[Assert\Positive(message: "Le nombre de chambres doit etre superieur a 0.")]
+    #[Assert\Range(
+        min: 1,
+        max: 500,
+        notInRangeMessage: "Le nombre de chambres doit etre compris entre {{ min }} et {{ max }}."
+    )]
     private ?int $nombreDeChambres = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -84,7 +95,7 @@ class Chambre
 
     public function setType(?string $type): self
     {
-        $this->type = $type;
+        $this->type = $this->normalizeText($type);
         return $this;
     }
 
@@ -117,7 +128,7 @@ class Chambre
 
     public function setEquipements(?string $equipements): self
     {
-        $this->equipements = $equipements;
+        $this->equipements = $this->normalizeText($equipements);
         return $this;
     }
 
@@ -173,5 +184,30 @@ class Chambre
     {
         $this->hotel = $hotel;
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validatePricing(ExecutionContextInterface $context): void
+    {
+        $standard = (float) ($this->prixStandard ?? 0);
+        $high = (float) ($this->prixHauteSaison ?? 0);
+        $low = (float) ($this->prixBasseSaison ?? 0);
+
+        if ($standard <= 0 && $high <= 0 && $low <= 0) {
+            $context->buildViolation('Au moins un prix (standard, haute saison ou basse saison) doit etre strictement positif.')
+                ->atPath('prixStandard')
+                ->addViolation();
+        }
+    }
+
+    private function normalizeText(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $normalized = trim(preg_replace('/\s+/', ' ', $value) ?? $value);
+
+        return $normalized === '' ? null : $normalized;
     }
 }

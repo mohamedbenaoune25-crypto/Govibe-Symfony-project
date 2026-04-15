@@ -165,6 +165,33 @@ body {
 }
 .gv-search-reset:hover { background: rgba(186, 26, 26, 0.12); color: #93000a; }
 
+.gv-top-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 1rem;
+}
+
+.gv-my-res-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #fff;
+    text-decoration: none;
+    background: linear-gradient(135deg, #00342d, #046b5e);
+    box-shadow: 0 6px 18px rgba(0, 52, 45, 0.22);
+    transition: all 0.25s ease;
+}
+
+.gv-my-res-btn:hover {
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(0, 52, 45, 0.28);
+}
+
 /* ─── Sort Controls ─── */
 .gv-sort-controls {
     background: rgba(255, 255, 255, 0.92);
@@ -419,6 +446,15 @@ body {
             {% endif %}
         </form>
     </div>
+
+    {% if app.user and not is_granted('ROLE_ADMIN') %}
+    <div class="gv-top-actions">
+        <a href="{{ path('app_reservation_index') }}" class="gv-my-res-btn">
+            <span class="material-symbols-outlined" style="font-size:1rem;">calendar_month</span>
+            {{ 'nav.reservations'|trans }}
+        </a>
+    </div>
+    {% endif %}
 
     <!-- Sort Controls -->
     <div class="gv-sort-controls">

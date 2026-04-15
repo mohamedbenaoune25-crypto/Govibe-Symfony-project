@@ -159,6 +159,13 @@ class ChambreController extends AbstractController
             $form->get('prixBasseSaison')->addError(new FormError('Le prix basse saison doit etre positif ou nul.'));
         }
 
+        $prixStandard = (float) ($chambre->getPrixStandard() ?? 0);
+        $prixHaute = (float) ($chambre->getPrixHauteSaison() ?? 0);
+        $prixBasse = (float) ($chambre->getPrixBasseSaison() ?? 0);
+        if ($prixStandard <= 0 && $prixHaute <= 0 && $prixBasse <= 0) {
+            $form->get('prixStandard')->addError(new FormError('Au moins un prix doit etre strictement positif.'));
+        }
+
         if ($form->has('hotel') && $chambre->getHotel() === null) {
             $form->get('hotel')->addError(new FormError("L'hotel associe est obligatoire."));
         }

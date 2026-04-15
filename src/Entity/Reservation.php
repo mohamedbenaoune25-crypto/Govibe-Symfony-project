@@ -28,7 +28,6 @@ class Reservation
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\Column(name: 'prix_total')]
-    #[Assert\NotNull(message: "Le prix total est obligatoire.")]
     #[Assert\Positive(message: "Le prix total doit etre superieur a 0.")]
     private ?float $prixTotal = null;
 
@@ -57,6 +56,7 @@ class Reservation
 
     #[ORM\ManyToOne(targetEntity: Hotel::class)]
     #[ORM\JoinColumn(name: 'hotel_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull(message: "L'hotel est obligatoire.")]
     private ?Hotel $hotel = null;
 
     public function __construct()
@@ -110,7 +110,8 @@ class Reservation
 
     public function setStatut(?string $statut): self
     {
-        $this->statut = $statut;
+        $normalized = $statut === null ? null : strtoupper(trim($statut));
+        $this->statut = $normalized === '' ? null : $normalized;
         return $this;
     }
 
@@ -167,6 +168,12 @@ class Reservation
         if ($this->dateFin <= $this->dateDebut) {
             $context->buildViolation('La date de fin doit etre posterieure a la date de debut.')
                 ->atPath('dateFin')
+                ->addViolation();
+        }
+
+        if ($this->chambre !== null && $this->hotel !== null && $this->chambre->getHotel()?->getId() !== $this->hotel->getId()) {
+            $context->buildViolation('La chambre selectionnee ne correspond pas a l\'hotel choisi.')
+                ->atPath('chambre')
                 ->addViolation();
         }
     }

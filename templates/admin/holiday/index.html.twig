@@ -1,0 +1,162 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gestion des Jours Feriés - Govibe Admin{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">⛔ Gestion des Jours Feriés</h1>
+
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            <!-- Supplément -->
+            <div class="card mb-4 border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">💰 Pourcentage de Supplément</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Supplément appliqué par nuit qui tombe sur un jour férié</p>
+                    
+                    <form method="POST" action="{{ path('app_admin_holidays_supplement') }}" class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label for="percentage" class="form-label">Pourcentage (%)</label>
+                            <div class="input-group">
+                                <input 
+                                    type="number" 
+                                    id="percentage" 
+                                    name="percentage" 
+                                    class="form-control" 
+                                    value="{{ supplementPercentage }}" 
+                                    min="0" 
+                                    max="100" 
+                                    step="0.01" 
+                                    required
+                                >
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <small class="form-text text-muted">Ex: 15 pour +15% du prix par nuit</small>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-warning">
+                                💾 Mettre à jour
+                            </button>
+                        </div>
+                        <input type="hidden" name="_token" value="{{ csrf_token('update_supplement') }}">
+                    </form>
+
+                    <div class="alert alert-info mt-3" role="alert">
+                        <strong>Exemple:</strong> Si le prix est 100€ par nuit et le supplément 15%, 
+                        une nuit sur jour férié coûtera <strong>115€</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Liste des jours fériés -->
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">📅 Jours Feriés ({{ holidays|length }})</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Nom du jour férié</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if holidays|length > 0 %}
+                                    {% for date, name in holidays %}
+                                    <tr>
+                                        <td class="fw-bold">
+                                            {% set dateObj = date | date_create %}
+                                            {{ dateObj | date('d/m/Y', 'UTC') }}
+                                        </td>
+                                        <td>{{ name }}</td>
+                                        <td>
+                                            <form method="POST" action="{{ path('app_admin_holidays_remove', {date: date}) }}" style="display:inline;">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce jour férié ?')">
+                                                    🗑️ Supprimer
+                                                </button>
+                                                <input type="hidden" name="_token" value="{{ csrf_token('remove_holiday_' ~ date) }}">
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center text-muted">Aucun jour férié configuré</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ajouter un jour férié -->
+            <div class="card mt-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">➕ Ajouter un Jour Férié</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ path('app_admin_holidays_add') }}" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="date" class="form-label">Date (YYYY-MM-DD)</label>
+                            <input 
+                                type="date" 
+                                id="date" 
+                                name="date" 
+                                class="form-control" 
+                                required
+                            >
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Nom du jour férié</label>
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                class="form-control" 
+                                placeholder="Ex: Noël" 
+                                required
+                            >
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-success">
+                                ➕ Ajouter le jour férié
+                            </button>
+                        </div>
+                        <input type="hidden" name="_token" value="{{ csrf_token('add_holiday') }}">
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5 !important;
+    }
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+</style>
+{% endblock %}

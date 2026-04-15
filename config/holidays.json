@@ -1,0 +1,53 @@
+{
+  "holidays": [
+    {
+      "date": "2026-01-01",
+      "name": "Jour de l'an"
+    },
+    {
+      "date": "2026-04-10",
+      "name": "Vendredi saint"
+    },
+    {
+      "date": "2026-04-13",
+      "name": "Lundi de Pâques"
+    },
+    {
+      "date": "2026-05-01",
+      "name": "Fête du travail"
+    },
+    {
+      "date": "2026-05-08",
+      "name": "Fête de la victoire 1945"
+    },
+    {
+      "date": "2026-05-21",
+      "name": "Ascension"
+    },
+    {
+      "date": "2026-05-31",
+      "name": "Pentecôte"
+    },
+    {
+      "date": "2026-07-14",
+      "name": "Fête nationale"
+    },
+    {
+      "date": "2026-08-15",
+      "name": "Assomption"
+    },
+    {
+      "date": "2026-11-01",
+      "name": "Toussaint"
+    },
+    {
+      "date": "2026-11-11",
+      "name": "Armistice 1918"
+    },
+    {
+      "date": "2026-12-25",
+      "name": "Noël"
+    }
+  ],
+  "supplementPercentage": 15
+}

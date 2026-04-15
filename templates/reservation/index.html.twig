@@ -107,6 +107,8 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 .gv-action-hotel:hover { background:#10B981; color:#fff; }
 .gv-action-edit { background:linear-gradient(135deg,#00342d,#046b5e); color:#fff; box-shadow:0 4px 10px rgba(0,52,45,0.15); }
 .gv-action-edit:hover { transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,52,45,0.25); color:#fff; }
+.gv-action-pay { background:linear-gradient(135deg,#e9c176,#ca9028); color:#3d2a00; box-shadow:0 4px 10px rgba(233,193,118,0.25); }
+.gv-action-pay:hover { transform:translateY(-2px); box-shadow:0 8px 18px rgba(233,193,118,0.35); color:#3d2a00; }
 .gv-action-delete { background:rgba(186,26,26,0.06); color:#93000a; border:1px solid rgba(186,26,26,0.1); }
 .gv-action-delete:hover { background:#ba1a1a; color:#fff; border-color:transparent; }
 
@@ -233,11 +235,21 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                     <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" class="gv-action-sm gv-action-view">
                         <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span> {{ 'common.view_details'|trans }}
                     </a>
-                    <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="gv-action-sm gv-action-hotel">
-                        <span class="material-symbols-outlined" style="font-size:0.9rem;">apartment</span> {{ 'common.hotel'|trans }}
-                    </a>
+                    {% if reservation.hotel %}
+                        <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="gv-action-sm gv-action-hotel">
+                            <span class="material-symbols-outlined" style="font-size:0.9rem;">apartment</span> {{ 'common.hotel'|trans }}
+                        </a>
+                    {% endif %}
                 </div>
                 <div class="d-flex gap-2">
+                    {% if reservation.statut == 'EN_ATTENTE' %}
+                    <form method="post" action="{{ path('app_reservation_pay', {'id': reservation.id}) }}" class="m-0">
+                        <input type="hidden" name="_token" value="{{ csrf_token('pay' ~ reservation.id) }}">
+                        <button class="gv-action-sm gv-action-pay" type="submit">
+                            <span class="material-symbols-outlined" style="font-size:0.9rem;">credit_card</span> Payer
+                        </button>
+                    </form>
+                    {% endif %}
                     <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="gv-action-sm gv-action-edit">
                         <span class="material-symbols-outlined" style="font-size:0.9rem;">edit</span> {{ 'common.edit'|trans }}
                     </a>

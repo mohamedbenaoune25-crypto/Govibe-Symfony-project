@@ -27,6 +27,10 @@ class Hotel
         minMessage: "Le nom de l'hotel doit contenir au moins {{ limit }} caracteres.",
         maxMessage: "Le nom de l'hotel ne peut pas depasser {{ limit }} caracteres."
     )]
+    #[Assert\Regex(
+        pattern: "/^[\p{L}0-9 .,'-]+$/u",
+        message: "Le nom de l'hotel contient des caracteres invalides."
+    )]
     private ?string $nom = null;
 
     #[ORM\Column(length: 150, nullable: true)]
@@ -37,6 +41,10 @@ class Hotel
         minMessage: "L'adresse doit contenir au moins {{ limit }} caracteres.",
         maxMessage: "L'adresse ne peut pas depasser {{ limit }} caracteres."
     )]
+    #[Assert\Regex(
+        pattern: "/^[\p{L}0-9\s,.'\/-]+$/u",
+        message: "L'adresse contient des caracteres invalides."
+    )]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -46,6 +54,10 @@ class Hotel
         max: 100,
         minMessage: "La ville doit contenir au moins {{ limit }} caracteres.",
         maxMessage: "La ville ne peut pas depasser {{ limit }} caracteres."
+    )]
+    #[Assert\Regex(
+        pattern: "/^[\p{L}\s'\-]+$/u",
+        message: "Le nom de la ville contient des caracteres invalides."
     )]
     private ?string $ville = null;
 
@@ -103,7 +115,7 @@ class Hotel
 
     public function setNom(?string $nom): self
     {
-        $this->nom = $nom;
+        $this->nom = $this->normalizeText($nom);
         return $this;
     }
 
@@ -114,7 +126,7 @@ class Hotel
 
     public function setAdresse(?string $adresse): self
     {
-        $this->adresse = $adresse;
+        $this->adresse = $this->normalizeText($adresse);
         return $this;
     }
 
@@ -125,7 +137,7 @@ class Hotel
 
     public function setVille(?string $ville): self
     {
-        $this->ville = $ville;
+        $this->ville = $this->normalizeText($ville);
         return $this;
     }
 
@@ -158,7 +170,7 @@ class Hotel
 
     public function setDescription(?string $description): self
     {
-        $this->description = $description;
+        $this->description = $this->normalizeText($description);
         return $this;
     }
 
@@ -169,7 +181,7 @@ class Hotel
 
     public function setPhotoUrl(?string $photoUrl): self
     {
-        $this->photoUrl = $photoUrl;
+        $this->photoUrl = $this->normalizeText($photoUrl);
         return $this;
     }
 
@@ -228,5 +240,16 @@ class Hotel
     {
         $this->isFavoris = !$this->isFavoris;
         return $this;
+    }
+
+    private function normalizeText(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $normalized = trim(preg_replace('/\s+/', ' ', $value) ?? $value);
+
+        return $normalized === '' ? null : $normalized;
     }
 }

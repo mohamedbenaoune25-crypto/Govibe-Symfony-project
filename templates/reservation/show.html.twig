@@ -129,7 +129,15 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
         <div>
             <div class="gv-sidebar-card">
                 <h5>{{ 'common.actions'|trans }}</h5>
-                <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="gv-action-btn gv-action-green"><span class="material-symbols-outlined" style="font-size:1rem;">apartment</span> {{ 'hotel.edit.view_hotel'|trans }}</a>
+                {% if reservation.hotel %}
+                    <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="gv-action-btn gv-action-green"><span class="material-symbols-outlined" style="font-size:1rem;">apartment</span> {{ 'hotel.edit.view_hotel'|trans }}</a>
+                {% endif %}
+                {% if reservation.statut == 'EN_ATTENTE' %}
+                    <form method="post" action="{{ path('app_reservation_pay', {'id': reservation.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('pay' ~ reservation.id) }}">
+                        <button type="submit" class="gv-action-btn gv-action-primary"><span class="material-symbols-outlined" style="font-size:1rem;">credit_card</span> Payer cette reservation</button>
+                    </form>
+                {% endif %}
                 <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="gv-action-btn gv-action-primary"><span class="material-symbols-outlined" style="font-size:1rem;">edit</span> {{ 'common.edit'|trans }}</a>
                 <a href="{{ path('app_reservation_index') }}" class="gv-action-btn gv-action-outline"><span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span> {{ 'reservation.edit.back'|trans }}</a>
             </div>

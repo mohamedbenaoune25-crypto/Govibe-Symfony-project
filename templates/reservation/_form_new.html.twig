@@ -7,22 +7,22 @@
     <div class="row g-4">
         {% if form.typeChambre is defined %}
             <div class="col-md-6">
-                {{ form_label(form.typeChambre, 'reservation.form.room_type'|trans, {'label_attr': {'class': 'gv-form-label'}}) }}
+                {{ form_label(form.typeChambre, 'reservation.form.room_type'|trans) }}
                 {{ form_widget(form.typeChambre, {'attr': {'class': 'form-select'}}) }}
             </div>
         {% endif %}
         <div class="col-md-6">
-            {{ form_label(form.dateDebut, 'reservation.form.date_start'|trans, {'label_attr': {'class': 'gv-form-label'}}) }}
+            {{ form_label(form.dateDebut, 'reservation.form.date_start'|trans) }}
             {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control' ~ (form.dateDebut.vars.errors|length ? ' is-invalid' : '')}}) }}
-            {{ form_errors(form.dateDebut) }}
+            {% if form.dateDebut.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
         </div>
         <div class="col-md-6">
-            {{ form_label(form.dateFin, 'reservation.form.date_end'|trans, {'label_attr': {'class': 'gv-form-label'}}) }}
+            {{ form_label(form.dateFin, 'reservation.form.date_end'|trans) }}
             {{ form_widget(form.dateFin, {'attr': {'class': 'form-control' ~ (form.dateFin.vars.errors|length ? ' is-invalid' : '')}}) }}
-            {{ form_errors(form.dateFin) }}
+            {% if form.dateFin.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
         </div>
         <div class="col-md-6">
-            <label class="gv-form-label">{{ 'reservation.form.total_price'|trans }}</label>
+            <label class="form-label">{{ 'reservation.form.total_price'|trans }}</label>
             <div id="reservation-price-breakdown" class="card border-info" style="display:none;">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between mb-2">
@@ -44,28 +44,29 @@
                     </div>
                 </div>
             </div>
+            <input type="text" id="reservation-estimated-total-input" class="form-control" value="-" readonly style="display:none;">
             <small class="text-muted">Calcul automatique selon la chambre et les dates.</small>
         </div>
         {% if form.statut is defined %}
             <div class="col-md-6">
-                {{ form_label(form.statut, 'reservation.form.status'|trans, {'label_attr': {'class': 'gv-form-label'}}) }}
+                {{ form_label(form.statut, 'reservation.form.status'|trans) }}
                 {{ form_widget(form.statut, {'attr': {'class': 'form-select' ~ (form.statut.vars.errors|length ? ' is-invalid' : '')}}) }}
-                {{ form_errors(form.statut) }}
+                {% if form.statut.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         {% endif %}
         <div class="col-12">
-            {{ form_label(form.chambre, 'reservation.form.room'|trans, {'label_attr': {'class': 'gv-form-label'}}) }}
+            {{ form_label(form.chambre, 'reservation.form.room'|trans) }}
             {{ form_widget(form.chambre, {'attr': {'class': 'form-select' ~ (form.chambre.vars.errors|length ? ' is-invalid' : '')}}) }}
-            {{ form_errors(form.chambre) }}
+            {% if form.chambre.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
         </div>
         <div class="col-12">
             <div id="reservation-disponibilite" class="gv-availability-note" aria-live="polite">{{ 'reservation.form.available_rooms'|trans }} : -</div>
         </div>
         {% if form.hotel is defined %}
             <div class="col-12">
-                {{ form_label(form.hotel, 'common.hotel'|trans, {'label_attr': {'class': 'gv-form-label'}}) }}
+                {{ form_label(form.hotel, 'common.hotel'|trans) }}
                 {{ form_widget(form.hotel, {'attr': {'class': 'form-select' ~ (form.hotel.vars.errors|length ? ' is-invalid' : '')}}) }}
-                {{ form_errors(form.hotel) }}
+                {% if form.hotel.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         {% endif %}
     </div>
@@ -85,28 +86,6 @@
     font-family: 'Manrope', sans-serif; display: inline-flex; align-items: center; gap: 0.5rem;
 }
 .gv-form-submit:hover { transform: translateY(-2px); box-shadow: 0 15px 35px -5px rgba(233,193,118,0.5); }
-
-.gv-form-label {
-    display: block;
-    margin-bottom: 0.45rem;
-    font-weight: 700;
-    color: #1f2937;
-    font-size: 0.92rem;
-}
-
-.gv-reservation-form .form-control,
-.gv-reservation-form .form-select {
-    min-height: 48px;
-    border-radius: 0.65rem;
-    border: 1px solid #cfd8e3;
-    padding: 0.62rem 0.78rem;
-}
-
-.gv-reservation-form .form-control:focus,
-.gv-reservation-form .form-select:focus {
-    border-color: #1f8d78;
-    box-shadow: 0 0 0 0.2rem rgba(31, 141, 120, 0.18);
-}
 
 .gv-reservation-form .invalid-feedback { display:block; color:#93000a; font-size:0.85rem; margin-top:0.3rem; }
 
@@ -129,16 +108,13 @@ document.addEventListener('DOMContentLoaded', function () {
     var dispoEl = document.getElementById('reservation-disponibilite');
     var dateDebutInput = document.getElementById('{{ form.dateDebut.vars.id }}');
     var dateFinInput = document.getElementById('{{ form.dateFin.vars.id }}');
-    var estimatedTotalLabel = document.getElementById('reservation-estimated-total');
-    var priceBreakdown = document.getElementById('reservation-price-breakdown');
-    var basePriceLabel = document.getElementById('reservation-base-price');
-    var holidayInfo = document.getElementById('reservation-holiday-info');
-    var holidayNightsLabel = document.getElementById('reservation-holiday-nights');
-    var supplementInfo = document.getElementById('reservation-supplement-info');
-    var supplementLabel = document.getElementById('reservation-supplement');
-
-    var holidays = [];
-    var supplementPercentage = 0;
+    var estimatedTotalEl = document.getElementById('reservation-estimated-total');
+    var priceBreakdownEl = document.getElementById('reservation-price-breakdown');
+    var basePriceEl = document.getElementById('reservation-base-price');
+    var holidayNightsEl = document.getElementById('reservation-holiday-nights');
+    var supplementEl = document.getElementById('reservation-supplement');
+    var holidayInfoEl = document.getElementById('reservation-holiday-info');
+    var supplementInfoEl = document.getElementById('reservation-supplement-info');
 
     if (!chambreSelect || !dispoEl) {
         return;
@@ -147,6 +123,19 @@ document.addEventListener('DOMContentLoaded', function () {
     var chambreOptions = Array.prototype.slice.call(chambreSelect.options).filter(function (opt) {
         return opt.value !== '';
     });
+
+    // Charger les jours fériés depuis l'API
+    var holidays = [];
+    var supplementPercentage = 0;
+    
+    fetch('{{ path("app_reservation_holidays_api") }}')
+        .then(function(response) { return response.json(); })
+        .catch(function() { return { holidays: [], supplementPercentage: 0 }; })
+        .then(function(data) {
+            holidays = data.holidays || [];
+            supplementPercentage = data.supplementPercentage || 0;
+            updateEstimatedTotal(); // Recalculer après chargement
+        });
 
     function normalize(value) {
         return (value || '').toString().trim().toLowerCase();
@@ -161,30 +150,16 @@ document.addEventListener('DOMContentLoaded', function () {
         return Number.isNaN(date.getTime()) ? null : date;
     }
 
+    function dateToString(date) {
+        var year = date.getFullYear();
+        var month = String(date.getMonth() + 1).padStart(2, '0');
+        var day = String(date.getDate()).padStart(2, '0');
+        return year + '-' + month + '-' + day;
+    }
+
     function diffDays(start, end) {
         var msPerDay = 24 * 60 * 60 * 1000;
         return Math.round((end.getTime() - start.getTime()) / msPerDay);
-    }
-
-    function formatIsoDate(date) {
-        var y = date.getFullYear();
-        var m = String(date.getMonth() + 1).padStart(2, '0');
-        var d = String(date.getDate()).padStart(2, '0');
-        return y + '-' + m + '-' + d;
-    }
-
-    function countHolidayNights(start, end) {
-        var count = 0;
-        var current = new Date(start.getTime());
-
-        while (current < end) {
-            if (holidays.indexOf(formatIsoDate(current)) !== -1) {
-                count += 1;
-            }
-            current.setDate(current.getDate() + 1);
-        }
-
-        return count;
     }
 
     function getUnitPrice(option) {
@@ -203,15 +178,31 @@ document.addEventListener('DOMContentLoaded', function () {
         return low > 0 ? low : 0;
     }
 
+    function countHolidayNights(start, end) {
+        var count = 0;
+        var current = new Date(start);
+        
+        while (current < end) {
+            var dateStr = dateToString(current);
+            if (holidays.indexOf(dateStr) !== -1) {
+                count++;
+            }
+            current.setDate(current.getDate() + 1);
+        }
+        
+        return count;
+    }
+
     function updateEstimatedTotal() {
-        if (!estimatedTotalLabel || !chambreSelect || !priceBreakdown) {
+        if (!estimatedTotalEl || !chambreSelect) {
+            priceBreakdownEl.style.display = 'none';
             return;
         }
 
         var option = chambreSelect.selectedOptions.length ? chambreSelect.selectedOptions[0] : null;
         if (!option || option.value === '') {
-            estimatedTotalLabel.textContent = '-';
-            priceBreakdown.style.display = 'none';
+            estimatedTotalEl.textContent = '-';
+            priceBreakdownEl.style.display = 'none';
             return;
         }
 
@@ -220,39 +211,46 @@ document.addEventListener('DOMContentLoaded', function () {
         var unit = getUnitPrice(option);
 
         if (!start || !end || end <= start || unit <= 0) {
-            estimatedTotalLabel.textContent = '-';
-            priceBreakdown.style.display = 'none';
+            estimatedTotalEl.textContent = '-';
+            priceBreakdownEl.style.display = 'none';
             return;
         }
 
         var nights = diffDays(start, end);
         if (nights <= 0) {
-            estimatedTotalLabel.textContent = '-';
-            priceBreakdown.style.display = 'none';
+            estimatedTotalEl.textContent = '-';
+            priceBreakdownEl.style.display = 'none';
             return;
         }
 
-        var baseTotal = unit * nights;
+        // Calculer le prix de base
+        var basePrice = (unit * nights);
+
+        // Calculer les nuits de jours fériés
         var holidayNights = countHolidayNights(start, end);
-        var holidaySupplement = holidayNights > 0
-            ? (unit * (supplementPercentage / 100) * holidayNights)
-            : 0;
-        var total = baseTotal + holidaySupplement;
-
-        basePriceLabel.textContent = baseTotal.toFixed(2) + ' €';
-        estimatedTotalLabel.textContent = total.toFixed(2) + ' €';
-
+        var supplementAmount = 0;
+        
         if (holidayNights > 0) {
-            holidayNightsLabel.textContent = holidayNights + ' nuit' + (holidayNights > 1 ? 's' : '');
-            supplementLabel.textContent = '+ ' + holidaySupplement.toFixed(2) + ' € (' + supplementPercentage + '%)';
-            holidayInfo.style.display = 'flex';
-            supplementInfo.style.display = 'flex';
-        } else {
-            holidayInfo.style.display = 'none';
-            supplementInfo.style.display = 'none';
+            supplementAmount = (unit * (supplementPercentage / 100)) * holidayNights;
         }
 
-        priceBreakdown.style.display = 'block';
+        var totalPrice = basePrice + supplementAmount;
+
+        // Mettre à jour l'affichage
+        basePriceEl.textContent = basePrice.toFixed(2) + ' €';
+        estimatedTotalEl.textContent = totalPrice.toFixed(2) + ' €';
+
+        if (holidayNights > 0) {
+            holidayNightsEl.textContent = holidayNights + ' nuit' + (holidayNights > 1 ? 's' : '');
+            supplementEl.textContent = '+ ' + supplementAmount.toFixed(2) + ' €';
+            holidayInfoEl.style.display = 'flex';
+            supplementInfoEl.style.display = 'flex';
+        } else {
+            holidayInfoEl.style.display = 'none';
+            supplementInfoEl.style.display = 'none';
+        }
+
+        priceBreakdownEl.style.display = 'block';
     }
 
     function applyFilters() {
@@ -305,24 +303,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (dateFinInput) {
         dateFinInput.addEventListener('change', updateEstimatedTotal);
     }
-
-    fetch('{{ path('app_reservation_holidays_api') }}')
-        .then(function (response) {
-            if (!response.ok) {
-                throw new Error('API holidays unavailable');
-            }
-            return response.json();
-        })
-        .then(function (data) {
-            holidays = Array.isArray(data.holidays) ? data.holidays : [];
-            supplementPercentage = Number(data.supplementPercentage || 0);
-            updateEstimatedTotal();
-        })
-        .catch(function () {
-            holidays = [];
-            supplementPercentage = 0;
-            updateEstimatedTotal();
-        });
 
     applyFilters();
     updateEstimatedTotal();

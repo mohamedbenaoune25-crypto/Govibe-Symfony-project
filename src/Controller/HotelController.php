@@ -16,10 +16,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\HolidayService;
 
 #[Route('/hotel')]
 class HotelController extends AbstractController
 {
+    private HolidayService $holidayService;
+
+    public function __construct(HolidayService $holidayService)
+    {
+        $this->holidayService = $holidayService;
+    }
+
     #[Route('/', name: 'app_hotel_index', methods: ['GET'])]
     public function index(Request $request, HotelRepository $hotelRepository): Response
     {
@@ -92,6 +100,7 @@ class HotelController extends AbstractController
                 $reservation->setUser($this->getUser());
                 $reservation->setHotel($hotel);
                 $reservation->setStatut('EN_ATTENTE');
+                $this->applyCalculatedTotal($reservation);
                 $this->validateReservationInput($reservation, $reservationForm);
 
                 if ($reservationForm->isValid()) {
@@ -220,10 +229,6 @@ class HotelController extends AbstractController
             $form->get('dateFin')->addError(new FormError('La date de fin doit etre posterieure a la date de debut.'));
         }
 
-        if ($reservation->getPrixTotal() === null || !is_numeric((string) $reservation->getPrixTotal()) || $reservation->getPrixTotal() <= 0) {
-            $form->get('prixTotal')->addError(new FormError('Le prix total doit etre un nombre superieur a 0.'));
-        }
-
         if ($form->has('statut') && trim((string) $reservation->getStatut()) === '') {
             $form->get('statut')->addError(new FormError('Le statut est obligatoire.'));
         }
@@ -231,5 +236,80 @@ class HotelController extends AbstractController
         if ($reservation->getChambre() === null) {
             $form->get('chambre')->addError(new FormError('La chambre est obligatoire.'));
         }
+
+        if ($reservation->getChambre() !== null && $reservation->getHotel() !== null && $reservation->getChambre()?->getHotel()?->getId() !== $reservation->getHotel()?->getId()) {
+            $form->get('chambre')->addError(new FormError('La chambre selectionnee ne correspond pas a l\'hotel choisi.'));
+        }
+
+        if ($reservation->getPrixTotal() === null || $reservation->getPrixTotal() <= 0) {
+            if ($reservation->getChambre() === null) {
+                $form->get('chambre')->addError(new FormError('Impossible de calculer le prix total sans chambre.'));
+            } else {
+                $form->get('chambre')->addError(new FormError('La chambre selectionnee ne contient pas de prix valide.'));
+            }
+
+            if (!$reservation->getDateDebut() instanceof \DateTimeInterface || !$reservation->getDateFin() instanceof \DateTimeInterface) {
+                $form->addError(new FormError('Le prix total est calcule automatiquement apres selection des dates.'));
+            }
+        }
+    }
+
+    private function applyCalculatedTotal(Reservation $reservation): void
+    {
+        $chambre = $reservation->getChambre();
+        if ($chambre === null) {
+            $reservation->setPrixTotal(null);
+            return;
+        }
+
+        // Keep reservation hotel aligned with selected room.
+        if ($chambre->getHotel() !== null) {
+            $reservation->setHotel($chambre->getHotel());
+        }
+
+        $dateDebut = $reservation->getDateDebut();
+        $dateFin = $reservation->getDateFin();
+        if (!$dateDebut instanceof \DateTimeInterface || !$dateFin instanceof \DateTimeInterface || $dateFin <= $dateDebut) {
+            $reservation->setPrixTotal(null);
+            return;
+        }
+
+        $nights = (int) $dateDebut->diff($dateFin)->days;
+        if ($nights <= 0) {
+            $reservation->setPrixTotal(null);
+            return;
+        }
+
+        $unitPrice = $this->resolveRoomUnitPrice($chambre);
+        if ($unitPrice <= 0) {
+            $reservation->setPrixTotal(null);
+            return;
+        }
+
+        $basePrice = round($unitPrice * $nights, 2);
+
+        // Ajouter supplément pour jours fériés
+        $dateDebut = \DateTimeImmutable::createFromInterface($dateDebut);
+        $dateFin = \DateTimeImmutable::createFromInterface($dateFin);
+        $holidaySupplement = $this->holidayService->calculateHolidaySupplement($unitPrice, $dateDebut, $dateFin);
+
+        $totalPrice = round($basePrice + $holidaySupplement, 2);
+        $reservation->setPrixTotal($totalPrice);
+    }
+
+    private function resolveRoomUnitPrice(\App\Entity\Chambre $chambre): float
+    {
+        $standard = (float) ($chambre->getPrixStandard() ?? 0);
+        if ($standard > 0) {
+            return $standard;
+        }
+
+        $highSeason = (float) ($chambre->getPrixHauteSaison() ?? 0);
+        if ($highSeason > 0) {
+            return $highSeason;
+        }
+
+        $lowSeason = (float) ($chambre->getPrixBasseSaison() ?? 0);
+        return $lowSeason > 0 ? $lowSeason : 0.0;
     }
 }

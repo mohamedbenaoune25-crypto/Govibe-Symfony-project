@@ -1,52 +1,57 @@
 {{ form_start(form, {'attr': {'class': 'hotel-form', 'novalidate': 'novalidate'}}) }}
+    {% if form.vars.errors|length > 0 %}
+        <div class="alert alert-danger" role="alert">
+            {{ form_errors(form) }}
+        </div>
+    {% endif %}
     <div class="row g-3">
         <div class="col-md-6">
-            <div class="form-floating">
+            <div class="hotel-form__field">
+                {{ form_label(form.nom, 'hotel.form.name'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
                 {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.name'|trans}}) }}
-                {{ form_label(form.nom, 'hotel.form.name'|trans, {'label_attr': {'class': 'form-label'}}) }}
-                {% if form.nom.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
+                {{ form_errors(form.nom) }}
             </div>
         </div>
         <div class="col-md-6">
-            <div class="form-floating">
+            <div class="hotel-form__field">
+                {{ form_label(form.ville, 'common.city'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
                 {{ form_widget(form.ville, {'attr': {'class': 'form-control' ~ (form.ville.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.city'|trans}}) }}
-                {{ form_label(form.ville, 'common.city'|trans, {'label_attr': {'class': 'form-label'}}) }}
-                {% if form.ville.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
+                {{ form_errors(form.ville) }}
             </div>
         </div>
         <div class="col-12">
-            <div class="form-floating">
+            <div class="hotel-form__field">
+                {{ form_label(form.adresse, 'common.address'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
                 {{ form_widget(form.adresse, {'attr': {'class': 'form-control' ~ (form.adresse.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.full_address'|trans}}) }}
-                {{ form_label(form.adresse, 'common.address'|trans, {'label_attr': {'class': 'form-label'}}) }}
-                {% if form.adresse.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
+                {{ form_errors(form.adresse) }}
             </div>
         </div>
         <div class="col-md-6">
-            <div class="form-floating">
+            <div class="hotel-form__field">
+                {{ form_label(form.nombreEtoiles, 'common.stars'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
                 {{ form_widget(form.nombreEtoiles, {'attr': {'class': 'form-control' ~ (form.nombreEtoiles.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.stars'|trans}}) }}
-                {{ form_label(form.nombreEtoiles, 'common.stars'|trans, {'label_attr': {'class': 'form-label'}}) }}
-                {% if form.nombreEtoiles.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
+                {{ form_errors(form.nombreEtoiles) }}
             </div>
         </div>
         <div class="col-md-6">
-            <div class="form-floating">
+            <div class="hotel-form__field">
+                {{ form_label(form.budget, 'hotel.form.budget_eur'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
                 {{ form_widget(form.budget, {'attr': {'class': 'form-control' ~ (form.budget.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.budget'|trans}}) }}
-                {{ form_label(form.budget, 'hotel.form.budget_eur'|trans, {'label_attr': {'class': 'form-label'}}) }}
-                {% if form.budget.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
+                {{ form_errors(form.budget) }}
             </div>
         </div>
         <div class="col-12">
-            <div class="form-floating">
+            <div class="hotel-form__field">
+                {{ form_label(form.photoUrl, 'hotel.form.photo_url'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
                 {{ form_widget(form.photoUrl, {'attr': {'class': 'form-control' ~ (form.photoUrl.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.photo_url'|trans}}) }}
-                {{ form_label(form.photoUrl, 'hotel.form.photo_url'|trans, {'label_attr': {'class': 'form-label'}}) }}
-                {% if form.photoUrl.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
+                {{ form_errors(form.photoUrl) }}
             </div>
         </div>
         <div class="col-12">
-            <div class="form-floating">
-                {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''), 'rows': 4, 'placeholder': 'common.description'|trans}}) }}
-                {{ form_label(form.description, 'common.description'|trans, {'label_attr': {'class': 'form-label'}}) }}
-                {% if form.description.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
+            <div class="hotel-form__field">
+                {{ form_label(form.description, 'common.description'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control hotel-form__textarea' ~ (form.description.vars.errors|length ? ' is-invalid' : ''), 'rows': 4, 'placeholder': 'common.description'|trans}}) }}
+                {{ form_errors(form.description) }}
             </div>
         </div>
     </div>
@@ -58,16 +63,28 @@
 {{ form_end(form) }}
 
 <style>
-.hotel-form .form-floating {
-    margin-bottom: 1rem;
+.hotel-form__field { margin-bottom: 0.25rem; }
+
+.hotel-form__label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.92rem;
 }
 
 .hotel-form .form-control {
     border: 2px solid #e9ecef;
     border-radius: 10px;
-    padding: 1rem 0.75rem;
+    min-height: 48px;
+    padding: 0.65rem 0.8rem;
     font-size: 1rem;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hotel-form .hotel-form__textarea {
+    min-height: 120px;
+    resize: vertical;
 }
 
 .hotel-form .form-control:focus {
@@ -75,16 +92,11 @@
     box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
 }
 
-.hotel-form .form-label {
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
 .hotel-form .invalid-feedback {
     display: block;
     color: #dc3545;
     font-size: 0.875rem;
-    margin-top: 0.25rem;
+    margin-top: 0.4rem;
 }
 
 .btn-primary {

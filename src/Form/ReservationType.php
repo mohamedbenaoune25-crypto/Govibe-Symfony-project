@@ -12,7 +12,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Doctrine\ORM\EntityRepository;
 
@@ -76,16 +75,6 @@ class ReservationType extends AbstractType
                 'required' => true,
                 'invalid_message' => 'Veuillez saisir une date de fin valide.',
             ])
-            ->add('prixTotal', NumberType::class, [
-                'label' => 'Prix total',
-                'required' => true,
-                'invalid_message' => 'Le prix total doit être un nombre valide.',
-                'attr' => [
-                    'min' => 0.01,
-                    'step' => '0.01',
-                ],
-                'constraints' => [new Assert\NotBlank(['message' => 'Le prix total est obligatoire.'])],
-            ])
             ->add('chambre', EntityType::class, [
                 'class' => Chambre::class,
                 'query_builder' => $hotel instanceof Hotel
@@ -109,6 +98,9 @@ class ReservationType extends AbstractType
                         'data-hotel-id' => (string) ($chambre->getHotel()?->getId() ?? ''),
                         'data-type' => (string) ($chambre->getType() ?? ''),
                         'data-disponibles' => (string) ($chambre->getNombreDeChambres() ?? 0),
+                        'data-prix-standard' => (string) ($chambre->getPrixStandard() ?? 0),
+                        'data-prix-haute' => (string) ($chambre->getPrixHauteSaison() ?? 0),
+                        'data-prix-basse' => (string) ($chambre->getPrixBasseSaison() ?? 0),
                     ];
                 },
             ])

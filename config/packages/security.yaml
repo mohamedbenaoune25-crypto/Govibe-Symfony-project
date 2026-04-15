@@ -36,13 +36,10 @@ security:
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
   access_control:
-<<<<<<< HEAD
     - { path: ^/admin/reservations/\d+/status$, roles: ROLE_ADMIN, methods: [POST] }
-=======
     - { path: ^/connect, roles: PUBLIC_ACCESS }
     - { path: ^/login, roles: PUBLIC_ACCESS }
     - { path: ^/register, roles: PUBLIC_ACCESS }
->>>>>>> a7ca2b7f98856d56cec0c9b7e46065622ed36879
     - { path: ^/admin, roles: ROLE_ADMIN }
     - { path: ^/postes, roles: [PUBLIC_ACCESS] } # Allow viewing posts, but maybe restrict creation/edit later
 
