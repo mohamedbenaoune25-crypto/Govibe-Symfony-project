@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Service\UserSessionService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -12,11 +13,16 @@ class LoginSuccessSubscriber implements EventSubscriberInterface
 {
     private UrlGeneratorInterface $urlGenerator;
     private LoggerInterface $logger;
+    private UserSessionService $sessionService;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, LoggerInterface $logger)
-    {
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator,
+        LoggerInterface $logger,
+        UserSessionService $sessionService
+    ) {
         $this->urlGenerator = $urlGenerator;
         $this->logger = $logger;
+        $this->sessionService = $sessionService;
     }
 
     public static function getSubscribedEvents(): array
@@ -31,12 +37,25 @@ class LoginSuccessSubscriber implements EventSubscriberInterface
     {
         $user = $event->getUser();
         $roles = $user->getRoles();
+        $request = $event->getRequest();
 
         $this->logger->info(sprintf('User %s connected with roles: %s', $user->getUserIdentifier(), implode(', ', $roles)));
 
-        // By default, Symfony redirects to where the user wanted to go before being asked to log in.
-        // We retrieve the target path from the session if it exists.
-        $request = $event->getRequest();
+        // Create a session record for this login (if not already created by the authenticator)
+        // The AdaptiveMFAAuthenticator already creates sessions for LOW risk,
+        // and the SecurityController creates them for MFA-verified logins.
+        // This handles OAuth logins (Google) which bypass the custom authenticator.
+        try {
+            $this->sessionService->createSession($user, $request);
+            $this->logger->info('[LoginSuccess] Session created for OAuth/external login', [
+                'user' => $user->getUserIdentifier(),
+            ]);
+        } catch (\Throwable $e) {
+            // Don't block login on session creation failure
+            $this->logger->error('[LoginSuccess] Failed to create session', [
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         // If the user is an admin, redirect directly strictly to the admin dashboard
         if (in_array('ROLE_ADMIN', $roles, true)) {

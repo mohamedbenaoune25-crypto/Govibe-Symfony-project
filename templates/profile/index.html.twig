@@ -510,6 +510,309 @@ body {
 .govibe-navbar {
     position: fixed !important;
 }
+
+/* ─── Sessions / Connected Devices ─── */
+.pf-sessions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.pf-session-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: rgba(252, 249, 248, 0.6);
+    border: 1.5px solid rgba(0, 52, 45, 0.08);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+}
+.pf-session-card:hover {
+    background: #fff;
+    border-color: rgba(0, 52, 45, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 52, 45, 0.06);
+    transform: translateY(-1px);
+}
+.pf-session-icon {
+    width: 3rem; height: 3rem;
+    border-radius: 0.75rem;
+    background: rgba(0, 52, 45, 0.06);
+    display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.pf-session-icon .material-symbols-outlined {
+    font-size: 1.4rem;
+    color: #046b5e;
+}
+.pf-session-details {
+    flex: 1;
+    min-width: 0;
+}
+.pf-session-device {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #00342d;
+    margin-bottom: 0.2rem;
+}
+.pf-session-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #546067;
+    margin-bottom: 0.15rem;
+    flex-wrap: wrap;
+}
+.pf-session-date {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+.pf-session-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+.pf-session-status {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #059669;
+}
+.pf-status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+    animation: dotPulse 2s ease-in-out infinite;
+}
+@keyframes dotPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+.pf-btn-revoke {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.4rem 0.85rem;
+    background: rgba(220, 38, 38, 0.06);
+    border: 1px solid rgba(220, 38, 38, 0.15);
+    border-radius: 0.5rem;
+    color: #dc2626;
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.pf-btn-revoke:hover {
+    background: rgba(220, 38, 38, 0.12);
+    border-color: rgba(220, 38, 38, 0.3);
+    transform: translateY(-1px);
+}
+.pf-revoke-form { margin: 0; }
+.pf-revoke-all-wrap {
+    margin-top: 1rem;
+    text-align: center;
+}
+.pf-btn-revoke-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    background: rgba(220, 38, 38, 0.05);
+    border: 1.5px solid rgba(220, 38, 38, 0.2);
+    border-radius: 0.75rem;
+    color: #dc2626;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-family: 'Manrope', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.pf-btn-revoke-all:hover {
+    background: rgba(220, 38, 38, 0.1);
+    border-color: rgba(220, 38, 38, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+}
+.pf-no-sessions {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+.pf-no-sessions p {
+    margin-top: 0.75rem;
+    color: #546067;
+}
+
+/* ─── Face ID Management ─── */
+.pf-face-card {
+    background: rgba(252, 249, 248, 0.6);
+    border: 1.5px solid rgba(0, 52, 45, 0.08);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+.pf-face-card.enrolled {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.02);
+}
+.pf-face-icon-wrap {
+    width: 5rem; height: 5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0, 52, 45, 0.08) 0%, rgba(4, 107, 94, 0.1) 100%);
+    display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+}
+.pf-face-card.enrolled .pf-face-icon-wrap {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.2) 100%);
+}
+.pf-face-icon-wrap .material-symbols-outlined {
+    font-size: 2.2rem;
+    color: #046b5e;
+}
+.pf-face-card.enrolled .pf-face-icon-wrap .material-symbols-outlined { color: #059669; }
+.pf-face-status-badge {
+    position: absolute;
+    bottom: -5px; right: -5px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #10B981;
+    border: 3px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+}
+.pf-face-status-badge .material-symbols-outlined { font-size: 0.8rem; color: #fff; }
+
+.pf-face-content { flex: 1; min-width: 200px; }
+.pf-face-content h3 {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #00342d;
+    margin: 0 0 0.25rem 0;
+}
+.pf-face-content p {
+    font-size: 0.85rem;
+    color: #546067;
+    margin: 0; line-height: 1.5;
+}
+
+.pf-face-actions {
+    display: flex; gap: 0.75rem; flex-shrink: 0;
+}
+.pf-btn-face-action {
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 0.5rem;
+    cursor: pointer; transition: all 0.2s ease;
+    border: none;
+}
+.pf-btn-face-setup {
+    background: #00342d; color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 52, 45, 0.2);
+}
+.pf-btn-face-setup:hover { background: #046b5e; transform: translateY(-2px); }
+.pf-btn-face-remove {
+    background: rgba(220, 38, 38, 0.08); color: #dc2626;
+}
+.pf-btn-face-remove:hover { background: rgba(220, 38, 38, 0.15); transform: translateY(-2px); }
+
+/* Webcam capture area within Profile */
+.pf-face-webcam-area {
+    width: 100%;
+    background: #1c1b1b;
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+    display: none;
+    margin-top: 1.5rem;
+    animation: pf-fadeUp 0.4s ease forwards;
+}
+.pf-face-webcam-area.active { display: block; }
+.pf-face-webcam-top {
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 1rem; display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 100%);
+    z-index: 10;
+}
+.pf-face-webcam-top h4 { color: #fff; margin: 0; font-size: 0.9rem; font-weight: 700; }
+.pf-btn-close-webcam {
+    background: rgba(255,255,255,0.2); border: none; color: #fff;
+    width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; backdrop-filter: blur(4px);
+}
+.pf-btn-close-webcam:hover { background: rgba(255,255,255,0.3); }
+
+.pf-face-webcam-view {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4/3;
+}
+.pf-face-webcam-view video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+.pf-face-webcam-view canvas { display: none; }
+
+.pf-face-guide {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px; height: 240px;
+    border: 3px solid rgba(160, 242, 225, 0.5);
+    border-radius: 50%;
+    box-shadow: 0 0 0 9999px rgba(0,0,0,0.4);
+    pointer-events: none;
+    animation: pulseGuide 2s infinite ease-in-out;
+}
+@keyframes pulseGuide { 0%, 100% { border-color: rgba(160, 242, 225, 0.5); } 50% { border-color: rgba(160, 242, 225, 0.9); } }
+
+.pf-face-webcam-bottom {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    z-index: 10;
+}
+.pf-face-status-text { color: #a0f2e1; font-size: 0.85rem; font-weight: 700; }
+.pf-btn-capture {
+    background: #10B981; color: #fff; border: none;
+    padding: 0.6rem 1.5rem; border-radius: 2rem; font-weight: 700; font-size: 0.9rem;
+    display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); transition: transform 0.2s;
+}
+.pf-btn-capture:hover { transform: scale(1.05); }
+.pf-btn-capture:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@media (max-width: 640px) {
+    .pf-session-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    .pf-session-actions {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+    }
+}
 </style>
 {% endblock %}
 
@@ -685,6 +988,144 @@ body {
                 </div>
 
             {{ form_end(form) }}
+
+                <div class="pf-divider"></div>
+
+                <!-- ═══ Face ID Management ═══ -->
+                <div class="pf-section-header">
+                    <div class="pf-section-icon"><span class="material-symbols-outlined">face</span></div>
+                    <div class="pf-section-info">
+                        <h2>Biométrie Face ID</h2>
+                        <p>Sécurisez votre compte ou vos validations MFA grâce à la reconnaissance faciale</p>
+                    </div>
+                </div>
+                <div class="pf-accent-bar"></div>
+
+                <div class="pf-face-card {% if has_face_enrolled %}enrolled{% endif %}" id="pf-face-card">
+                    <div class="pf-face-icon-wrap">
+                        <span class="material-symbols-outlined">face</span>
+                        {% if has_face_enrolled %}
+                            <div class="pf-face-status-badge"><span class="material-symbols-outlined">check</span></div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="pf-face-content">
+                        <h3 id="pf-face-title">{% if has_face_enrolled %}Face ID Activé{% else %}Face ID Non Configuré{% endif %}</h3>
+                        <p id="pf-face-desc">
+                            {% if has_face_enrolled %}
+                                Votre visage est enregistré pour la connexion biométrique et le MFA.
+                            {% else %}
+                                Activez Face ID pour vous connecter plus rapidement et sécuriser vos actions sensibles.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="pf-face-actions">
+                        {% if has_face_enrolled %}
+                            <button type="button" class="pf-btn-face-action pf-btn-face-setup" onclick="startFaceEnrollment()">
+                                <span class="material-symbols-outlined">autorenew</span> Mettre à jour
+                            </button>
+                            <button type="button" class="pf-btn-face-action pf-btn-face-remove" onclick="removeFaceId()">
+                                <span class="material-symbols-outlined">delete</span> Supprimer
+                            </button>
+                        {% else %}
+                            <button type="button" class="pf-btn-face-action pf-btn-face-setup" onclick="startFaceEnrollment()">
+                                <span class="material-symbols-outlined">center_focus_strong</span> Configurer Face ID
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Webcam capture widget -->
+                <div class="pf-face-webcam-area" id="pf-webcam-area">
+                    <div class="pf-face-webcam-top">
+                        <h4>Scanner votre visage</h4>
+                        <button type="button" class="pf-btn-close-webcam" onclick="closeFaceWebcam()">
+                            <span class="material-symbols-outlined" style="font-size:1.2rem;">close</span>
+                        </button>
+                    </div>
+                    <div class="pf-face-webcam-view">
+                        <video id="pf-video" autoplay playsinline muted></video>
+                        <canvas id="pf-canvas"></canvas>
+                        <div class="pf-face-guide"></div>
+                    </div>
+                    <div class="pf-face-webcam-bottom">
+                        <div class="pf-face-status-text" id="pf-webcam-status">Positionnez votre visage au centre du cercle</div>
+                        <button type="button" class="pf-btn-capture" id="pf-btn-capture" onclick="captureFaceEncoding()">
+                            <span class="material-symbols-outlined">photo_camera</span> Capturer
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pf-divider"></div>
+
+                <!-- ═══ Active Sessions / Connected Devices ═══ -->
+                <div class="pf-section-header">
+                    <div class="pf-section-icon"><span class="material-symbols-outlined">devices</span></div>
+                    <div class="pf-section-info">
+                        <h2>Appareils Connectés</h2>
+                        <p>Gérez vos sessions actives et déconnectez les appareils non reconnus</p>
+                    </div>
+                </div>
+                <div class="pf-accent-bar"></div>
+
+                {% if active_sessions is defined and active_sessions|length > 0 %}
+                    <div class="pf-sessions-list" id="sessions-list">
+                        {% for session in active_sessions %}
+                            <div class="pf-session-card" id="session-{{ session.id }}">
+                                <div class="pf-session-icon">
+                                    {% if 'Android' in session.deviceName or 'iOS' in session.deviceName %}
+                                        <span class="material-symbols-outlined">phone_android</span>
+                                    {% elseif 'iPad' in session.deviceName %}
+                                        <span class="material-symbols-outlined">tablet</span>
+                                    {% else %}
+                                        <span class="material-symbols-outlined">laptop</span>
+                                    {% endif %}
+                                </div>
+                                <div class="pf-session-details">
+                                    <div class="pf-session-device">{{ session.deviceName }}</div>
+                                    <div class="pf-session-meta">
+                                        <span>📍 {{ session.city ?? 'N/A' }}, {{ session.country ?? 'N/A' }}</span>
+                                        <span>•</span>
+                                        <span>🌐 {{ session.ipAddress }}</span>
+                                    </div>
+                                    <div class="pf-session-date">
+                                        <span class="material-symbols-outlined" style="font-size:0.85rem;">schedule</span>
+                                        Connecté le {{ session.loginDate|date('d/m/Y à H:i') }}
+                                    </div>
+                                </div>
+                                <div class="pf-session-actions">
+                                    <div class="pf-session-status">
+                                        <span class="pf-status-dot"></span> Actif
+                                    </div>
+                                    <form method="post" action="{{ path('app_user_session_revoke', {id: session.id}) }}" class="pf-revoke-form" onsubmit="return confirm('Êtes-vous sûr de vouloir déconnecter cet appareil ?');">
+                                        <button type="submit" class="pf-btn-revoke">
+                                            <span class="material-symbols-outlined" style="font-size:1rem;">logout</span>
+                                            Déconnecter
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {% if active_sessions|length > 1 %}
+                        <div class="pf-revoke-all-wrap">
+                            <form method="post" action="{{ path('app_user_sessions_revoke_all') }}" onsubmit="return confirm('Êtes-vous sûr de vouloir déconnecter TOUS les appareils ? Vous devrez vous reconnecter.');">
+                                <button type="submit" class="pf-btn-revoke-all">
+                                    <span class="material-symbols-outlined" style="font-size:1.1rem;">devices_off</span>
+                                    Déconnecter tous les appareils
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="pf-no-sessions">
+                        <span class="material-symbols-outlined" style="font-size:2rem;color:#bfc9c4;">devices_off</span>
+                        <p>Aucune session active trouvée.</p>
+                    </div>
+                {% endif %}
+
         </main>
     </div>
 {% endblock %}
@@ -885,5 +1326,111 @@ document.addEventListener('DOMContentLoaded', () => {
     s.textContent = `@keyframes pf-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`;
     document.head.appendChild(s);
 });
+
+/* ─── Profile Face ID Management ─── */
+let pfFaceStream = null;
+
+async function startFaceEnrollment() {
+    const area = document.getElementById('pf-webcam-area');
+    const video = document.getElementById('pf-video');
+    const status = document.getElementById('pf-webcam-status');
+    const btn = document.getElementById('pf-btn-capture');
+
+    // Reset UI
+    area.classList.add('active');
+    status.textContent = 'Positionnez votre visage au centre du cercle';
+    status.style.color = '#a0f2e1';
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined">photo_camera</span> Capturer';
+
+    try {
+        pfFaceStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480, facingMode: 'user' }
+        });
+        video.srcObject = pfFaceStream;
+    } catch (err) {
+        console.error('Webcam error:', err);
+        status.textContent = '❌ Erreur webcam. Autorisez la caméra.';
+        status.style.color = '#ef4444';
+        btn.disabled = true;
+    }
+}
+
+function closeFaceWebcam() {
+    if (pfFaceStream) {
+        pfFaceStream.getTracks().forEach(track => track.stop());
+        pfFaceStream = null;
+    }
+    document.getElementById('pf-webcam-area').classList.remove('active');
+}
+
+async function captureFaceEncoding() {
+    const video = document.getElementById('pf-video');
+    const canvas = document.getElementById('pf-canvas');
+    const status = document.getElementById('pf-webcam-status');
+    const btn = document.getElementById('pf-btn-capture');
+
+    // UI Feedback
+    status.textContent = '⏳ Encodage en cours...';
+    status.style.color = '#fbbf24';
+    btn.disabled = true;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+
+    try {
+        const response = await fetch('{{ path("app_user_enroll_face") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Image }),
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            status.textContent = '✅ Face ID configuré !';
+            status.style.color = '#10B981';
+            
+            // Reload page to reflect changes or manually update DOM (we'll reload for simplicity & flash messages)
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            status.textContent = '❌ ' + (data.message || 'Échec de la configuration');
+            status.style.color = '#ef4444';
+            btn.disabled = false;
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        status.textContent = '❌ Erreur réseau.';
+        status.style.color = '#ef4444';
+        btn.disabled = false;
+    }
+}
+
+async function removeFaceId() {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer vos données biométriques ? Vous ne pourrez plus vous connecter avec Face ID.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('{{ path("app_user_remove_face") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Erreur: ' + (data.message || 'Impossible de supprimer.'));
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        alert('Une erreur s\'est produite.');
+    }
+}
 </script>
 {% endblock %}

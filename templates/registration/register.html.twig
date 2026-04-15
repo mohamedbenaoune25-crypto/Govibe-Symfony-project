@@ -143,6 +143,17 @@
     .gv-btn-primary:hover::before { transform: translateX(100%); }
     .gv-btn-primary:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 18px 40px -10px rgba(0, 52, 45, 0.5); }
     .gv-btn-primary:active { transform: translateY(0) scale(0.99); }
+    .gv-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+    .gv-btn-secondary {
+        width: 100%; padding: 0.85rem;
+        background: transparent;
+        color: #00342d; border: 2px solid rgba(0, 52, 45, 0.2); border-radius: 0.75rem;
+        font-size: 0.95rem; font-weight: 700; font-family: 'Manrope', sans-serif;
+        cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .gv-btn-secondary:hover { background: rgba(0, 52, 45, 0.05); border-color: rgba(0, 52, 45, 0.4); }
 
     .gv-auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #707975; }
     .gv-auth-footer a { color: #00342d; font-weight: 800; text-decoration: none; margin-left: 0.25rem; }
@@ -182,6 +193,110 @@
 
     .govibe-navbar, .govibe-footer, .container.position-relative { display: none !important; }
     .floating-element { display: none !important; }
+
+    /* ─── Face ID Section ─── */
+    .face-enrollment-section {
+        margin-bottom: 1.5rem;
+        padding: 1.25rem;
+        background: rgba(0, 52, 45, 0.03);
+        border: 2px dashed rgba(0, 52, 45, 0.15);
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+    .face-enrollment-section.captured {
+        border-color: #10B981;
+        background: rgba(16, 185, 129, 0.05);
+        border-style: solid;
+    }
+    .face-section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #3f4945;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .face-section-header .material-symbols-outlined { font-size: 1.1rem; color: #707975; }
+    .face-section-desc {
+        font-size: 0.8rem;
+        color: #707975;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .face-webcam-register {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: #1c1b1b;
+        border-radius: 0.85rem;
+        overflow: hidden;
+        margin-bottom: 0.75rem;
+        display: none;
+    }
+    .face-webcam-register.active { display: block; }
+    .face-webcam-register video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+    }
+    .face-webcam-register canvas { display: none; }
+    .face-reg-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+    .face-reg-guide {
+        width: 140px;
+        height: 180px;
+        border: 3px solid rgba(160, 242, 225, 0.5);
+        border-radius: 50%;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+        animation: frPulse 2s ease-in-out infinite;
+    }
+    .face-reg-guide.scanning { border-color: #fbbf24; animation: frScan 1s linear infinite; }
+    .face-reg-guide.success { border-color: #10B981; animation: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3), 0 0 20px rgba(16, 185, 129, 0.5); }
+    .face-reg-guide.error { border-color: #ef4444; animation: none; }
+    @keyframes frPulse { 0%, 100% { border-color: rgba(160, 242, 225, 0.5); } 50% { border-color: rgba(160, 242, 225, 0.9); } }
+    @keyframes frScan { 0% { border-color: #fbbf24; } 50% { border-color: #f59e0b; } 100% { border-color: #fbbf24; } }
+
+    .face-reg-status {
+        position: absolute;
+        bottom: 0.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: #a0f2e1;
+        padding: 0.35rem 0.85rem;
+        border-radius: 2rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        backdrop-filter: blur(8px);
+        white-space: nowrap;
+    }
+    .face-reg-status.error { color: #fca5a5; }
+    .face-reg-status.success { color: #6ee7b7; }
+
+    .face-captured-badge {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1rem;
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        border-radius: 0.6rem;
+        color: #005046;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+    .face-captured-badge .material-symbols-outlined { font-size: 1.1rem; color: #10B981; }
 </style>
 {% endblock %}
 
@@ -206,7 +321,7 @@
     <div class="auth-form-panel">
         <div class="auth-form-inner">
             <h3 class="auth-form-title">Rejoignez GoVibe</h3>
-            <p class="auth-form-subtitle">Créez votre compte et planifiez vos vacances de rêve.</p>
+            <p class="auth-form-subtitle">Créez votre compte et configurez votre Face ID sécurisé.</p>
 
             {% for message in app.flashes('success') %}
                 <div class="gv-alert gv-alert-success">
@@ -221,7 +336,7 @@
                 </div>
             {% endfor %}
 
-            {{ form_start(registrationForm, {'attr': {'class': 'modern-form', 'novalidate': 'novalidate'}}) }}
+            {{ form_start(registrationForm, {'attr': {'class': 'modern-form', 'novalidate': 'novalidate', 'id': 'registrationForm'}}) }}
 
                 <div class="gv-form-row">
                     <div class="gv-field">
@@ -264,12 +379,58 @@
                     <div class="text-danger">{{ form_errors(registrationForm.plainPassword) }}</div>
                 </div>
 
+                <!-- ═══ Face ID Enrollment Section ═══ -->
+                <div class="face-enrollment-section" id="faceEnrollSection">
+                    <div class="face-section-header">
+                        <span class="material-symbols-outlined">face</span>
+                        Configuration Face ID
+                    </div>
+                    <p class="face-section-desc">
+                        Capturez votre visage pour activer la connexion biométrique Face ID.
+                    </p>
+
+                    <div class="face-webcam-register" id="faceWebcamRegister">
+                        <video id="faceVideoRegister" autoplay playsinline muted></video>
+                        <canvas id="faceCanvasRegister"></canvas>
+                        <div class="face-reg-overlay">
+                            <div class="face-reg-guide" id="faceGuideRegister"></div>
+                        </div>
+                        <div class="face-reg-status" id="faceStatusRegister">Positionnez votre visage</div>
+                    </div>
+
+                    <div id="faceCapturedBadge" style="display:none;">
+                        <div class="face-captured-badge">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            <span id="faceCapturedText">Face ID capturé avec succès !</span>
+                        </div>
+                    </div>
+
+                    <div id="faceRegError" class="gv-alert gv-alert-error" style="display:none; margin-top:0.5rem; margin-bottom:0;">
+                        <span class="material-symbols-outlined" style="font-size:1.1rem;">error</span>
+                        <span id="faceRegErrorText"></span>
+                    </div>
+
+                    <div style="display:flex; gap:0.5rem; margin-top:0.75rem;" id="faceButtonsRow">
+                        <button type="button" class="gv-btn-secondary" id="btnStartCamera" onclick="startRegisterWebcam()" style="flex:1;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">videocam</span>
+                            Ouvrir caméra
+                        </button>
+                        <button type="button" class="gv-btn-secondary" id="btnCaptureFace" onclick="captureRegisterFace()" style="flex:1; display:none;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">photo_camera</span>
+                            Capturer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden field to store face encoding JSON -->
+                <input type="hidden" name="face_encoding_data" id="faceEncodingData" value="">
+
                 <div class="gv-check-row">
                     {{ form_widget(registrationForm.agreeTerms) }}
                     <label>J'accepte les conditions d'utilisation</label>
                 </div>
 
-                <button type="submit" class="gv-btn-primary">
+                <button type="submit" class="gv-btn-primary" id="btnSubmitRegister">
                     Créer mon compte
                     <span class="material-symbols-outlined" style="font-size:1.2rem;">check_circle</span>
                 </button>
@@ -287,6 +448,128 @@
 <div style="position:fixed;bottom:-10%;right:-10%;width:24rem;height:24rem;background:rgba(61,42,0,0.1);border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;"></div>
 
 <script>
+// ─── Registration Face Enrollment ───
+let regStream = null;
+
+async function startRegisterWebcam() {
+    const webcamContainer = document.getElementById('faceWebcamRegister');
+    const video = document.getElementById('faceVideoRegister');
+    const status = document.getElementById('faceStatusRegister');
+    const btnStart = document.getElementById('btnStartCamera');
+    const btnCapture = document.getElementById('btnCaptureFace');
+
+    try {
+        regStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480, facingMode: 'user' }
+        });
+        video.srcObject = regStream;
+        webcamContainer.classList.add('active');
+        btnStart.style.display = 'none';
+        btnCapture.style.display = 'flex';
+        status.textContent = 'Positionnez votre visage dans le cercle';
+        status.className = 'face-reg-status';
+    } catch (err) {
+        console.error('Webcam error:', err);
+        const errorDiv = document.getElementById('faceRegError');
+        const errorText = document.getElementById('faceRegErrorText');
+        errorDiv.style.display = 'flex';
+        errorText.textContent = 'Impossible d\'accéder à la caméra. Vérifiez les permissions.';
+    }
+}
+
+async function captureRegisterFace() {
+    const video = document.getElementById('faceVideoRegister');
+    const canvas = document.getElementById('faceCanvasRegister');
+    const guide = document.getElementById('faceGuideRegister');
+    const status = document.getElementById('faceStatusRegister');
+    const btnCapture = document.getElementById('btnCaptureFace');
+    const errorDiv = document.getElementById('faceRegError');
+    const errorText = document.getElementById('faceRegErrorText');
+
+    errorDiv.style.display = 'none';
+
+    // Capture frame
+    guide.className = 'face-reg-guide scanning';
+    status.textContent = 'Analyse du visage...';
+    btnCapture.disabled = true;
+    btnCapture.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">hourglass_top</span> Encodage...';
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+
+    try {
+        const response = await fetch('{{ path("app_register_encode_face") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Image }),
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.encoding) {
+            // Store encoding in hidden field
+            document.getElementById('faceEncodingData').value = JSON.stringify(data.encoding);
+
+            // Show success
+            guide.className = 'face-reg-guide success';
+            status.textContent = '✅ Visage encodé !';
+            status.className = 'face-reg-status success';
+
+            // Update UI
+            const section = document.getElementById('faceEnrollSection');
+            section.classList.add('captured');
+
+            const badge = document.getElementById('faceCapturedBadge');
+            badge.style.display = 'block';
+
+            // Stop webcam after capture
+            setTimeout(() => {
+                if (regStream) {
+                    regStream.getTracks().forEach(track => track.stop());
+                    regStream = null;
+                }
+                document.getElementById('faceWebcamRegister').classList.remove('active');
+                btnCapture.style.display = 'none';
+
+                // Show recapture button
+                const btnStart = document.getElementById('btnStartCamera');
+                btnStart.style.display = 'flex';
+                btnStart.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">refresh</span> Recapturer';
+            }, 1500);
+
+            return;
+        }
+
+        // Error
+        guide.className = 'face-reg-guide error';
+        status.textContent = data.message || 'Échec';
+        status.className = 'face-reg-status error';
+        errorDiv.style.display = 'flex';
+        errorText.textContent = data.message || 'Impossible d\'encoder le visage.';
+
+        setTimeout(() => {
+            guide.className = 'face-reg-guide';
+            status.textContent = 'Positionnez votre visage';
+            status.className = 'face-reg-status';
+        }, 3000);
+
+    } catch (err) {
+        console.error('Face encode error:', err);
+        guide.className = 'face-reg-guide error';
+        status.textContent = 'Erreur réseau';
+        status.className = 'face-reg-status error';
+        errorDiv.style.display = 'flex';
+        errorText.textContent = 'Service Face ID indisponible. Vous pourrez configurer Face ID plus tard.';
+    }
+
+    btnCapture.disabled = false;
+    btnCapture.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">photo_camera</span> Capturer';
+}
+
+// ─── Particle system ───
 (function() {
     const canvas = document.getElementById('authParticles');
     if (!canvas) return;

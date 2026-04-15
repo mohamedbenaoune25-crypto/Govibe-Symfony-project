@@ -1,0 +1,68 @@
+{# templates/emails/new_login_alert.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: 1px solid #e1e8e7; }
+        .header { background: linear-gradient(135deg, #7c2d12 0%, #dc2626 50%, #ef4444 100%); padding: 40px 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0 0 8px; font-size: 24px; letter-spacing: 1px; font-weight: 700; }
+        .header p { color: rgba(255, 255, 255, 0.8); margin: 0; font-size: 14px; }
+        .alert-icon { font-size: 48px; margin-bottom: 15px; }
+        .content { padding: 40px; color: #334155; line-height: 1.7; }
+        .content h2 { color: #1e293b; margin-top: 0; font-size: 20px; }
+        .info-card { background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.15); border-radius: 12px; padding: 20px; margin: 25px 0; }
+        .info-row { display: flex; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { font-weight: 700; color: #64748b; min-width: 120px; }
+        .info-value { color: #1e293b; font-weight: 600; }
+        .action-box { background: rgba(0, 52, 45, 0.04); border-left: 4px solid #00342d; padding: 20px; border-radius: 0 12px 12px 0; margin: 25px 0; }
+        .btn { display: inline-block; padding: 14px 35px; background: linear-gradient(135deg, #00342d, #046b5e); color: #ffffff; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 14px; margin-top: 15px; }
+        .footer { background-color: #f8faf9; padding: 25px; text-align: center; color: #94a3b8; font-size: 12px; border-top: 1px solid #e1e8e7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="alert-icon">⚠️</div>
+            <h1>Alerte de Sécurité</h1>
+            <p>Nouvelle connexion détectée sur votre compte</p>
+        </div>
+        <div class="content">
+            <h2>Bonjour {{ user.prenom }},</h2>
+            <p>Nous avons détecté une nouvelle connexion à votre compte GoVibe depuis un emplacement inhabituel :</p>
+
+            <div class="info-card">
+                <div class="info-row">
+                    <span class="info-label">📍 Localisation</span>
+                    <span class="info-value">{{ city }}, {{ country }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">💻 Appareil</span>
+                    <span class="info-value">{{ device }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">🌐 Adresse IP</span>
+                    <span class="info-value">{{ ip }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📅 Date</span>
+                    <span class="info-value">{{ date|date('d/m/Y à H:i') }}</span>
+                </div>
+            </div>
+
+            <div class="action-box">
+                <strong>🔒 Si c'était vous :</strong> Vous pouvez ignorer cet email en toute sécurité.
+                <br><br>
+                <strong>🚨 Si ce n'était PAS vous :</strong> Changez immédiatement votre mot de passe et vérifiez vos sessions actives dans votre profil GoVibe.
+            </div>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 GoVibe. Votre sécurité est notre priorité.</p>
+            <p>Ceci est un message automatique, merci de ne pas y répondre.</p>
+        </div>
+    </div>
+</body>
+</html>

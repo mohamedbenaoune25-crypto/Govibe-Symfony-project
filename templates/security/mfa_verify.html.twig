@@ -1,0 +1,751 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vérification de Sécurité | GoVibe{% endblock %}
+
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Manrope', sans-serif !important;
+        background: linear-gradient(135deg, #0a1a14 0%, #00261c 50%, #0d0d0d 100%) !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 1rem !important;
+        overflow-x: hidden !important;
+        margin: 0 !important;
+    }
+
+    /* ─── Animated Background ─── */
+    .mfa-bg-grid {
+        position: fixed;
+        top: 0; left: 0; width: 200%; height: 200%;
+        background-size: 60px 60px;
+        background-image:
+            linear-gradient(to right, rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+        transform: perspective(600px) rotateX(55deg) translateY(-80px) translateZ(-300px);
+        animation: gridFlow 25s linear infinite;
+        z-index: 0;
+        pointer-events: none;
+    }
+    @keyframes gridFlow {
+        0% { transform: perspective(600px) rotateX(55deg) translateY(0) translateZ(-300px); }
+        100% { transform: perspective(600px) rotateX(55deg) translateY(60px) translateZ(-300px); }
+    }
+
+    .mfa-orb {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(100px);
+        opacity: 0.3;
+        z-index: 0;
+        pointer-events: none;
+    }
+    .mfa-orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, #10B981, #064E3B); top: -10%; left: -10%; animation: orbDrift1 12s ease-in-out infinite alternate; }
+    .mfa-orb-2 { width: 300px; height: 300px; background: radial-gradient(circle, #fbbf24, #92400e); bottom: -10%; right: -10%; animation: orbDrift2 15s ease-in-out infinite alternate; }
+    @keyframes orbDrift1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(40px, 30px) scale(1.08); } }
+    @keyframes orbDrift2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-30px, -40px) scale(1.12); } }
+
+    /* ─── Main Card ─── */
+    .mfa-card {
+        width: 100%;
+        max-width: 520px;
+        background: rgba(252, 249, 248, 0.97);
+        border-radius: 2rem;
+        padding: 3rem 3.5rem;
+        box-shadow:
+            0 50px 100px -20px rgba(0, 0, 0, 0.6),
+            0 0 0 1px rgba(255, 255, 255, 0.05),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        position: relative;
+        z-index: 10;
+        transform: translateY(20px);
+        opacity: 0;
+        animation: cardReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    }
+    @keyframes cardReveal { to { transform: translateY(0); opacity: 1; } }
+    @media (max-width: 480px) { .mfa-card { padding: 2rem 1.5rem; } }
+
+    /* ─── Shield Animation ─── */
+    .mfa-shield {
+        width: 80px; height: 80px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00342d 0%, #046b5e 100%);
+        display: flex;
+        align-items: center; justify-content: center;
+        box-shadow: 0 15px 40px -10px rgba(0, 52, 45, 0.4);
+        animation: shieldPulse 2s ease-in-out infinite;
+    }
+    .mfa-shield .material-symbols-outlined {
+        font-size: 36px;
+        color: #a0f2e1;
+        font-variation-settings: 'FILL' 1;
+    }
+    @keyframes shieldPulse {
+        0%, 100% { box-shadow: 0 15px 40px -10px rgba(0, 52, 45, 0.4); }
+        50% { box-shadow: 0 15px 40px -10px rgba(0, 52, 45, 0.6), 0 0 0 8px rgba(16, 185, 129, 0.1); }
+    }
+
+    .mfa-title {
+        font-family: 'Noto Serif', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1c1b1b;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    .mfa-subtitle {
+        text-align: center;
+        color: #707975;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.5;
+    }
+    .mfa-email {
+        text-align: center;
+        font-weight: 700;
+        color: #00342d;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    /* ─── Risk Level Badge ─── */
+    .mfa-risk-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin: 0 auto 1.5rem;
+        width: fit-content;
+    }
+    .mfa-risk-badge.high {
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px solid rgba(251, 191, 36, 0.3);
+        color: #92400e;
+    }
+    .mfa-risk-badge.very-high {
+        background: rgba(239, 68, 68, 0.08);
+        border: 1px solid rgba(239, 68, 68, 0.25);
+        color: #991b1b;
+    }
+
+    /* ─── MFA Method Tabs ─── */
+    .mfa-tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 1.5rem;
+        background: #e5e2e1;
+        border-radius: 0.75rem;
+        padding: 4px;
+    }
+    .mfa-tab {
+        flex: 1;
+        padding: 0.7rem 0.75rem;
+        background: transparent;
+        border: none;
+        border-radius: 0.6rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #707975;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem;
+    }
+    .mfa-tab:hover { color: #3f4945; }
+    .mfa-tab.active {
+        background: #fff;
+        color: #00342d;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    .mfa-tab .material-symbols-outlined { font-size: 1rem; }
+
+    .mfa-panel { display: none; }
+    .mfa-panel.active { display: block; animation: panelFadeIn 0.3s ease; }
+    @keyframes panelFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ─── OTP Input ─── */
+    .otp-container {
+        display: flex;
+        gap: 0.6rem;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+    .otp-input {
+        width: 52px; height: 60px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        font-family: 'Manrope', sans-serif;
+        color: #00342d;
+        background: #e5e2e1;
+        border: 2px solid transparent;
+        border-radius: 0.85rem;
+        outline: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        caret-color: #046b5e;
+    }
+    .otp-input:focus {
+        background: #fff;
+        border-color: #046b5e;
+        box-shadow: 0 0 0 4px rgba(4, 107, 94, 0.15);
+        transform: translateY(-2px);
+    }
+    .otp-input.filled {
+        background: rgba(0, 52, 45, 0.06);
+        border-color: rgba(0, 52, 45, 0.15);
+    }
+    .otp-input.error {
+        border-color: #dc2626;
+        background: rgba(220, 38, 38, 0.04);
+        animation: shake 0.4s ease;
+    }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+
+    /* ─── Timer ─── */
+    .mfa-timer {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #707975;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+    }
+    .mfa-timer .material-symbols-outlined { font-size: 1.1rem; }
+    .mfa-timer-value { font-weight: 700; color: #00342d; font-variant-numeric: tabular-nums; }
+    .mfa-timer.expiring .mfa-timer-value { color: #dc2626; }
+
+    /* ─── Buttons ─── */
+    .mfa-btn-verify {
+        width: 100%;
+        padding: 1.1rem;
+        background: linear-gradient(135deg, #00342d 0%, #004d43 70%, #046b5e 100%);
+        color: #fff;
+        border: none;
+        border-radius: 0.85rem;
+        font-size: 1.05rem;
+        font-weight: 700;
+        font-family: 'Manrope', sans-serif;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 12px 28px -8px rgba(0, 52, 45, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+    .mfa-btn-verify::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
+    .mfa-btn-verify:hover::before { transform: translateX(100%); }
+    .mfa-btn-verify:hover { transform: translateY(-2px); box-shadow: 0 18px 40px -10px rgba(0, 52, 45, 0.5); }
+    .mfa-btn-verify:active { transform: translateY(0); }
+    .mfa-btn-verify:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    .mfa-resend {
+        text-align: center;
+        margin-top: 1.5rem;
+    }
+    .mfa-resend-text {
+        font-size: 0.85rem;
+        color: #707975;
+    }
+    .mfa-resend-btn {
+        background: none;
+        border: none;
+        color: #00342d;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        text-decoration: underline;
+        font-family: 'Manrope', sans-serif;
+        transition: color 0.2s;
+    }
+    .mfa-resend-btn:hover { color: #046b5e; }
+    .mfa-resend-btn:disabled { color: #bfc9c4; cursor: not-allowed; text-decoration: none; }
+
+    .mfa-back {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    .mfa-back a {
+        font-size: 0.8rem;
+        color: #707975;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .mfa-back a:hover { color: #00342d; }
+
+    /* ─── Face Webcam (MFA) ─── */
+    .face-webcam-mfa {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: #1c1b1b;
+        border-radius: 1rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    .face-webcam-mfa video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+    }
+    .face-webcam-mfa canvas { display: none; }
+    .face-overlay-mfa {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+    .face-guide-mfa {
+        width: 160px;
+        height: 200px;
+        border: 3px solid rgba(160, 242, 225, 0.5);
+        border-radius: 50%;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+        animation: fgPulse 2s ease-in-out infinite;
+    }
+    .face-guide-mfa.scanning { border-color: #fbbf24; animation: fgScan 1s linear infinite; }
+    .face-guide-mfa.success { border-color: #10B981; animation: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3), 0 0 30px rgba(16, 185, 129, 0.5); }
+    .face-guide-mfa.error { border-color: #ef4444; animation: none; }
+    @keyframes fgPulse { 0%, 100% { border-color: rgba(160, 242, 225, 0.5); } 50% { border-color: rgba(160, 242, 225, 0.9); } }
+    @keyframes fgScan { 0% { border-color: #fbbf24; } 50% { border-color: #f59e0b; } 100% { border-color: #fbbf24; } }
+
+    .face-status-mfa {
+        position: absolute;
+        bottom: 0.75rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: #a0f2e1;
+        padding: 0.4rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        backdrop-filter: blur(8px);
+        white-space: nowrap;
+    }
+    .face-status-mfa.error { color: #fca5a5; }
+    .face-status-mfa.success { color: #6ee7b7; }
+
+    /* ─── Alert ─── */
+    .mfa-alert {
+        padding: 0.85rem 1rem;
+        border-radius: 0.75rem;
+        font-size: 0.85rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .mfa-alert-error {
+        background: rgba(186, 26, 26, 0.08);
+        border: 1px solid rgba(186, 26, 26, 0.2);
+        color: #93000a;
+    }
+    .mfa-alert-success {
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        color: #005046;
+    }
+
+    /* Hide base template elements */
+    .govibe-navbar, .govibe-footer, .container.position-relative { display: none !important; }
+    .floating-element { display: none !important; }
+</style>
+{% endblock %}
+
+{% block body %}
+<!-- Background Effects -->
+<div class="mfa-bg-grid"></div>
+<div class="mfa-orb mfa-orb-1"></div>
+<div class="mfa-orb mfa-orb-2"></div>
+
+<div class="mfa-card">
+    <!-- Shield Icon -->
+    <div class="mfa-shield">
+        <span class="material-symbols-outlined">verified_user</span>
+    </div>
+
+    <h2 class="mfa-title">Vérification requise</h2>
+    <p class="mfa-subtitle">Choisissez votre méthode de vérification</p>
+    <p class="mfa-email">{{ email }}</p>
+
+    <!-- Risk Level Badge -->
+    {% if auth_level == 'VERY_HIGH' %}
+        <div class="mfa-risk-badge very-high">
+            <span class="material-symbols-outlined" style="font-size:1rem;">warning</span>
+            Risque très élevé détecté
+        </div>
+    {% else %}
+        <div class="mfa-risk-badge high">
+            <span class="material-symbols-outlined" style="font-size:1rem;">shield</span>
+            Vérification de sécurité
+        </div>
+    {% endif %}
+
+    <!-- Flash Messages -->
+    {% for message in app.flashes('success') %}
+        <div class="mfa-alert mfa-alert-success">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;">check_circle</span>
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="mfa-alert mfa-alert-error">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;">error</span>
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% if error %}
+        <div class="mfa-alert mfa-alert-error">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;">warning</span>
+            {{ error }}
+        </div>
+    {% endif %}
+
+    <!-- ═══ MFA Method Tabs ═══ -->
+    <div class="mfa-tabs">
+        <button type="button" class="mfa-tab active" data-tab="otp" id="mfa-tab-otp">
+            <span class="material-symbols-outlined">mail</span>
+            Code OTP
+        </button>
+        {% if has_face_enrolled %}
+        <button type="button" class="mfa-tab" data-tab="face" id="mfa-tab-face">
+            <span class="material-symbols-outlined">face</span>
+            Face ID
+        </button>
+        {% endif %}
+    </div>
+
+    <!-- ═══ Panel 1: OTP Verification ═══ -->
+    <div class="mfa-panel active" id="mfa-panel-otp">
+        <form method="post" action="{{ path('app_mfa_verify') }}" id="mfa-form">
+            <div class="otp-container" id="otp-container">
+                <input type="text" name="digit_1" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" autofocus>
+                <input type="text" name="digit_2" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" name="digit_3" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" name="digit_4" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" name="digit_5" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+                <input type="text" name="digit_6" class="otp-input" maxlength="1" inputmode="numeric" pattern="[0-9]">
+            </div>
+
+            <!-- Timer -->
+            <div class="mfa-timer" id="mfa-timer">
+                <span class="material-symbols-outlined">timer</span>
+                Code valide pendant <span class="mfa-timer-value" id="timer-value">05:00</span>
+            </div>
+
+            <button type="submit" class="mfa-btn-verify" id="btn-verify">
+                <span class="material-symbols-outlined" style="font-size:1.2rem;">verified_user</span>
+                Vérifier le code
+            </button>
+        </form>
+
+        <!-- Resend -->
+        <div class="mfa-resend">
+            <span class="mfa-resend-text">Vous n'avez pas reçu le code ? </span>
+            <form method="post" action="{{ path('app_mfa_resend') }}" style="display:inline;">
+                <button type="submit" class="mfa-resend-btn" id="btn-resend">Renvoyer le code</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ═══ Panel 2: Face ID Verification ═══ -->
+    {% if has_face_enrolled %}
+    <div class="mfa-panel" id="mfa-panel-face">
+        <div class="face-webcam-mfa" id="faceWebcamMfa">
+            <video id="faceVideoMfa" autoplay playsinline muted></video>
+            <canvas id="faceCanvasMfa"></canvas>
+            <div class="face-overlay-mfa">
+                <div class="face-guide-mfa" id="faceGuideMfa"></div>
+            </div>
+            <div class="face-status-mfa" id="faceStatusMfa">Positionnez votre visage</div>
+        </div>
+
+        <button type="button" class="mfa-btn-verify" id="btnFaceMfa" onclick="verifyFaceMfa()">
+            <span class="material-symbols-outlined" style="font-size:1.2rem;">face</span>
+            Vérifier mon visage
+        </button>
+
+        <div id="faceMfaError" class="mfa-alert mfa-alert-error" style="display:none; margin-top:1rem;">
+            <span class="material-symbols-outlined" style="font-size:1.1rem;">error</span>
+            <span id="faceMfaErrorText"></span>
+        </div>
+
+        <div style="text-align:center; margin-top:1rem;">
+            <button type="button" class="mfa-resend-btn" onclick="switchToOtp()">
+                Utiliser le code OTP à la place
+            </button>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back to login -->
+    <div class="mfa-back">
+        <a href="{{ path('app_login') }}">
+            <span class="material-symbols-outlined" style="font-size:0.9rem;vertical-align:middle;">arrow_back</span>
+            Retour à la connexion
+        </a>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const inputs = document.querySelectorAll('.otp-input');
+    const form = document.getElementById('mfa-form');
+    const btnVerify = document.getElementById('btn-verify');
+
+    // ─── Tab Switching ───
+    document.querySelectorAll('.mfa-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.mfa-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.mfa-panel').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('mfa-panel-' + tab.dataset.tab).classList.add('active');
+
+            if (tab.dataset.tab === 'face') {
+                startMfaWebcam();
+            } else {
+                stopMfaWebcam();
+            }
+        });
+    });
+
+    // ─── OTP Input Auto-focus & Navigation ───
+    inputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            const val = e.target.value;
+            e.target.value = val.replace(/[^0-9]/g, '');
+
+            if (e.target.value && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+
+            if (e.target.value) {
+                e.target.classList.add('filled');
+                e.target.classList.remove('error');
+            } else {
+                e.target.classList.remove('filled');
+            }
+
+            const allFilled = [...inputs].every(i => i.value.length === 1);
+            if (allFilled) {
+                btnVerify.focus();
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                inputs[index - 1].focus();
+                inputs[index - 1].value = '';
+                inputs[index - 1].classList.remove('filled');
+            }
+            if (e.key === 'ArrowLeft' && index > 0) {
+                inputs[index - 1].focus();
+            }
+            if (e.key === 'ArrowRight' && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+        });
+
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pasteData = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '');
+            if (pasteData.length === 6) {
+                inputs.forEach((inp, i) => {
+                    inp.value = pasteData[i] || '';
+                    if (inp.value) inp.classList.add('filled');
+                });
+                inputs[5].focus();
+            }
+        });
+
+        input.addEventListener('focus', () => {
+            input.select();
+        });
+    });
+
+    // ─── Countdown Timer ───
+    let remaining = {{ expires_in }};
+    const timerEl = document.getElementById('timer-value');
+    const timerWrap = document.getElementById('mfa-timer');
+
+    function updateTimer() {
+        if (remaining <= 0) {
+            timerEl.textContent = '00:00';
+            timerWrap.classList.add('expiring');
+            btnVerify.disabled = true;
+            btnVerify.textContent = 'Code expiré';
+            return;
+        }
+
+        const mins = Math.floor(remaining / 60);
+        const secs = remaining % 60;
+        timerEl.textContent = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+
+        if (remaining <= 60) {
+            timerWrap.classList.add('expiring');
+        }
+
+        remaining--;
+        setTimeout(updateTimer, 1000);
+    }
+    updateTimer();
+
+    // ─── Form Validation ───
+    form.addEventListener('submit', (e) => {
+        const code = [...inputs].map(i => i.value).join('');
+        if (code.length !== 6) {
+            e.preventDefault();
+            inputs.forEach(i => {
+                if (!i.value) i.classList.add('error');
+            });
+            return;
+        }
+    });
+});
+
+// ─── Face ID MFA Functions ───
+let mfaFaceStream = null;
+
+async function startMfaWebcam() {
+    const video = document.getElementById('faceVideoMfa');
+    const status = document.getElementById('faceStatusMfa');
+
+    if (mfaFaceStream) return;
+
+    try {
+        mfaFaceStream = await navigator.mediaDevices.getUserMedia({
+            video: { width: 640, height: 480, facingMode: 'user' }
+        });
+        video.srcObject = mfaFaceStream;
+        status.textContent = 'Positionnez votre visage';
+        status.className = 'face-status-mfa';
+    } catch (err) {
+        status.textContent = 'Impossible d\'accéder à la caméra';
+        status.className = 'face-status-mfa error';
+    }
+}
+
+function stopMfaWebcam() {
+    if (mfaFaceStream) {
+        mfaFaceStream.getTracks().forEach(track => track.stop());
+        mfaFaceStream = null;
+    }
+}
+
+async function verifyFaceMfa() {
+    const video = document.getElementById('faceVideoMfa');
+    const canvas = document.getElementById('faceCanvasMfa');
+    const guide = document.getElementById('faceGuideMfa');
+    const status = document.getElementById('faceStatusMfa');
+    const btn = document.getElementById('btnFaceMfa');
+    const errorDiv = document.getElementById('faceMfaError');
+    const errorText = document.getElementById('faceMfaErrorText');
+
+    errorDiv.style.display = 'none';
+
+    if (!mfaFaceStream) {
+        await startMfaWebcam();
+        await new Promise(r => setTimeout(r, 1000));
+    }
+
+    // Capture frame
+    guide.className = 'face-guide-mfa scanning';
+    status.textContent = 'Analyse en cours...';
+    status.className = 'face-status-mfa';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.2rem;">hourglass_top</span> Vérification...';
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+
+    try {
+        const response = await fetch('{{ path("app_mfa_verify_face") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Image }),
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.match && data.redirect) {
+            guide.className = 'face-guide-mfa success';
+            status.textContent = '✅ Vérifié ! (' + data.confidence + '%)';
+            status.className = 'face-status-mfa success';
+
+            setTimeout(() => {
+                window.location.href = data.redirect;
+            }, 800);
+            return;
+        }
+
+        // Failed
+        guide.className = 'face-guide-mfa error';
+        status.textContent = data.message || 'Non reconnu';
+        status.className = 'face-status-mfa error';
+        errorDiv.style.display = 'flex';
+        errorText.textContent = data.message || 'Visage non reconnu.';
+
+        setTimeout(() => {
+            guide.className = 'face-guide-mfa';
+            status.textContent = 'Positionnez votre visage';
+            status.className = 'face-status-mfa';
+        }, 3000);
+
+    } catch (err) {
+        guide.className = 'face-guide-mfa error';
+        status.textContent = 'Erreur réseau';
+        status.className = 'face-status-mfa error';
+        errorDiv.style.display = 'flex';
+        errorText.textContent = 'Erreur de connexion.';
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.2rem;">face</span> Vérifier mon visage';
+}
+
+function switchToOtp() {
+    stopMfaWebcam();
+    document.querySelectorAll('.mfa-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.mfa-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('mfa-tab-otp').classList.add('active');
+    document.getElementById('mfa-panel-otp').classList.add('active');
+}
+</script>
+{% endblock %}

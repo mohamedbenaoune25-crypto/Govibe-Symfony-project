@@ -8,6 +8,8 @@ security:
       entity:
         class: App\Entity\Personne
         property: email
+    oauth_user_provider:
+      id: App\Security\GoogleOAuthUserProvider
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -15,11 +17,17 @@ security:
     main:
       lazy: true
       provider: app_user_provider
-      form_login:
+      entry_point: App\Security\AdaptiveMFAAuthenticator
+      custom_authenticators:
+        - App\Security\AdaptiveMFAAuthenticator
+      oauth:
+        resource_owners:
+          google: /connect/check-google
         login_path: app_login
-        check_path: app_login
-        enable_csrf: true
-        default_target_path: app_home
+        use_forward: false
+        failure_path: app_login
+        oauth_user_provider:
+          service: App\Security\GoogleOAuthUserProvider
       logout:
         path: app_logout
         # where to redirect after logout
@@ -28,6 +36,9 @@ security:
   # Easy way to control access for large sections of your site
   # Note: Only the *first* access control that matches will be used
   access_control:
+    - { path: ^/connect, roles: PUBLIC_ACCESS }
+    - { path: ^/login, roles: PUBLIC_ACCESS }
+    - { path: ^/register, roles: PUBLIC_ACCESS }
     - { path: ^/admin, roles: ROLE_ADMIN }
     - { path: ^/postes, roles: [PUBLIC_ACCESS] } # Allow viewing posts, but maybe restrict creation/edit later
 
