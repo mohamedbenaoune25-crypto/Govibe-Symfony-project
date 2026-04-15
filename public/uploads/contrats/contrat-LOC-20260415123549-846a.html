@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            color: #333;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #013220;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #013220;
+            margin: 0;
+            font-size: 28px;
+        }
+        .header p {
+            color: #50C878;
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        .content {
+            margin: 20px 0;
+        }
+        .section-title {
+            background-color: #013220;
+            color: white;
+            padding: 10px 15px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .contract-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .info-box {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .info-label {
+            color: #666;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .info-value {
+            color: #013220;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 3px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th {
+            background-color: #50C878;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 12px;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+        }
+        .total-row {
+            background-color: #f5f3e7;
+            font-weight: bold;
+        }
+        .conditions-box {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-left: 4px solid #013220;
+            margin-top: 30px;
+            font-size: 11px;
+        }
+        .conditions-box h3 {
+            margin-top: 0;
+            color: #013220;
+        }
+        .conditions-box p {
+            margin: 8px 0;
+            line-height: 1.5;
+        }
+        .signature-section {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .signature-box {
+            width: 45%;
+            border-top: 1px solid #333;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 12px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #999;
+            font-size: 10px;
+        }
+        .highlight {
+            color: #50C878;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>CONTRAT DE LOCATION DE VOITURE</h1>
+        <p>GoVibe - Gestion de Locations Automobiles</p>
+    </div>
+
+    <div class="content">
+        <div class="section-title">RÉFÉRENCES DU CONTRAT</div>
+        <div class="contract-info">
+            <div class="info-box">
+                <div class="info-label">Numéro de Contrat</div>
+                <div class="info-value">LOC-20260415123549-846a</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Date de Génération</div>
+                <div class="info-value">15/04/2026 12:35</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Statut</div>
+                <div class="info-value">EN_ATTENTE</div>
+            </div>
+        </div>
+
+        <div class="section-title">INFORMATIONS CLIENT</div>
+                <div class="contract-info">
+            <div class="info-box">
+                <div class="info-label">Nom Complet</div>
+                <div class="info-value">test test</div>
+            </div>
+            <div class="info-box">
+                <div class="info-label">Adresse Email</div>
+                <div class="info-value">test@test.com</div>
+            </div>
+        </div>
+
+        <div class="section-title">VÉHICULE LOUÉ</div>
+                <table>
+            <tr>
+                <th style="width: 25%">Marque</th>
+                <th style="width: 25%">Modèle</th>
+                <th style="width: 25%">Matricule</th>
+                <th style="width: 25%">Année</th>
+            </tr>
+            <tr>
+                <td>Toyota</td>
+                <td>Corolla</td>
+                <td><span class="highlight">124 TN 54</span></td>
+                <td>2022</td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <th>Carburant</th>
+                <th>Agence</th>
+            </tr>
+            <tr>
+                <td>Essence</td>
+                <td>AVIS Car Rental</td>
+            </tr>
+        </table>
+
+        <div class="section-title">PÉRIODE DE LOCATION</div>
+        <table>
+            <tr>
+                <th style="width: 33%">Date Début</th>
+                <th style="width: 33%">Date Fin</th>
+                <th style="width: 34%">Nombre de Jours</th>
+            </tr>
+            <tr>
+                <td>27/04/2026</td>
+                <td>30/04/2026</td>
+                <td>4 jour(s)</td>
+            </tr>
+        </table>
+
+        <div class="section-title">TARIFICATION</div>
+        <table>
+            <tr>
+                <th style="width: 40%">Description</th>
+                <th style="width: 30%; text-align: right;">Quantité</th>
+                <th style="width: 30%; text-align: right;">Total (DT)</th>
+            </tr>
+            <tr>
+                <td>Location de Toyota Corolla</td>
+                <td style="text-align: right;">4 jour(s)</td>
+                <td style="text-align: right;">360.00</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="2">MONTANT TOTAL À PAYER</td>
+                <td style="text-align: right;">360.00 DT</td>
+            </tr>
+        </table>
+
+        <div class="conditions-box">
+            <h3>CONDITIONS GÉNÉRALES DE LOCATION</h3>
+            <p>
+                <strong>1. Responsabilités du Locataire:</strong><br>
+                Le locataire se déclare propriétaire et responsable de la garde du véhicule pendant toute la période de location. 
+                Il s'engage à utiliser le véhicule conformément aux lois et réglementations en vigueur.
+            </p>
+            <p>
+                <strong>2. Horaires de Prise en Charge et Restitution:</strong><br>
+                - Prise en charge: <span class="highlight">09:00 AM</span><br>
+                - Restitution: <span class="highlight">18:00 (6:00 PM)</span>
+            </p>
+            <p>
+                <strong>3. Modalités de Paiement:</strong><br>
+                Le montant total doit être payé avant la prise en charge du véhicule. Acceptons espèces et cartes bancaires.
+            </p>
+            <p>
+                <strong>4. Dégâts et Assurance:</strong><br>
+                Le locataire est responsable de tout dégât causé au véhicule. Une franchise de 500 DT s'applique. 
+                L'assurance tous risques est disponible à 150 DT par jour.
+            </p>
+            <p>
+                <strong>5. Pénalités de Retard:</strong><br>
+                Un retard de plus d'une heure entraîne des frais supplémentaires de 50 DT par heure complète.
+            </p>
+            <p>
+                <strong>6. Annulation:</strong><br>
+                Les demandes d'annulation doivent être faites au moins 48 heures à l'avance pour un remboursement complet.
+            </p>
+        </div>
+
+        <div class="signature-section">
+            <div class="signature-box">
+                <p><strong>Pour GoVibe</strong></p>
+                <p style="height: 50px; border-bottom: 1px solid #333;"></p>
+                <p>Signature et Cachet</p>
+                <p>15/04/2026</p>
+            </div>
+            <div class="signature-box">
+                <p><strong>Le Locataire</strong></p>
+                <p style="height: 50px; border-bottom: 1px solid #333;"></p>
+                <p>test test</p>
+                <p>15/04/2026</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Ce document est généré automatiquement par le système GoVibe. Pour toute question, contactez-nous à support@govibe.tn</p>
+            <p>Document généré le 15/04/2026 12:35</p>
+        </div>
+    </div>
+</body>
+</html>

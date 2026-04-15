@@ -134,6 +134,38 @@
                 </div>
             </div>
 
+            {% if voiture.getLatitude() and voiture.getLongitude() %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header" style="background-color: #50C878; border: none;">
+                        <h5 class="mb-0" style="color: white;">
+                            <i class="bi bi-signpost-split"></i> Distance et Itineraire
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">API gratuite sans cle: OpenStreetMap + OSRM.</p>
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button type="button" class="btn btn-outline-primary" id="adminLocateRouteBtn">
+                                <i class="bi bi-crosshair"></i> Calculer depuis ma position
+                            </button>
+                            <span class="small text-muted" id="adminRouteStatus">Aucun calcul effectue</span>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-6">
+                                <div class="border rounded p-2 bg-light">
+                                    <strong>Distance:</strong> <span id="adminRouteDistance">-</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border rounded p-2 bg-light">
+                                    <strong>Duree:</strong> <span id="adminRouteDuration">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="adminCarMap"></div>
+                    </div>
+                </div>
+            {% endif %}
+
             <!-- Description -->
             {% if voiture.description %}
                 <div class="card border-0 shadow-sm mb-4">
@@ -218,5 +250,115 @@
         color: #333;
         font-size: 1rem;
     }
+
+    #adminCarMap {
+        height: 360px;
+        border-radius: 10px;
+        border: 1px solid #dfe5e9;
+    }
 </style>
+
+{% if voiture.getLatitude() and voiture.getLongitude() %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const destinationLat = parseFloat('{{ voiture.getLatitude() }}');
+    const destinationLng = parseFloat('{{ voiture.getLongitude() }}');
+    const locateBtn = document.getElementById('adminLocateRouteBtn');
+    const statusEl = document.getElementById('adminRouteStatus');
+    const distanceEl = document.getElementById('adminRouteDistance');
+    const durationEl = document.getElementById('adminRouteDuration');
+
+    const map = L.map('adminCarMap').setView([destinationLat, destinationLng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const carMarker = L.marker([destinationLat, destinationLng]).addTo(map)
+        .bindPopup('Voiture: {{ voiture.marque|e('js') }} {{ voiture.modele|e('js') }}')
+        .openPopup();
+
+    let userMarker = null;
+    let routeLayer = null;
+
+    function formatDuration(seconds) {
+        const minutes = Math.round(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        if (hours <= 0) {
+            return minutes + ' min';
+        }
+        return hours + ' h ' + remainingMinutes + ' min';
+    }
+
+    async function drawRoute(userLat, userLng) {
+        const url = 'https://router.project-osrm.org/route/v1/driving/'
+            + userLng + ',' + userLat + ';' + destinationLng + ',' + destinationLat
+            + '?overview=full&geometries=geojson';
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.routes || !data.routes.length) {
+            throw new Error('No route');
+        }
+
+        const route = data.routes[0];
+        if (routeLayer) {
+            map.removeLayer(routeLayer);
+        }
+
+        routeLayer = L.geoJSON(route.geometry, {
+            style: { color: '#0d6efd', weight: 5, opacity: 0.8 }
+        }).addTo(map);
+
+        distanceEl.textContent = (route.distance / 1000).toFixed(2) + ' km';
+        durationEl.textContent = formatDuration(route.duration);
+
+        const bounds = L.latLngBounds([
+            [userLat, userLng],
+            [destinationLat, destinationLng]
+        ]);
+        map.fitBounds(bounds.pad(0.2));
+    }
+
+    locateBtn?.addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            statusEl.textContent = 'Geolocalisation non supportee.';
+            return;
+        }
+
+        statusEl.textContent = 'Localisation en cours...';
+        navigator.geolocation.getCurrentPosition(async function (position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+
+            userMarker = L.marker([userLat, userLng]).addTo(map)
+                .bindPopup('Votre position');
+
+            try {
+                await drawRoute(userLat, userLng);
+                statusEl.textContent = 'Itineraire calcule avec succes.';
+            } catch (error) {
+                statusEl.textContent = 'Impossible de calculer l\'itineraire actuellement.';
+            }
+        }, function () {
+            statusEl.textContent = 'Permission de localisation refusee ou indisponible.';
+        }, {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0,
+        });
+    });
+
+    setTimeout(function () { map.invalidateSize(); }, 200);
+});
+</script>
+{% endif %}
 {% endblock %}
