@@ -39,20 +39,26 @@ class LocationType extends AbstractType
                         number_format(floatval($voiture->getPrixJour()), 2)
                     );
                 },
+                'choice_attr' => function (Voiture $voiture): array {
+                    $statut = (string) $voiture->getStatut();
+
+                    return [
+                        'data-statut' => $statut,
+                        'data-is-disponible' => $statut === 'DISPONIBLE' ? '1' : '0',
+                    ];
+                },
                 'query_builder' => function(EntityRepository $er) {
                     return $er->createQueryBuilder('v')
-                        ->where('v.statut = :statut')
-                        ->setParameter('statut', 'DISPONIBLE')
                         ->orderBy('v.marque', 'ASC')
                         ->addOrderBy('v.modele', 'ASC');
                 },
                 'placeholder' => 'Sélectionner une voiture',
                 'label' => 'Voiture',
-                'help' => 'Sélectionnez la voiture que vous souhaitez louer',
+                'help' => 'Sélectionnez une voiture puis vérifiez son état avant de valider la location',
                 'attr' => [
                     'class' => 'form-select',
                     'data-bs-toggle' => 'tooltip',
-                    'title' => 'Les voitures affichées sont uniquement celles disponibles'
+                    'title' => 'L\'état de la voiture sélectionnée est affiché sous le champ'
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez sélectionner une voiture']),
@@ -140,6 +146,14 @@ class LocationType extends AbstractType
                     if (is_string($voitureId)) {
                         $voiture = $voitureRepository->find((int) $voitureId);
                         if ($voiture) {
+                            if ($voiture->getStatut() !== 'DISPONIBLE') {
+                                $form->get('voiture')->addError(
+                                    new FormError('Cette voiture est ' . strtolower((string) $voiture->getStatut()) . '. Veuillez choisir une voiture disponible.')
+                                );
+                                $event->setData($data);
+                                return;
+                            }
+
                             $prixJour = floatval($voiture->getPrixJour());
                             $montantTotal = $prixJour * $nbJours;
                             $data['montantTotal'] = round($montantTotal, 2);

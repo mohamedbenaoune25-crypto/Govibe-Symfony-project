@@ -20,6 +20,19 @@
         </div>
     </div>
 
+    <div class="alert alert-info d-flex flex-wrap align-items-center justify-content-between gap-2" role="alert">
+        <div>
+            <i class="bi bi-geo-alt"></i>
+            Activez votre position pour afficher la distance entre vous et toutes les voitures.
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-outline-primary btn-sm" id="adminLocateBtn">
+                <i class="bi bi-crosshair"></i> Utiliser ma position
+            </button>
+            <small class="text-muted" id="adminDistanceStatus">Position non definie</small>
+        </div>
+    </div>
+
     <!-- Statistiques -->
     <div class="row mb-4">
         <div class="col-md-3">
@@ -189,6 +202,7 @@
                             </a>
                         </th>
                         <th>Statut</th>
+                        <th>Distance</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -218,6 +232,13 @@
                                     <span class="badge" style="background-color: {{ statutColor }};">
                                         {{ statutLabel }}
                                     </span>
+                                </td>
+                                <td>
+                                    {% if voiture.latitude and voiture.longitude %}
+                                        <span class="distance-cell" data-lat="{{ voiture.latitude }}" data-lng="{{ voiture.longitude }}">-</span>
+                                    {% else %}
+                                        <span class="text-muted">Coordonnees manquantes</span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
@@ -268,7 +289,7 @@
                         {% endfor %}
                     {% else %}
                         <tr>
-                            <td colspan="7" class="text-center py-4">
+                            <td colspan="8" class="text-center py-4">
                                 <i class="bi bi-inbox" style="font-size: 2rem; color: #CCC;"></i>
                                 <p class="mt-2 text-muted">Aucune voiture trouvée</p>
                             </td>
@@ -335,4 +356,66 @@
         background-color: #F5F3E7;
     }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const locateBtn = document.getElementById('adminLocateBtn');
+    const statusEl = document.getElementById('adminDistanceStatus');
+    const distanceCells = document.querySelectorAll('.distance-cell');
+
+    function toRad(value) {
+        return value * Math.PI / 180;
+    }
+
+    function haversineKm(lat1, lng1, lat2, lng2) {
+        const earthRadiusKm = 6371;
+        const dLat = toRad(lat2 - lat1);
+        const dLng = toRad(lng2 - lng1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+            + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2))
+            * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return earthRadiusKm * c;
+    }
+
+    function renderDistances(userLat, userLng) {
+        distanceCells.forEach(function (cell) {
+            const carLat = parseFloat(cell.dataset.lat || '');
+            const carLng = parseFloat(cell.dataset.lng || '');
+
+            if (Number.isNaN(carLat) || Number.isNaN(carLng)) {
+                cell.textContent = 'Coordonnees invalides';
+                return;
+            }
+
+            const km = haversineKm(userLat, userLng, carLat, carLng);
+            cell.textContent = km.toFixed(2) + ' km';
+        });
+    }
+
+    locateBtn?.addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            statusEl.textContent = 'Geolocalisation non supportee par le navigateur.';
+            return;
+        }
+
+        statusEl.textContent = 'Recuperation de votre position...';
+
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+
+            renderDistances(userLat, userLng);
+            statusEl.textContent = 'Distance calculee a partir de votre position actuelle.';
+        }, function () {
+            statusEl.textContent = 'Impossible d\'obtenir votre position.';
+        }, {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0,
+        });
+    });
+
+});
+</script>
 {% endblock %}

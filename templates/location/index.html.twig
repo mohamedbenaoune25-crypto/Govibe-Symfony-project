@@ -202,6 +202,99 @@ body {
     box-shadow: 0 12px 30px -6px rgba(0, 52, 45, 0.5);
 }
 
+/* ─── AI Car Search ─── */
+.gv-ai-shell {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(0, 52, 45, 0.06);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 52, 45, 0.08);
+    margin-bottom: 2rem;
+}
+
+.gv-ai-title {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.15rem;
+    color: #00342d;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+}
+
+.gv-ai-sub {
+    color: #546067;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.gv-ai-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto;
+    gap: 0.75rem;
+    align-items: end;
+}
+
+@media (max-width: 768px) {
+    .gv-ai-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+.gv-ai-results {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.gv-ai-result-card {
+    border: 1px solid rgba(0, 52, 45, 0.08);
+    border-radius: 1rem;
+    padding: 0.9rem 1rem;
+    background: rgba(0, 52, 45, 0.02);
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    gap: 0.7rem;
+    align-items: center;
+}
+
+@media (max-width: 992px) {
+    .gv-ai-result-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+.gv-ai-col-label {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #546067;
+    font-weight: 700;
+}
+
+.gv-ai-col-value {
+    font-size: 0.9rem;
+    color: #00342d;
+    font-weight: 700;
+}
+
+.gv-ai-source-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: rgba(0, 52, 45, 0.08);
+    color: #00342d;
+}
+
+.gv-ai-empty {
+    color: #546067;
+    font-size: 0.9rem;
+    padding: 0.75rem 0;
+}
+
 /* ─── Results Count ─── */
 .gv-results-info {
     color: #546067;
@@ -504,6 +597,31 @@ body {
         </form>
     </div>
 
+    <div class="gv-ai-shell">
+        <div class="gv-ai-title">Assistant IA: trouver une voiture disponible</div>
+        <div class="gv-ai-sub">Saisissez une localisation (ex: Tunis, Sousse) et un budget max pour obtenir une liste intelligente.</div>
+
+        <form id="gvAiSearchForm" class="gv-ai-form">
+            <div>
+                <label class="gv-filter-label">Localisation</label>
+                <input type="text" id="gvAiLocation" class="gv-filter-input" placeholder="Tunis, Sousse, Sfax..." required>
+            </div>
+            <div>
+                <label class="gv-filter-label">Prix max (DT/jour)</label>
+                <input type="number" id="gvAiMaxPrice" class="gv-filter-input" min="0" step="1" placeholder="200">
+            </div>
+            <div>
+                <button type="submit" class="gv-filter-btn" id="gvAiSearchBtn">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">auto_awesome</span>
+                    Rechercher
+                </button>
+            </div>
+        </form>
+
+        <div id="gvAiStatus" class="gv-ai-empty">Aucune recherche lancée.</div>
+        <div id="gvAiResults" class="gv-ai-results" aria-live="polite"></div>
+    </div>
+
     <!-- Flash Messages -->
     {% for message in app.flashes('success') %}
     <div class="alert alert-success rounded-4 border-0 mb-4" style="background:#eafaf1; color:#005046; border:1px solid #a0f2e1!important; font-weight:600;">
@@ -670,6 +788,77 @@ document.addEventListener('DOMContentLoaded', function() {
             observer.observe(el);
         });
     }
+
+    const aiForm = document.getElementById('gvAiSearchForm');
+    const aiLocation = document.getElementById('gvAiLocation');
+    const aiMaxPrice = document.getElementById('gvAiMaxPrice');
+    const aiStatus = document.getElementById('gvAiStatus');
+    const aiResults = document.getElementById('gvAiResults');
+    const aiEndpoint = '{{ path('app_api_ai_cars_recommendations') }}';
+
+    function renderAiResults(cars) {
+        aiResults.innerHTML = '';
+
+        if (!cars.length) {
+            aiResults.innerHTML = '<div class="gv-ai-empty">Aucune voiture disponible pour ces critères.</div>';
+            return;
+        }
+
+        cars.forEach(function(car) {
+            const canRent = car.rentable !== false;
+            const actionHtml = canRent
+                ? '<a href="{{ path('app_location_new') }}?recommendedCar=' + car.id + '" class="gv-action-btn gv-action-view" style="justify-content:center;">Louer</a>'
+                : '<span class="gv-ai-source-chip">Externe: affichage seul</span>';
+
+            const card = document.createElement('div');
+            card.className = 'gv-ai-result-card';
+            card.innerHTML = ''
+                + '<div><div class="gv-ai-col-label">Modele</div><div class="gv-ai-col-value">' + car.modele + '</div></div>'
+                + '<div><div class="gv-ai-col-label">Prix</div><div class="gv-ai-col-value">' + Number(car.prix).toFixed(2) + ' DT/jour</div></div>'
+                + '<div><div class="gv-ai-col-label">Agence</div><div class="gv-ai-col-value">' + car.agence + '</div></div>'
+                + '<div><div class="gv-ai-col-label">Localisation</div><div class="gv-ai-col-value">' + car.localisation + ' <span class="gv-ai-source-chip">' + (car.source || 'unknown') + '</span></div></div>'
+                + '<div>' + actionHtml + '</div>';
+            aiResults.appendChild(card);
+        });
+    }
+
+    aiForm?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const locationValue = (aiLocation?.value || '').trim();
+        const maxPriceValue = (aiMaxPrice?.value || '').trim();
+
+        if (!locationValue) {
+            aiStatus.textContent = 'Veuillez saisir une localisation.';
+            return;
+        }
+
+        aiStatus.textContent = 'Recherche IA en cours...';
+        aiResults.innerHTML = '';
+
+        try {
+            const query = new URLSearchParams({
+                location: locationValue,
+                maxPrice: maxPriceValue || '0'
+            });
+            const response = await fetch(aiEndpoint + '?' + query.toString(), {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if (!response.ok) {
+                throw new Error('API error');
+            }
+
+            const payload = await response.json();
+            const provider = payload.provider || 'local-fallback';
+            const externalCount = Number(payload.externalCount || 0);
+            aiStatus.textContent = payload.count + ' voiture(s) recommandee(s) pour "' + locationValue + '" (IA: ' + provider + ', externes: ' + externalCount + ').';
+            renderAiResults(payload.cars || []);
+        } catch (error) {
+            aiStatus.textContent = 'La recherche IA est indisponible pour le moment. Veuillez reessayer.';
+        }
+    });
 });
 </script>
 {% endblock %}

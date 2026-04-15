@@ -4,6 +4,7 @@
 {{ parent() }}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
 <style>
 body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 24}
 .gv-hero{position:relative;padding:170px 0 110px;background:linear-gradient(160deg,#00342d,#013220 40%,#001a12);overflow:hidden;text-align:center;border-radius:0 0 3rem 3rem;box-shadow:0 20px 50px rgba(0,52,45,.15)}
@@ -45,6 +46,10 @@ body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.ma
 .gv-ao{background:transparent;color:#546067;border:1.5px solid rgba(0,52,45,.08)}.gv-ao:hover{border-color:rgba(0,52,45,.2);background:rgba(0,52,45,.03);color:#00342d}
 .gv-ag{background:linear-gradient(135deg,#00342d,#046b5e);color:#fff;box-shadow:0 6px 15px rgba(0,52,45,.25)}.gv-ag:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,52,45,.35);color:#fff}
 .gv-ad{background:rgba(186,26,26,.06);color:#93000a;border:1px solid rgba(186,26,26,.1)}.gv-ad:hover{background:#ba1a1a;color:#fff;border-color:transparent}
+.gv-map{height:360px;border:1px solid rgba(0,52,45,.1);border-radius:1rem}
+.gv-map-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.75rem;margin:1rem 0}
+.gv-map-stat{background:rgba(0,52,45,.03);border:1px solid rgba(0,52,45,.06);border-radius:.8rem;padding:.75rem .9rem}
+.gv-map-status{font-size:.88rem;color:#546067}
 </style>
 {% endblock %}
 {% block body %}
@@ -109,6 +114,18 @@ body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.ma
             <a href="{{ path('app_location_excel', {id: location.idLocation}) }}" class="gv-doc"><span class="material-symbols-outlined" style="font-size:1rem">table_chart</span> Détails Excel</a>
         </div>
     </div>
+    {% if voiture.latitude and voiture.longitude %}
+    <div class="gv-card">
+        <div class="gv-ct"><span class="material-symbols-outlined">map</span> Distance et Itineraire vers la voiture</div>
+        <p class="gv-map-status" id="clientMapStatus">Utilisez votre position pour calculer l'itineraire. Service gratuit sans cle API.</p>
+        <button type="button" class="gv-ab gv-ag" id="clientLocateBtn"><span class="material-symbols-outlined" style="font-size:1rem">my_location</span> Calculer depuis ma position</button>
+        <div class="gv-map-stats">
+            <div class="gv-map-stat"><strong>Distance</strong><div id="clientRouteDistance">-</div></div>
+            <div class="gv-map-stat"><strong>Duree estimee</strong><div id="clientRouteDuration">-</div></div>
+        </div>
+        <div id="clientLocationMap" class="gv-map"></div>
+    </div>
+    {% endif %}
     <div class="gv-card">
         <div class="gv-actions">
             <a href="{{ path('app_location_index') }}" class="gv-ab gv-ao"><span class="material-symbols-outlined" style="font-size:1rem">arrow_back</span> Retour</a>
@@ -120,4 +137,104 @@ body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.ma
         </div>
     </div>
 </div>
+{% if voiture.latitude and voiture.longitude %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const destinationLat = parseFloat('{{ voiture.latitude }}');
+    const destinationLng = parseFloat('{{ voiture.longitude }}');
+    const statusEl = document.getElementById('clientMapStatus');
+    const locateBtn = document.getElementById('clientLocateBtn');
+    const distanceEl = document.getElementById('clientRouteDistance');
+    const durationEl = document.getElementById('clientRouteDuration');
+
+    const map = L.map('clientLocationMap').setView([destinationLat, destinationLng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([destinationLat, destinationLng]).addTo(map)
+        .bindPopup('Voiture louee: {{ voiture.marque|e('js') }} {{ voiture.modele|e('js') }}')
+        .openPopup();
+
+    let userMarker = null;
+    let routeLayer = null;
+
+    function formatDuration(seconds) {
+        const minutes = Math.round(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const remainingMinutes = minutes % 60;
+        if (hours <= 0) {
+            return minutes + ' min';
+        }
+        return hours + ' h ' + remainingMinutes + ' min';
+    }
+
+    async function drawRoute(userLat, userLng) {
+        const url = 'https://router.project-osrm.org/route/v1/driving/'
+            + userLng + ',' + userLat + ';' + destinationLng + ',' + destinationLat
+            + '?overview=full&geometries=geojson';
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.routes || !data.routes.length) {
+            throw new Error('No route');
+        }
+
+        const route = data.routes[0];
+        if (routeLayer) {
+            map.removeLayer(routeLayer);
+        }
+
+        routeLayer = L.geoJSON(route.geometry, {
+            style: { color: '#10B981', weight: 5, opacity: 0.85 }
+        }).addTo(map);
+
+        distanceEl.textContent = (route.distance / 1000).toFixed(2) + ' km';
+        durationEl.textContent = formatDuration(route.duration);
+
+        const bounds = L.latLngBounds([
+            [userLat, userLng],
+            [destinationLat, destinationLng]
+        ]);
+        map.fitBounds(bounds.pad(0.2));
+    }
+
+    locateBtn?.addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            statusEl.textContent = 'Geolocalisation non supportee par ce navigateur.';
+            return;
+        }
+
+        statusEl.textContent = 'Localisation en cours...';
+        navigator.geolocation.getCurrentPosition(async function (position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+
+            userMarker = L.marker([userLat, userLng]).addTo(map).bindPopup('Votre position');
+
+            try {
+                await drawRoute(userLat, userLng);
+                statusEl.textContent = 'Itineraire calcule avec succes.';
+            } catch (error) {
+                statusEl.textContent = 'Impossible de calculer l\'itineraire pour le moment.';
+            }
+        }, function () {
+            statusEl.textContent = 'Autorisation de localisation refusee ou indisponible.';
+        }, {
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0,
+        });
+    });
+
+    setTimeout(function () { map.invalidateSize(); }, 200);
+});
+</script>
+{% endif %}
 {% endblock %}

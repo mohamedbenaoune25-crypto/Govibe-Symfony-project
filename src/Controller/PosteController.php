@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PosteController extends AbstractController
 {
     #[Route('/', name: 'app_poste_index', methods: ['GET'])]
-    public function index(Request $request, PosteRepository $posteRepository, ForumRepository $forumRepository): Response
+    public function index(Request $request, PosteRepository $posteRepository, ForumRepository $forumRepository, EntityManagerInterface $entityManager): Response
     {
         $query = $request->query->get('q');
         $sort = $request->query->get('sort', 'newest');
@@ -36,11 +36,35 @@ class PosteController extends AbstractController
         // Fetch forums for sidebar
         $forums = $forumRepository->findAll();
 
+        // Check for flagged content if admin (used for showing/hiding the "Attention" box)
+        $flaggedCount = 0;
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $badWords = ['con', 'salope', 'merde', 'putain', 'connard', 'encule', 'débile', 'pute', 'btch', 'fck'];
+            $qb = $posteRepository->createQueryBuilder('p');
+            $orX = $qb->expr()->orX();
+            foreach ($badWords as $i => $word) {
+                $orX->add($qb->expr()->like('p.contenu', ':word'.$i));
+                $qb->setParameter('word'.$i, '%'.$word.'%');
+            }
+            $flaggedCount = $qb->select('count(p.postId)')->where($orX)->getQuery()->getSingleScalarResult();
+
+            if ($flaggedCount == 0) {
+                $qbC = $entityManager->getRepository(\App\Entity\Commentaire::class)->createQueryBuilder('c');
+                $orXC = $qbC->expr()->orX();
+                foreach ($badWords as $i => $word) {
+                    $orXC->add($qbC->expr()->like('c.contenu', ':word'.$i));
+                    $qbC->setParameter('word'.$i, '%'.$word.'%');
+                }
+                $flaggedCount = $qbC->select('count(c.commentaireId)')->where($orXC)->getQuery()->getSingleScalarResult();
+            }
+        }
+
         return $this->render('poste/index.html.twig', [
             'postes' => $postes,
             'forums' => $forums,
             'current_query' => $query,
             'current_sort' => $sort,
+            'flagged_count' => $flaggedCount,
             'title' => $sort === 'mine' ? 'Mes Publications' : 'Community Feed'
         ]);
     }
@@ -142,6 +166,23 @@ class PosteController extends AbstractController
                         $newFilename
                     );
                     $poste->setUrl('/uploads/postes/'.$newFilename);
+                } elseif ($request->request->get('externalImageUrl')) {
+                    // Download from AI suggested URL
+                    $extUrl = $request->request->get('externalImageUrl');
+                    try {
+                        $imgContent = file_get_contents($extUrl);
+                        if ($imgContent) {
+                            $ext = pathinfo(parse_url($extUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+                            $newFilename = uniqid().'.'.$ext;
+                            file_put_contents(
+                                $this->getParameter('kernel.project_dir').'/public/uploads/postes/'.$newFilename,
+                                $imgContent
+                            );
+                            $poste->setUrl('/uploads/postes/'.$newFilename);
+                        }
+                    } catch (\Exception $e) {
+                        // Log error or ignore
+                    }
                 }
             } else {
                 $poste->setUrl(null);
@@ -200,6 +241,20 @@ class PosteController extends AbstractController
                         $newFilename
                     );
                     $poste->setUrl('/uploads/postes/'.$newFilename);
+                } elseif ($request->request->get('externalImageUrl')) {
+                    $extUrl = $request->request->get('externalImageUrl');
+                    try {
+                        $imgContent = file_get_contents($extUrl);
+                        if ($imgContent) {
+                            $ext = pathinfo(parse_url($extUrl, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
+                            $newFilename = uniqid().'.'.$ext;
+                            file_put_contents(
+                                $this->getParameter('kernel.project_dir').'/public/uploads/postes/'.$newFilename,
+                                $imgContent
+                            );
+                            $poste->setUrl('/uploads/postes/'.$newFilename);
+                        }
+                    } catch (\Exception $e) {}
                 }
             } else {
                 // If it's a STATUS post, clear any existing media URL
@@ -223,6 +278,29 @@ class PosteController extends AbstractController
     }
 
 
+
+    #[Route('/like/{postId}', name: 'app_poste_like', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function like(Poste $poste, EntityManagerInterface $entityManager, Request $request): Response
+    {
+        $session = $request->getSession();
+        $likedPosts = $session->get('liked_posts', []);
+        
+        $isAlreadyLiked = in_array($poste->getPostId(), $likedPosts);
+        $poste->toggleLike($isAlreadyLiked);
+        
+        if ($isAlreadyLiked) {
+            $likedPosts = array_diff($likedPosts, [$poste->getPostId()]);
+        } else {
+            $likedPosts[] = $poste->getPostId();
+        }
+        
+        $session->set('liked_posts', $likedPosts);
+        $entityManager->flush();
+        
+        $referer = $request->headers->get('referer');
+        return $referer ? $this->redirect($referer) : $this->redirectToRoute('app_poste_index');
+    }
 
     #[Route('/{postId}', name: 'app_poste_delete', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]

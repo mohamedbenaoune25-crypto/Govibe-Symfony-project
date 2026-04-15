@@ -1,0 +1,54 @@
+{# templates/emails/otp_email.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: 1px solid #e1e8e7; }
+        .header { background: linear-gradient(135deg, #00342d 0%, #004d43 50%, #046b5e 100%); padding: 40px 30px; text-align: center; }
+        .header h1 { color: #ffffff; margin: 0 0 8px; font-size: 28px; letter-spacing: 1px; font-weight: 700; }
+        .header p { color: rgba(160, 242, 225, 0.8); margin: 0; font-size: 14px; }
+        .shield-icon { font-size: 48px; margin-bottom: 15px; }
+        .content { padding: 40px; color: #334155; line-height: 1.7; }
+        .content h2 { color: #00342d; margin-top: 0; font-size: 20px; }
+        .otp-box { background: linear-gradient(135deg, rgba(0, 52, 45, 0.04), rgba(4, 107, 94, 0.06)); border: 2px dashed rgba(4, 107, 94, 0.3); border-radius: 16px; padding: 30px; text-align: center; margin: 25px 0; }
+        .otp-code { font-size: 40px; font-weight: 800; letter-spacing: 12px; color: #00342d; font-family: 'Courier New', monospace; margin: 10px 0; }
+        .otp-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #046b5e; margin-bottom: 5px; }
+        .otp-expiry { font-size: 13px; color: #94a3b8; margin-top: 8px; }
+        .warning-box { background: rgba(251, 191, 36, 0.08); border-left: 4px solid #fbbf24; padding: 15px 20px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 13px; color: #78716c; }
+        .footer { background-color: #f8faf9; padding: 25px; text-align: center; color: #94a3b8; font-size: 12px; border-top: 1px solid #e1e8e7; }
+        .footer a { color: #046b5e; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="shield-icon">🔐</div>
+            <h1>GoVibe Security</h1>
+            <p>Vérification de connexion</p>
+        </div>
+        <div class="content">
+            <h2>Bonjour {{ user.prenom }},</h2>
+            <p>Une tentative de connexion à votre compte GoVibe a été détectée. Pour confirmer qu'il s'agit bien de vous, veuillez utiliser le code de vérification ci-dessous :</p>
+
+            <div class="otp-box">
+                <div class="otp-label">Votre code de vérification</div>
+                <div class="otp-code">{{ code }}</div>
+                <div class="otp-expiry">⏱ Ce code expire dans <strong>{{ validity_minutes }} minutes</strong></div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Important :</strong> Ne partagez jamais ce code avec qui que ce soit. L'équipe GoVibe ne vous demandera jamais votre code par téléphone ou email.
+            </div>
+
+            <p style="font-size: 14px; color: #64748b;">Si vous n'avez pas demandé cette vérification, nous vous recommandons de changer votre mot de passe immédiatement.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 GoVibe. Votre compagnon de voyage premium.</p>
+            <p>Ceci est un message automatique, merci de ne pas y répondre.</p>
+        </div>
+    </div>
+</body>
+</html>

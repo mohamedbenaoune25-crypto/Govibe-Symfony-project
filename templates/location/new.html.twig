@@ -3,6 +3,7 @@
 {% block title %}Nouvelle Location — GoVibe{% endblock %}
 
 {% block body %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
@@ -49,6 +50,72 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 
 .form-error { color:#93000a; font-size:0.85rem; margin-top:5px; }
 .form-help { font-size:0.85rem; color:#707975; margin-top:5px; }
+
+.gv-car-status {
+    margin-top:0.75rem;
+    padding:0.75rem 0.9rem;
+    border-radius:0.75rem;
+    font-size:0.9rem;
+    font-weight:700;
+    display:none;
+}
+
+.gv-car-status.is-disponible {
+    background:rgba(16,185,129,0.12);
+    color:#046c4e;
+    border:1px solid rgba(16,185,129,0.25);
+}
+
+.gv-car-status.is-indisponible {
+    background:rgba(185,28,28,0.1);
+    color:#7f1d1d;
+    border:1px solid rgba(185,28,28,0.25);
+}
+
+.gv-slot-status {
+    margin-top:0.75rem;
+    padding:0.75rem 0.9rem;
+    border-radius:0.75rem;
+    font-size:0.9rem;
+    font-weight:700;
+    display:none;
+}
+
+.gv-slot-status.is-available {
+    background:rgba(16,185,129,0.12);
+    color:#046c4e;
+    border:1px solid rgba(16,185,129,0.25);
+}
+
+.gv-slot-status.is-unavailable {
+    background:rgba(185,28,28,0.1);
+    color:#7f1d1d;
+    border:1px solid rgba(185,28,28,0.25);
+}
+
+.gv-calendar-card {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(0,52,45,0.08);
+    border-radius: 1rem;
+    background: rgba(0,52,45,0.02);
+}
+
+.gv-calendar-title {
+    font-weight: 700;
+    color: #00342d;
+    margin-bottom: 0.35rem;
+}
+
+.gv-calendar-help {
+    font-size: 0.85rem;
+    color: #546067;
+    margin-bottom: 0.65rem;
+}
+
+#availability-calendar {
+    min-height: 320px;
+}
 
 .gv-price-display {
     background:rgba(0,52,45,0.03); border:1px solid rgba(0,52,45,0.06);
@@ -120,6 +187,8 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
         <div class="form-group">
             {{ form_label(form.voiture) }}
             {{ form_widget(form.voiture) }}
+            <div id="voiture-status" class="gv-car-status" role="status" aria-live="polite"></div>
+            <div id="slot-status" class="gv-slot-status" role="status" aria-live="polite"></div>
             {% if form.voiture.vars.errors|length %}
             <div class="form-error">
                 {% for error in form.voiture.vars.errors %}
@@ -134,6 +203,14 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                 <span class="gv-price-label">Prix journalier:</span>
                 <span class="gv-price-value" id="prix-jour">-</span>
             </div>
+        </div>
+
+        <div class="gv-calendar-card">
+            <div class="gv-calendar-title">Calendrier de disponibilite</div>
+            <div class="gv-calendar-help" id="calendar-help-text">
+                Selectionnez une voiture pour afficher ses dates d'indisponibilite.
+            </div>
+            <div id="availability-calendar"></div>
         </div>
     </div>
 
@@ -203,21 +280,232 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
     {{ form_end(form) }}
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const voitureSelect = document.querySelector('select[name*="voiture"]');
     const dateDebutInput = document.querySelector('input[name*="dateDebut"]');
     const dateFinInput = document.querySelector('input[name*="dateFin"]');
     const montantTotalInput = document.querySelector('input[name*="montantTotal"]');
+    const submitBtn = document.getElementById('submitBtn');
+    const voitureStatusBox = document.getElementById('voiture-status');
+    const slotStatusBox = document.getElementById('slot-status');
+    const availabilityCheckUrl = '{{ path('app_location_check_availability') }}';
+    const calendarHelpText = document.getElementById('calendar-help-text');
+    const calendarEndpoint = '{{ path('fc_load_events') }}';
+    let canSubmitForStatus = true;
+    let canSubmitForSlot = true;
+    let availabilityRequestId = 0;
+    let availabilityCalendar = null;
+
+    if (typeof FullCalendar !== 'undefined') {
+        availabilityCalendar = new FullCalendar.Calendar(document.getElementById('availability-calendar'), {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            height: 380,
+            fixedWeekCount: false,
+            firstDay: 1,
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek'
+            },
+            buttonText: {
+                today: 'Aujourd\'hui',
+                month: 'Mois',
+                week: 'Semaine'
+            },
+            events: function(info, successCallback, failureCallback) {
+                const selectedCarId = voitureSelect?.value;
+                if (!selectedCarId) {
+                    successCallback([]);
+                    return;
+                }
+
+                const url = new URL(calendarEndpoint, window.location.origin);
+                url.searchParams.set('start', info.startStr);
+                url.searchParams.set('end', info.endStr);
+                url.searchParams.set('filters', JSON.stringify({ carId: selectedCarId }));
+
+                fetch(url.toString(), {
+                    method: 'GET',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                    .then(function(response) {
+                        if (response.status === 204) {
+                            return [];
+                        }
+                        if (!response.ok) {
+                            throw new Error('Calendar request failed');
+                        }
+                        return response.json();
+                    })
+                    .then(function(events) {
+                        successCallback(events);
+                    })
+                    .catch(function() {
+                        failureCallback();
+                    });
+            }
+        });
+
+        availabilityCalendar.render();
+    }
+
+    function refreshAvailabilityCalendar() {
+        if (!availabilityCalendar) {
+            return;
+        }
+
+        const selectedOption = voitureSelect?.options?.[voitureSelect.selectedIndex];
+        if (!voitureSelect?.value) {
+            calendarHelpText.textContent = 'Selectionnez une voiture pour afficher ses dates d\'indisponibilite.';
+            availabilityCalendar.removeAllEvents();
+            availabilityCalendar.refetchEvents();
+            return;
+        }
+
+        const carLabel = selectedOption?.text?.split(' - ')[0] || 'Voiture selectionnee';
+        calendarHelpText.textContent = 'Les plages rouges representent les periodes deja louees pour ' + carLabel + '.';
+        availabilityCalendar.refetchEvents();
+    }
+
+    function syncSubmitButtonState() {
+        const canSubmit = canSubmitForStatus && canSubmitForSlot;
+        submitBtn.disabled = !canSubmit;
+        if (canSubmit) {
+            submitBtn.title = '';
+            return;
+        }
+
+        submitBtn.title = !canSubmitForStatus
+            ? 'Cette voiture est indisponible'
+            : 'Ce créneau est déjà alloué';
+    }
+
+    function resetSlotStatus() {
+        canSubmitForSlot = true;
+        slotStatusBox.style.display = 'none';
+        slotStatusBox.classList.remove('is-available', 'is-unavailable');
+        syncSubmitButtonState();
+    }
+
+    async function updateSlotAvailability() {
+        const voitureId = voitureSelect?.value;
+        const dateDebutValue = dateDebutInput?.value;
+        const dateFinValue = dateFinInput?.value;
+
+        if (!voitureId || !dateDebutValue || !dateFinValue || !canSubmitForStatus) {
+            resetSlotStatus();
+            return true;
+        }
+
+        const dateDebut = new Date(dateDebutValue);
+        const dateFin = new Date(dateFinValue);
+        if (dateFin <= dateDebut) {
+            resetSlotStatus();
+            return true;
+        }
+
+        const currentRequestId = ++availabilityRequestId;
+        try {
+            const query = new URLSearchParams({
+                voitureId,
+                dateDebut: dateDebutValue,
+                dateFin: dateFinValue,
+            });
+            const response = await fetch(availabilityCheckUrl + '?' + query.toString(), {
+                method: 'GET',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const data = await response.json();
+
+            if (currentRequestId !== availabilityRequestId) {
+                return canSubmitForSlot;
+            }
+
+            canSubmitForSlot = !!data.available;
+            slotStatusBox.style.display = 'block';
+            slotStatusBox.classList.remove('is-available', 'is-unavailable');
+
+            if (canSubmitForSlot) {
+                slotStatusBox.classList.add('is-available');
+                slotStatusBox.textContent = data.message || 'Ce créneau est disponible.';
+            } else {
+                slotStatusBox.classList.add('is-unavailable');
+                slotStatusBox.textContent = data.message || 'Cette voiture est déjà allouée sur ce créneau.';
+            }
+
+            syncSubmitButtonState();
+            return canSubmitForSlot;
+        } catch (error) {
+            if (currentRequestId !== availabilityRequestId) {
+                return canSubmitForSlot;
+            }
+
+            canSubmitForSlot = false;
+            slotStatusBox.style.display = 'block';
+            slotStatusBox.classList.remove('is-available');
+            slotStatusBox.classList.add('is-unavailable');
+            slotStatusBox.textContent = 'Verification du créneau impossible. Veuillez réessayer.';
+            syncSubmitButtonState();
+            return false;
+        }
+    }
+
+    function mapStatusLabel(statut) {
+        const labels = {
+            DISPONIBLE: 'Disponible',
+            EN_MAINTENANCE: 'En maintenance',
+            ACCIDENTE: 'Accidentee',
+            INDISPONIBLE: 'Indisponible',
+        };
+
+        return labels[statut] || statut || 'Inconnu';
+    }
+
+    function updateVoitureStatus() {
+        if (!voitureSelect || !voitureSelect.value) {
+            voitureStatusBox.style.display = 'none';
+            canSubmitForStatus = true;
+            syncSubmitButtonState();
+            return true;
+        }
+
+        const selectedOption = voitureSelect.options[voitureSelect.selectedIndex];
+        const statut = selectedOption?.dataset?.statut || '';
+        const isDisponible = selectedOption?.dataset?.isDisponible === '1';
+
+        voitureStatusBox.style.display = 'block';
+        voitureStatusBox.classList.remove('is-disponible', 'is-indisponible');
+
+        if (isDisponible) {
+            voitureStatusBox.classList.add('is-disponible');
+            voitureStatusBox.textContent = 'Etat de la voiture: ' + mapStatusLabel(statut);
+            canSubmitForStatus = true;
+            syncSubmitButtonState();
+            return true;
+        }
+
+        voitureStatusBox.classList.add('is-indisponible');
+        voitureStatusBox.textContent = 'Etat de la voiture: ' + mapStatusLabel(statut) + '. Location impossible avec cette voiture.';
+        canSubmitForStatus = false;
+        syncSubmitButtonState();
+        return false;
+    }
 
     function updateQuote() {
         const voitureId = voitureSelect.value;
         const dateDebut = new Date(dateDebutInput.value);
         const dateFin = new Date(dateFinInput.value);
 
+        canSubmitForStatus = updateVoitureStatus();
+
         if (!voitureId || !dateDebutInput.value || !dateFinInput.value) {
             document.getElementById('days-info').style.display = 'none';
             document.getElementById('voiture-details').style.display = 'none';
+            resetSlotStatus();
+            refreshAvailabilityCalendar();
             return;
         }
 
@@ -249,6 +537,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             document.getElementById('voiture-details').style.display = 'block';
         }
+
+        if (!canSubmitForStatus) {
+            resetSlotStatus();
+            montantTotalInput.value = '';
+            document.getElementById('resume-montant').innerText = '0,00 DT';
+            refreshAvailabilityCalendar();
+            return;
+        }
+
+        refreshAvailabilityCalendar();
+        updateSlotAvailability();
     }
 
     voitureSelect?.addEventListener('change', updateQuote);
@@ -257,11 +556,25 @@ document.addEventListener('DOMContentLoaded', function() {
     updateQuote();
 
     const form = document.querySelector('form');
-    form?.addEventListener('submit', function(e) {
+    form?.addEventListener('submit', async function(e) {
+        if (!updateVoitureStatus()) {
+            e.preventDefault();
+            alert('La voiture sélectionnée est indisponible. Veuillez en choisir une autre.');
+            return;
+        }
+
         if (!form.checkValidity()) { e.preventDefault(); e.stopPropagation(); form.classList.add('was-validated'); return; }
         const dateDebut = new Date(dateDebutInput.value);
         const dateFin = new Date(dateFinInput.value);
         if (dateFin <= dateDebut) { e.preventDefault(); alert('La date de fin doit être après la date de début'); return; }
+
+        const slotAvailable = await updateSlotAvailability();
+        if (!slotAvailable) {
+            e.preventDefault();
+            alert('Ce créneau est déjà alloué à un autre client. Veuillez changer la période ou la voiture.');
+            return;
+        }
+
         form.classList.add('was-validated');
     });
 });

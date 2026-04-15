@@ -47,6 +47,7 @@ class Commentaire
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Personne $user = null;
 
+
     public function __construct()
     {
         $this->dateCommentaire = new \DateTime();
@@ -134,6 +135,16 @@ class Commentaire
         return $this;
     }
 
+    public function toggleLike(bool $isAlreadyLiked): self
+    {
+        if ($isAlreadyLiked) {
+            $this->likes = max(0, ($this->likes ?? 0) - 1);
+        } else {
+            $this->likes = ($this->likes ?? 0) + 1;
+        }
+        return $this;
+    }
+
     public function getPoste(): ?Poste
     {
         return $this->poste;
@@ -155,4 +166,5 @@ class Commentaire
         $this->user = $user;
         return $this;
     }
+
 }

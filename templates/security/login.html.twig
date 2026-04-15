@@ -195,9 +195,47 @@
     .auth-form-subtitle {
         color: #707975;
         font-size: 0.95rem;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
         line-height: 1.5;
     }
+
+    /* ─── Login Method Tabs ─── */
+    .login-tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 2rem;
+        background: #e5e2e1;
+        border-radius: 0.75rem;
+        padding: 4px;
+    }
+    .login-tab {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        background: transparent;
+        border: none;
+        border-radius: 0.6rem;
+        font-family: 'Manrope', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #707975;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+    }
+    .login-tab:hover { color: #3f4945; }
+    .login-tab.active {
+        background: #fff;
+        color: #00342d;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    .login-tab .material-symbols-outlined { font-size: 1.1rem; }
+
+    .login-panel { display: none; }
+    .login-panel.active { display: block; animation: panelFadeIn 0.3s ease; }
+    @keyframes panelFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ─── Form Fields ─── */
     .gv-field { margin-bottom: 1.5rem; }
@@ -324,6 +362,65 @@
         box-shadow: 0 18px 40px -10px rgba(0, 52, 45, 0.5);
     }
     .gv-btn-primary:active { transform: translateY(0) scale(0.99); }
+    .gv-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
+
+    /* ─── Face ID Webcam ─── */
+    .face-webcam-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4/3;
+        background: #1c1b1b;
+        border-radius: 1rem;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+    .face-webcam-container video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: scaleX(-1);
+    }
+    .face-webcam-container canvas {
+        display: none;
+    }
+    .face-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+    .face-guide {
+        width: 180px;
+        height: 230px;
+        border: 3px solid rgba(160, 242, 225, 0.5);
+        border-radius: 50%;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
+        animation: facePulse 2s ease-in-out infinite;
+    }
+    .face-guide.scanning { border-color: #fbbf24; animation: faceScanning 1s linear infinite; }
+    .face-guide.success { border-color: #10B981; animation: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3), 0 0 30px rgba(16, 185, 129, 0.5); }
+    .face-guide.error { border-color: #ef4444; animation: none; }
+    @keyframes facePulse { 0%, 100% { border-color: rgba(160, 242, 225, 0.5); } 50% { border-color: rgba(160, 242, 225, 0.9); } }
+    @keyframes faceScanning { 0% { border-color: #fbbf24; } 50% { border-color: #f59e0b; } 100% { border-color: #fbbf24; } }
+
+    .face-status {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.7);
+        color: #a0f2e1;
+        padding: 0.5rem 1.25rem;
+        border-radius: 2rem;
+        font-size: 0.8rem;
+        font-weight: 700;
+        backdrop-filter: blur(8px);
+        white-space: nowrap;
+    }
+    .face-status.error { color: #fca5a5; }
+    .face-status.success { color: #6ee7b7; }
 
     /* ─── Divider ─── */
     .gv-divider {
@@ -348,33 +445,39 @@
 
     /* ─── Social Buttons ─── */
     .gv-social-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
     }
     .gv-social-btn {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.6rem;
-        padding: 0.9rem;
+        gap: 0.75rem;
+        padding: 1rem;
         border: 1.5px solid rgba(191, 201, 196, 0.4);
         border-radius: 0.75rem;
-        background: transparent;
+        background: #fff;
         cursor: pointer;
         font-weight: 700;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         color: #1c1b1b;
         font-family: 'Manrope', sans-serif;
-        transition: all 0.2s ease;
+        text-decoration: none;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
     .gv-social-btn:hover {
-        background: rgba(0, 52, 45, 0.04);
-        border-color: rgba(0, 52, 45, 0.2);
+        background: #f8faf9;
+        border-color: rgba(66, 133, 244, 0.4);
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.15);
+        transform: translateY(-1px);
     }
-    .gv-social-btn .material-symbols-outlined {
-        font-size: 1.2rem;
-        font-variation-settings: 'FILL' 1;
+    .gv-social-btn:active {
+        transform: translateY(0);
+    }
+    .gv-social-btn svg {
+        flex-shrink: 0;
     }
 
     /* ─── Footer Links ─── */
@@ -506,7 +609,7 @@
     <div class="auth-form-panel">
         <div class="auth-form-inner">
             <h3 class="auth-form-title">Bon Retour</h3>
-            <p class="auth-form-subtitle">Veuillez entrer vos identifiants pour accéder à votre espace.</p>
+            <p class="auth-form-subtitle">Choisissez votre méthode de connexion sécurisée.</p>
 
             {% for message in app.flashes('success') %}
                 <div class="gv-alert gv-alert-success">
@@ -527,51 +630,93 @@
                 </div>
             {% endif %}
 
-            <form method="post" action="{{ path('app_login') }}">
+            <!-- ═══ Login Method Tabs ═══ -->
+            <div class="login-tabs">
+                <button type="button" class="login-tab active" data-tab="password" id="tab-password">
+                    <span class="material-symbols-outlined">lock</span>
+                    Mot de passe
+                </button>
+                <button type="button" class="login-tab" data-tab="faceid" id="tab-faceid">
+                    <span class="material-symbols-outlined">face</span>
+                    Face ID
+                </button>
+            </div>
+
+            <!-- ═══ Panel 1: Password Login ═══ -->
+            <div class="login-panel active" id="panel-password">
+                <form method="post" action="{{ path('app_login') }}">
+                    <div class="gv-field">
+                        <label class="gv-field-label" for="inputEmail">
+                            <span class="material-symbols-outlined">mail</span> Adresse Email
+                        </label>
+                        <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="gv-input" autocomplete="email" required autofocus placeholder="voyageur@govibe.com">
+                    </div>
+
+                    <div class="gv-field">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label class="gv-field-label" for="inputPassword" style="margin-bottom:0;">
+                                <span class="material-symbols-outlined">lock</span> Mot de passe
+                            </label>
+                            <a href="{{ path('app_forgot_password') }}" class="gv-forgot-link">Mot de passe oublié ?</a>
+                        </div>
+                        <div class="gv-input-wrap" style="margin-top:0.5rem;">
+                            <input type="password" name="_password" id="inputPassword" class="gv-input" autocomplete="current-password" required placeholder="••••••••">
+                            <button type="button" class="gv-pwd-toggle" onclick="togglePwd('inputPassword', this)">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="gv-check-row">
+                        <input type="checkbox" id="remember">
+                        <label for="remember">Rester connecté pendant 30 jours</label>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <button type="submit" class="gv-btn-primary">
+                        Connexion à GoVibe
+                        <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_forward</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- ═══ Panel 2: Face ID Login ═══ -->
+            <div class="login-panel" id="panel-faceid">
                 <div class="gv-field">
-                    <label class="gv-field-label" for="inputEmail">
+                    <label class="gv-field-label" for="faceEmailInput">
                         <span class="material-symbols-outlined">mail</span> Adresse Email
                     </label>
-                    <input type="email" value="{{ last_username }}" name="_username" id="inputEmail" class="gv-input" autocomplete="email" required autofocus placeholder="voyageur@govibe.com">
+                    <input type="email" id="faceEmailInput" class="gv-input" placeholder="voyageur@govibe.com" value="{{ last_username }}">
                 </div>
 
-                <div class="gv-field">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <label class="gv-field-label" for="inputPassword" style="margin-bottom:0;">
-                            <span class="material-symbols-outlined">lock</span> Mot de passe
-                        </label>
-                        <a href="{{ path('app_forgot_password') }}" class="gv-forgot-link">Mot de passe oublié ?</a>
+                <div class="face-webcam-container" id="faceWebcamLogin">
+                    <video id="faceVideoLogin" autoplay playsinline muted></video>
+                    <canvas id="faceCanvasLogin"></canvas>
+                    <div class="face-overlay">
+                        <div class="face-guide" id="faceGuideLogin"></div>
                     </div>
-                    <div class="gv-input-wrap" style="margin-top:0.5rem;">
-                        <input type="password" name="_password" id="inputPassword" class="gv-input" autocomplete="current-password" required placeholder="••••••••">
-                        <button type="button" class="gv-pwd-toggle" onclick="togglePwd('inputPassword', this)">
-                            <span class="material-symbols-outlined">visibility</span>
-                        </button>
-                    </div>
+                    <div class="face-status" id="faceStatusLogin">Positionnez votre visage dans le cercle</div>
                 </div>
 
-                <div class="gv-check-row">
-                    <input type="checkbox" id="remember">
-                    <label for="remember">Rester connecté pendant 30 jours</label>
-                </div>
-
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                <button type="submit" class="gv-btn-primary">
-                    Connexion à GoVibe
-                    <span class="material-symbols-outlined" style="font-size:1.2rem;">arrow_forward</span>
+                <button type="button" class="gv-btn-primary" id="btnFaceLogin" onclick="captureAndVerifyFace()">
+                    <span class="material-symbols-outlined" style="font-size:1.2rem;">face</span>
+                    Scanner mon visage
                 </button>
-            </form>
+
+                <div id="faceLoginError" class="gv-alert gv-alert-error" style="display:none; margin-top:1rem;">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">error</span>
+                    <span id="faceLoginErrorText"></span>
+                </div>
+            </div>
 
             <div class="gv-divider"><span>Ou continuer avec</span></div>
 
             <div class="gv-social-row">
-                <button class="gv-social-btn" type="button">
-                    <span class="material-symbols-outlined">google</span> Google
-                </button>
-                <button class="gv-social-btn" type="button">
-                    <span class="material-symbols-outlined">smartphone</span> Apple
-                </button>
+                <a href="{{ path('hwi_oauth_service_redirect', { service: 'google' }) }}" class="gv-social-btn" id="btn-google-oauth">
+                    <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59a14.5 14.5 0 0 1 0-9.18l-7.98-6.19a24.0 24.0 0 0 0 0 21.56l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                    Continuer avec Google
+                </a>
             </div>
 
             <div class="gv-auth-footer">
@@ -593,7 +738,24 @@
 <div style="position:fixed;bottom:-10%;right:-10%;width:24rem;height:24rem;background:rgba(61,42,0,0.1);border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;"></div>
 
 <script>
-    // Password toggle
+    // ─── Tab Switching ───
+    document.querySelectorAll('.login-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.login-panel').forEach(p => p.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+
+            // Start webcam when Face ID tab is selected
+            if (tab.dataset.tab === 'faceid') {
+                startFaceWebcam();
+            } else {
+                stopFaceWebcam();
+            }
+        });
+    });
+
+    // ─── Password toggle ───
     function togglePwd(inputId, btn) {
         const input = document.getElementById(inputId);
         const icon = btn.querySelector('.material-symbols-outlined');
@@ -606,7 +768,121 @@
         }
     }
 
-    // Particle system
+    // ─── Face ID Webcam Logic ───
+    let faceStream = null;
+
+    async function startFaceWebcam() {
+        const video = document.getElementById('faceVideoLogin');
+        const status = document.getElementById('faceStatusLogin');
+
+        if (faceStream) return; // Already running
+
+        try {
+            faceStream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480, facingMode: 'user' }
+            });
+            video.srcObject = faceStream;
+            status.textContent = 'Positionnez votre visage dans le cercle';
+            status.className = 'face-status';
+        } catch (err) {
+            status.textContent = 'Impossible d\'accéder à la caméra';
+            status.className = 'face-status error';
+            console.error('Webcam error:', err);
+        }
+    }
+
+    function stopFaceWebcam() {
+        if (faceStream) {
+            faceStream.getTracks().forEach(track => track.stop());
+            faceStream = null;
+        }
+    }
+
+    async function captureAndVerifyFace() {
+        const email = document.getElementById('faceEmailInput').value.trim();
+        const video = document.getElementById('faceVideoLogin');
+        const canvas = document.getElementById('faceCanvasLogin');
+        const guide = document.getElementById('faceGuideLogin');
+        const status = document.getElementById('faceStatusLogin');
+        const btn = document.getElementById('btnFaceLogin');
+        const errorDiv = document.getElementById('faceLoginError');
+        const errorText = document.getElementById('faceLoginErrorText');
+
+        // Validate email
+        if (!email) {
+            errorDiv.style.display = 'flex';
+            errorText.textContent = 'Veuillez entrer votre adresse email.';
+            return;
+        }
+        errorDiv.style.display = 'none';
+
+        // Check webcam
+        if (!faceStream) {
+            await startFaceWebcam();
+            await new Promise(r => setTimeout(r, 1000));
+        }
+
+        // Capture frame
+        guide.className = 'face-guide scanning';
+        status.textContent = 'Analyse en cours...';
+        status.className = 'face-status';
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.2rem;">hourglass_top</span> Vérification...';
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+        const base64Image = canvas.toDataURL('image/jpeg', 0.9);
+
+        try {
+            const response = await fetch('{{ path("app_login_face") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, image: base64Image }),
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.redirect) {
+                guide.className = 'face-guide success';
+                status.textContent = '✅ ' + (data.message || 'Authentifié !');
+                status.className = 'face-status success';
+
+                setTimeout(() => {
+                    window.location.href = data.redirect;
+                }, 800);
+                return;
+            }
+
+            // Error
+            guide.className = 'face-guide error';
+            status.textContent = data.message || 'Échec de la vérification';
+            status.className = 'face-status error';
+            errorDiv.style.display = 'flex';
+            errorText.textContent = data.message || 'Visage non reconnu.';
+
+            // Reset after 3 seconds
+            setTimeout(() => {
+                guide.className = 'face-guide';
+                status.textContent = 'Positionnez votre visage dans le cercle';
+                status.className = 'face-status';
+            }, 3000);
+
+        } catch (err) {
+            console.error('Face login error:', err);
+            guide.className = 'face-guide error';
+            status.textContent = 'Erreur de connexion';
+            status.className = 'face-status error';
+            errorDiv.style.display = 'flex';
+            errorText.textContent = 'Erreur réseau. Vérifiez votre connexion.';
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1.2rem;">face</span> Scanner mon visage';
+    }
+
+    // ─── Particle system ───
     (function() {
         const canvas = document.getElementById('authParticles');
         if (!canvas) return;

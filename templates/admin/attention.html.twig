@@ -1,0 +1,179 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}Attention - Modération{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .attention-card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(186, 26, 26, 0.08);
+        transition: transform 0.2s;
+        border-left: 5px solid #ba1a1a;
+        margin-bottom: 1.5rem;
+        background: #fff;
+    }
+    .attention-card:hover { transform: translateY(-3px); }
+    .badge-bad { background-color: #ba1a1a; color: #fff; }
+    .content-highlighter span.bad-word {
+        color: #ba1a1a;
+        font-weight: 800;
+        text-decoration: underline;
+        background: rgba(186, 26, 26, 0.05);
+        padding: 0 2px;
+        border-radius: 4px;
+    }
+    .tab-btn {
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    .tab-btn.active {
+        background-color: #00342d;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-3 bg-danger bg-opacity-10 rounded-4">
+                    <span class="material-symbols-outlined text-danger" style="font-size: 2rem;">warning</span>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-0">Contenu à Surveiller</h2>
+                    <p class="text-muted mb-0">Détection automatique des mots inappropriés dans les publications et commentaires.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats summary -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="p-3 bg-white rounded-4 shadow-sm border">
+                <div class="text-muted small fw-bold text-uppercase mb-1">Publications signalées</div>
+                <div class="fs-3 fw-bold text-danger">{{ postes|length }}</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 bg-white rounded-4 shadow-sm border">
+                <div class="text-muted small fw-bold text-uppercase mb-1">Commentaires signalés</div>
+                <div class="fs-3 fw-bold text-danger">{{ commentaires|length }}</div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills gap-2 mb-4" id="moderationTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link tab-btn active" id="postes-tab" data-bs-toggle="pill" data-bs-target="#postes-list">
+                Publications ({{ postes|length }})
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link tab-btn" id="comments-tab" data-bs-toggle="pill" data-bs-target="#comments-list">
+                Commentaires ({{ commentaires|length }})
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="moderationTabsContent">
+        <!-- LISTE DES POSTES -->
+        <div class="tab-pane fade show active" id="postes-list">
+            {% if postes is empty %}
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
+                    <span class="material-symbols-outlined text-muted mb-3" style="font-size: 3rem;">check_circle</span>
+                    <p class="text-muted">Aucune publication contenant des mots inappropriés n'a été détectée.</p>
+                </div>
+            {% else %}
+                <div class="row">
+                    {% for p in postes %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="attention-card p-4 h-100 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px;">
+                                            <span class="small fw-bold text-success">{{ p.user ? p.user.prenom|first|upper : '?' }}</span>
+                                        </div>
+                                        <div class="small fw-bold">{{ p.user ? p.user.prenom ~ ' ' ~ p.user.nom : 'Anonyme' }}</div>
+                                    </div>
+                                    <span class="badge badge-bad rounded-pill px-2 py-1 small">POST</span>
+                                </div>
+
+                                <div class="flex-grow-1 content-highlighter">
+                                    {% set finalContent = p.contenu %}
+                                    {% for word in bad_words %}
+                                        {# Basic highlighting approach in Twig #}
+                                        {% set finalContent = finalContent|replace({ (word): '<span class="bad-word">' ~ word ~ '</span>' }) %}
+                                    {% endfor %}
+                                    <p class="mb-0">{{ finalContent|raw }}</p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">{{ p.dateCreation|date('d/m/Y H:i') }}</span>
+                                    <form action="{{ path('app_admin_poste_delete', {id: p.postId}) }}" method="POST" onsubmit="return confirm('Supprimer définitivement cette publication ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ p.postId) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                            <span class="material-symbols-outlined" style="font-size:1.1rem;">delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- LISTE DES COMMENTAIRES -->
+        <div class="tab-pane fade" id="comments-list">
+            {% if commentaires is empty %}
+                <div class="text-center py-5 bg-white rounded-4 shadow-sm border">
+                    <span class="material-symbols-outlined text-muted mb-3" style="font-size: 3rem;">check_circle</span>
+                    <p class="text-muted">Aucun commentaire contenant des mots inappropriés n'a été détecté.</p>
+                </div>
+            {% else %}
+                <div class="row">
+                    {% for c in commentaires %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="attention-card p-4 h-100 d-flex flex-column" style="border-left-color: #ff9800;">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width:32px; height:32px;">
+                                            <span class="small fw-bold text-warning">{{ c.user ? c.user.prenom|first|upper : '?' }}</span>
+                                        </div>
+                                        <div class="small fw-bold">{{ c.user ? c.user.prenom : 'Anonyme' }}</div>
+                                    </div>
+                                    <span class="badge bg-warning rounded-pill px-2 py-1 small">COMMENTAIRE</span>
+                                </div>
+
+                                <div class="flex-grow-1 content-highlighter">
+                                    {% set finalContent = c.contenu %}
+                                    {% for word in bad_words %}
+                                        {% set finalContent = finalContent|replace({ (word): '<span class="bad-word">' ~ word ~ '</span>' }) %}
+                                    {% endfor %}
+                                    <p class="mb-0">{{ finalContent|raw }}</p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small">Sur publication #{{ c.poste ? c.poste.postId : '?' }}</span>
+                                    <form action="{{ path('app_admin_commentaire_delete', {id: c.commentaireId}) }}" method="POST" onsubmit="return confirm('Supprimer définitivement ce commentaire ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ c.commentaireId) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger border-0">
+                                            <span class="material-symbols-outlined" style="font-size:1.1rem;">delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

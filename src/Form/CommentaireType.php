@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Commentaire;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,6 +21,12 @@ class CommentaireType extends AbstractType
                     'class' => 'form-control border-0 shadow-none bg-light p-3 rounded-4',
                     'rows' => 1
                 ]
+            ])
+            ->add('voiceMessageFile', FileType::class, [
+                'label' => false,
+                'mapped' => false,
+                'required' => false,
+                'attr' => ['class' => 'd-none', 'accept' => 'audio/*']
             ])
         ;
     }
