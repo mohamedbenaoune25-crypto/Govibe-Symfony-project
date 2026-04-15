@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier la Chambre - GoVibe{% endblock %}
+{% block title %}{{ 'chambre.edit.meta_title'|trans }}{% endblock %}
 
 {% block body %}
 <div class="container-fluid py-5">
@@ -10,16 +10,16 @@
             <ol class="breadcrumb bg-transparent p-0">
                 <li class="breadcrumb-item">
                     <a href="{{ path('app_hotel_index') }}" class="text-emerald text-decoration-none">
-                        <i class="bi bi-house me-2"></i>Hôtels
+                        <i class="bi bi-house me-2"></i>{{ 'nav.hotels'|trans }}
                     </a>
                 </li>
                 <li class="breadcrumb-item">
                     <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="text-emerald text-decoration-none">
-                        {{ chambre.hotel.nom }}
+                        {{ translated_hotel_value(chambre.hotel, 'nom') }}
                     </a>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">
-                    Modifier {{ chambre.type }}
+                    {{ 'chambre.edit.breadcrumb_current'|trans({'%type%': chambre.type}) }}
                 </li>
             </ol>
         </nav>
@@ -28,21 +28,22 @@
                 <div class="card form-card shadow-lg border-0">
                     <div class="card-header bg-emerald text-white">
                         <h3 class="mb-0">
-                            <i class="bi bi-pencil me-2"></i>Modifier la Chambre
+                            <i class="bi bi-pencil me-2"></i>{{ 'chambre.edit.heading'|trans }}
                         </h3>
-                        <p class="mb-0 mt-1 opacity-75">{{ chambre.type }} - {{ chambre.hotel.nom }}</p>
+                        <p class="mb-0 mt-1 opacity-75">{{ chambre.type }} - {{ translated_hotel_value(chambre.hotel, 'nom') }}</p>
                     </div>
                     <div class="card-body p-4">
+                        <p class="text-muted mb-3">{{ 'chambre.edit.subtitle'|trans }}</p>
                         {{ include('chambre/_form.html.twig') }}
                     </div>
                     <div class="card-footer bg-light">
                         <div class="d-flex justify-content-between">
                             <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="btn btn-outline-info">
-                                <i class="bi bi-building me-2"></i>Voir l'hôtel
+                                <i class="bi bi-building me-2"></i>{{ 'hotel.edit.view_hotel'|trans }}
                             </a>
                             <div>
                                 <a href="{{ path('app_chambre_show', {'id': chambre.id}) }}" class="btn btn-info">
-                                    <i class="bi bi-eye me-2"></i>Voir la chambre
+                                    <i class="bi bi-eye me-2"></i>{{ 'chambre.edit.view_room'|trans }}
                                 </a>
                             </div>
                         </div>
@@ -52,12 +53,12 @@
                 <div class="card danger-card shadow-lg border-0 mt-4">
                     <div class="card-header bg-danger text-white">
                         <h5 class="mb-0">
-                            <i class="bi bi-exclamation-triangle me-2"></i>Suppression
+                            <i class="bi bi-exclamation-triangle me-2"></i>{{ 'common.deletion'|trans }}
                         </h5>
                     </div>
                     <div class="card-body">
                         <p class="text-muted mb-3">
-                            Attention : La suppression de cette chambre est irréversible.
+                            {{ 'chambre.edit.delete_warning'|trans }}
                         </p>
                         {{ include('chambre/_delete_form.html.twig') }}
                     </div>

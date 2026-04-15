@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app.request.locale|default('fr') }}" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -401,6 +401,8 @@
     </style>
 </head>
 <body>
+    {% set currentRoute = app.request.attributes.get('_route')|default('') %}
+    {% set showLocaleSelector = currentRoute starts with 'app_admin_hotels' or currentRoute starts with 'app_admin_chambres' %}
 
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -410,62 +412,62 @@
         <ul class="sidebar-nav">
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_dashboard') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') == 'app_admin_dashboard' %}active{% endif %}">
-                    <i class="bi bi-grid-1x2"></i> Dashboard
+                    <i class="bi bi-grid-1x2"></i> {{ 'admin.sidebar.dashboard'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_users') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') == 'app_admin_users' %}active{% endif %}">
-                    <i class="bi bi-people"></i> Utilisateurs
+                    <i class="bi bi-people"></i> {{ 'admin.sidebar.users'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_reclamations') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') == 'app_admin_reclamations' %}active{% endif %}">
-                    <i class="bi bi-envelope-exclamation"></i> Réclamations
+                    <i class="bi bi-envelope-exclamation"></i> {{ 'admin.sidebar.claims'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_location_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_location' %}active{% endif %}">
-                    <i class="bi bi-geo-alt"></i> Locations
+                    <i class="bi bi-geo-alt"></i> {{ 'admin.sidebar.locations'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_hotels_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_hotels' %}active{% endif %}">
-                    <i class="bi bi-building"></i> Hôtels
+                    <i class="bi bi-building"></i> {{ 'admin.sidebar.hotels'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_vols_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_vols' %}active{% endif %}">
-                    <i class="bi bi-airplane"></i> Vols
+                    <i class="bi bi-airplane"></i> {{ 'admin.sidebar.flights'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('admin_voiture_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'admin_voiture' %}active{% endif %}">
-                    <i class="bi bi-car-front"></i> Voitures
+                    <i class="bi bi-car-front"></i> {{ 'admin.sidebar.cars'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_poste_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_poste' %}active{% endif %}">
-                    <i class="bi bi-chat-square-text"></i> Publications
+                    <i class="bi bi-chat-square-text"></i> {{ 'admin.sidebar.posts'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_forum_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_forum' %}active{% endif %}">
-                    <i class="bi bi-collection"></i> Forums
+                    <i class="bi bi-collection"></i> {{ 'admin.sidebar.forums'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_admin_checkouts_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_admin_checkouts' %}active{% endif %}">
-                    <i class="bi bi-ticket-perforated"></i> Checkouts
+                    <i class="bi bi-ticket-perforated"></i> {{ 'admin.sidebar.checkouts'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="{{ path('app_activite_index') }}" class="sidebar-nav-link {% if app.request.attributes.get('_route') starts with 'app_activite' %}active{% endif %}">
-                    <i class="bi bi-calendar-event"></i> Activités
+                    <i class="bi bi-calendar-event"></i> {{ 'admin.sidebar.activities'|trans }}
                 </a>
             </li>
             <li class="sidebar-nav-item logout-item">
                 <a href="{{ path('app_logout') }}" class="sidebar-nav-link text-danger mt-2">
-                    <i class="bi bi-box-arrow-right"></i> Déconnexion
+                    <i class="bi bi-box-arrow-right"></i> {{ 'nav.logout'|trans }}
                 </a>
             </li>
         </ul>
@@ -475,9 +477,27 @@
     <main class="main-content">
         <!-- Header -->
         <header class="admin-header" data-aos="fade-down" data-aos-duration="600">
+            {% set activeLocale = current_locale() %}
             <h1 class="header-title">{% block page_title %}Dashboard{% endblock %}</h1>
             <div class="header-actions">
-                <div class="admin-badge"><i class="bi bi-shield-check me-2"></i>Espace Sécurisé</div>
+                {% if showLocaleSelector %}
+                    <div class="dropdown">
+                        <button class="btn btn-pro dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-translate me-1"></i>{{ activeLocale|upper }}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% for locale in supported_locales() %}
+                                <li>
+                                    <a class="dropdown-item d-flex justify-content-between align-items-center {% if locale.code == activeLocale %}active{% endif %}" href="{{ path('app_locale_switch', {'locale': locale.code}) }}">
+                                        <span>{{ locale.label }} ({{ locale.code|upper }})</span>
+                                        {% if locale.code == activeLocale %}<i class="bi bi-check2"></i>{% endif %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <div class="admin-badge"><i class="bi bi-shield-check me-2"></i>{{ 'admin.secure_space'|trans }}</div>
                 <div class="fw-bold text-white">{{ app.user.prenom }} {{ app.user.nom }}</div>
             </div>
         </header>

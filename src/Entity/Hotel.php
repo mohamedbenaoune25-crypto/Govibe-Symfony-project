@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: HotelRepository::class)]
 #[ORM\Table(name: 'hotel')]
@@ -19,24 +20,56 @@ class Hotel
     private ?int $id = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\NotBlank(message: "Le nom de l'hotel est obligatoire.")]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: "Le nom de l'hotel doit contenir au moins {{ limit }} caracteres.",
+        maxMessage: "Le nom de l'hotel ne peut pas depasser {{ limit }} caracteres."
+    )]
     private ?string $nom = null;
 
     #[ORM\Column(length: 150, nullable: true)]
+    #[Assert\NotBlank(message: "L'adresse est obligatoire.")]
+    #[Assert\Length(
+        min: 5,
+        max: 150,
+        minMessage: "L'adresse doit contenir au moins {{ limit }} caracteres.",
+        maxMessage: "L'adresse ne peut pas depasser {{ limit }} caracteres."
+    )]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\NotBlank(message: "La ville est obligatoire.")]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: "La ville doit contenir au moins {{ limit }} caracteres.",
+        maxMessage: "La ville ne peut pas depasser {{ limit }} caracteres."
+    )]
     private ?string $ville = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Range(
+        min: 1,
+        max: 5,
+        notInRangeMessage: "Le nombre d'etoiles doit etre compris entre {{ min }} et {{ max }}."
+    )]
     private ?int $nombreEtoiles = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: "Le budget doit etre une valeur positive.")]
     private ?float $budget = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\Length(
+        max: 2000,
+        maxMessage: "La description ne peut pas depasser {{ limit }} caracteres."
+    )]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Url(message: "Veuillez saisir une URL valide.")]
     private ?string $photoUrl = null;
 
     #[ORM\Column]

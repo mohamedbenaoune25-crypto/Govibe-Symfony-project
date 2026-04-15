@@ -10,6 +10,8 @@ use App\Repository\HotelRepository;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -47,11 +49,15 @@ class HotelController extends AbstractController
         $form = $this->createForm(HotelType::class, $hotel);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($hotel);
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            $this->validateHotelInput($hotel, $form);
 
-            return $this->redirectToRoute('app_hotel_index', [], Response::HTTP_SEE_OTHER);
+            if ($form->isValid()) {
+                $entityManager->persist($hotel);
+                $entityManager->flush();
+
+                return $this->redirectToRoute('app_hotel_index', [], Response::HTTP_SEE_OTHER);
+            }
         }
 
         return $this->render('hotel/new.html.twig', [
@@ -82,15 +88,18 @@ class HotelController extends AbstractController
             ]);
             $reservationForm->handleRequest($request);
 
-            if ($reservationForm->isSubmitted() && $reservationForm->isValid()) {
+            if ($reservationForm->isSubmitted()) {
                 $reservation->setUser($this->getUser());
                 $reservation->setHotel($hotel);
                 $reservation->setStatut('EN_ATTENTE');
+                $this->validateReservationInput($reservation, $reservationForm);
 
-                $entityManager->persist($reservation);
-                $entityManager->flush();
+                if ($reservationForm->isValid()) {
+                    $entityManager->persist($reservation);
+                    $entityManager->flush();
 
-                return $this->redirectToRoute('app_hotel_show', ['id' => $hotel->getId()], Response::HTTP_SEE_OTHER);
+                    return $this->redirectToRoute('app_hotel_show', ['id' => $hotel->getId()], Response::HTTP_SEE_OTHER);
+                }
             }
 
             $hotelReservations = $reservationRepository->createQueryBuilder('r')
@@ -127,10 +136,14 @@ class HotelController extends AbstractController
             ->setMethod('POST')
             ->getForm();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            $this->validateHotelInput($hotel, $form);
 
-            return $this->redirectToRoute('app_hotel_index', [], Response::HTTP_SEE_OTHER);
+            if ($form->isValid()) {
+                $entityManager->flush();
+
+                return $this->redirectToRoute('app_hotel_index', [], Response::HTTP_SEE_OTHER);
+            }
         }
 
         return $this->render('hotel/edit.html.twig', [
@@ -164,5 +177,59 @@ class HotelController extends AbstractController
             'isFavoris' => $hotel->isFavoris(),
             'message' => $hotel->isFavoris() ? 'Ajouté aux favoris' : 'Retiré des favoris'
         ]);
+    }
+
+    private function validateHotelInput(Hotel $hotel, FormInterface $form): void
+    {
+        if (trim((string) $hotel->getNom()) === '') {
+            $form->get('nom')->addError(new FormError("Le nom de l'hotel est obligatoire."));
+        }
+
+        if (trim((string) $hotel->getAdresse()) === '') {
+            $form->get('adresse')->addError(new FormError("L'adresse est obligatoire."));
+        }
+
+        if (trim((string) $hotel->getVille()) === '') {
+            $form->get('ville')->addError(new FormError('La ville est obligatoire.'));
+        }
+
+        if ($hotel->getNombreEtoiles() !== null && ($hotel->getNombreEtoiles() < 1 || $hotel->getNombreEtoiles() > 5)) {
+            $form->get('nombreEtoiles')->addError(new FormError("Le nombre d'etoiles doit etre compris entre 1 et 5."));
+        }
+
+        if ($hotel->getBudget() !== null && $hotel->getBudget() < 0) {
+            $form->get('budget')->addError(new FormError('Le budget doit etre positif ou nul.'));
+        }
+
+        if ($hotel->getPhotoUrl() !== null && trim($hotel->getPhotoUrl()) !== '' && filter_var($hotel->getPhotoUrl(), FILTER_VALIDATE_URL) === false) {
+            $form->get('photoUrl')->addError(new FormError('Veuillez saisir une URL valide.'));
+        }
+    }
+
+    private function validateReservationInput(Reservation $reservation, FormInterface $form): void
+    {
+        if (!$reservation->getDateDebut() instanceof \DateTimeInterface) {
+            $form->get('dateDebut')->addError(new FormError('La date de debut est obligatoire et doit etre valide.'));
+        }
+
+        if (!$reservation->getDateFin() instanceof \DateTimeInterface) {
+            $form->get('dateFin')->addError(new FormError('La date de fin est obligatoire et doit etre valide.'));
+        }
+
+        if ($reservation->getDateDebut() instanceof \DateTimeInterface && $reservation->getDateFin() instanceof \DateTimeInterface && $reservation->getDateFin() <= $reservation->getDateDebut()) {
+            $form->get('dateFin')->addError(new FormError('La date de fin doit etre posterieure a la date de debut.'));
+        }
+
+        if ($reservation->getPrixTotal() === null || !is_numeric((string) $reservation->getPrixTotal()) || $reservation->getPrixTotal() <= 0) {
+            $form->get('prixTotal')->addError(new FormError('Le prix total doit etre un nombre superieur a 0.'));
+        }
+
+        if ($form->has('statut') && trim((string) $reservation->getStatut()) === '') {
+            $form->get('statut')->addError(new FormError('Le statut est obligatoire.'));
+        }
+
+        if ($reservation->getChambre() === null) {
+            $form->get('chambre')->addError(new FormError('La chambre est obligatoire.'));
+        }
     }
 }

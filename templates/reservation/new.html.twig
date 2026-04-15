@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle Réservation — GoVibe{% endblock %}
+{% block title %}{{ 'reservation.new.meta_title'|trans }}{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -50,11 +50,11 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 <div class="gv-form-hero">
     <span class="material-symbols-outlined gv-hero-icon-bg">hotel</span>
     <div class="container">
-        <h1>Nouvelle <em>Réservation</em></h1>
+        <h1>{{ 'reservation.new.heading_prefix'|trans }} <em>{{ 'reservation.new.heading_emphasis'|trans }}</em></h1>
         {% if selectedHotel %}
-            <p>Hôtel sélectionné : <strong>{{ selectedHotel.nom }}</strong></p>
+            <p>{{ 'reservation.new.selected_hotel'|trans }} : <strong>{{ translated_hotel_value(selectedHotel, 'nom') }}</strong></p>
         {% else %}
-            <p>Réservez votre chambre d'hôtel idéale</p>
+            <p>{{ 'reservation.new.subtitle'|trans }}</p>
         {% endif %}
     </div>
 </div>
@@ -66,12 +66,12 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
         <div class="gv-form-footer">
             <a href="{{ path('app_reservation_index') }}" class="gv-back-link">
                 <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
-                Retour à la liste
+                {{ 'common.back_to_list'|trans }}
             </a>
             {% if selectedHotel %}
                 <a href="{{ path('app_hotel_show', {'id': selectedHotel.id}) }}" class="gv-hotel-link">
                     <span class="material-symbols-outlined" style="font-size:1rem;">apartment</span>
-                    Retour à l'hôtel
+                    {{ 'reservation.new.back_hotel'|trans }}
                 </a>
             {% endif %}
         </div>

@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hôtels — GoVibe | Séjours Premium{% endblock %}
+{% block title %}{{ 'hotel.index.meta_title'|trans }}{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -395,8 +395,8 @@ body {
 <div class="gv-hotel-hero">
     <span class="material-symbols-outlined gv-hero-icon-bg">apartment</span>
     <div class="container">
-        <h1 class="gv-hero-title">Nos <em>Hôtels</em></h1>
-        <p class="gv-hero-sub">Découvrez notre sélection d'hôtels d'exception pour un séjour inoubliable. Le luxe rencontre l'authenticité.</p>
+        <h1 class="gv-hero-title">{{ 'hotel.index.hero_title_prefix'|trans }} <em>{{ 'hotel.index.hero_title_emphasis'|trans }}</em></h1>
+        <p class="gv-hero-sub">{{ 'hotel.index.hero_subtitle'|trans }}</p>
     </div>
 </div>
 
@@ -407,14 +407,14 @@ body {
     <div class="gv-search-shell">
         <form method="GET" action="{{ path('app_hotel_index') }}" class="gv-search-inner">
             <span class="material-symbols-outlined">search</span>
-            <input type="text" name="search" class="gv-search-input" placeholder="Rechercher un hôtel par nom, ville ou description..." value="{{ search }}">
+            <input type="text" name="search" class="gv-search-input" placeholder="{{ 'hotel.index.search_placeholder'|trans }}" value="{{ search }}">
             <button class="gv-search-btn" type="submit">
                 <span class="material-symbols-outlined" style="font-size:1.1rem;">search</span>
-                Rechercher
+                {{ 'common.search'|trans }}
             </button>
             {% if search %}
                 <a href="{{ path('app_hotel_index') }}" class="gv-search-reset">
-                    <span class="material-symbols-outlined" style="font-size:0.9rem;">close</span> Effacer
+                    <span class="material-symbols-outlined" style="font-size:0.9rem;">close</span> {{ 'common.clear'|trans }}
                 </a>
             {% endif %}
         </form>
@@ -423,29 +423,33 @@ body {
     <!-- Sort Controls -->
     <div class="gv-sort-controls">
         <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nom', 'sortDir': 'asc'}) }}" class="gv-sort-btn {{ sortBy == 'nom' and sortDir == 'asc' ? 'active' : '' }}">
-            <span class="material-symbols-outlined" style="font-size:1rem;">sort_by_alpha</span> Nom A→Z
+            <span class="material-symbols-outlined" style="font-size:1rem;">sort_by_alpha</span> {{ 'hotel.index.sort_name_asc'|trans }}
         </a>
         <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nom', 'sortDir': 'desc'}) }}" class="gv-sort-btn {{ sortBy == 'nom' and sortDir == 'desc' ? 'active' : '' }}">
-            <span class="material-symbols-outlined" style="font-size:1rem;">sort_by_alpha</span> Nom Z→A
+            <span class="material-symbols-outlined" style="font-size:1rem;">sort_by_alpha</span> {{ 'hotel.index.sort_name_desc'|trans }}
         </a>
         <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'budget', 'sortDir': 'asc'}) }}" class="gv-sort-btn {{ sortBy == 'budget' and sortDir == 'asc' ? 'active' : '' }}">
-            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_upward</span> Prix ↑
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_upward</span> {{ 'hotel.index.sort_price_asc'|trans }}
         </a>
         <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'budget', 'sortDir': 'desc'}) }}" class="gv-sort-btn {{ sortBy == 'budget' and sortDir == 'desc' ? 'active' : '' }}">
-            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_downward</span> Prix ↓
+            <span class="material-symbols-outlined" style="font-size:1rem;">arrow_downward</span> {{ 'hotel.index.sort_price_desc'|trans }}
         </a>
         <a href="{{ path('app_hotel_index', {'search': search, 'sortBy': 'nombreEtoiles', 'sortDir': 'desc'}) }}" class="gv-sort-btn {{ sortBy == 'nombreEtoiles' ? 'active' : '' }}">
-            <span class="material-symbols-outlined" style="font-size:1rem; font-variation-settings: 'FILL' 1; color: {{ sortBy == 'nombreEtoiles' ? '#fff' : '#e9c176' }};">star</span> Note
+            <span class="material-symbols-outlined" style="font-size:1rem; font-variation-settings: 'FILL' 1; color: {{ sortBy == 'nombreEtoiles' ? '#fff' : '#e9c176' }};">star</span> {{ 'hotel.index.sort_rating'|trans }}
         </a>
     </div>
 
     <!-- Hotel Grid -->
     <div class="gv-hotel-grid">
         {% for hotel in hotels %}
+            {% set hotelName = translated_hotel_value(hotel, 'nom') %}
+            {% set hotelAddress = translated_hotel_value(hotel, 'adresse') %}
+            {% set hotelCity = translated_hotel_value(hotel, 'ville') %}
+            {% set translatedDescription = translated_hotel_description(hotel) %}
             <div class="gv-hotel-card gv-reveal">
                 <div class="gv-hotel-img-wrapper">
                     {% if hotel.photoUrl %}
-                        <img src="{{ hotel.photoUrl }}" alt="{{ hotel.nom }}">
+                        <img src="{{ hotel.photoUrl }}" alt="{{ hotelName }}">
                     {% else %}
                         <div class="gv-hotel-placeholder">
                             <span class="material-symbols-outlined">apartment</span>
@@ -460,32 +464,32 @@ body {
                     {% endif %}
                 </div>
                 <div class="gv-hotel-card-body">
-                    <h3 class="gv-hotel-name">{{ hotel.nom }}</h3>
+                    <h3 class="gv-hotel-name">{{ hotelName }}</h3>
                     <div class="gv-hotel-location">
                         <span class="material-symbols-outlined">location_on</span>
-                        {{ hotel.adresse }}, {{ hotel.ville }}
+                        {{ hotelAddress }}, {{ hotelCity }}
                     </div>
-                    {% if hotel.description %}
-                        <p class="gv-hotel-desc">{{ hotel.description|slice(0, 120) }}...</p>
+                    {% if translatedDescription %}
+                        <p class="gv-hotel-desc">{{ translatedDescription|slice(0, 120) }}...</p>
                     {% endif %}
                     {% if hotel.budget %}
                         <div class="gv-hotel-price">
-                            {{ hotel.budget }}€ <small>/ nuit</small>
+                            {{ hotel.budget }}€ <small>{{ 'common.per_night'|trans }}</small>
                         </div>
                     {% endif %}
                 </div>
                 <div class="gv-hotel-card-footer">
                     <a href="{{ path('app_hotel_show', {'id': hotel.id}) }}" class="gv-btn-details">
                         <span class="material-symbols-outlined" style="font-size:1rem;">visibility</span>
-                        Voir Détails
+                        {{ 'common.view_details'|trans }}
                     </a>
                 </div>
             </div>
         {% else %}
             <div class="gv-empty">
                 <span class="material-symbols-outlined gv-empty-icon">apartment</span>
-                <h4>Aucun hôtel trouvé</h4>
-                <p>Nos partenaires hôteliers seront bientôt listés. Revenez plus tard.</p>
+                <h4>{{ 'hotel.index.empty_title'|trans }}</h4>
+                <p>{{ 'hotel.index.empty_subtitle'|trans }}</p>
             </div>
         {% endfor %}
     </div>

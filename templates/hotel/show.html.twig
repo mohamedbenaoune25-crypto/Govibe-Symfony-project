@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ hotel.nom }} — GoVibe | Détails Hôtel{% endblock %}
+{% block title %}{{ 'hotel.show.meta_title'|trans({'%name%': translated_hotel_value(hotel, 'nom')}) }}{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -131,11 +131,14 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 {% endblock %}
 
 {% block body %}
+{% set hotelName = translated_hotel_value(hotel, 'nom') %}
+{% set hotelAddress = translated_hotel_value(hotel, 'adresse') %}
+{% set hotelCity = translated_hotel_value(hotel, 'ville') %}
 <!-- ─── HERO ─── -->
 <div class="gv-hotel-show-hero">
     <div class="hero-bg">
         {% if hotel.photoUrl %}
-            <img src="{{ hotel.photoUrl }}" alt="{{ hotel.nom }}">
+            <img src="{{ hotel.photoUrl }}" alt="{{ hotelName }}">
         {% else %}
             <div class="hero-bg-placeholder"></div>
         {% endif %}
@@ -148,18 +151,18 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                 {% for i in 1..5 %}
                     <span class="material-symbols-outlined {{ i <= hotel.nombreEtoiles ? 'gv-star-filled' : 'gv-star-empty' }}">star</span>
                 {% endfor %}
-                <span style="margin-left:0.5rem; font-size:0.85rem; color:rgba(255,255,255,0.6);">{{ hotel.nombreEtoiles }} étoiles</span>
+                <span style="margin-left:0.5rem; font-size:0.85rem; color:rgba(255,255,255,0.6);">{{ 'hotel.show.stars_count'|trans({'%count%': hotel.nombreEtoiles}) }}</span>
             </div>
             {% endif %}
-            <h1>{{ hotel.nom }}</h1>
+            <h1>{{ hotelName }}</h1>
             <div class="hero-location">
                 <span class="material-symbols-outlined">location_on</span>
-                {{ hotel.adresse }}, {{ hotel.ville }}
+                {{ hotelAddress }}, {{ hotelCity }}
             </div>
             {% if hotel.budget %}
             <div class="gv-hero-price-tag">
                 <span class="price">{{ hotel.budget }}€</span>
-                <span class="unit">/ nuit</span>
+                <span class="unit">{{ 'common.per_night'|trans }}</span>
             </div>
             {% endif %}
         </div>
@@ -174,26 +177,26 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
             <!-- Info Card -->
             <div class="gv-show-card">
                 <div class="gv-show-section-title">
-                    <span class="material-symbols-outlined">info</span> Informations
+                    <span class="material-symbols-outlined">info</span> {{ 'hotel.show.info'|trans }}
                 </div>
                 <div class="gv-info-grid">
                     <div class="gv-info-item">
-                        <div class="gv-info-label">Adresse</div>
-                        <div class="gv-info-value">{{ hotel.adresse }}</div>
+                        <div class="gv-info-label">{{ 'common.address'|trans }}</div>
+                        <div class="gv-info-value">{{ hotelAddress }}</div>
                     </div>
                     <div class="gv-info-item">
-                        <div class="gv-info-label">Ville</div>
-                        <div class="gv-info-value">{{ hotel.ville }}</div>
+                        <div class="gv-info-label">{{ 'common.city'|trans }}</div>
+                        <div class="gv-info-value">{{ hotelCity }}</div>
                     </div>
                     {% if hotel.createdAt %}
                     <div class="gv-info-item">
-                        <div class="gv-info-label">Créé le</div>
+                        <div class="gv-info-label">{{ 'common.created_at'|trans }}</div>
                         <div class="gv-info-value">{{ hotel.createdAt|date('d/m/Y à H:i') }}</div>
                     </div>
                     {% endif %}
                     {% if hotel.updatedAt %}
                     <div class="gv-info-item">
-                        <div class="gv-info-label">Mis à jour le</div>
+                        <div class="gv-info-label">{{ 'common.updated_at'|trans }}</div>
                         <div class="gv-info-value">{{ hotel.updatedAt|date('d/m/Y à H:i') }}</div>
                     </div>
                     {% endif %}
@@ -201,12 +204,13 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
             </div>
 
             <!-- Description Card -->
-            {% if hotel.description %}
+            {% set translatedDescription = translated_hotel_description(hotel) %}
+            {% if translatedDescription %}
             <div class="gv-show-card">
                 <div class="gv-show-section-title">
-                    <span class="material-symbols-outlined">description</span> Description
+                    <span class="material-symbols-outlined">description</span> {{ 'common.description'|trans }}
                 </div>
-                <div class="gv-description">{{ hotel.description|nl2br }}</div>
+                <div class="gv-description">{{ translatedDescription|nl2br }}</div>
             </div>
             {% endif %}
 
@@ -214,7 +218,7 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
             {% if hotel.chambres|length > 0 %}
             <div class="gv-show-card">
                 <div class="gv-show-section-title">
-                    <span class="material-symbols-outlined">door_open</span> Chambres disponibles ({{ hotel.chambres|length }})
+                    <span class="material-symbols-outlined">door_open</span> {{ 'hotel.show.available_rooms'|trans({'%count%': hotel.chambres|length}) }}
                 </div>
                 <div class="gv-chambre-grid">
                     {% for chambre in hotel.chambres %}
@@ -222,10 +226,10 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                         <div class="gv-chambre-type">{{ chambre.type }}</div>
                         <div class="gv-chambre-cap">
                             <span class="material-symbols-outlined" style="font-size:0.9rem; vertical-align:-2px; color:#10B981;">group</span>
-                            {{ chambre.capacite }} personne(s)
+                            {{ 'hotel.show.capacity_people'|trans({'%count%': chambre.capacite}) }}
                         </div>
                         {% if chambre.prixStandard %}
-                        <div class="gv-chambre-price">{{ chambre.prixStandard }}€/nuit</div>
+                        <div class="gv-chambre-price">{{ chambre.prixStandard }}€{{ 'hotel.show.per_night_compact'|trans }}</div>
                         {% endif %}
                     </div>
                     {% endfor %}
@@ -237,27 +241,27 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
         <!-- Sidebar -->
         <div>
             <div class="gv-sidebar-card">
-                <h5>Actions</h5>
+                <h5>{{ 'common.actions'|trans }}</h5>
                 {% if app.user and not is_granted('ROLE_ADMIN') %}
                 <a href="{{ path('app_reservation_new', {'hotel': hotel.id}) }}" class="gv-action-btn gv-action-primary">
                     <span class="material-symbols-outlined" style="font-size:1.1rem;">calendar_add_on</span>
-                    Réserver maintenant
+                    {{ 'hotel.show.book_now'|trans }}
                 </a>
                 {% endif %}
                 <a href="{{ path('app_chambre_index') }}" class="gv-action-btn gv-action-green">
                     <span class="material-symbols-outlined" style="font-size:1.1rem;">door_open</span>
-                    Voir les chambres
+                    {{ 'hotel.show.view_rooms'|trans }}
                 </a>
                 <a href="{{ path('app_hotel_index') }}" class="gv-action-btn gv-action-outline">
                     <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
-                    Retour à la liste
+                    {{ 'common.back_to_list'|trans }}
                 </a>
             </div>
 
             <div class="gv-sidebar-card">
                 <div class="gv-note">
                     <span class="material-symbols-outlined" style="font-size:1rem; vertical-align:-2px; color:#10B981;">info</span>
-                    Interface en lecture seule pour les utilisateurs.
+                    {{ 'hotel.show.read_only_note'|trans }}
                 </div>
             </div>
         </div>
@@ -284,10 +288,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     const icon = this.querySelector('i');
                     const text = this.querySelector('#favoriteText');
-                    if (data.isFavoris) { icon.classList.remove('bi-star'); icon.classList.add('bi-star-fill'); if(text) text.textContent = 'Retirer des favoris'; this.classList.add('favorited'); }
-                    else { icon.classList.remove('bi-star-fill'); icon.classList.add('bi-star'); if(text) text.textContent = 'Ajouter aux favoris'; this.classList.remove('favorited'); }
+                    if (data.isFavoris) { icon.classList.remove('bi-star'); icon.classList.add('bi-star-fill'); if(text) text.textContent = '{{ 'hotel.show.favorite_remove'|trans }}'; this.classList.add('favorited'); }
+                    else { icon.classList.remove('bi-star-fill'); icon.classList.add('bi-star'); if(text) text.textContent = '{{ 'hotel.show.favorite_add'|trans }}'; this.classList.remove('favorited'); }
                 }
-            } catch (error) { console.error('Erreur:', error); }
+            } catch (error) { console.error('{{ 'common.error'|trans }}:', error); }
         });
     }
 });

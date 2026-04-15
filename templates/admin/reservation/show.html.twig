@@ -1,24 +1,27 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Détail réservation{% endblock %}
-{% block page_title %}Détail réservation{% endblock %}
+{% block title %}{{ 'admin.reservation.show.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'admin.reservation.show.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <div class="admin-card">
     <div class="admin-card-header d-flex justify-content-between align-items-center">
-        <span>Réservation #{{ reservation.id }}</span>
+        <span>{{ 'reservation.show.title'|trans }} #{{ reservation.id }}</span>
         <span class="badge bg-success">{{ reservation.statut }}</span>
     </div>
     <div class="admin-card-body">
-        <p><strong>Client:</strong> {{ reservation.user ? reservation.user.prenom ~ ' ' ~ reservation.user.nom : '-' }}</p>
-        <p><strong>Email:</strong> {{ reservation.user ? reservation.user.email : '-' }}</p>
-        <p><strong>Hôtel:</strong> {{ reservation.hotel ? reservation.hotel.nom : '-' }}</p>
-        <p><strong>Chambre:</strong> {{ reservation.chambre ? reservation.chambre.type : '-' }}</p>
-        <p><strong>Date début:</strong> {{ reservation.dateDebut|date('d/m/Y') }}</p>
-        <p><strong>Date fin:</strong> {{ reservation.dateFin|date('d/m/Y') }}</p>
-        <p><strong>Prix total:</strong> {{ reservation.prixTotal }}€</p>
+        <p><strong>{{ 'admin.reservation.common.client'|trans }}:</strong> {{ reservation.user ? reservation.user.prenom ~ ' ' ~ reservation.user.nom : '-' }}</p>
+        <p><strong>{{ 'admin.reservation.common.email'|trans }}:</strong> {{ reservation.user ? reservation.user.email : '-' }}</p>
+        <p><strong>{{ 'common.hotel'|trans }}:</strong> {{ reservation.hotel ? translated_hotel_value(reservation.hotel, 'nom') : '-' }}</p>
+        <p><strong>{{ 'common.rooms'|trans }}:</strong> {{ reservation.chambre ? reservation.chambre.type : '-' }}</p>
+        <p><strong>{{ 'admin.reservation.common.date_start'|trans }}:</strong> {{ reservation.dateDebut|date('d/m/Y') }}</p>
+        <p><strong>{{ 'admin.reservation.common.date_end'|trans }}:</strong> {{ reservation.dateFin|date('d/m/Y') }}</p>
+        <p><strong>{{ 'reservation.common.total_price'|trans }}:</strong> {{ reservation.prixTotal }}€</p>
 
-        <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro mt-3">Retour hôtels</a>
+        <div class="d-flex gap-2 mt-3">
+            <a href="{{ path('app_admin_reservations_edit_status', {'id': reservation.id, 'redirect_to': path('app_admin_reservations_show', {'id': reservation.id})}) }}" class="btn btn-outline-primary">{{ 'admin.reservation.common.edit_status'|trans }}</a>
+            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro">{{ 'admin.chambre.actions.back_hotels'|trans }}</a>
+        </div>
     </div>
 </div>
 {% endblock %}

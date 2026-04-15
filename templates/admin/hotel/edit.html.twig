@@ -1,12 +1,17 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Modifier un hôtel{% endblock %}
-{% block page_title %}Modifier un hôtel{% endblock %}
+{% block title %}{{ 'admin.hotel.edit.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'admin.hotel.edit.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <div class="admin-card mb-4">
     <div class="admin-card-body">
-        {{ form_start(form) }}
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+        {% if form.vars.errors|length > 0 %}
+            <div class="alert alert-danger" role="alert">
+                {{ form_errors(form) }}
+            </div>
+        {% endif %}
         <div class="row g-3">
             {{ form_row(form.nom, {'attr': {'class': 'form-control'}}) }}
             {{ form_row(form.adresse, {'attr': {'class': 'form-control'}}) }}
@@ -18,10 +23,10 @@
         </div>
         <div class="mt-4 d-flex gap-2">
             <button class="btn btn-primary-pro" type="submit">
-                <i class="bi bi-check2-square me-1"></i>Mettre à jour
+                <i class="bi bi-check2-square me-1"></i>{{ 'common.update'|trans }}
             </button>
             <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+                <i class="bi bi-arrow-left me-1"></i>{{ 'common.back_to_list'|trans }}
             </a>
         </div>
         {{ form_end(form) }}
@@ -29,10 +34,10 @@
 </div>
 
 <div class="admin-card">
-    <div class="admin-card-header text-danger">Suppression</div>
+    <div class="admin-card-header text-danger">{{ 'common.deletion'|trans }}</div>
     <div class="admin-card-body">
         {{ form_start(delete_form) }}
-        <button class="btn btn-danger" type="submit" onclick="return confirm('Confirmer la suppression de cet hôtel ?');">Supprimer l'hôtel</button>
+        <button class="btn btn-danger" type="submit" onclick="return confirm('{{ 'admin.hotel.confirm_delete'|trans }}');">{{ 'admin.hotel.actions.delete'|trans }}</button>
         {{ form_end(delete_form) }}
     </div>
 </div>

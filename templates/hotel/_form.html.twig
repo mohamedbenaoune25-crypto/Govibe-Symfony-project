@@ -1,58 +1,58 @@
-{{ form_start(form, {'attr': {'class': 'hotel-form'}}) }}
+{{ form_start(form, {'attr': {'class': 'hotel-form', 'novalidate': 'novalidate'}}) }}
     <div class="row g-3">
         <div class="col-md-6">
             <div class="form-floating">
-                {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Nom de l\'hôtel'}}) }}
-                {{ form_label(form.nom, 'Nom de l\'hôtel', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.nom) }}
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.name'|trans}}) }}
+                {{ form_label(form.nom, 'hotel.form.name'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.nom.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-floating">
-                {{ form_widget(form.ville, {'attr': {'class': 'form-control', 'placeholder': 'Ville'}}) }}
-                {{ form_label(form.ville, 'Ville', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.ville) }}
+                {{ form_widget(form.ville, {'attr': {'class': 'form-control' ~ (form.ville.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.city'|trans}}) }}
+                {{ form_label(form.ville, 'common.city'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.ville.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-12">
             <div class="form-floating">
-                {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'placeholder': 'Adresse complète'}}) }}
-                {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.adresse) }}
+                {{ form_widget(form.adresse, {'attr': {'class': 'form-control' ~ (form.adresse.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.full_address'|trans}}) }}
+                {{ form_label(form.adresse, 'common.address'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.adresse.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-floating">
-                {{ form_widget(form.nombreEtoiles, {'attr': {'class': 'form-control', 'placeholder': 'Nombre d\'étoiles'}}) }}
-                {{ form_label(form.nombreEtoiles, 'Nombre d\'étoiles', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.nombreEtoiles) }}
+                {{ form_widget(form.nombreEtoiles, {'attr': {'class': 'form-control' ~ (form.nombreEtoiles.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.stars'|trans}}) }}
+                {{ form_label(form.nombreEtoiles, 'common.stars'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.nombreEtoiles.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-floating">
-                {{ form_widget(form.budget, {'attr': {'class': 'form-control', 'placeholder': 'Budget'}}) }}
-                {{ form_label(form.budget, 'Budget (€)', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.budget) }}
+                {{ form_widget(form.budget, {'attr': {'class': 'form-control' ~ (form.budget.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.budget'|trans}}) }}
+                {{ form_label(form.budget, 'hotel.form.budget_eur'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.budget.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-12">
             <div class="form-floating">
-                {{ form_widget(form.photoUrl, {'attr': {'class': 'form-control', 'placeholder': 'URL de la photo'}}) }}
-                {{ form_label(form.photoUrl, 'URL de la photo', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.photoUrl) }}
+                {{ form_widget(form.photoUrl, {'attr': {'class': 'form-control' ~ (form.photoUrl.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.photo_url'|trans}}) }}
+                {{ form_label(form.photoUrl, 'hotel.form.photo_url'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.photoUrl.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-12">
             <div class="form-floating">
-                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 4, 'placeholder': 'Description de l\'hôtel'}}) }}
-                {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.description) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''), 'rows': 4, 'placeholder': 'common.description'|trans}}) }}
+                {{ form_label(form.description, 'common.description'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.description.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
             </div>
         </div>
     </div>
     <div class="d-grid mt-4">
         <button class="btn btn-primary btn-lg">
-            <i class="bi bi-check-circle me-2"></i>{{ button_label|default('Sauvegarder l\'hôtel') }}
+            <i class="bi bi-check-circle me-2"></i>{{ button_label|default('hotel.form.save_default'|trans) }}
         </button>
     </div>
 {{ form_end(form) }}

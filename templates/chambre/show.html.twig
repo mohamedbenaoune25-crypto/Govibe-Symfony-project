@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}{{ chambre.type }} — GoVibe{% endblock %}
+{% block title %}{{ 'chambre.show.meta_title'|trans({'%type%': chambre.type}) }}{% endblock %}
 {% block stylesheets %}
 {{ parent() }}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
@@ -45,55 +45,59 @@ body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.ma
 </style>
 {% endblock %}
 {% block body %}
+{% set roomHotelName = translated_hotel_value(chambre.hotel, 'nom') %}
+{% set roomHotelAddress = translated_hotel_value(chambre.hotel, 'adresse') %}
+{% set roomHotelCity = translated_hotel_value(chambre.hotel, 'ville') %}
 <div class="gv-hero">
     <span class="material-symbols-outlined gv-hero-icon-bg">door_open</span>
     <div class="container">
         <div class="gv-bc">
-            <a href="{{ path('app_hotel_index') }}"><span class="material-symbols-outlined" style="font-size:.9rem">apartment</span> Hôtels</a>
+            <a href="{{ path('app_hotel_index') }}"><span class="material-symbols-outlined" style="font-size:.9rem">apartment</span> {{ 'nav.hotels'|trans }}</a>
             <span class="material-symbols-outlined" style="font-size:.7rem;opacity:.5">chevron_right</span>
-            <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}">{{ chambre.hotel.nom }}</a>
+            <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}">{{ roomHotelName }}</a>
             <span class="material-symbols-outlined" style="font-size:.7rem;opacity:.5">chevron_right</span>
             <span class="accent">{{ chambre.type }}</span>
         </div>
         <h1 class="gv-ht">{{ chambre.type }}</h1>
-        <p class="gv-hs">{{ chambre.hotel.nom }}</p>
-        {% if chambre.prixStandard %}<div class="gv-hp">{{ chambre.prixStandard }}€ <small>/ nuit</small></div>{% endif %}
+        <p class="gv-hs">{{ roomHotelName }}</p>
+        {% if chambre.prixStandard %}<div class="gv-hp">{{ chambre.prixStandard }}€ <small>{{ 'common.per_night'|trans }}</small></div>{% endif %}
     </div>
 </div>
 <div class="gv-c"><div class="gv-g">
 <div>
     <div class="gv-card">
-        <div class="gv-ct"><span class="material-symbols-outlined">info</span> Caractéristiques</div>
+        <div class="gv-ct"><span class="material-symbols-outlined">info</span> {{ 'chambre.show.features'|trans }}</div>
         <div class="gv-ig">
-            <div class="gv-ii"><div class="gv-il">Capacité</div><div class="gv-iv">{{ chambre.capacite }} personne(s)</div></div>
-            {% if chambre.equipements %}<div class="gv-ii"><div class="gv-il">Équipements</div><div class="gv-iv">{{ chambre.equipements }}</div></div>{% endif %}
-            {% if chambre.createdAt %}<div class="gv-ii"><div class="gv-il">Créé le</div><div class="gv-iv">{{ chambre.createdAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
-            {% if chambre.updatedAt %}<div class="gv-ii"><div class="gv-il">Mis à jour</div><div class="gv-iv">{{ chambre.updatedAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
+            <div class="gv-ii"><div class="gv-il">{{ 'common.capacity'|trans }}</div><div class="gv-iv">{{ 'chambre.show.people_count'|trans({'%count%': chambre.capacite}) }}</div></div>
+            <div class="gv-ii"><div class="gv-il">{{ 'common.number_of_rooms'|trans }}</div><div class="gv-iv">{{ chambre.nombreDeChambres }}</div></div>
+            {% if chambre.equipements %}<div class="gv-ii"><div class="gv-il">{{ 'common.equipments'|trans }}</div><div class="gv-iv">{{ chambre.equipements }}</div></div>{% endif %}
+            {% if chambre.createdAt %}<div class="gv-ii"><div class="gv-il">{{ 'common.created_at'|trans }}</div><div class="gv-iv">{{ chambre.createdAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
+            {% if chambre.updatedAt %}<div class="gv-ii"><div class="gv-il">{{ 'common.updated_at'|trans }}</div><div class="gv-iv">{{ chambre.updatedAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
         </div>
     </div>
     <div class="gv-card">
-        <div class="gv-ct"><span class="material-symbols-outlined">payments</span> Tarification</div>
+        <div class="gv-ct"><span class="material-symbols-outlined">payments</span> {{ 'chambre.show.pricing'|trans }}</div>
         <div class="gv-pg">
-            {% if chambre.prixStandard %}<div class="gv-pc"><div class="gv-pcl">Standard</div><div class="gv-pcv ps">{{ chambre.prixStandard }}€</div></div>{% endif %}
-            {% if chambre.prixHauteSaison %}<div class="gv-pc"><div class="gv-pcl">Haute saison</div><div class="gv-pcv ph">{{ chambre.prixHauteSaison }}€</div></div>{% endif %}
-            {% if chambre.prixBasseSaison %}<div class="gv-pc"><div class="gv-pcl">Basse saison</div><div class="gv-pcv pl">{{ chambre.prixBasseSaison }}€</div></div>{% endif %}
+            {% if chambre.prixStandard %}<div class="gv-pc"><div class="gv-pcl">{{ 'common.standard'|trans }}</div><div class="gv-pcv ps">{{ chambre.prixStandard }}€</div></div>{% endif %}
+            {% if chambre.prixHauteSaison %}<div class="gv-pc"><div class="gv-pcl">{{ 'common.high_season'|trans }}</div><div class="gv-pcv ph">{{ chambre.prixHauteSaison }}€</div></div>{% endif %}
+            {% if chambre.prixBasseSaison %}<div class="gv-pc"><div class="gv-pcl">{{ 'common.low_season'|trans }}</div><div class="gv-pcv pl">{{ chambre.prixBasseSaison }}€</div></div>{% endif %}
         </div>
     </div>
     <div class="gv-card">
-        <div class="gv-ct"><span class="material-symbols-outlined">apartment</span> Hôtel associé</div>
+        <div class="gv-ct"><span class="material-symbols-outlined">apartment</span> {{ 'chambre.show.associated_hotel'|trans }}</div>
         <div class="gv-hs2">
-            <div class="gv-hn">{{ chambre.hotel.nom }}</div>
-            <div class="gv-ha">{{ chambre.hotel.adresse }}, {{ chambre.hotel.ville }}</div>
-            {% if chambre.hotel.nombreEtoiles %}<div class="gv-st">{% for i in 1..5 %}<span class="material-symbols-outlined {{ i <= chambre.hotel.nombreEtoiles ? 'so' : 'sf' }}">star</span>{% endfor %}<span style="margin-left:.4rem;font-size:.85rem;color:#546067">{{ chambre.hotel.nombreEtoiles }} étoiles</span></div>{% endif %}
+            <div class="gv-hn">{{ roomHotelName }}</div>
+            <div class="gv-ha">{{ roomHotelAddress }}, {{ roomHotelCity }}</div>
+            {% if chambre.hotel.nombreEtoiles %}<div class="gv-st">{% for i in 1..5 %}<span class="material-symbols-outlined {{ i <= chambre.hotel.nombreEtoiles ? 'so' : 'sf' }}">star</span>{% endfor %}<span style="margin-left:.4rem;font-size:.85rem;color:#546067">{{ 'hotel.show.stars_count'|trans({'%count%': chambre.hotel.nombreEtoiles}) }}</span></div>{% endif %}
         </div>
     </div>
 </div>
 <div>
-    <div class="gv-sb"><h5>Actions</h5>
-        <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="gv-ab gv-ag"><span class="material-symbols-outlined" style="font-size:1rem">apartment</span> Voir l'hôtel</a>
-        <a href="{{ path('app_chambre_index') }}" class="gv-ab gv-ao"><span class="material-symbols-outlined" style="font-size:1rem">arrow_back</span> Liste des chambres</a>
+    <div class="gv-sb"><h5>{{ 'common.actions'|trans }}</h5>
+        <a href="{{ path('app_hotel_show', {'id': chambre.hotel.id}) }}" class="gv-ab gv-ag"><span class="material-symbols-outlined" style="font-size:1rem">apartment</span> {{ 'hotel.edit.view_hotel'|trans }}</a>
+        <a href="{{ path('app_chambre_index') }}" class="gv-ab gv-ao"><span class="material-symbols-outlined" style="font-size:1rem">arrow_back</span> {{ 'chambre.show.rooms_list'|trans }}</a>
     </div>
-    <div class="gv-sb"><div class="gv-note"><span class="material-symbols-outlined">info</span> Interface en lecture seule.</div></div>
+    <div class="gv-sb"><div class="gv-note"><span class="material-symbols-outlined">info</span> {{ 'chambre.show.read_only_note'|trans }}</div></div>
 </div>
 </div></div>
 {% endblock %}

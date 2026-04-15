@@ -1,0 +1,65 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}{{ 'admin.reservation.edit_status.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'admin.reservation.edit_status.page_title'|trans }}{% endblock %}
+
+{% block body %}
+<div class="admin-card mb-4">
+    <div class="admin-card-header d-flex justify-content-between align-items-center">
+        <span>{{ 'reservation.show.title'|trans }} #{{ reservation.id }}</span>
+        <span class="text-muted">{{ 'admin.reservation.edit_status.subtitle'|trans }}</span>
+    </div>
+    <div class="admin-card-body">
+        <form method="post" action="{{ path('app_admin_reservations_edit_status', {'id': reservation.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('reservation_edit_status_' ~ reservation.id) }}">
+            <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">{{ 'admin.reservation.common.client'|trans }}</label>
+                    <input type="text" class="form-control" value="{{ reservation.user ? reservation.user.prenom ~ ' ' ~ reservation.user.nom : '-' }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ 'admin.reservation.common.email'|trans }}</label>
+                    <input type="text" class="form-control" value="{{ reservation.user ? reservation.user.email : '-' }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ 'common.hotel'|trans }}</label>
+                    <input type="text" class="form-control" value="{{ reservation.hotel ? translated_hotel_value(reservation.hotel, 'nom') : '-' }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ 'common.rooms'|trans }}</label>
+                    <input type="text" class="form-control" value="{{ reservation.chambre ? reservation.chambre.type : '-' }}" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ 'admin.reservation.common.date_start'|trans }}</label>
+                    <input type="text" class="form-control" value="{{ reservation.dateDebut|date('d/m/Y') }}" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ 'admin.reservation.common.date_end'|trans }}</label>
+                    <input type="text" class="form-control" value="{{ reservation.dateFin|date('d/m/Y') }}" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ 'reservation.common.total_price'|trans }}</label>
+                    <input type="text" class="form-control" value="{{ reservation.prixTotal }}€" readonly>
+                </div>
+                <div class="col-md-3">
+                    <label for="statut" class="form-label">{{ 'reservation.form.status'|trans }}</label>
+                    <select id="statut" name="statut" class="form-select">
+                        {% for value in status_choices %}
+                            <option value="{{ value }}" {% if reservation.statut == value %}selected{% endif %}>
+                                {% if value == 'EN_ATTENTE' %}{{ 'reservation.status.pending'|trans }}{% elseif value == 'CONFIRMEE' %}{{ 'reservation.status.accepted'|trans }}{% else %}{{ 'reservation.status.refused'|trans }}{% endif %}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                <button type="submit" class="btn btn-primary-pro">{{ 'admin.reservation.edit_status.save'|trans }}</button>
+                <a href="{{ redirect_to ?: path('app_admin_reservations_index') }}" class="btn btn-outline-secondary">{{ 'common.cancel'|trans }}</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

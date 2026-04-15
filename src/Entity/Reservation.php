@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 #[ORM\Table(name: 'reservation')]
@@ -16,15 +18,26 @@ class Reservation
     private ?int $id = null;
 
     #[ORM\Column(name: 'date_debut', type: Types::DATE_MUTABLE)]
+    #[Assert\NotNull(message: "La date de debut est obligatoire.")]
+    #[Assert\Type(type: '\\DateTimeInterface', message: "La date de debut doit etre une date valide.")]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(name: 'date_fin', type: Types::DATE_MUTABLE)]
+    #[Assert\NotNull(message: "La date de fin est obligatoire.")]
+    #[Assert\Type(type: '\\DateTimeInterface', message: "La date de fin doit etre une date valide.")]
     private ?\DateTimeInterface $dateFin = null;
 
     #[ORM\Column(name: 'prix_total')]
+    #[Assert\NotNull(message: "Le prix total est obligatoire.")]
+    #[Assert\Positive(message: "Le prix total doit etre superieur a 0.")]
     private ?float $prixTotal = null;
 
     #[ORM\Column(length: 20, options: ['default' => 'EN_ATTENTE'])]
+    #[Assert\NotBlank(message: "Le statut est obligatoire.")]
+    #[Assert\Choice(
+        choices: ['EN_ATTENTE', 'ACCEPTEE', 'REFUSEE', 'CONFIRMEE', 'ANNULEE'],
+        message: "Le statut choisi est invalide."
+    )]
     private ?string $statut = 'EN_ATTENTE';
 
     #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
@@ -39,6 +52,7 @@ class Reservation
 
     #[ORM\ManyToOne(targetEntity: Chambre::class)]
     #[ORM\JoinColumn(name: 'chambre_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[Assert\NotNull(message: "La chambre est obligatoire.")]
     private ?Chambre $chambre = null;
 
     #[ORM\ManyToOne(targetEntity: Hotel::class)]
@@ -61,7 +75,7 @@ class Reservation
         return $this->dateDebut;
     }
 
-    public function setDateDebut(\DateTimeInterface $dateDebut): self
+    public function setDateDebut(?\DateTimeInterface $dateDebut): self
     {
         $this->dateDebut = $dateDebut;
         return $this;
@@ -72,7 +86,7 @@ class Reservation
         return $this->dateFin;
     }
 
-    public function setDateFin(\DateTimeInterface $dateFin): self
+    public function setDateFin(?\DateTimeInterface $dateFin): self
     {
         $this->dateFin = $dateFin;
         return $this;
@@ -83,7 +97,7 @@ class Reservation
         return $this->prixTotal;
     }
 
-    public function setPrixTotal(float $prixTotal): self
+    public function setPrixTotal(?float $prixTotal): self
     {
         $this->prixTotal = $prixTotal;
         return $this;
@@ -94,7 +108,7 @@ class Reservation
         return $this->statut;
     }
 
-    public function setStatut(string $statut): self
+    public function setStatut(?string $statut): self
     {
         $this->statut = $statut;
         return $this;
@@ -141,5 +155,19 @@ class Reservation
     {
         $this->hotel = $hotel;
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateDates(ExecutionContextInterface $context): void
+    {
+        if (!$this->dateDebut instanceof \DateTimeInterface || !$this->dateFin instanceof \DateTimeInterface) {
+            return;
+        }
+
+        if ($this->dateFin <= $this->dateDebut) {
+            $context->buildViolation('La date de fin doit etre posterieure a la date de debut.')
+                ->atPath('dateFin')
+                ->addViolation();
+        }
     }
 }

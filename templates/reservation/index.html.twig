@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réservations — GoVibe{% endblock %}
+{% block title %}{{ 'reservation.index.meta_title'|trans }}{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -126,12 +126,12 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 <div class="gv-res-hero">
     <span class="material-symbols-outlined gv-hero-icon-bg">calendar_month</span>
     <div class="container">
-        <h1 class="gv-hero-title">Gestion des <em>Réservations</em></h1>
-        <p class="gv-hero-sub">Consultez, ajoutez et gérez vos réservations hôtelières</p>
+        <h1 class="gv-hero-title">{{ 'reservation.index.hero_title_prefix'|trans }} <em>{{ 'reservation.index.hero_title_emphasis'|trans }}</em></h1>
+        <p class="gv-hero-sub">{{ 'reservation.index.hero_subtitle'|trans }}</p>
         {% if not is_granted('ROLE_ADMIN') %}
         <a href="{{ path('app_reservation_new') }}" class="gv-hero-cta">
             <span class="material-symbols-outlined" style="font-size:1.1rem;">add_circle</span>
-            Créer une Réservation
+            {{ 'reservation.index.create'|trans }}
         </a>
         {% endif %}
     </div>
@@ -143,29 +143,29 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
         <form method="GET" action="{{ path('app_reservation_index') }}" class="row g-3 align-items-end">
             <div class="col-md-5">
                 <label for="search" class="form-label">
-                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">search</span> Rechercher
+                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">search</span> {{ 'common.search'|trans }}
                 </label>
-                <input type="text" class="form-control" id="search" name="search" placeholder="Client, hôtel, chambre ou statut..." value="{{ search }}">
+                <input type="text" class="form-control" id="search" name="search" placeholder="{{ 'reservation.index.search_placeholder'|trans }}" value="{{ search }}">
             </div>
             <div class="col-md-3">
                 <label for="sortBy" class="form-label">
-                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">sort</span> Trier par
+                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">sort</span> {{ 'common.sort_by'|trans }}
                 </label>
                 <select class="form-select" id="sortBy" name="sortBy">
-                    <option value="dateDebut" {% if sortBy == 'dateDebut' %}selected{% endif %}>Date d'arrivée</option>
-                    <option value="dateFin" {% if sortBy == 'dateFin' %}selected{% endif %}>Date de départ</option>
-                    <option value="prixTotal" {% if sortBy == 'prixTotal' %}selected{% endif %}>Prix total</option>
-                    <option value="statut" {% if sortBy == 'statut' %}selected{% endif %}>Statut</option>
-                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>Date de création</option>
+                    <option value="dateDebut" {% if sortBy == 'dateDebut' %}selected{% endif %}>{{ 'reservation.index.sort_arrival'|trans }}</option>
+                    <option value="dateFin" {% if sortBy == 'dateFin' %}selected{% endif %}>{{ 'reservation.index.sort_departure'|trans }}</option>
+                    <option value="prixTotal" {% if sortBy == 'prixTotal' %}selected{% endif %}>{{ 'reservation.index.sort_total'|trans }}</option>
+                    <option value="statut" {% if sortBy == 'statut' %}selected{% endif %}>{{ 'reservation.index.sort_status'|trans }}</option>
+                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>{{ 'reservation.index.sort_created'|trans }}</option>
                 </select>
             </div>
             <div class="col-md-2">
                 <label for="sortDir" class="form-label">
-                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">swap_vert</span> Ordre
+                    <span class="material-symbols-outlined" style="font-size:0.95rem; vertical-align:-2px; color:#10B981;">swap_vert</span> {{ 'common.order'|trans }}
                 </label>
                 <select class="form-select" id="sortDir" name="sortDir">
-                    <option value="ASC" {% if sortDir == 'ASC' %}selected{% endif %}>Croissant ↑</option>
-                    <option value="DESC" {% if sortDir == 'DESC' %}selected{% endif %}>Décroissant ↓</option>
+                    <option value="ASC" {% if sortDir == 'ASC' %}selected{% endif %}>{{ 'common.ascending'|trans }} ↑</option>
+                    <option value="DESC" {% if sortDir == 'DESC' %}selected{% endif %}>{{ 'common.descending'|trans }} ↓</option>
                 </select>
             </div>
             <div class="col-md-1">
@@ -188,13 +188,13 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
         {% for reservation in reservations %}
         <div class="gv-res-card gv-reveal">
             <div class="gv-res-card-header">
-                <h6>Réservation #{{ reservation.id }}</h6>
-                {% if reservation.statut == 'CONFIRMEE' %}
-                    <span class="gv-status-badge gv-status-confirmed">Confirmée</span>
-                {% elseif reservation.statut == 'ANNULEE' %}
-                    <span class="gv-status-badge gv-status-cancelled">Annulée</span>
+                <h6>{{ 'reservation.index.card_title'|trans({'%id%': reservation.id}) }}</h6>
+                {% if reservation.statut == 'ACCEPTEE' or reservation.statut == 'CONFIRMEE' %}
+                    <span class="gv-status-badge gv-status-confirmed">{{ 'reservation.status.accepted'|trans }}</span>
+                {% elseif reservation.statut == 'REFUSEE' or reservation.statut == 'ANNULEE' %}
+                    <span class="gv-status-badge gv-status-cancelled">{{ 'reservation.status.refused'|trans }}</span>
                 {% else %}
-                    <span class="gv-status-badge gv-status-pending">{{ reservation.statut }}</span>
+                    <span class="gv-status-badge gv-status-pending">{{ 'reservation.status.pending'|trans }}</span>
                 {% endif %}
             </div>
             <div class="gv-res-card-body">
@@ -205,7 +205,7 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                 </div>
                 <div class="gv-info-item">
                     <span class="material-symbols-outlined">apartment</span>
-                    <strong>{{ reservation.hotel.nom }}</strong>
+                    <strong>{{ reservation.hotel ? translated_hotel_value(reservation.hotel, 'nom') : '-' }}</strong>
                 </div>
                 <div class="gv-info-item">
                     <span class="material-symbols-outlined">door_open</span>
@@ -214,37 +214,37 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 
                 <div class="gv-date-grid">
                     <div class="gv-date-box">
-                        <div class="gv-date-label">Arrivée</div>
+                        <div class="gv-date-label">{{ 'reservation.common.arrival'|trans }}</div>
                         <div class="gv-date-value">{{ reservation.dateDebut|date('d/m/Y') }}</div>
                     </div>
                     <div class="gv-date-box">
-                        <div class="gv-date-label">Départ</div>
+                        <div class="gv-date-label">{{ 'reservation.common.departure'|trans }}</div>
                         <div class="gv-date-value">{{ reservation.dateFin|date('d/m/Y') }}</div>
                     </div>
                 </div>
 
                 <div class="gv-price-box">
-                    <div class="gv-price-label">Prix total</div>
+                    <div class="gv-price-label">{{ 'reservation.common.total_price'|trans }}</div>
                     <div class="gv-price-value">{{ reservation.prixTotal }}€</div>
                 </div>
             </div>
             <div class="gv-res-card-footer">
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" class="gv-action-sm gv-action-view">
-                        <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span> Détails
+                        <span class="material-symbols-outlined" style="font-size:0.9rem;">visibility</span> {{ 'common.view_details'|trans }}
                     </a>
                     <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="gv-action-sm gv-action-hotel">
-                        <span class="material-symbols-outlined" style="font-size:0.9rem;">apartment</span> Hôtel
+                        <span class="material-symbols-outlined" style="font-size:0.9rem;">apartment</span> {{ 'common.hotel'|trans }}
                     </a>
                 </div>
                 <div class="d-flex gap-2">
                     <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="gv-action-sm gv-action-edit">
-                        <span class="material-symbols-outlined" style="font-size:0.9rem;">edit</span> Modifier
+                        <span class="material-symbols-outlined" style="font-size:0.9rem;">edit</span> {{ 'common.edit'|trans }}
                     </a>
-                    <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" onsubmit="return confirm('Supprimer cette réservation ?');" class="m-0">
+                    <form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" onsubmit="return confirm('{{ 'reservation.index.delete_confirm'|trans }}');" class="m-0">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
                         <button class="gv-action-sm gv-action-delete" type="submit">
-                            <span class="material-symbols-outlined" style="font-size:0.9rem;">delete</span> Supprimer
+                            <span class="material-symbols-outlined" style="font-size:0.9rem;">delete</span> {{ 'common.delete'|trans }}
                         </button>
                     </form>
                 </div>
@@ -253,12 +253,12 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
         {% else %}
         <div class="gv-empty">
             <span class="material-symbols-outlined gv-empty-icon">event_busy</span>
-            <h4>Aucune réservation trouvée</h4>
-            <p>Il n'y a pas encore de réservations sur la plateforme.</p>
+            <h4>{{ 'reservation.index.empty_title'|trans }}</h4>
+            <p>{{ 'reservation.index.empty_subtitle'|trans }}</p>
             {% if not is_granted('ROLE_ADMIN') %}
             <a href="{{ path('app_reservation_new') }}" class="gv-hero-cta">
                 <span class="material-symbols-outlined" style="font-size:1.1rem;">add_circle</span>
-                Créer la Première Réservation
+                {{ 'reservation.index.create_first'|trans }}
             </a>
             {% endif %}
         </div>

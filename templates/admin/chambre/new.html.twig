@@ -1,60 +1,71 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Ajouter une chambre{% endblock %}
-{% block page_title %}Ajouter une chambre{% endblock %}
+{% block title %}{{ 'admin.chambre.new.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'admin.chambre.new.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <div class="go-form-page">
     <div class="go-form-card chambre-form-card">
         <div class="go-form-card-header chambre-form-header">
-            <h2 class="mb-1 fs-4"><i class="bi bi-door-open me-2"></i>Nouvelle chambre</h2>
-            <p class="mb-0 opacity-75">Complétez les informations de la chambre puis assignez-la à un hôtel.</p>
+            <h2 class="mb-1 fs-4"><i class="bi bi-door-open me-2"></i>{{ 'admin.chambre.new.heading'|trans }}</h2>
+            <p class="mb-0 opacity-75">{{ 'admin.chambre.new.subtitle'|trans }}</p>
         </div>
         <div class="go-form-card-body chambre-form-body">
-            {{ form_start(form) }}
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            {% if form.vars.errors|length > 0 %}
+                <div class="alert alert-danger" role="alert">
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-info-circle me-2"></i>Informations générales</h5>
+                <h5 class="form-section-title"><i class="bi bi-info-circle me-2"></i>{{ 'admin.chambre.form.general_info'|trans }}</h5>
                 <div class="row g-3">
                     <div class="col-md-6">
                         {{ form_row(form.type, {
-                            'label': 'Type de chambre',
-                            'attr': {'class': 'form-control', 'placeholder': 'Ex: Suite Deluxe'}
+                            'label': 'admin.chambre.form.type'|trans,
+                            'attr': {'class': 'form-control', 'placeholder': 'admin.chambre.form.type_placeholder'|trans}
                         }) }}
                     </div>
                     <div class="col-md-6">
                         {{ form_row(form.capacite, {
-                            'label': 'Capacité (personnes)',
-                            'attr': {'class': 'form-control', 'min': 1, 'placeholder': 'Ex: 2'}
+                            'label': 'admin.chambre.form.capacity_people'|trans,
+                            'attr': {'class': 'form-control', 'min': 1, 'placeholder': 'admin.chambre.form.capacity_placeholder'|trans}
+                        }) }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form_row(form.nombreDeChambres, {
+                            'label': 'common.number_of_rooms'|trans,
+                            'attr': {'class': 'form-control', 'min': 1, 'placeholder': 'admin.chambre.form.number_placeholder'|trans}
                         }) }}
                     </div>
                     <div class="col-12">
                         {{ form_row(form.equipements, {
-                            'label': 'Équipements',
-                            'attr': {'class': 'form-control', 'placeholder': 'Wi-Fi, TV, Climatisation...'}
+                            'label': 'common.equipments'|trans,
+                            'attr': {'class': 'form-control', 'placeholder': 'admin.chambre.form.equipments_placeholder'|trans}
                         }) }}
                     </div>
                 </div>
             </section>
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-cash-stack me-2"></i>Tarification</h5>
+                <h5 class="form-section-title"><i class="bi bi-cash-stack me-2"></i>{{ 'admin.chambre.form.pricing'|trans }}</h5>
                 <div class="row g-3">
                     <div class="col-md-4">
                         {{ form_row(form.prixStandard, {
-                            'label': 'Prix standard',
+                            'label': 'common.standard_price'|trans,
                             'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
                         }) }}
                     </div>
                     <div class="col-md-4">
                         {{ form_row(form.prixHauteSaison, {
-                            'label': 'Prix haute saison',
+                            'label': 'common.high_season_price'|trans,
                             'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
                         }) }}
                     </div>
                     <div class="col-md-4">
                         {{ form_row(form.prixBasseSaison, {
-                            'label': 'Prix basse saison',
+                            'label': 'common.low_season_price'|trans,
                             'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
                         }) }}
                     </div>
@@ -62,19 +73,19 @@
             </section>
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-building me-2"></i>Association</h5>
+                <h5 class="form-section-title"><i class="bi bi-building me-2"></i>{{ 'admin.chambre.form.association'|trans }}</h5>
                 <div class="row g-3">
                     {% if form.hotel is defined %}
                         <div class="col-12">
                             {{ form_row(form.hotel, {
-                                'label': 'Hôtel associé',
+                                'label': 'admin.chambre.form.associated_hotel'|trans,
                                 'attr': {'class': 'form-select'}
                             }) }}
                         </div>
                     {% elseif hotel is defined and hotel %}
                         <div class="col-12">
-                            <label class="form-label">Hôtel associé</label>
-                            <input type="text" class="form-control" value="{{ hotel.nom }}" readonly>
+                            <label class="form-label">{{ 'admin.chambre.form.associated_hotel'|trans }}</label>
+                            <input type="text" class="form-control" value="{{ translated_hotel_value(hotel, 'nom') }}" readonly>
                         </div>
                     {% endif %}
                 </div>
@@ -82,10 +93,10 @@
 
             <div class="mt-4 d-flex flex-wrap justify-content-end gap-2">
                 <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Retour hôtels
+                    <i class="bi bi-arrow-left me-1"></i>{{ 'admin.chambre.actions.back_hotels'|trans }}
                 </a>
                 <button class="btn btn-primary-pro" type="submit">
-                    <i class="bi bi-check-circle me-1"></i>Enregistrer la chambre
+                    <i class="bi bi-check-circle me-1"></i>{{ 'admin.chambre.actions.save'|trans }}
                 </button>
             </div>
 

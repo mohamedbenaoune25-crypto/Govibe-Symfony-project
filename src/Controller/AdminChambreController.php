@@ -8,6 +8,8 @@ use App\Form\ChambreType;
 use App\Repository\ChambreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +46,7 @@ class AdminChambreController extends AbstractController
                 ->setParameter('search', '%' . $search . '%');
         }
 
-        $validSortFields = ['type', 'capacite', 'prixStandard', 'prixHauteSaison', 'prixBasseSaison', 'createdAt'];
+        $validSortFields = ['type', 'capacite', 'nombreDeChambres', 'prixStandard', 'prixHauteSaison', 'prixBasseSaison', 'createdAt'];
         if (!in_array($sortBy, $validSortFields, true)) {
             $sortBy = 'type';
         }
@@ -84,14 +86,31 @@ class AdminChambreController extends AbstractController
         $selectedHotel = $hotelId > 0 ? $entityManager->getRepository(Hotel::class)->find($hotelId) : null;
 
         $chambre = new Chambre();
+        if ($selectedHotel instanceof Hotel) {
+            $chambre->setHotel($selectedHotel);
+        }
+
         $form = $this->createForm(ChambreType::class, $chambre, [
             'hotel' => $selectedHotel,
         ]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            if ($selectedHotel instanceof Hotel) {
-                $chambre->setHotel($selectedHotel);
+        if ($form->isSubmitted()) {
+            $this->validateChambreInput($chambre, $form, !$selectedHotel instanceof Hotel);
+
+            if (!$form->isValid()) {
+                if ($request->isXmlHttpRequest()) {
+                    return new JsonResponse([
+                        'success' => false,
+                        'message' => 'Le formulaire contient des erreurs.',
+                    ], Response::HTTP_UNPROCESSABLE_ENTITY);
+                }
+
+                return $this->render('admin/chambre/new.html.twig', [
+                    'chambre' => $chambre,
+                    'form' => $form,
+                    'hotel' => $selectedHotel,
+                ]);
             }
 
             $entityManager->persist($chambre);
@@ -105,6 +124,7 @@ class AdminChambreController extends AbstractController
                         'type' => $chambre->getType() ?: '-',
                         'hotel' => $chambre->getHotel()?->getNom() ?: '-',
                         'capacite' => $chambre->getCapacite() ?? '-',
+                        'nombreDeChambres' => $chambre->getNombreDeChambres() ?? '-',
                         'prixStandard' => $chambre->getPrixStandard() ?? '-',
                     ],
                 ]);
@@ -115,13 +135,6 @@ class AdminChambreController extends AbstractController
             }
 
             return $this->redirectToRoute('app_admin_chambres_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        if ($request->isXmlHttpRequest() && $form->isSubmitted()) {
-            return new JsonResponse([
-                'success' => false,
-                'message' => 'Le formulaire contient des erreurs.',
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         return $this->render('admin/chambre/new.html.twig', [
@@ -164,10 +177,14 @@ class AdminChambreController extends AbstractController
             ->setMethod('POST')
             ->getForm();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+        if ($form->isSubmitted()) {
+            $this->validateChambreInput($chambre, $form);
 
-            return $this->redirectToRoute('app_admin_chambres_index', [], Response::HTTP_SEE_OTHER);
+            if ($form->isValid()) {
+                $entityManager->flush();
+
+                return $this->redirectToRoute('app_admin_chambres_index', [], Response::HTTP_SEE_OTHER);
+            }
         }
 
         return $this->render('admin/chambre/edit.html.twig', [
@@ -186,5 +203,36 @@ class AdminChambreController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_chambres_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function validateChambreInput(Chambre $chambre, FormInterface $form, bool $requireHotel = true): void
+    {
+        if (trim((string) $chambre->getType()) === '') {
+            $form->get('type')->addError(new FormError('Le type de chambre est obligatoire.'));
+        }
+
+        if ($chambre->getCapacite() === null || $chambre->getCapacite() <= 0) {
+            $form->get('capacite')->addError(new FormError('La capacite doit etre un entier superieur a 0.'));
+        }
+
+        if ($chambre->getNombreDeChambres() === null || $chambre->getNombreDeChambres() <= 0) {
+            $form->get('nombreDeChambres')->addError(new FormError('Le nombre de chambres doit etre un entier superieur a 0.'));
+        }
+
+        if ($chambre->getPrixStandard() !== null && $chambre->getPrixStandard() < 0) {
+            $form->get('prixStandard')->addError(new FormError('Le prix standard doit etre positif ou nul.'));
+        }
+
+        if ($chambre->getPrixHauteSaison() !== null && $chambre->getPrixHauteSaison() < 0) {
+            $form->get('prixHauteSaison')->addError(new FormError('Le prix haute saison doit etre positif ou nul.'));
+        }
+
+        if ($chambre->getPrixBasseSaison() !== null && $chambre->getPrixBasseSaison() < 0) {
+            $form->get('prixBasseSaison')->addError(new FormError('Le prix basse saison doit etre positif ou nul.'));
+        }
+
+        if ($requireHotel && $form->has('hotel') && $chambre->getHotel() === null) {
+            $form->get('hotel')->addError(new FormError("L'hotel associe est obligatoire."));
+        }
     }
 }

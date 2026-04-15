@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier Réservation — GoVibe{% endblock %}
+{% block title %}{{ 'reservation.edit.meta_title'|trans }}{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -36,7 +36,7 @@ body { font-family:'Manrope',sans-serif !important; background:#fcf9f8 !importan
 <div class="gv-form-hero">
     <span class="material-symbols-outlined gv-hero-icon-bg">edit</span>
     <div class="container">
-        <h1>Modifier la <em>Réservation</em></h1>
+        <h1>{{ 'reservation.edit.heading_prefix'|trans }} <em>{{ 'reservation.edit.heading_emphasis'|trans }}</em></h1>
         <p>#{{ reservation.id }} — {{ reservation.user.prenom }} {{ reservation.user.nom }}</p>
     </div>
 </div>
@@ -45,13 +45,13 @@ body { font-family:'Manrope',sans-serif !important; background:#fcf9f8 !importan
     <div class="gv-form-card">
         {{ include('reservation/_form.html.twig') }}
         <div class="gv-form-footer">
-            <a href="{{ path('app_reservation_index') }}" class="gv-back-link"><span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span> Retour</a>
-            <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" class="gv-back-link"><span class="material-symbols-outlined" style="font-size:1rem;">visibility</span> Voir la réservation</a>
+            <a href="{{ path('app_reservation_index') }}" class="gv-back-link"><span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span> {{ 'reservation.edit.back'|trans }}</a>
+            <a href="{{ path('app_reservation_show', {'id': reservation.id}) }}" class="gv-back-link"><span class="material-symbols-outlined" style="font-size:1rem;">visibility</span> {{ 'reservation.edit.view'|trans }}</a>
         </div>
     </div>
     <div class="gv-danger-section">
-        <div class="gv-danger-title"><span class="material-symbols-outlined" style="font-size:1rem;">warning</span> Suppression</div>
-        <p>La suppression de cette réservation est irréversible.</p>
+        <div class="gv-danger-title"><span class="material-symbols-outlined" style="font-size:1rem;">warning</span> {{ 'common.deletion'|trans }}</div>
+        <p>{{ 'reservation.edit.delete_warning'|trans }}</p>
         {{ include('reservation/_delete_form.html.twig') }}
     </div>
 </div>

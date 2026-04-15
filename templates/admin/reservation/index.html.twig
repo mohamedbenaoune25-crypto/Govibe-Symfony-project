@@ -1,17 +1,17 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Réservations{% endblock %}
-{% block page_title %}Réservations{% endblock %}
+{% block title %}{{ 'admin.reservation.index.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'admin.reservation.index.page_title'|trans }}{% endblock %}
 
 {% block body %}
 <div class="admin-card mb-4">
     <div class="admin-card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-calendar-check me-2 text-muted"></i> Réservations</span>
+        <span><i class="bi bi-calendar-check me-2 text-muted"></i> {{ 'admin.reservation.index.heading'|trans }}</span>
         <div class="d-flex align-items-center gap-2">
-            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-sm btn-pro">Retour hôtels</a>
+            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-sm btn-pro">{{ 'admin.chambre.actions.back_hotels'|trans }}</a>
             {% if selectedHotel %}
-                <span class="badge bg-info-subtle text-dark">Hôtel: {{ selectedHotel.nom }}</span>
-                <a href="{{ path('app_admin_reservations_index') }}" class="btn btn-sm btn-outline-secondary">Voir toutes les réservations</a>
+                <span class="badge bg-info-subtle text-dark">{{ 'common.hotel'|trans }}: {{ translated_hotel_value(selectedHotel, 'nom') }}</span>
+                <a href="{{ path('app_admin_reservations_index') }}" class="btn btn-sm btn-outline-secondary">{{ 'admin.reservation.index.view_all'|trans }}</a>
             {% endif %}
         </div>
     </div>
@@ -21,29 +21,29 @@
                 <input type="hidden" name="hotel" value="{{ selectedHotel.id }}">
             {% endif %}
             <div class="col-md-5">
-                <label class="form-label">Recherche</label>
-                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Client, hôtel, chambre, statut">
+                <label class="form-label">{{ 'common.search'|trans }}</label>
+                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="{{ 'admin.reservation.index.search_placeholder'|trans }}">
             </div>
             <div class="col-md-3">
-                <label class="form-label">Trier par</label>
+                <label class="form-label">{{ 'common.sort_by'|trans }}</label>
                 <select name="sortBy" class="form-select">
-                    <option value="dateDebut" {% if sortBy == 'dateDebut' %}selected{% endif %}>Date début</option>
-                    <option value="dateFin" {% if sortBy == 'dateFin' %}selected{% endif %}>Date fin</option>
-                    <option value="prixTotal" {% if sortBy == 'prixTotal' %}selected{% endif %}>Prix total</option>
-                    <option value="statut" {% if sortBy == 'statut' %}selected{% endif %}>Statut</option>
-                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>Création</option>
+                    <option value="dateDebut" {% if sortBy == 'dateDebut' %}selected{% endif %}>{{ 'admin.reservation.common.date_start'|trans }}</option>
+                    <option value="dateFin" {% if sortBy == 'dateFin' %}selected{% endif %}>{{ 'admin.reservation.common.date_end'|trans }}</option>
+                    <option value="prixTotal" {% if sortBy == 'prixTotal' %}selected{% endif %}>{{ 'reservation.common.total_price'|trans }}</option>
+                    <option value="statut" {% if sortBy == 'statut' %}selected{% endif %}>{{ 'reservation.form.status'|trans }}</option>
+                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>{{ 'common.creation'|trans }}</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Ordre</label>
+                <label class="form-label">{{ 'common.order'|trans }}</label>
                 <select name="sortDir" class="form-select">
                     <option value="ASC" {% if sortDir|upper == 'ASC' %}selected{% endif %}>ASC</option>
                     <option value="DESC" {% if sortDir|upper == 'DESC' %}selected{% endif %}>DESC</option>
                 </select>
             </div>
             <div class="col-md-2 d-flex gap-2">
-                <button class="btn btn-pro w-100" type="submit">Filtrer</button>
-                <a class="btn btn-outline-secondary w-100" href="{{ selectedHotel ? path('app_admin_reservations_index', {'hotel': selectedHotel.id}) : path('app_admin_reservations_index') }}">Reset</a>
+                <button class="btn btn-pro w-100" type="submit">{{ 'common.filter'|trans }}</button>
+                <a class="btn btn-outline-secondary w-100" href="{{ selectedHotel ? path('app_admin_reservations_index', {'hotel': selectedHotel.id}) : path('app_admin_reservations_index') }}">{{ 'common.reset'|trans }}</a>
             </div>
         </form>
 
@@ -51,29 +51,38 @@
             <table class="table admin-table align-middle">
                 <thead>
                     <tr>
-                        <th>Client</th>
-                        <th>Hôtel</th>
-                        <th>Chambre</th>
-                        <th>Dates</th>
-                        <th>Statut</th>
-                        <th class="text-end">Actions</th>
+                        <th>{{ 'admin.reservation.common.client'|trans }}</th>
+                        <th>{{ 'common.hotel'|trans }}</th>
+                        <th>{{ 'common.rooms'|trans }}</th>
+                        <th>{{ 'admin.reservation.common.dates'|trans }}</th>
+                        <th>{{ 'reservation.form.status'|trans }}</th>
+                        <th class="text-end">{{ 'common.actions'|trans }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for reservation in reservations %}
                         <tr>
                             <td>{{ reservation.user ? reservation.user.prenom ~ ' ' ~ reservation.user.nom : '-' }}</td>
-                            <td>{{ reservation.hotel ? reservation.hotel.nom : '-' }}</td>
+                            <td>{{ reservation.hotel ? translated_hotel_value(reservation.hotel, 'nom') : '-' }}</td>
                             <td>{{ reservation.chambre ? reservation.chambre.type : '-' }}</td>
                             <td>{{ reservation.dateDebut|date('d/m/Y') }} - {{ reservation.dateFin|date('d/m/Y') }}</td>
-                            <td>{{ reservation.statut }}</td>
+                            <td>
+                                {% if reservation.statut == 'CONFIRMEE' %}
+                                    <span class="badge bg-success-subtle text-success-emphasis">{{ 'reservation.status.accepted'|trans }}</span>
+                                {% elseif reservation.statut == 'ANNULEE' %}
+                                    <span class="badge bg-danger-subtle text-danger-emphasis">{{ 'reservation.status.refused'|trans }}</span>
+                                {% else %}
+                                    <span class="badge bg-warning-subtle text-warning-emphasis">{{ 'reservation.status.pending'|trans }}</span>
+                                {% endif %}
+                            </td>
                             <td class="text-end">
-                                <a href="{{ path('app_admin_reservations_show', {'id': reservation.id}) }}" class="btn btn-sm btn-pro">Voir</a>
+                                <a href="{{ path('app_admin_reservations_show', {'id': reservation.id}) }}" class="btn btn-sm btn-pro">{{ 'common.view'|trans }}</a>
+                                <a href="{{ path('app_admin_reservations_edit_status', {'id': reservation.id, 'redirect_to': app.request.uri}) }}" class="btn btn-sm btn-outline-primary">{{ 'admin.reservation.common.edit_status'|trans }}</a>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">Aucune réservation trouvée.</td>
+                            <td colspan="6" class="text-center text-muted py-4">{{ 'admin.reservation.index.empty'|trans }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

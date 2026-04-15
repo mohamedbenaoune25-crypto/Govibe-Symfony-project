@@ -1,6 +1,6 @@
-<form method="post" action="{{ path('app_hotel_delete', {'id': hotel.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet hôtel ? Cette action est irréversible et supprimera également toutes les chambres associées.');">
+<form method="post" action="{{ path('app_hotel_delete', {'id': hotel.id}) }}" onsubmit="return confirm('{{ 'hotel.delete.confirm'|trans }}');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ hotel.id) }}">
-    <button type="submit" class="btn btn-danger btn-lg w-100">Supprimer cet hôtel</button>
+    <button type="submit" class="btn btn-danger btn-lg w-100">{{ 'hotel.delete.button'|trans }}</button>
 </form>
 
 <style>

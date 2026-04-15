@@ -1,44 +1,53 @@
-{{ form_start(form, {'attr': {'class': 'gv-reservation-form'}}) }}
+{{ form_start(form, {'attr': {'class': 'gv-reservation-form', 'novalidate': 'novalidate'}}) }}
     <div class="row g-4">
+        {% if form.typeChambre is defined %}
+            <div class="col-md-6">
+                {{ form_label(form.typeChambre, 'reservation.form.room_type'|trans) }}
+                {{ form_widget(form.typeChambre, {'attr': {'class': 'form-select'}}) }}
+            </div>
+        {% endif %}
         <div class="col-md-6">
-            {{ form_label(form.dateDebut, 'Date de début') }}
-            {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.dateDebut) }}
+            {{ form_label(form.dateDebut, 'reservation.form.date_start'|trans) }}
+            {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control' ~ (form.dateDebut.vars.errors|length ? ' is-invalid' : '')}}) }}
+            {% if form.dateDebut.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
         </div>
         <div class="col-md-6">
-            {{ form_label(form.dateFin, 'Date de fin') }}
-            {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.dateFin) }}
+            {{ form_label(form.dateFin, 'reservation.form.date_end'|trans) }}
+            {{ form_widget(form.dateFin, {'attr': {'class': 'form-control' ~ (form.dateFin.vars.errors|length ? ' is-invalid' : '')}}) }}
+            {% if form.dateFin.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
         </div>
         <div class="col-md-6">
-            {{ form_label(form.prixTotal, 'Prix total (€)') }}
-            {{ form_widget(form.prixTotal, {'attr': {'class': 'form-control', 'placeholder': 'Prix total'}}) }}
-            {{ form_errors(form.prixTotal) }}
+            {{ form_label(form.prixTotal, 'reservation.form.total_price'|trans) }}
+            {{ form_widget(form.prixTotal, {'attr': {'class': 'form-control' ~ (form.prixTotal.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'reservation.form.total_price_placeholder'|trans}}) }}
+            {% if form.prixTotal.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
         </div>
         {% if form.statut is defined %}
             <div class="col-md-6">
-                {{ form_label(form.statut, 'Statut') }}
-                {{ form_widget(form.statut, {'attr': {'class': 'form-select'}}) }}
-                {{ form_errors(form.statut) }}
+                {{ form_label(form.statut, 'reservation.form.status'|trans) }}
+                {{ form_widget(form.statut, {'attr': {'class': 'form-select' ~ (form.statut.vars.errors|length ? ' is-invalid' : '')}}) }}
+                {% if form.statut.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         {% endif %}
         <div class="col-12">
-            {{ form_label(form.chambre, 'Chambre') }}
-            {{ form_widget(form.chambre, {'attr': {'class': 'form-select'}}) }}
-            {{ form_errors(form.chambre) }}
+            {{ form_label(form.chambre, 'reservation.form.room'|trans) }}
+            {{ form_widget(form.chambre, {'attr': {'class': 'form-select' ~ (form.chambre.vars.errors|length ? ' is-invalid' : '')}}) }}
+            {% if form.chambre.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
+        </div>
+        <div class="col-12">
+            <div id="reservation-disponibilite" class="gv-availability-note" aria-live="polite">{{ 'reservation.form.available_rooms'|trans }} : -</div>
         </div>
         {% if form.hotel is defined %}
             <div class="col-12">
-                {{ form_label(form.hotel, 'Hôtel') }}
-                {{ form_widget(form.hotel, {'attr': {'class': 'form-select'}}) }}
-                {{ form_errors(form.hotel) }}
+                {{ form_label(form.hotel, 'common.hotel'|trans) }}
+                {{ form_widget(form.hotel, {'attr': {'class': 'form-select' ~ (form.hotel.vars.errors|length ? ' is-invalid' : '')}}) }}
+                {% if form.hotel.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         {% endif %}
     </div>
     <div class="text-center mt-4">
         <button class="gv-form-submit">
             <span class="material-symbols-outlined" style="font-size:1.1rem;">check_circle</span>
-            {{ button_label|default('Sauvegarder la réservation') }}
+            {{ button_label|default('reservation.form.save_default'|trans) }}
         </button>
     </div>
 {{ form_end(form) }}
@@ -53,4 +62,78 @@
 .gv-form-submit:hover { transform: translateY(-2px); box-shadow: 0 15px 35px -5px rgba(233,193,118,0.5); }
 
 .gv-reservation-form .invalid-feedback { display:block; color:#93000a; font-size:0.85rem; margin-top:0.3rem; }
+
+.gv-availability-note {
+    border: 1px solid rgba(0, 52, 45, 0.12);
+    border-radius: 0.7rem;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #00342d;
+    background: rgba(160, 242, 225, 0.18);
+}
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var hotelSelect = document.getElementById('{{ form.hotel is defined ? form.hotel.vars.id : '' }}');
+    var typeSelect = document.getElementById('{{ form.typeChambre is defined ? form.typeChambre.vars.id : '' }}');
+    var chambreSelect = document.getElementById('{{ form.chambre.vars.id }}');
+    var dispoEl = document.getElementById('reservation-disponibilite');
+
+    if (!chambreSelect || !dispoEl) {
+        return;
+    }
+
+    var chambreOptions = Array.prototype.slice.call(chambreSelect.options).filter(function (opt) {
+        return opt.value !== '';
+    });
+
+    function normalize(value) {
+        return (value || '').toString().trim().toLowerCase();
+    }
+
+    function applyFilters() {
+        var selectedHotel = hotelSelect ? hotelSelect.value : '';
+        var selectedType = typeSelect ? normalize(typeSelect.value) : '';
+        var totalDisponibles = 0;
+
+        chambreOptions.forEach(function (option) {
+            var optionHotel = option.getAttribute('data-hotel-id') || '';
+            var optionType = normalize(option.getAttribute('data-type'));
+            var optionDisponibles = parseInt(option.getAttribute('data-disponibles') || '0', 10);
+
+            var hotelMatch = !selectedHotel || optionHotel === selectedHotel;
+            var typeMatch = !selectedType || optionType === selectedType;
+            var visible = hotelMatch && typeMatch;
+
+            option.hidden = !visible;
+            option.disabled = !visible;
+
+            if (visible && !isNaN(optionDisponibles)) {
+                totalDisponibles += optionDisponibles;
+            }
+        });
+
+        if (chambreSelect.selectedOptions.length && chambreSelect.selectedOptions[0].disabled) {
+            chambreSelect.value = '';
+        }
+
+        if (selectedType) {
+            dispoEl.textContent = '{{ 'reservation.form.available_rooms_for_type'|trans }} : ' + totalDisponibles;
+        } else {
+            dispoEl.textContent = '{{ 'reservation.form.available_rooms'|trans }} : ' + totalDisponibles;
+        }
+    }
+
+    if (hotelSelect) {
+        hotelSelect.addEventListener('change', applyFilters);
+    }
+
+    if (typeSelect) {
+        typeSelect.addEventListener('change', applyFilters);
+    }
+
+    applyFilters();
+});
+</script>

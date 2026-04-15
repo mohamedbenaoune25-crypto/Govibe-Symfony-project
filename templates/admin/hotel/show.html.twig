@@ -1,31 +1,35 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}Détail hôtel{% endblock %}
-{% block page_title %}Détail hôtel{% endblock %}
+{% block title %}{{ 'admin.hotel.show.title'|trans }}{% endblock %}
+{% block page_title %}{{ 'admin.hotel.show.page_title'|trans }}{% endblock %}
 
 {% block body %}
+{% set adminHotelName = translated_hotel_value(hotel, 'nom') %}
+{% set adminHotelAddress = translated_hotel_value(hotel, 'adresse') %}
+{% set adminHotelCity = translated_hotel_value(hotel, 'ville') %}
+{% set adminHotelDescription = translated_hotel_description(hotel) %}
 <div class="row g-4">
     <div class="col-lg-8">
         <div class="admin-card">
             <div class="admin-card-header d-flex justify-content-between align-items-center">
-                <span>{{ hotel.nom }}</span>
-                <span class="badge bg-success">{{ hotel.chambres|length }} chambres</span>
+                <span>{{ adminHotelName }}</span>
+                <span class="badge bg-success">{{ 'admin.hotel.show.rooms_count'|trans({'%count%': hotel.chambres|length}) }}</span>
             </div>
             <div class="admin-card-body">
-                <p><strong>Adresse:</strong> {{ hotel.adresse }}</p>
-                <p><strong>Ville:</strong> {{ hotel.ville }}</p>
-                <p><strong>Étoiles:</strong> {{ hotel.nombreEtoiles ?: '-' }}</p>
-                <p><strong>Budget:</strong> {{ hotel.budget ?: '-' }}</p>
-                <p><strong>Description:</strong><br>{{ hotel.description ?: '-' }}</p>
+                <p><strong>{{ 'common.address'|trans }}:</strong> {{ adminHotelAddress }}</p>
+                <p><strong>{{ 'common.city'|trans }}:</strong> {{ adminHotelCity }}</p>
+                <p><strong>{{ 'common.stars'|trans }}:</strong> {{ hotel.nombreEtoiles ?: '-' }}</p>
+                <p><strong>{{ 'common.budget'|trans }}:</strong> {{ hotel.budget ?: '-' }}</p>
+                <p><strong>{{ 'common.description'|trans }}:</strong><br>{{ adminHotelDescription ?: '-' }}</p>
 
-                <h6 class="mt-4 mb-3">Chambres associées</h6>
+                <h6 class="mt-4 mb-3">{{ 'admin.hotel.show.related_rooms'|trans }}</h6>
                 <div class="table-responsive">
                     <table class="table admin-table">
                         <thead>
                             <tr>
-                                <th>Type</th>
-                                <th>Capacité</th>
-                                <th>Prix</th>
+                                <th>{{ 'common.type'|trans }}</th>
+                                <th>{{ 'common.capacity'|trans }}</th>
+                                <th>{{ 'common.price'|trans }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -36,7 +40,7 @@
                                     <td>{{ chambre.prixStandard ?: '-' }}</td>
                                 </tr>
                             {% else %}
-                                <tr><td colspan="3" class="text-muted text-center py-4">Aucune chambre associée.</td></tr>
+                                <tr><td colspan="3" class="text-muted text-center py-4">{{ 'admin.hotel.show.no_related_rooms'|trans }}</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -46,27 +50,27 @@
     </div>
     <div class="col-lg-4">
         <div class="admin-card mb-4">
-            <div class="admin-card-header">Actions</div>
+            <div class="admin-card-header">{{ 'common.actions'|trans }}</div>
             <div class="admin-card-body d-grid gap-2">
                 <a href="{{ path('app_admin_hotels_edit', {'id': hotel.id}) }}" class="btn btn-primary-pro">
-                    <i class="bi bi-pencil-square me-1"></i>Modifier l'hôtel
+                    <i class="bi bi-pencil-square me-1"></i>{{ 'admin.hotel.actions.edit'|trans }}
                 </a>
                 <a href="{{ path('app_admin_chambres_index', {'hotel': hotel.id}) }}" class="btn btn-pro">
-                    <i class="bi bi-door-open me-1"></i>Gérer les chambres
+                    <i class="bi bi-door-open me-1"></i>{{ 'admin.hotel.actions.manage_rooms'|trans }}
                 </a>
                 <a href="{{ path('app_admin_reservations_index', {'hotel': hotel.id}) }}" class="btn btn-pro">
-                    <i class="bi bi-calendar-check me-1"></i>Voir les réservations
+                    <i class="bi bi-calendar-check me-1"></i>{{ 'admin.hotel.actions.view_reservations'|trans }}
                 </a>
                 <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>Retour à la liste
+                    <i class="bi bi-arrow-left me-1"></i>{{ 'common.back_to_list'|trans }}
                 </a>
             </div>
         </div>
         <div class="admin-card">
-            <div class="admin-card-header text-danger">Suppression</div>
+            <div class="admin-card-header text-danger">{{ 'common.deletion'|trans }}</div>
             <div class="admin-card-body">
                 {{ form_start(delete_form) }}
-                <button class="btn btn-danger" type="submit" onclick="return confirm('Confirmer la suppression de cet hôtel ?');">Supprimer l'hôtel</button>
+                <button class="btn btn-danger" type="submit" onclick="return confirm('{{ 'admin.hotel.confirm_delete'|trans }}');">{{ 'admin.hotel.actions.delete'|trans }}</button>
                 {{ form_end(delete_form) }}
             </div>
         </div>

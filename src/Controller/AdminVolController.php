@@ -26,7 +26,10 @@ class AdminVolController extends AbstractController
     }
 
     #[Route('/new', name: 'app_admin_vols_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         $vol = new Vol();
         $form = $this->createForm(VolType::class, $vol);
@@ -54,7 +57,11 @@ class AdminVolController extends AbstractController
     }
 
     #[Route('/{flightId}/edit', name: 'app_admin_vols_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Vol $vol, EntityManagerInterface $entityManager): Response
+    public function edit(
+        Request $request,
+        Vol $vol,
+        EntityManagerInterface $entityManager
+    ): Response
     {
         $form = $this->createForm(VolType::class, $vol);
         $form->handleRequest($request);

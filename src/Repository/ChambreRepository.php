@@ -18,7 +18,7 @@ class ChambreRepository extends ServiceEntityRepository
 
     public function findAllSorted(string $sortBy = 'type', string $sortDir = 'ASC'): array
     {
-        $validSortFields = ['type', 'capacite', 'prixStandard', 'prixHauteSaison', 'prixBasseSaison', 'createdAt'];
+        $validSortFields = ['type', 'capacite', 'nombreDeChambres', 'prixStandard', 'prixHauteSaison', 'prixBasseSaison', 'createdAt'];
         $sortDir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
 
         if (!in_array($sortBy, $validSortFields)) {
@@ -33,7 +33,7 @@ class ChambreRepository extends ServiceEntityRepository
 
     public function searchChambres(string $search = '', string $sortBy = 'type', string $sortDir = 'ASC'): array
     {
-        $validSortFields = ['type', 'capacite', 'prixStandard', 'prixHauteSaison', 'prixBasseSaison', 'createdAt'];
+        $validSortFields = ['type', 'capacite', 'nombreDeChambres', 'prixStandard', 'prixHauteSaison', 'prixBasseSaison', 'createdAt'];
         $sortDir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
 
         if (!in_array($sortBy, $validSortFields)) {
@@ -47,6 +47,11 @@ class ChambreRepository extends ServiceEntityRepository
         if (!empty($search)) {
             $qb->andWhere('c.type LIKE :search OR h.nom LIKE :search OR c.equipements LIKE :search')
                 ->setParameter('search', '%' . $search . '%');
+
+            if (ctype_digit($search)) {
+                $qb->orWhere('c.nombreDeChambres = :searchNumber')
+                    ->setParameter('searchNumber', (int) $search);
+            }
         }
 
         return $qb->getQuery()->getResult();

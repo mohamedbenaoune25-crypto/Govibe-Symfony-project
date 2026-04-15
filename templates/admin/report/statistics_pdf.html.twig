@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rapport statistiques admin</title>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #1f2937; }
+        h1 { color: #0f5132; margin-bottom: 4px; }
+        h2 { color: #0f5132; margin: 18px 0 8px; font-size: 15px; }
+        .muted { color: #6b7280; margin-bottom: 12px; }
+        .kpi { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        .kpi td { border: 1px solid #e5e7eb; padding: 8px; }
+        .kpi .label { background: #f3f4f6; font-weight: bold; width: 40%; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+        th, td { border: 1px solid #e5e7eb; padding: 6px; text-align: left; }
+        th { background: #e5f4ee; color: #0f5132; }
+    </style>
+</head>
+<body>
+    <h1>Rapport statistique administrateur</h1>
+    <div class="muted">Généré le {{ generatedAt|date('d/m/Y H:i') }}</div>
+
+    <h2>Synthèse</h2>
+    <table class="kpi">
+        <tr><td class="label">Nombre d'hôtels</td><td>{{ reportData.stats.totalHotels }}</td></tr>
+        <tr><td class="label">Nombre de chambres</td><td>{{ reportData.stats.totalChambres }}</td></tr>
+        <tr><td class="label">Nombre de réservations</td><td>{{ reportData.stats.totalReservations }}</td></tr>
+        <tr><td class="label">Réservations en attente</td><td>{{ reportData.reservationsByStatus.EN_ATTENTE|default(0) }}</td></tr>
+        <tr><td class="label">Réservations acceptées</td><td>{{ reportData.reservationsByStatus.CONFIRMEE|default(0) }}</td></tr>
+        <tr><td class="label">Réservations refusées</td><td>{{ reportData.reservationsByStatus.ANNULEE|default(0) }}</td></tr>
+    </table>
+
+    <h2>Hôtels</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th><th>Nom</th><th>Ville</th><th>Adresse</th><th>Budget</th><th>Nb chambres</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hotel in reportData.hotels %}
+                <tr>
+                    <td>{{ hotel.id }}</td>
+                    <td>{{ hotel.nom }}</td>
+                    <td>{{ hotel.ville }}</td>
+                    <td>{{ hotel.adresse }}</td>
+                    <td>{{ hotel.budget is not null ? hotel.budget : '-' }}</td>
+                    <td>{{ hotel.nombreChambres }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">Aucun hôtel</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Chambres</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th><th>Hôtel</th><th>Type</th><th>Capacité</th><th>Nb chambres</th><th>Prix standard</th><th>Prix haute saison</th><th>Prix basse saison</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for chambre in reportData.chambres %}
+                <tr>
+                    <td>{{ chambre.id }}</td>
+                    <td>{{ chambre.hotelNom }}</td>
+                    <td>{{ chambre.type }}</td>
+                    <td>{{ chambre.capacite }}</td>
+                    <td>{{ chambre.nombreDeChambres }}</td>
+                    <td>{{ chambre.prixStandard is not null ? chambre.prixStandard : '-' }}</td>
+                    <td>{{ chambre.prixHauteSaison is not null ? chambre.prixHauteSaison : '-' }}</td>
+                    <td>{{ chambre.prixBasseSaison is not null ? chambre.prixBasseSaison : '-' }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8">Aucune chambre</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Réservations</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th><th>Client</th><th>Hôtel</th><th>Chambre</th><th>Date début</th><th>Date fin</th><th>Prix total</th><th>Statut</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reportData.reservations %}
+                <tr>
+                    <td>{{ reservation.id }}</td>
+                    <td>{{ reservation.clientNom|trim }}</td>
+                    <td>{{ reservation.hotelNom }}</td>
+                    <td>{{ reservation.chambreType }}</td>
+                    <td>{{ reservation.dateDebut ? reservation.dateDebut|date('d/m/Y') : '-' }}</td>
+                    <td>{{ reservation.dateFin ? reservation.dateFin|date('d/m/Y') : '-' }}</td>
+                    <td>{{ reservation.prixTotal }}</td>
+                    <td>{{ reservation.statut }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8">Aucune réservation</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

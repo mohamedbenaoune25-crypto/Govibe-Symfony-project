@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ChambreRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ChambreRepository::class)]
 #[ORM\Table(name: 'chambre')]
@@ -16,21 +17,42 @@ class Chambre
     private ?int $id = null;
 
     #[ORM\Column(length: 100, nullable: true)]
+    #[Assert\NotBlank(message: "Le type de chambre est obligatoire.")]
+    #[Assert\Length(
+        min: 2,
+        max: 100,
+        minMessage: "Le type de chambre doit contenir au moins {{ limit }} caracteres.",
+        maxMessage: "Le type de chambre ne peut pas depasser {{ limit }} caracteres."
+    )]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\NotNull(message: "La capacite est obligatoire.")]
+    #[Assert\Positive(message: "La capacite doit etre superieure a 0.")]
     private ?int $capacite = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Assert\NotNull(message: "Le nombre de chambres est obligatoire.")]
+    #[Assert\Positive(message: "Le nombre de chambres doit etre superieur a 0.")]
+    private ?int $nombreDeChambres = null;
+
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Les equipements ne peuvent pas depasser {{ limit }} caracteres."
+    )]
     private ?string $equipements = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: "Le prix standard doit etre positif ou nul.")]
     private ?float $prixStandard = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: "Le prix haute saison doit etre positif ou nul.")]
     private ?float $prixHauteSaison = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\PositiveOrZero(message: "Le prix basse saison doit etre positif ou nul.")]
     private ?float $prixBasseSaison = null;
 
     #[ORM\Column]
@@ -41,6 +63,7 @@ class Chambre
 
     #[ORM\ManyToOne(targetEntity: Hotel::class, inversedBy: 'chambres')]
     #[ORM\JoinColumn(name: 'hotel_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Assert\NotNull(message: "L'hotel associe est obligatoire.")]
     private ?Hotel $hotel = null;
 
     public function __construct()
@@ -73,6 +96,17 @@ class Chambre
     public function setCapacite(?int $capacite): self
     {
         $this->capacite = $capacite;
+        return $this;
+    }
+
+    public function getNombreDeChambres(): ?int
+    {
+        return $this->nombreDeChambres;
+    }
+
+    public function setNombreDeChambres(?int $nombreDeChambres): self
+    {
+        $this->nombreDeChambres = $nombreDeChambres;
         return $this;
     }
 

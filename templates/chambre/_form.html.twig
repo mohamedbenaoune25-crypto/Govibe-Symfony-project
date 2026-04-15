@@ -1,58 +1,67 @@
-{{ form_start(form, {'attr': {'class': 'chambre-form'}}) }}
+{{ form_start(form, {'attr': {'class': 'chambre-form', 'novalidate': 'novalidate'}}) }}
     <div class="row g-3">
         <div class="col-md-6">
             <div class="form-floating">
-                {{ form_widget(form.type, {'attr': {'class': 'form-control', 'placeholder': 'Type de chambre'}}) }}
-                {{ form_label(form.type, 'Type de chambre', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.type) }}
+                {{ form_widget(form.type, {'attr': {'class': 'form-control' ~ (form.type.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'chambre.form.type'|trans}}) }}
+                {{ form_label(form.type, 'chambre.form.type'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.type.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-floating">
-                {{ form_widget(form.capacite, {'attr': {'class': 'form-control', 'placeholder': 'Capacité'}}) }}
-                {{ form_label(form.capacite, 'Capacité', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.capacite) }}
+                {{ form_widget(form.capacite, {'attr': {'class': 'form-control' ~ (form.capacite.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.capacity'|trans}}) }}
+                {{ form_label(form.capacite, 'common.capacity'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.capacite.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-floating">
+                {{ form_widget(form.nombreDeChambres, {'attr': {'class': 'form-control' ~ (form.nombreDeChambres.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.number_of_rooms'|trans}}) }}
+                {{ form_label(form.nombreDeChambres, 'common.number_of_rooms'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.nombreDeChambres.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-12">
             <div class="form-floating">
-                {{ form_widget(form.equipements, {'attr': {'class': 'form-control', 'placeholder': 'Équipements'}}) }}
-                {{ form_label(form.equipements, 'Équipements', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.equipements) }}
+                {{ form_widget(form.equipements, {'attr': {'class': 'form-control' ~ (form.equipements.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.equipments'|trans}}) }}
+                {{ form_label(form.equipements, 'common.equipments'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.equipements.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-floating">
-                {{ form_widget(form.prixStandard, {'attr': {'class': 'form-control', 'placeholder': 'Prix standard'}}) }}
-                {{ form_label(form.prixStandard, 'Prix standard (€)', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.prixStandard) }}
+                {{ form_widget(form.prixStandard, {'attr': {'class': 'form-control' ~ (form.prixStandard.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.standard_price'|trans}}) }}
+                {{ form_label(form.prixStandard, 'chambre.form.standard_price_eur'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.prixStandard.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-floating">
-                {{ form_widget(form.prixHauteSaison, {'attr': {'class': 'form-control', 'placeholder': 'Prix haute saison'}}) }}
-                {{ form_label(form.prixHauteSaison, 'Prix haute saison (€)', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.prixHauteSaison) }}
+                {{ form_widget(form.prixHauteSaison, {'attr': {'class': 'form-control' ~ (form.prixHauteSaison.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.high_season_price'|trans}}) }}
+                {{ form_label(form.prixHauteSaison, 'chambre.form.high_season_price_eur'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.prixHauteSaison.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-4">
             <div class="form-floating">
-                {{ form_widget(form.prixBasseSaison, {'attr': {'class': 'form-control', 'placeholder': 'Prix basse saison'}}) }}
-                {{ form_label(form.prixBasseSaison, 'Prix basse saison (€)', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.prixBasseSaison) }}
+                {{ form_widget(form.prixBasseSaison, {'attr': {'class': 'form-control' ~ (form.prixBasseSaison.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.low_season_price'|trans}}) }}
+                {{ form_label(form.prixBasseSaison, 'chambre.form.low_season_price_eur'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                {% if form.prixBasseSaison.vars.errors|length %}<div class="invalid-feedback">{{ 'common.invalid_value'|trans }}</div>{% endif %}
             </div>
         </div>
-        <div class="col-12">
-            <div class="form-floating">
-                {{ form_widget(form.hotel, {'attr': {'class': 'form-select'}}) }}
-                {{ form_label(form.hotel, 'Hôtel', {'label_attr': {'class': 'form-label'}}) }}
-                {{ form_errors(form.hotel) }}
+        {% if form.hotel is defined %}
+            <div class="col-12">
+                <div class="form-floating">
+                    {{ form_widget(form.hotel, {'attr': {'class': 'form-select' ~ (form.hotel.vars.errors|length ? ' is-invalid' : '')}}) }}
+                    {{ form_label(form.hotel, 'common.hotel'|trans, {'label_attr': {'class': 'form-label'}}) }}
+                    {% if form.hotel.vars.errors|length %}<div class="invalid-feedback">{{ 'common.required_field'|trans }}</div>{% endif %}
+                </div>
             </div>
-        </div>
+        {% endif %}
     </div>
     <div class="d-grid mt-4">
         <button class="btn btn-primary btn-lg">
-            <i class="bi bi-check-circle me-2"></i>{{ button_label|default('Sauvegarder la chambre') }}
+            <i class="bi bi-check-circle me-2"></i>{{ button_label|default('chambre.form.save_default'|trans) }}
         </button>
     </div>
 {{ form_end(form) }}

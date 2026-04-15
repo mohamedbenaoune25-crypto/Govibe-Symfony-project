@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Chambre;
 use App\Entity\Hotel;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,26 +23,56 @@ class ChambreType extends AbstractType
             ->add('type', TextType::class, [
                 'label' => 'Type de chambre',
                 'required' => true,
+                'invalid_message' => 'Veuillez saisir un type de chambre valide.',
+                'constraints' => [new Assert\NotBlank(['message' => 'Le type de chambre est obligatoire.'])],
             ])
             ->add('capacite', IntegerType::class, [
                 'label' => 'Capacité',
-                'required' => false,
+                'required' => true,
+                'invalid_message' => 'La capacité doit être un entier.',
+                'attr' => [
+                    'min' => 1,
+                ],
+            ])
+            ->add('nombreDeChambres', IntegerType::class, [
+                'label' => 'Nombre de chambres',
+                'required' => true,
+                'invalid_message' => 'Le nombre de chambres doit être un entier.',
+                'attr' => [
+                    'min' => 1,
+                ],
             ])
             ->add('equipements', TextType::class, [
                 'label' => 'Équipements',
                 'required' => false,
+                'invalid_message' => 'Veuillez saisir des équipements valides.',
             ])
             ->add('prixStandard', NumberType::class, [
                 'label' => 'Prix standard',
                 'required' => false,
+                'invalid_message' => 'Le prix standard doit être un nombre valide.',
+                'attr' => [
+                    'min' => 0,
+                    'step' => '0.01',
+                ],
             ])
             ->add('prixHauteSaison', NumberType::class, [
                 'label' => 'Prix haute saison',
                 'required' => false,
+                'invalid_message' => 'Le prix haute saison doit être un nombre valide.',
+                'attr' => [
+                    'min' => 0,
+                    'step' => '0.01',
+                ],
             ])
             ->add('prixBasseSaison', NumberType::class, [
                 'label' => 'Prix basse saison',
                 'required' => false,
+                'invalid_message' => 'Le prix basse saison doit être un nombre valide.',
+                'attr' => [
+                    'min' => 0,
+                    'step' => '0.01',
+                ],
             ])
         ;
 
@@ -51,6 +82,9 @@ class ChambreType extends AbstractType
                 'choice_label' => 'nom',
                 'label' => 'Hôtel',
                 'required' => true,
+                'placeholder' => 'Sélectionnez un hôtel',
+                'invalid_message' => 'Veuillez sélectionner un hôtel valide.',
+                'constraints' => [new Assert\NotBlank(['message' => 'L\'hôtel associé est obligatoire.'])],
             ]);
         }
     }

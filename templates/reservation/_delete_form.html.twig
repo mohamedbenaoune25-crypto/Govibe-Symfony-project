@@ -1,6 +1,6 @@
-<form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ? Cette action est irréversible.');">
+<form method="post" action="{{ path('app_reservation_delete', {'id': reservation.id}) }}" onsubmit="return confirm('{{ 'reservation.delete.confirm'|trans }}');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reservation.id) }}">
-    <button type="submit" class="btn btn-danger btn-lg w-100">Supprimer cette réservation</button>
+    <button type="submit" class="btn btn-danger btn-lg w-100">{{ 'reservation.delete.button'|trans }}</button>
 </form>
 
 <style>

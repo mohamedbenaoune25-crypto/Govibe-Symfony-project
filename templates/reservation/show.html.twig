@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réservation #{{ reservation.id }} — GoVibe{% endblock %}
+{% block title %}{{ 'reservation.show.meta_title'|trans({'%id%': reservation.id}) }}{% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
@@ -68,18 +68,21 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 {% endblock %}
 
 {% block body %}
+{% set reservationHotelName = reservation.hotel ? translated_hotel_value(reservation.hotel, 'nom') : '-' %}
+{% set reservationHotelAddress = reservation.hotel ? translated_hotel_value(reservation.hotel, 'adresse') : '-' %}
+{% set reservationHotelCity = reservation.hotel ? translated_hotel_value(reservation.hotel, 'ville') : '-' %}
 <div class="gv-show-hero">
     <span class="material-symbols-outlined gv-hero-icon-bg">hotel</span>
     <div class="container">
-        {% if reservation.statut == 'CONFIRMEE' %}
-            <span class="gv-status-hero gv-status-confirmed"><span class="material-symbols-outlined" style="font-size:0.85rem;">verified</span> Confirmée</span>
-        {% elseif reservation.statut == 'ANNULEE' %}
-            <span class="gv-status-hero gv-status-cancelled"><span class="material-symbols-outlined" style="font-size:0.85rem;">cancel</span> Annulée</span>
+        {% if reservation.statut == 'ACCEPTEE' or reservation.statut == 'CONFIRMEE' %}
+            <span class="gv-status-hero gv-status-confirmed"><span class="material-symbols-outlined" style="font-size:0.85rem;">verified</span> {{ 'reservation.status.accepted'|trans }}</span>
+        {% elseif reservation.statut == 'REFUSEE' or reservation.statut == 'ANNULEE' %}
+            <span class="gv-status-hero gv-status-cancelled"><span class="material-symbols-outlined" style="font-size:0.85rem;">cancel</span> {{ 'reservation.status.refused'|trans }}</span>
         {% else %}
-            <span class="gv-status-hero gv-status-pending"><span class="material-symbols-outlined" style="font-size:0.85rem;">pending</span> {{ reservation.statut }}</span>
+            <span class="gv-status-hero gv-status-pending"><span class="material-symbols-outlined" style="font-size:0.85rem;">pending</span> {{ 'reservation.status.pending'|trans }}</span>
         {% endif %}
-        <h1 class="gv-hero-title">Réservation <em>#{{ reservation.id }}</em></h1>
-        <p class="gv-hero-sub">{{ reservation.hotel.nom }} — {{ reservation.chambre.type }}</p>
+        <h1 class="gv-hero-title">{{ 'reservation.show.title'|trans }} <em>#{{ reservation.id }}</em></h1>
+        <p class="gv-hero-sub">{{ reservationHotelName }} — {{ reservation.chambre.type }}</p>
         <div class="gv-hero-price">{{ reservation.prixTotal }}€</div>
     </div>
 </div>
@@ -88,51 +91,51 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
     <div class="gv-grid">
         <div>
             <div class="gv-card">
-                <div class="gv-card-title"><span class="material-symbols-outlined">person</span> Client</div>
+                <div class="gv-card-title"><span class="material-symbols-outlined">person</span> {{ 'admin.reservation.common.client'|trans }}</div>
                 <div class="gv-info-grid">
-                    <div class="gv-info-item"><div class="gv-info-label">Nom</div><div class="gv-info-value">{{ reservation.user.prenom }} {{ reservation.user.nom }}</div></div>
-                    <div class="gv-info-item"><div class="gv-info-label">Email</div><div class="gv-info-value">{{ reservation.user.email }}</div></div>
+                    <div class="gv-info-item"><div class="gv-info-label">{{ 'common.name'|trans }}</div><div class="gv-info-value">{{ reservation.user.prenom }} {{ reservation.user.nom }}</div></div>
+                    <div class="gv-info-item"><div class="gv-info-label">{{ 'admin.reservation.common.email'|trans }}</div><div class="gv-info-value">{{ reservation.user.email }}</div></div>
                 </div>
             </div>
             <div class="gv-card">
-                <div class="gv-card-title"><span class="material-symbols-outlined">apartment</span> Hôtel & Chambre</div>
+                <div class="gv-card-title"><span class="material-symbols-outlined">apartment</span> {{ 'reservation.show.hotel_room'|trans }}</div>
                 <div class="gv-info-grid">
-                    <div class="gv-info-item"><div class="gv-info-label">Hôtel</div><div class="gv-info-value">{{ reservation.hotel.nom }}</div></div>
-                    <div class="gv-info-item"><div class="gv-info-label">Chambre</div><div class="gv-info-value">{{ reservation.chambre.type }}</div></div>
-                    <div class="gv-info-item" style="grid-column:1/-1;"><div class="gv-info-label">Adresse</div><div class="gv-info-value">{{ reservation.hotel.adresse }}, {{ reservation.hotel.ville }}</div></div>
+                    <div class="gv-info-item"><div class="gv-info-label">{{ 'common.hotel'|trans }}</div><div class="gv-info-value">{{ reservationHotelName }}</div></div>
+                    <div class="gv-info-item"><div class="gv-info-label">{{ 'common.rooms'|trans }}</div><div class="gv-info-value">{{ reservation.chambre.type }}</div></div>
+                    <div class="gv-info-item" style="grid-column:1/-1;"><div class="gv-info-label">{{ 'common.address'|trans }}</div><div class="gv-info-value">{{ reservationHotelAddress }}, {{ reservationHotelCity }}</div></div>
                 </div>
             </div>
             <div class="gv-card">
-                <div class="gv-card-title"><span class="material-symbols-outlined">date_range</span> Dates de séjour</div>
+                <div class="gv-card-title"><span class="material-symbols-outlined">date_range</span> {{ 'reservation.show.stay_dates'|trans }}</div>
                 <div class="gv-date-grid">
-                    <div class="gv-date-box"><div class="gv-date-label">Arrivée</div><div class="gv-date-value">{{ reservation.dateDebut|date('d/m/Y') }}</div></div>
-                    <div class="gv-date-box"><div class="gv-date-label">Départ</div><div class="gv-date-value">{{ reservation.dateFin|date('d/m/Y') }}</div></div>
+                    <div class="gv-date-box"><div class="gv-date-label">{{ 'reservation.common.arrival'|trans }}</div><div class="gv-date-value">{{ reservation.dateDebut|date('d/m/Y') }}</div></div>
+                    <div class="gv-date-box"><div class="gv-date-label">{{ 'reservation.common.departure'|trans }}</div><div class="gv-date-value">{{ reservation.dateFin|date('d/m/Y') }}</div></div>
                 </div>
                 <div class="gv-price-box">
-                    <div class="gv-price-label">Montant total</div>
+                    <div class="gv-price-label">{{ 'reservation.show.total_amount'|trans }}</div>
                     <div class="gv-price-value">{{ reservation.prixTotal }}€</div>
                 </div>
             </div>
             {% if reservation.createdAt or reservation.updatedAt %}
             <div class="gv-card">
-                <div class="gv-card-title"><span class="material-symbols-outlined">info</span> Informations</div>
+                <div class="gv-card-title"><span class="material-symbols-outlined">info</span> {{ 'hotel.show.info'|trans }}</div>
                 <div class="gv-info-grid">
-                    {% if reservation.createdAt %}<div class="gv-info-item"><div class="gv-info-label">Réservé le</div><div class="gv-info-value">{{ reservation.createdAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
-                    {% if reservation.updatedAt %}<div class="gv-info-item"><div class="gv-info-label">Mis à jour le</div><div class="gv-info-value">{{ reservation.updatedAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
+                    {% if reservation.createdAt %}<div class="gv-info-item"><div class="gv-info-label">{{ 'reservation.show.booked_at'|trans }}</div><div class="gv-info-value">{{ reservation.createdAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
+                    {% if reservation.updatedAt %}<div class="gv-info-item"><div class="gv-info-label">{{ 'common.updated_at'|trans }}</div><div class="gv-info-value">{{ reservation.updatedAt|date('d/m/Y à H:i') }}</div></div>{% endif %}
                 </div>
             </div>
             {% endif %}
         </div>
         <div>
             <div class="gv-sidebar-card">
-                <h5>Actions</h5>
-                <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="gv-action-btn gv-action-green"><span class="material-symbols-outlined" style="font-size:1rem;">apartment</span> Voir l'hôtel</a>
-                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="gv-action-btn gv-action-primary"><span class="material-symbols-outlined" style="font-size:1rem;">edit</span> Modifier</a>
-                <a href="{{ path('app_reservation_index') }}" class="gv-action-btn gv-action-outline"><span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span> Retour</a>
+                <h5>{{ 'common.actions'|trans }}</h5>
+                <a href="{{ path('app_hotel_show', {'id': reservation.hotel.id}) }}" class="gv-action-btn gv-action-green"><span class="material-symbols-outlined" style="font-size:1rem;">apartment</span> {{ 'hotel.edit.view_hotel'|trans }}</a>
+                <a href="{{ path('app_reservation_edit', {'id': reservation.id}) }}" class="gv-action-btn gv-action-primary"><span class="material-symbols-outlined" style="font-size:1rem;">edit</span> {{ 'common.edit'|trans }}</a>
+                <a href="{{ path('app_reservation_index') }}" class="gv-action-btn gv-action-outline"><span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span> {{ 'reservation.edit.back'|trans }}</a>
             </div>
             <div class="gv-danger-card">
-                <h5><span class="material-symbols-outlined" style="font-size:1rem;">warning</span> Zone dangereuse</h5>
-                <p>La suppression est irréversible.</p>
+                <h5><span class="material-symbols-outlined" style="font-size:1rem;">warning</span> {{ 'reservation.show.danger_zone'|trans }}</h5>
+                <p>{{ 'reservation.show.delete_warning'|trans }}</p>
                 {{ include('reservation/_delete_form.html.twig') }}
             </div>
         </div>
