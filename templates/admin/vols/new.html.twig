@@ -2,185 +2,236 @@
 
 {% block page_title %}{{ vol.flightId ? 'Modifier le Vol ' ~ vol.flightId : 'Créer un Nouveau Vol' }}{% endblock %}
 
-{% block stylesheets %}
-{{ parent() }}
-{% endblock %}
-
 {% block body %}
 <style>
-    .form-group label {
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        text-transform: uppercase !important;
-        color: #6c757d !important;
-        margin-bottom: 0.5rem;
+    /* 
+       SCENE: Admin Flight Form (Isolated Refactor)
+       ALIGNED WITH: Checkout Design "Gold Standard"
+    */
+    .gv-vol-form-modal {
+        max-width: 850px;
+        margin: {% if app.request.isXmlHttpRequest %}0 auto{% else %}4rem auto{% endif %};
+        background: linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 252, 249, 0.96) 100%);
+        backdrop-filter: blur(20px) saturate(190%);
+        -webkit-backdrop-filter: blur(20px) saturate(190%);
+        border-radius: 1.75rem;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        overflow: hidden;
+        animation: gvModalEntry 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+        {% if not app.request.isXmlHttpRequest %}
+        box-shadow: 0 40px 100px rgba(0, 52, 45, 0.12), 0 10px 30px rgba(0, 52, 45, 0.05);
+        {% endif %}
+    }
+
+    @keyframes gvModalEntry {
+        0% { opacity: 0; transform: scale(0.96) translateY(10px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .gv-vol-form-inner {
+        padding: 2.5rem 3rem !important;
+    }
+
+    /* Header Logic - Matches Checkout Modal Header */
+    .gv-vol-header-eyebrow {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .gv-vol-header-title {
+        font-family: 'Noto Serif', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #013220;
+        letter-spacing: -0.02em;
+        margin-bottom: 4px;
+    }
+    .gv-vol-header-subtitle {
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 0;
+    }
+
+    /* Form Controls - Mimic Checkout Style */
+    .gv-vol-form-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+        display: block;
+        letter-spacing: 0.01em;
+    }
+
+    .gv-vol-input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.8) !important;
+        border: 1.5px solid rgba(16, 185, 129, 0.12) !important;
+        border-radius: 0.85rem !important;
+        padding: 0.8rem 1rem !important;
+        font-size: 0.95rem !important;
+        color: #013220 !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .gv-vol-input:focus {
+        background: #fff !important;
+        border-color: #10B981 !important;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+        outline: none !important;
+        transform: translateY(-1px);
+    }
+
+    /* Actions - Identical Buttons */
+    .gv-vol-footer-actions {
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1.5px solid rgba(16, 185, 129, 0.08);
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    .gv-vol-btn {
+        padding: 0.75rem 2rem;
+        border-radius: 2rem;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.25s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .gv-vol-btn-cancel {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+    .gv-vol-btn-cancel:hover {
+        background: #e2e8f0;
+        color: #475569;
+    }
+
+    .gv-vol-btn-submit {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3);
+    }
+    .gv-vol-btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Selection Fix */
+    select.gv-vol-input {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 1rem;
+        padding-right: 2.5rem !important;
     }
 </style>
-{% if app.request.isXmlHttpRequest %}
-<div class="p-4 p-md-5">
-    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
-        <div>
-            <p class="text-uppercase text-success fw-semibold mb-2 mb-1">Vol</p>
-            <h2 class="h3 fw-bold mb-1">{{ vol.flightId ? 'Modifier le Vol ' ~ vol.flightId : 'Créer un Nouveau Vol' }}</h2>
-            <p class="text-muted mb-0">Ajoutez ou modifiez un vol depuis cette fenêtre.</p>
+
+<div class="gv-vol-form-modal">
+    <div class="gv-vol-form-inner">
+        <!-- Close button (only in modal view) -->
+        {% if app.request.isXmlHttpRequest %}
+            <button type="button" class="btn-close float-end shadow-none" aria-label="Fermer" onclick="bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide()"></button>
+        {% endif %}
+
+        <div class="mb-4">
+            <div class="gv-vol-header-eyebrow">
+                <i class="bi bi-airplane-engines-fill text-success"></i> Management
+            </div>
+            <h2 class="gv-vol-header-title">{{ vol.flightId ? 'Modification du Vol' : 'Programmer un Vol' }}</h2>
+            <p class="gv-vol-header-subtitle">Précisez les paramètres techniques et commerciaux de la flotte.</p>
         </div>
-        <button type="button" class="btn-close" aria-label="Fermer" onclick="bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide()"></button>
-    </div>
-
-    {{ form_start(form, {'action': vol.flightId ? path('app_admin_vols_edit', {'flightId': vol.flightId}) : path('app_admin_vols_new'), 'attr': {'novalidate': 'novalidate'}}) }}
-            <div class="row g-4 mb-4">
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.flightId) }}
-                    {{ form_widget(form.flightId, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.flightId) }}
-                </div>
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.airline) }}
-                    {{ form_widget(form.airline, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.airline) }}
-                </div>
-            </div>
-
-            <div class="row g-4 mb-4">
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.departureAirport) }}
-                    {{ form_widget(form.departureAirport, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.departureAirport) }}
-                </div>
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.destination) }}
-                    {{ form_widget(form.destination, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.destination) }}
-                </div>
-            </div>
-
-            <div class="row g-4 mb-4">
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.departureTime) }}
-                    {{ form_widget(form.departureTime, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.departureTime) }}
-                </div>
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.arrivalTime) }}
-                    {{ form_widget(form.arrivalTime, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.arrivalTime) }}
-                </div>
-            </div>
-
-            <div class="row g-4 mb-4">
-                <div class="col-md-4 form-group">
-                    {{ form_label(form.classeChaise) }}
-                    {{ form_widget(form.classeChaise, {'attr': {'class': 'form-select'}}) }}
-                    {{ form_errors(form.classeChaise) }}
-                </div>
-                <div class="col-md-4 form-group">
-                    {{ form_label(form.prix) }}
-                    <div class="input-group">
-                        {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
-                        <span class="input-group-text">€</span>
-                    </div>
-                    {{ form_errors(form.prix) }}
-                </div>
-                <div class="col-md-4 form-group">
-                    {{ form_label(form.availableSeats) }}
-                    {{ form_widget(form.availableSeats, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.availableSeats) }}
-                </div>
-            </div>
-
-            <div class="form-group mb-4">
-                {{ form_label(form.description) }}
-                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.description) }}
-            </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary-pro w-100">{{ button_label|default('Enregistrer le vol') }}</button>
-            </div>
-    {{ form_end(form) }}
-</div>
-{% else %}
-<section class="go-form-page">
-<div class="go-form-card">
-    <div class="go-form-card-header">
-        <i class="bi bi-airplane"></i> Informations du Vol
-    </div>
-    <div class="go-form-card-body">
-        <a href="{{ path('app_admin_vols_index') }}" class="btn btn-sm btn-light mb-4"><i class="bi bi-arrow-left"></i> Retour à la flotte</a>
 
         {{ form_start(form, {'action': vol.flightId ? path('app_admin_vols_edit', {'flightId': vol.flightId}) : path('app_admin_vols_new'), 'attr': {'novalidate': 'novalidate'}}) }}
-            <div class="row g-4 mb-4">
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.flightId) }}
-                    {{ form_widget(form.flightId, {'attr': {'class': 'form-control'}}) }}
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="gv-vol-form-label">Identifiant Vol</label>
+                    {{ form_widget(form.flightId, {'attr': {'class': 'gv-vol-input', 'placeholder': 'ex: AF-302'}}) }}
                     {{ form_errors(form.flightId) }}
                 </div>
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.airline) }}
-                    {{ form_widget(form.airline, {'attr': {'class': 'form-control'}}) }}
+                
+                <div class="col-md-6">
+                    <label class="gv-vol-form-label">Compagnie Aérienne</label>
+                    {{ form_widget(form.airline, {'attr': {'class': 'gv-vol-input'}}) }}
                     {{ form_errors(form.airline) }}
                 </div>
-            </div>
 
-            <div class="row g-4 mb-4">
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.departureAirport) }}
-                    {{ form_widget(form.departureAirport, {'attr': {'class': 'form-control'}}) }}
+                <div class="col-md-6">
+                    <label class="gv-vol-form-label">Aéroport de Départ</label>
+                    {{ form_widget(form.departureAirport, {'attr': {'class': 'gv-vol-input'}}) }}
                     {{ form_errors(form.departureAirport) }}
                 </div>
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.destination) }}
-                    {{ form_widget(form.destination, {'attr': {'class': 'form-control'}}) }}
+
+                <div class="col-md-6">
+                    <label class="gv-vol-form-label">Destination</label>
+                    {{ form_widget(form.destination, {'attr': {'class': 'gv-vol-input'}}) }}
                     {{ form_errors(form.destination) }}
                 </div>
-            </div>
 
-            <div class="row g-4 mb-4">
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.departureTime) }}
-                    {{ form_widget(form.departureTime, {'attr': {'class': 'form-control'}}) }}
+                <div class="col-md-6">
+                    <label class="gv-vol-form-label">Heure de Départ</label>
+                    {{ form_widget(form.departureTime, {'attr': {'class': 'gv-vol-input'}}) }}
                     {{ form_errors(form.departureTime) }}
                 </div>
-                <div class="col-md-6 form-group">
-                    {{ form_label(form.arrivalTime) }}
-                    {{ form_widget(form.arrivalTime, {'attr': {'class': 'form-control'}}) }}
+
+                <div class="col-md-6">
+                    <label class="gv-vol-form-label">Heure d'Arrivée</label>
+                    {{ form_widget(form.arrivalTime, {'attr': {'class': 'gv-vol-input'}}) }}
                     {{ form_errors(form.arrivalTime) }}
                 </div>
-            </div>
 
-            <div class="row g-4 mb-4">
-                <div class="col-md-4 form-group">
-                    {{ form_label(form.classeChaise) }}
-                    {{ form_widget(form.classeChaise, {'attr': {'class': 'form-select'}}) }}
+                <div class="col-md-4">
+                    <label class="gv-vol-form-label">Classe</label>
+                    {{ form_widget(form.classeChaise, {'attr': {'class': 'gv-vol-input'}}) }}
                     {{ form_errors(form.classeChaise) }}
                 </div>
-                <div class="col-md-4 form-group">
-                    {{ form_label(form.prix) }}
-                    <div class="input-group">
-                        {{ form_widget(form.prix, {'attr': {'class': 'form-control'}}) }}
-                        <span class="input-group-text">€</span>
-                    </div>
+
+                <div class="col-md-4">
+                    <label class="gv-vol-form-label">Tarif de Base (DT)</label>
+                    {{ form_widget(form.prix, {'attr': {'class': 'gv-vol-input'}}) }}
                     {{ form_errors(form.prix) }}
                 </div>
-                <div class="col-md-4 form-group">
-                    {{ form_label(form.availableSeats) }}
-                    {{ form_widget(form.availableSeats, {'attr': {'class': 'form-control'}}) }}
+
+                <div class="col-md-4">
+                    <label class="gv-vol-form-label">Capacité (Sièges)</label>
+                    {{ form_widget(form.availableSeats, {'attr': {'class': 'gv-vol-input'}}) }}
                     {{ form_errors(form.availableSeats) }}
+                </div>
+                
+                <div class="col-12">
+                    <label class="gv-vol-form-label">Description Technique & Services</label>
+                    {{ form_widget(form.description, {'attr': {'class': 'gv-vol-input', 'rows': '3'}}) }}
+                    {{ form_errors(form.description) }}
                 </div>
             </div>
 
-            <div class="form-group mb-4">
-                {{ form_label(form.description) }}
-                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
-                {{ form_errors(form.description) }}
+            <div class="gv-vol-footer-actions">
+                {% if app.request.isXmlHttpRequest %}
+                    <button type="button" class="gv-vol-btn gv-vol-btn-cancel" onclick="bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide()">Annuler</button>
+                {% else %}
+                    <a href="{{ path('app_admin_vols_index') }}" class="text-decoration-none"><button type="button" class="gv-vol-btn gv-vol-btn-cancel">Annuler</button></a>
+                {% endif %}
+                <button type="submit" class="gv-vol-btn gv-vol-btn-submit">
+                    <i class="bi bi-shield-check"></i>
+                    {{ button_label|default('Enregistrer le Vol') }}
+                </button>
             </div>
-
-            <div class="mt-4">
-                <button type="submit" class="btn btn-primary-pro w-100">{{ button_label|default('Enregistrer le vol') }}</button>
-            </div>
+            
         {{ form_end(form) }}
     </div>
 </div>
-</section>
-{% endif %}
 {% endblock %}

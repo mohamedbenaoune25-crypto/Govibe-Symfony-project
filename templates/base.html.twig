@@ -46,12 +46,69 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(165deg, rgba(1, 50, 32, 0.45), rgba(5, 35, 24, 0.35)),
-                        url('{{ asset('images/home-hero5.png') }}') center/cover fixed no-repeat;
+            background-color: #0a192f; /* Dark nautical fallback */
             color: #333;
             padding-top: 0;
             min-height: 100vh;
+            position: relative;
+            isolation: isolate;
+            overflow-x: hidden;
         }
+
+        /* ─── Tropical Emerald Background ─── */
+        #gv-tropical-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -20;
+            background-color: #013220; /* Dark green fallback */
+            background-image: url('{{ asset('images/home-hero5.png') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            will-change: transform;
+            animation: gv-tropical-breeze 30s ease-in-out infinite alternate;
+        }
+
+        @keyframes gv-tropical-breeze {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.08); }
+        }
+
+        /* ─── Modern Glassmorphism ─── */
+        .glass-emerald-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(1, 50, 32, 0.1);
+        }
+
+        /* ─── Content Reveal Animation ─── */
+        .gv-content-fade-in {
+            animation: gv-content-lift 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+            position: relative;
+            z-index: 10;
+        }
+
+        .gv-tropical-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: -10;
+            background: radial-gradient(circle at 50% 50%, rgba(1, 50, 32, 0.1) 0%, rgba(0,0,0,0.4) 100%);
+            pointer-events: none;
+        }
+
+        @keyframes gv-content-lift {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
 
         h1, h2, h3, h4, h5, h6 {
             font-family: 'Outfit', sans-serif;
@@ -141,6 +198,84 @@
             color: white;
         }
 
+        /* Global Search Bar */
+        .gv-global-search {
+            position: relative;
+            margin-right: 15px;
+            width: 280px;
+        }
+        .gv-global-search input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            padding: 8px 16px 8px 38px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+        .gv-global-search input::placeholder { color: rgba(255,255,255,0.6); }
+        .gv-global-search input:focus {
+            background: rgba(255, 255, 255, 0.95);
+            color: #013220;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+        }
+        .gv-global-search input:focus::placeholder { color: #64748b; }
+        .gv-global-search .material-symbols-outlined {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: rgba(255,255,255,0.7);
+            transition: color 0.3s ease;
+        }
+        .gv-global-search input:focus ~ .material-symbols-outlined { color: var(--primary-emerald); }
+        
+        .gv-search-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.05);
+            backdrop-filter: blur(20px);
+            opacity: 0; visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1050;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .gv-search-dropdown.active {
+            opacity: 1; visibility: visible; transform: translateY(0);
+        }
+        .gv-search-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            transition: background 0.2s;
+        }
+        .gv-search-item:last-child { border-bottom: none; }
+        .gv-search-item:hover { background: rgba(34, 197, 94, 0.05); }
+        .gv-search-item-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--primary-emerald);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .gv-search-item-content { flex: 1; overflow: hidden; }
+        .gv-search-item-title { color: #0f172a; font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gv-search-item-sub { color: #64748b; font-size: 12px; }
+
         .user-avatar {
             width: 34px; height: 34px;
             border-radius: 50%;
@@ -201,15 +336,37 @@
         /* ─── Detail Modal (global) ─── */
         .govibe-detail-modal .modal-content {
             border: 0;
-            border-radius: 28px;
+            border-radius: 32px; /* Smoother, more premium corners */
             overflow: hidden;
-            box-shadow: 0 40px 100px rgba(1, 50, 32, 0.25);
-            background: rgba(255, 255, 255, 0.98);
-            max-height: calc(100vh - 2rem);
+            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.4);
+            background: #000; /* Match wrapper black base */
+            max-height: calc(100vh - 5rem);
         }
 
         .govibe-detail-modal .modal-dialog {
-            max-width: 720px;
+            max-width: 820px; /* Reduced for elegance */
+            margin: 2.5rem auto; /* Increased outer spacing */
+            display: flex;
+            align-items: center;
+            min-height: calc(100% - 5rem);
+            transform-origin: center center;
+            transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.32s ease;
+        }
+
+        @media (min-width: 576px) {
+            .govibe-detail-modal .modal-dialog {
+                min-height: calc(100% - 5rem);
+            }
+        }
+
+        .modal.fade .modal-dialog {
+            transform: translateY(26px) scale(0.93);
+            opacity: 0;
+        }
+
+        .modal.show .modal-dialog {
+            transform: translateY(0) scale(1);
+            opacity: 1;
         }
 
         .govibe-detail-modal .modal-backdrop.show,
@@ -353,14 +510,31 @@
             padding: 128px 0 72px;
         }
 
+        /* Glass-Style Form Cards */
         .go-form-card {
             border: 0;
             border-radius: 28px;
             overflow: hidden;
-            box-shadow: 0 30px 80px rgba(1, 50, 32, 0.12);
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(12px);
+            box-shadow: 0 40px 100px rgba(1, 50, 32, 0.18);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            transform-origin: center center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
+
+
+        @media (prefers-reduced-motion: reduce) {
+            #gv-ocean-bg,
+            .go-form-card,
+            .gv-content-fade-in,
+            .modal.fade .modal-dialog,
+            .modal.show .modal-dialog {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
 
         .go-form-card-header {
             padding: 28px 32px;
@@ -400,9 +574,383 @@
         }
         ::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.5); }
     </style>
+    <style>
+/* ─── Custom Scrollbar ─── */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 52, 45, 0.15); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 52, 45, 0.3); }
+
+.modal-body { max-height: 80vh; }
+
+/* ═══ AI Voice Command Center ═══ */
+.gv-ai-orb-wrap {
+    position: fixed; bottom: 5rem; right: 4rem; z-index: 9999;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+}
+.gv-ai-orb {
+    width: 68px; height: 68px; border-radius: 50%; border: none; cursor: pointer;
+    background: linear-gradient(135deg, #10b981 0%, #047857 50%, #059669 100%);
+    color: white; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.45), 0 0 60px rgba(16, 185, 129, 0.15), inset 0 -2px 6px rgba(0,0,0,0.15);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative; z-index: 3;
+    animation: orbFloat 4s ease-in-out infinite;
+}
+.gv-ai-orb:hover {
+    transform: scale(1.12) translateY(-4px);
+    box-shadow: 0 0 35px rgba(16, 185, 129, 0.6), 0 0 80px rgba(16, 185, 129, 0.25), inset 0 -2px 6px rgba(0,0,0,0.15);
+}
+.gv-ai-orb .material-symbols-outlined { font-size: 1.8rem; font-variation-settings: 'FILL' 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); transition: all 0.3s; }
+@keyframes orbFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+
+/* ── Orb 4-State System ── */
+.gv-ai-orb-wrap[data-voice-state="listening"] .gv-ai-orb {
+    background: linear-gradient(135deg, #ef4444, #dc2626, #b91c1c);
+    box-shadow: 0 0 30px rgba(239,68,68,0.5), 0 0 70px rgba(239,68,68,0.2);
+    animation: orbPulseListen 1.2s ease-in-out infinite;
+}
+@keyframes orbPulseListen { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+.gv-ai-orb-wrap[data-voice-state="thinking"] .gv-ai-orb {
+    background: linear-gradient(135deg, #f59e0b, #d97706, #b45309);
+    box-shadow: 0 0 30px rgba(245,158,11,0.5), 0 0 70px rgba(245,158,11,0.2);
+    animation: orbRotateThink 2s linear infinite;
+}
+@keyframes orbRotateThink { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+
+.gv-ai-orb-wrap[data-voice-state="speaking"] .gv-ai-orb {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed, #6d28d9);
+    box-shadow: 0 0 30px rgba(139,92,246,0.5), 0 0 70px rgba(139,92,246,0.2);
+    animation: orbWaveSpeak 1s ease-in-out infinite;
+}
+@keyframes orbWaveSpeak { 0%,100%{transform:scale(1) translateY(0)} 25%{transform:scale(1.04) translateY(-3px)} 75%{transform:scale(0.97) translateY(2px)} }
+
+/* Orb ring pulses — adapt to states */
+.gv-ai-orb-ring {
+    position: absolute; border-radius: 50%; z-index: 1;
+    border: 2px solid rgba(16, 185, 129, 0.35);
+    animation: orbRingPulse 2.5s ease-out infinite;
+    pointer-events: none;
+}
+.gv-ai-orb-ring:nth-child(1) { inset: -6px; }
+.gv-ai-orb-ring:nth-child(2) { inset: -14px; animation-delay: 0.8s; border-color: rgba(16, 185, 129, 0.2); }
+.gv-ai-orb-ring:nth-child(3) { inset: -22px; animation-delay: 1.6s; border-color: rgba(16, 185, 129, 0.1); }
+@keyframes orbRingPulse { 0%{transform:scale(0.85);opacity:1} 100%{transform:scale(1.3);opacity:0} }
+
+.gv-ai-orb-wrap[data-voice-state="listening"] .gv-ai-orb-ring { border-color: rgba(239,68,68,0.4); animation-duration: 1s; }
+.gv-ai-orb-wrap[data-voice-state="thinking"] .gv-ai-orb-ring { border-color: rgba(245,158,11,0.3); animation-duration: 1.5s; }
+.gv-ai-orb-wrap[data-voice-state="speaking"] .gv-ai-orb-ring { border-color: rgba(139,92,246,0.3); animation-duration: 1.8s; }
+
+/* ── Voice State Label ── */
+.gv-voice-state-label {
+    position: absolute; right: calc(100% + 14px); top: 50%; transform: translateY(-50%);
+    background: rgba(0,52,45,0.95); color: #a0f2e1; padding: 6px 14px; border-radius: 10px;
+    font-size: 0.72rem; font-weight: 700; white-space: nowrap;
+    opacity: 0; transition: all 0.3s; backdrop-filter: blur(8px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2); pointer-events: none;
+}
+.gv-voice-state-label::after {
+    content:''; position:absolute; right:-6px; top:50%; transform:translateY(-50%);
+    border:6px solid transparent; border-left-color:rgba(0,52,45,0.95);
+}
+.gv-ai-orb-wrap:hover .gv-voice-state-label,
+.gv-ai-orb-wrap[data-voice-state="listening"] .gv-voice-state-label,
+.gv-ai-orb-wrap[data-voice-state="thinking"] .gv-voice-state-label,
+.gv-ai-orb-wrap[data-voice-state="speaking"] .gv-voice-state-label { opacity: 1; }
+
+.gv-ai-orb-wrap[data-voice-state="listening"] .gv-voice-state-label { background: rgba(127,29,29,0.95); color: #fca5a5; }
+.gv-ai-orb-wrap[data-voice-state="listening"] .gv-voice-state-label::after { border-left-color: rgba(127,29,29,0.95); }
+.gv-ai-orb-wrap[data-voice-state="thinking"] .gv-voice-state-label { background: rgba(120,53,15,0.95); color: #fde68a; }
+.gv-ai-orb-wrap[data-voice-state="thinking"] .gv-voice-state-label::after { border-left-color: rgba(120,53,15,0.95); }
+.gv-ai-orb-wrap[data-voice-state="speaking"] .gv-voice-state-label { background: rgba(76,29,149,0.95); color: #ddd6fe; }
+.gv-ai-orb-wrap[data-voice-state="speaking"] .gv-voice-state-label::after { border-left-color: rgba(76,29,149,0.95); }
+
+/* ── Inline Voice Response Panel ── */
+.gv-voice-panel {
+    position: absolute; bottom: calc(100% + 16px); right: 0;
+    width: 340px; max-width: calc(100vw - 3rem);
+    background: rgba(255,255,255,0.98); border-radius: 1.25rem;
+    box-shadow: 0 20px 60px rgba(0,52,45,0.2), 0 0 1px rgba(0,0,0,0.1);
+    backdrop-filter: blur(20px); border: 1px solid rgba(0,52,45,0.06);
+    opacity: 0; visibility: hidden; transform: translateY(10px) scale(0.96);
+    transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+    z-index: 10;
+}
+.gv-voice-panel.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+.gv-voice-panel-header {
+    display: flex; align-items: center; gap: 10px; padding: 14px 18px;
+    border-bottom: 1px solid rgba(0,52,45,0.06);
+    background: linear-gradient(135deg, rgba(0,52,45,0.04), rgba(16,185,129,0.04));
+    border-radius: 1.25rem 1.25rem 0 0;
+}
+.gv-voice-panel-header .material-symbols-outlined { font-size: 1.1rem; color: #10b981; }
+.gv-voice-panel-title { font-size: 0.78rem; font-weight: 800; color: #00342d; letter-spacing: 0.03em; }
+.gv-voice-panel-close { margin-left: auto; background: none; border: none; cursor: pointer; color: #94a3b8; padding: 4px; border-radius: 8px; transition: all 0.2s; }
+.gv-voice-panel-close:hover { background: rgba(0,0,0,0.05); color: #00342d; }
+.gv-voice-panel-body { padding: 16px 18px; }
+.gv-voice-transcript { font-size: 0.8rem; color: #64748b; font-style: italic; margin-bottom: 10px; min-height: 20px; }
+.gv-voice-response { font-size: 0.88rem; color: #0f172a; font-weight: 600; line-height: 1.5; }
+.gv-voice-panel-actions { display: flex; gap: 6px; padding: 10px 18px 14px; }
+.gv-voice-action-btn {
+    padding: 6px 14px; border-radius: 2rem; font-size: 0.7rem; font-weight: 700;
+    border: 1px solid rgba(0,52,45,0.1); background: #fff; color: #00342d;
+    cursor: pointer; transition: all 0.2s; font-family: inherit;
+}
+.gv-voice-action-btn:hover { background: rgba(16,185,129,0.08); border-color: rgba(16,185,129,0.3); }
+.gv-voice-action-btn.primary { background: linear-gradient(135deg, #00342d, #046b5e); color: #fff; border-color: transparent; }
+
+/* ── Voice Shortcut Hints (per-page) ── */
+.gv-voice-hints {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 10px 16px; background: rgba(16,185,129,0.04);
+    border: 1px solid rgba(16,185,129,0.1); border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+.gv-voice-hints .material-symbols-outlined { font-size: 1rem; color: #10b981; }
+.gv-voice-hints > span:nth-child(2) { font-size: 0.72rem; font-weight: 700; color: #546067; text-transform: uppercase; letter-spacing: 0.05em; }
+.gv-voice-hint-chip {
+    padding: 4px 12px; border-radius: 2rem; font-size: 0.72rem; font-weight: 700;
+    background: rgba(255,255,255,0.8); border: 1px solid rgba(0,52,45,0.08);
+    color: #00342d; cursor: pointer; transition: all 0.2s; font-family: inherit;
+}
+.gv-voice-hint-chip:hover { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25); transform: translateY(-1px); }
+
+.chat-container {
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #fcf9f8;
+}
+.chat-message {
+    max-width: 80%;
+    padding: 0.85rem 1.15rem;
+    border-radius: 1.25rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    position: relative;
+    animation: messageIn 0.3s ease both;
+}
+@keyframes messageIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.chat-message.ai {
+    align-self: flex-start;
+    background: #fff;
+    color: #1c1b1b;
+    border-bottom-left-radius: 0.25rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 52, 45, 0.05);
+}
+    .chat-message.user {
+        align-self: flex-end;
+        background: linear-gradient(135deg, #00342d 0%, #013220 100%);
+        color: #fff;
+        border-bottom-right-radius: 0.25rem;
+        box-shadow: 0 4px 15px rgba(0, 52, 45, 0.1);
+    }
+    /* ─── AI Selector Professional Design ─── */
+    .gv-ai-selector-container {
+        position: relative;
+        display: inline-block;
+    }
+    .gv-ai-selector-btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(5px);
+    }
+    .gv-ai-selector-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+    .gv-ai-selector-btn .arrow {
+        font-size: 1rem;
+        transition: transform 0.3s ease;
+    }
+    .gv-ai-selector-container.open .gv-ai-selector-btn .arrow {
+        transform: rotate(180deg);
+    }
+    .gv-ai-selector-menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        background: rgba(255, 255, 255, 0.98);
+        min-width: 160px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        padding: 6px;
+        z-index: 100;
+        display: none;
+        animation: slideInUp 0.2s ease forwards;
+        border: 1px solid rgba(0, 52, 45, 0.05);
+    }
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .gv-ai-selector-item {
+        padding: 8px 12px;
+        border-radius: 8px;
+        color: #1c1b1b;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .gv-ai-selector-item:hover {
+        background: rgba(16, 185, 129, 0.08);
+        color: #00342d;
+    }
+    .gv-ai-selector-item.active {
+        background: #00342d;
+        color: white;
+    }
+    .gv-ai-selector-item i {
+        font-size: 1.1rem;
+    }
+    .gv-icon-gemini {
+        background: linear-gradient(135deg, #4285f4 0%, #9b72f3 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: bold;
+    }
+    .gv-icon-groq {
+        color: #f59e0b;
+    }
+    .gv-ai-selector-item .model-desc {
+        font-size: 0.65rem;
+        opacity: 0.7;
+        font-weight: 500;
+        display: block;
+    }
+
+.chat-input-area {
+    padding: 1.25rem;
+    background: #fff;
+    border-top: 1px solid rgba(0, 52, 45, 0.06);
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+.chat-input {
+    flex: 1;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 0.65rem 1rem;
+    font-size: 0.95rem;
+    outline: none;
+    transition: all 0.2s;
+}
+.chat-input:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+.chat-send-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 0.75rem;
+    background: #00342d;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.chat-send-btn:hover {
+    background: #10b981;
+    transform: scale(1.05);
+}
+
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 4px 8px;
+}
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #bfc9c4;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+}
+    /* --- Mentions --- */
+    .gv-mentions-list {
+        position: absolute;
+        z-index: 10000;
+        background: rgba(255, 255, 255, 0.98);
+        border: 1px solid rgba(0, 52, 45, 0.08);
+        border-radius: 1rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+        min-width: 220px;
+        max-height: 260px;
+        overflow-y: auto;
+        padding: 0.5rem;
+        backdrop-filter: blur(10px);
+    }
+    .gv-mention-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        border-radius: 0.75rem;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+    .gv-mention-item:hover, .gv-mention-item.active {
+        background: rgba(16, 185, 129, 0.08);
+        color: #00342d;
+    }
+    .gv-mention-avatar {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #eee;
+    }
+    .gv-mention-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .gv-mention-name { font-weight: 700; font-size: 0.9rem; }
+    .gv-mention-tag { font-size: 0.75rem; color: #64748b; }
+</style>
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
+    <div id="gv-tropical-bg"></div>
+    <div class="gv-tropical-overlay"></div>
+
 
     {% block header %}
     <nav class="navbar navbar-expand-lg govibe-navbar" id="mainNav">
@@ -431,6 +979,7 @@
                     {% endif %}
                 </ul>
                 <div class="d-flex align-items-center">
+<<<<<<< HEAD
                     {% if showLocaleSelector %}
                         <div class="dropdown me-2">
                             <button class="btn user-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -449,6 +998,15 @@
                             </ul>
                         </div>
                     {% endif %}
+=======
+                    <!-- Global Search -->
+                    <div class="gv-global-search">
+                        <input type="text" id="gvGlobalSearchInput" placeholder="Rechercher vol, hôtel, voiture..." autocomplete="off">
+                        <span class="material-symbols-outlined">search</span>
+                        <div class="gv-search-dropdown" id="gvSearchDropdown"></div>
+                    </div>
+                    
+>>>>>>> 25d65a9 (integartion avec vol api ai)
                     {% if app.user %}
                         <div class="dropdown">
                             <button class="btn user-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -472,6 +1030,9 @@
     </nav>
     {% endblock %}
 
+    <div class="gv-content-fade-in">
+
+
     <div class="container position-relative" style="z-index: 1040; margin-top: 90px;">
         {% for label, messages in app.flashes %}
             {% for message in messages %}
@@ -485,18 +1046,7 @@
 
     {% block body %}{% endblock %}
 
-    <div class="modal fade govibe-detail-modal" id="detailModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div id="detailModalBody" class="modal-body p-0">
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-success" role="status"></div>
-                        <p class="mt-3 text-muted small">Chargement...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     {% block footer %}
     <footer class="govibe-footer">
@@ -537,18 +1087,147 @@
         </div>
     </footer>
     {% endblock %}
+    </div>
+
+    <!-- ═══ Modals & Overlays (Outside animation wrapper to prevent stacking context freeze) ═══ -->
+    <div class="modal fade govibe-detail-modal" id="detailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div id="detailModalBody" class="modal-body p-0">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-success" role="status"></div>
+                        <p class="mt-3 text-muted small">Chargement...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px);">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
+            <div class="modal-content border-0 overflow-hidden shadow-lg" style="border-radius:1.5rem;">
+                <div class="modal-header border-0 p-4" style="background: linear-gradient(135deg, #00342d 0%, #013220 100%); color: white;">
+                    <div class="d-flex align-items-center gap-3 flex-wrap" style="flex:1;">
+                        <div class="d-flex align-items-center justify-content-center rounded-3" style="width:45px; height:45px; background:rgba(255,255,255,0.1); position:relative;">
+                            <span class="material-symbols-outlined" style="color:#a0f2e1;">neurology</span>
+                            <span id="aiHealthDot" style="position:absolute;top:2px;right:2px;width:10px;height:10px;border-radius:50%;background:#10b981;border:2px solid #013220;animation:healthPulse 2s infinite;"></span>
+                        </div>
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0" style="font-size:1.05rem;">GoVibe AI</h5>
+                            <div class="gv-ai-selector-container" id="aiSelector" style="margin-top:2px;">
+                                <div class="gv-ai-selector-btn" onclick="toggleAISelector()" style="padding:2px 10px;font-size:0.7rem;">
+                                    <span id="selectedAIName">Gemini (Google)</span>
+                                    <span class="material-symbols-outlined arrow" style="font-size:0.85rem;">expand_more</span>
+                                </div>
+                                <div class="gv-ai-selector-menu" id="aiMenu">
+                                    <div class="gv-ai-selector-item active" onclick="selectAI('gemini', 'Gemini (Google)')">
+                                        <span class="material-symbols-outlined gv-icon-gemini">auto_awesome</span>
+                                        <span>Gemini</span>
+                                    </div>
+                                    <div class="gv-ai-selector-item" onclick="selectAI('groq', 'Groq (Grok Speed)')">
+                                        <span class="material-symbols-outlined gv-icon-groq">bolt</span>
+                                        <span>Groq</span>
+                                    </div>
+                                    <div class="gv-ai-selector-item" onclick="selectAI('voice', 'Voice Agent (Docker)')">
+                                        <span class="material-symbols-outlined gv-icon-groq">mic</span>
+                                        <span>Voice Agent</span>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="aiModelSelectorValue" value="gemini">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div style="padding:10px 16px 2px;background:#f8faf9;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid rgba(0,52,45,0.06);">
+                    <button onclick="quickCommand('Trouve-moi un vol pas cher')" class="gv-quick-pill">✈️ Vols</button>
+                    <button onclick="quickCommand('Montre-moi les hôtels')" class="gv-quick-pill">🏨 Hôtels</button>
+                    <button onclick="quickCommand('Mes réservations')" class="gv-quick-pill">📋 Réservations</button>
+                    <button onclick="quickCommand('Recommande-moi un voyage')" class="gv-quick-pill">🌍 Inspire-moi</button>
+                </div>
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages custom-scrollbar">
+                        <div class="chat-message ai">
+                            Bonjour ! Je suis votre assistant voyage GoVibe AI. 🌍✈️<br><br>Je peux vous aider à :
+                            <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">
+                                <span class="gv-action-chip" onclick="quickCommand('Trouve un vol pas cher')">✈️ Trouver un vol</span>
+                                <span class="gv-action-chip" onclick="quickCommand('Meilleur hôtel')">🏨 Hôtels</span>
+                                <span class="gv-action-chip" onclick="quickCommand('Mes réservations')">📋 Réservations</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="voiceStatus" style="display:none;"></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" class="chat-input" placeholder="Écrivez ou utilisez la voix..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                        <button class="chat-send-btn" type="button" onclick="toggleTts()" title="Couper la voix" id="ttsToggleBtn" style="color:#10b981;">
+                            <span class="material-symbols-outlined">volume_up</span>
+                        </button>
+                        <button class="chat-send-btn" type="button" onclick="startVoiceInput()" title="Parler" id="voiceMicBtn">
+                            <span class="material-symbols-outlined">mic</span>
+                        </button>
+                        <button class="chat-send-btn" onclick="sendMessage()">
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Voice Center -->
+    <div class="gv-ai-orb-wrap" id="gvVoiceWrap" data-voice-state="idle" data-page="{{ app.request.attributes.get('_route') }}">
+        <div class="gv-voice-panel" id="gvVoicePanel">
+            <div class="gv-voice-panel-header">
+                <span class="material-symbols-outlined">neurology</span>
+                <span class="gv-voice-panel-title">GoVibe Voice AI</span>
+                <button class="gv-voice-panel-close" onclick="gvVoice.closePanel()" title="Fermer">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">close</span>
+                </button>
+            </div>
+            <div class="gv-voice-panel-body">
+                <div class="gv-voice-transcript" id="gvVoiceTranscript"></div>
+                <div class="gv-voice-response" id="gvVoiceResponse">Cliquez sur l'orbe ou appuyez <kbd style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:0.7rem;">Ctrl+Shift+V</kbd> pour parler.</div>
+            </div>
+            <div class="gv-voice-panel-actions" style="flex-wrap:wrap; gap:8px; justify-content:center;">
+                <button class="gv-voice-action-btn" onclick="gvVoice.startListening()" style="color:#10b981; border-color:rgba(16,185,129,0.3); font-size:0.8rem; font-weight:bold;">🟢 Démarrer</button>
+                <button class="gv-voice-action-btn" onclick="gvVoice.stopListening()" style="color:#ef4444; border-color:rgba(239,68,68,0.3); font-size:0.8rem; font-weight:bold;">🔴 Arrêter Micro</button>
+                <button class="gv-voice-action-btn" onclick="gvVoice.toggleMute()" id="gvBtnMute" style="color:#f59e0b; border-color:rgba(245,158,11,0.3); font-size:0.8rem; font-weight:bold;">🔇 Rendre Muet</button>
+                <button class="gv-voice-action-btn primary" onclick="gvVoice.emergencyStop()" style="background:#ef4444; color:white; border:none; width:100%; font-size:0.9rem; font-weight:bold; box-shadow:0 4px 12px rgba(239,68,68,0.3);">⏹️ Urgence - Stop Assistant</button>
+                <button class="gv-voice-action-btn w-100 mt-1" onclick="openChatModal()" style="font-size:0.8rem;">💬 Ouvrir le Chat Texte</button>
+            </div>
+        </div>
+        <div style="position:relative;width:68px;height:68px;">
+            <div class="gv-ai-orb-ring"></div>
+            <div class="gv-ai-orb-ring"></div>
+            <div class="gv-ai-orb-ring"></div>
+            <button type="button" class="gv-ai-orb" id="aiOrbBtn">
+                <span class="material-symbols-outlined" id="aiOrbIcon">neurology</span>
+            </button>
+            <div class="gv-voice-state-label" id="gvVoiceLabel">🤖 Cliquez pour parler</div>
+        </div>
+    </div>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             var navbar = document.getElementById("mainNav");
+            var _scrollTicking = false;
             window.addEventListener("scroll", function() {
-                if (window.scrollY > 50) {
-                    navbar.classList.add("scrolled");
-                } else {
-                    navbar.classList.remove("scrolled");
+                if (!_scrollTicking) {
+                    _scrollTicking = true;
+                    requestAnimationFrame(function() {
+                        if (window.scrollY > 50) {
+                            navbar.classList.add("scrolled");
+                        } else {
+                            navbar.classList.remove("scrolled");
+                        }
+                        _scrollTicking = false;
+                    });
                 }
             });
+
 
             var revealCards = document.querySelectorAll('[data-card-animate]');
             if (revealCards.length) {
@@ -581,13 +1260,1194 @@
 
                 fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
                     .then(function(response) { return response.text(); })
-                    .then(function(html) { body.innerHTML = html; })
+                    .then(function(html) { 
+                        body.innerHTML = html; 
+                        var scripts = body.querySelectorAll('script');
+                        scripts.forEach(function(s) {
+                            if (s.src) {
+                                var newScript = document.createElement('script');
+                                newScript.src = s.src;
+                                document.body.appendChild(newScript);
+                            } else {
+                                var newScript = document.createElement('script');
+                                newScript.text = s.innerHTML;
+                                document.body.appendChild(newScript).parentNode.removeChild(newScript);
+                            }
+                        });
+                    })
                     .catch(function() {
                         body.innerHTML = '<div class="alert alert-danger m-4 rounded-4">Impossible de charger les détails.</div>';
                     });
             };
+
+            // Detail Modal logic (kept as is)
+
         });
     </script>
+    <script>
+// ═══════════════════════════════════════════════════════════════
+// GoVibe Global Search System — Enhanced
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('gvGlobalSearchInput');
+    const searchDropdown = document.getElementById('gvSearchDropdown');
+    if (!searchInput || !searchDropdown) return;
+
+    let debounceTimer;
+    let activeIdx = -1;
+
+    // Ctrl+K shortcut to focus search
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            searchInput.focus();
+            searchInput.select();
+        }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        activeIdx = -1;
+        if (query.length < 2) {
+            searchDropdown.classList.remove('active');
+            return;
+        }
+
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            searchDropdown.innerHTML = '<div class="p-3 text-center"><div class="spinner-border spinner-border-sm text-success" role="status"></div></div>';
+            searchDropdown.classList.add('active');
+
+            fetch('/api/search?q=' + encodeURIComponent(query))
+                .then(response => response.json())
+                .then(data => {
+                    searchDropdown.innerHTML = '';
+                    if (data.results && data.results.length > 0) {
+                        let lastCat = '';
+                        data.results.forEach(item => {
+                            // Category header
+                            if (item.category && item.category !== lastCat) {
+                                lastCat = item.category;
+                                const header = document.createElement('div');
+                                header.className = 'gv-search-cat-header';
+                                header.style.cssText = 'padding:8px 16px 4px;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;';
+                                header.textContent = item.category;
+                                searchDropdown.appendChild(header);
+                            }
+                            const link = document.createElement('a');
+                            link.href = item.url;
+                            link.className = 'gv-search-item';
+                            link.setAttribute('data-search-nav', 'true');
+                            const badgeHtml = item.badge
+                                ? `<span style="display:inline-block;padding:2px 8px;border-radius:2rem;font-size:0.6rem;font-weight:800;background:${item.badgeColor || '#10b981'}20;color:${item.badgeColor || '#10b981'};border:1px solid ${item.badgeColor || '#10b981'}30;margin-left:auto;white-space:nowrap;">${item.badge}</span>`
+                                : '';
+                            link.innerHTML = `
+                                <div class="gv-search-item-icon">
+                                    <span class="material-symbols-outlined">${item.icon}</span>
+                                </div>
+                                <div class="gv-search-item-content">
+                                    <div class="gv-search-item-title">${item.title}</div>
+                                    <div class="gv-search-item-sub">${item.subtitle}</div>
+                                </div>
+                                ${badgeHtml}
+                            `;
+                            searchDropdown.appendChild(link);
+                        });
+                        // Keyboard hint
+                        const hint = document.createElement('div');
+                        hint.style.cssText = 'padding:6px 16px;font-size:0.63rem;color:#94a3b8;text-align:center;border-top:1px solid rgba(0,0,0,0.04);';
+                        hint.textContent = '↑↓ naviguer · Enter sélectionner · Esc fermer';
+                        searchDropdown.appendChild(hint);
+                        searchDropdown.classList.add('active');
+                    } else {
+                        searchDropdown.innerHTML = '<div class="p-3 text-center text-muted" style="font-size:13px;">Aucun résultat trouvé.</div>';
+                        searchDropdown.classList.add('active');
+                    }
+                })
+                .catch(err => console.error('Search error:', err));
+        }, 300);
+    });
+
+    // Keyboard navigation
+    searchInput.addEventListener('keydown', (e) => {
+        const items = searchDropdown.querySelectorAll('[data-search-nav]');
+        if (!items.length) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIdx = Math.min(activeIdx + 1, items.length - 1);
+            updateActive(items);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIdx = Math.max(activeIdx - 1, 0);
+            updateActive(items);
+        } else if (e.key === 'Enter' && activeIdx >= 0) {
+            e.preventDefault();
+            items[activeIdx]?.click();
+        } else if (e.key === 'Escape') {
+            searchDropdown.classList.remove('active');
+            searchInput.blur();
+        }
+    });
+
+    function updateActive(items) {
+        items.forEach((el, i) => {
+            el.style.background = i === activeIdx ? 'rgba(16,185,129,0.08)' : '';
+        });
+        if (items[activeIdx]) items[activeIdx].scrollIntoView({ block: 'nearest' });
+    }
+
+    // Close dropdown on click outside
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+            searchDropdown.classList.remove('active');
+        }
+    });
+
+    searchInput.addEventListener('focus', () => {
+        if (searchInput.value.trim().length >= 2 && searchDropdown.innerHTML !== '') {
+            searchDropdown.classList.add('active');
+        }
+    });
+});
+</script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// GoVibe AI Voice Command Center — Global Controller
+// ═══════════════════════════════════════════════════════════════
+let chatModal;
+let _gvTtsEnabled = true;
+let _gvFrenchVoice = null;
+let _gvAiNavRoutes = {
+    vols: '{{ path('app_vols_index') }}',
+    checkout: '{{ path('app_checkout_index') }}',
+    hotels: '{{ path('app_hotel_index') }}',
+    activites: '{{ path('app_activite_index') }}',
+    voitures: '{{ path('app_location_index') }}',
+    publications: '{{ path('app_poste_index') }}',
+    reclamations: '{{ path('app_reclamation_index') }}',
+    profil: '{{ path('app_user_profile') }}',
+    accueil: '{{ path('app_user_home') }}',
+    reservations: '{{ path('app_reservation_session_index') }}'
+};
+
+function _gvVoiceRecognitionLang() {
+    const browserLang = (navigator.language || 'fr-FR').toLowerCase();
+    return browserLang.startsWith('fr') ? 'fr-FR' : 'en-US';
+}
+
+function _gvVoiceRecognitionLangs() {
+    const primary = _gvVoiceRecognitionLang();
+    const secondary = primary === 'fr-FR' ? 'en-US' : 'fr-FR';
+    return [primary, secondary];
+}
+
+function _gvVoiceErrorMessage(code) {
+    const map = {
+        'not-allowed': 'Acces micro refuse. Autorisez le microphone dans votre navigateur.',
+        'service-not-allowed': 'Reconnaissance vocale desactivee par le navigateur.',
+        'audio-capture': 'Aucun microphone detecte. Verifiez votre peripherique audio.',
+        'no-speech': 'Aucune voix detectee. Parlez plus pres du micro.',
+        'network': 'Erreur reseau de reconnaissance vocale. Reessayez.',
+        'language-not-supported': 'Langue vocale non supportee. Passez le navigateur en francais ou anglais.',
+        'aborted': 'Ecoute interrompue.',
+    };
+    return map[code] || ('Erreur de reconnaissance vocale: ' + code);
+}
+
+function _gvIsGreeting(text) {
+    const normalized = (text || '').trim().toLowerCase();
+    if (!normalized) return false;
+    const greetings = ['hi', 'hello', 'hey', 'salut', 'bonjour', 'yo'];
+    return greetings.includes(normalized);
+}
+
+async function _gvRecalibrateNoiseProfile() {
+    try {
+        await fetch('{{ path('app_api_python_assistant_noise_recalibrate') }}', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+    } catch (e) {
+        // Silent fallback: browser WebSpeech can still work even if Python assistant is offline.
+    }
+}
+
+async function _gvEnsureMicAccess() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        return { ok: false, message: 'Navigateur incompatible avec l\'acces microphone.' };
+    }
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach((track) => track.stop());
+        return { ok: true, message: '' };
+    } catch (err) {
+        const code = err && err.name ? String(err.name) : 'unknown';
+        const normalized = code.toLowerCase().includes('notallowed') ? 'not-allowed' :
+            (code.toLowerCase().includes('notfound') ? 'audio-capture' : 'unknown');
+        return { ok: false, message: _gvVoiceErrorMessage(normalized) };
+    }
+}
+
+// ═══ Voice Command Engine ═══════════════════════════════════
+const gvVoice = {
+    state: 'idle', // idle | listening | thinking | speaking
+    recognition: null,
+    lastResponse: '',
+    lastTranscript: '',
+    voiceCommandCount: parseInt(localStorage.getItem('gvVoiceCmdCount') || '0'),
+    audioCtx: null,
+    noSpeechRetryCount: 0,
+    noSpeechLangIndex: 0,
+    forcedRecognitionLang: null,
+
+    init() {
+        // Orb click = toggle voice. Double-click = open chat modal.
+        const orb = document.getElementById('aiOrbBtn');
+        if (orb) {
+            let clickTimer = null;
+            orb.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (clickTimer) { clearTimeout(clickTimer); clickTimer = null; openChatModal(); return; }
+                clickTimer = setTimeout(() => {
+                    clickTimer = null;
+                    if (this.state === 'idle') { this.startListening(); }
+                    else if (this.state === 'listening') { this.stopListening(); }
+                    else if (this.state === 'speaking') { this.stopSpeaking(); }
+                    else { this.togglePanel(); }
+                }, 280);
+            });
+        }
+
+        // Keyboard shortcut: Ctrl+Shift+V
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+                e.preventDefault();
+                if (this.state === 'idle') this.startListening();
+                else if (this.state === 'listening') this.stopListening();
+            }
+        });
+    },
+
+    setState(newState) {
+        this.state = newState;
+        const wrap = document.getElementById('gvVoiceWrap');
+        const icon = document.getElementById('aiOrbIcon');
+        const label = document.getElementById('gvVoiceLabel');
+        if (!wrap) return;
+        wrap.dataset.voiceState = newState;
+        const stateMap = {
+            idle:      { icon: 'neurology', label: '🤖 Cliquez pour parler' },
+            listening: { icon: 'mic', label: '🎙️ Écoute en cours...' },
+            thinking:  { icon: 'psychology', label: '🧠 Réflexion...' },
+            speaking:  { icon: 'volume_up', label: '🔊 GoVibe parle...' },
+        };
+        const s = stateMap[newState] || stateMap.idle;
+        if (icon) icon.textContent = s.icon;
+        if (label) label.textContent = s.label;
+    },
+
+    playPing(type) {
+        try {
+            if (!this.audioCtx) this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const ctx = this.audioCtx;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            if (type === 'start') { osc.frequency.setValueAtTime(880, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.1); }
+            else if (type === 'success') { osc.frequency.setValueAtTime(660, ctx.currentTime); osc.frequency.exponentialRampToValueAtTime(990, ctx.currentTime + 0.15); }
+            else { osc.frequency.setValueAtTime(440, ctx.currentTime); }
+            gain.gain.setValueAtTime(0.08, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+            osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.2);
+        } catch(e) { /* AudioContext not available */ }
+    },
+
+    async startListening() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { this.showPanel('La reconnaissance vocale n\'est pas supportée.', ''); return; }
+
+        const micCheck = await _gvEnsureMicAccess();
+        if (!micCheck.ok) {
+            this.showPanel('Erreur Microphone', micCheck.message);
+            this.setState('idle');
+            return;
+        }
+
+        this.setState('listening');
+        this.playPing('start');
+        this.showPanel('', '🎙️ Parlez maintenant...');
+        if (!this.forcedRecognitionLang) {
+            this.noSpeechRetryCount = 0;
+            this.noSpeechLangIndex = 0;
+        }
+        const langs = _gvVoiceRecognitionLangs();
+        const langToUse = this.forcedRecognitionLang || langs[0];
+
+        this.recognition = new SR();
+        this.recognition.lang = langToUse;
+        this.recognition.interimResults = true;
+        this.recognition.maxAlternatives = 1;
+        this.recognition.continuous = true;
+
+        let bestInterim = '';
+        let silenceTimer = null;
+        let processed = false;
+        const self = this;
+
+        // Safety timeout: if nothing happens in 12s, stop gracefully
+        const safetyTimeout = setTimeout(() => {
+            if (!processed && self.recognition) {
+                processed = true;
+                try { self.recognition.stop(); } catch(e) {}
+                if (bestInterim) {
+                    self.forcedRecognitionLang = null;
+                    self.processCommand(bestInterim);
+                } else {
+                    self.setState('idle');
+                    self.showPanel('', 'Aucune parole détectée. Réessayez.');
+                }
+            }
+        }, 12000);
+
+        this.recognition.onresult = (event) => {
+            if (processed) return;
+            let finalTranscript = '';
+            let interimTranscript = '';
+
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const t = event.results[i][0]?.transcript || '';
+                if (event.results[i].isFinal) {
+                    finalTranscript += t + ' ';
+                } else {
+                    interimTranscript += t;
+                }
+            }
+
+            finalTranscript = finalTranscript.trim();
+            interimTranscript = interimTranscript.trim();
+
+            // Show live interim text in the panel
+            if (interimTranscript) {
+                bestInterim = interimTranscript;
+                self.showPanel('', '🎙️ "' + interimTranscript + '"...');
+            }
+
+            if (finalTranscript) {
+                const lowerText = finalTranscript.toLowerCase();
+                const logOutKeywords = ["log out", "logout", "sign out", "signout", "exit session"];
+                if (logOutKeywords.some(kw => lowerText.includes(kw))) {
+                    processed = true;
+                    clearTimeout(safetyTimeout);
+                    if (silenceTimer) clearTimeout(silenceTimer);
+                    self.forcedRecognitionLang = null;
+                    try { self.recognition.stop(); } catch(e) {}
+                    
+                    self.showPanel('"' + finalTranscript + '"', "Logging you out...");
+                    self.speak("Logging you out").then(() => {
+                        fetch('/logout', { method: 'GET' })
+                            .then(() => window.location.href = '/login');
+                    });
+                    return;
+                }
+
+                processed = true;
+                clearTimeout(safetyTimeout);
+                if (silenceTimer) clearTimeout(silenceTimer);
+                self.forcedRecognitionLang = null;
+                try { self.recognition.stop(); } catch(e) {}
+                self.processCommand(finalTranscript);
+            } else if (interimTranscript) {
+                // If we get interim results but no final, wait 2s of silence then use interim
+                if (silenceTimer) clearTimeout(silenceTimer);
+                silenceTimer = setTimeout(() => {
+                    if (!processed && bestInterim) {
+                        processed = true;
+                        clearTimeout(safetyTimeout);
+                        try { self.recognition.stop(); } catch(e) {}
+                        self.forcedRecognitionLang = null;
+                        self.processCommand(bestInterim);
+                    }
+                }, 2000);
+            }
+        };
+        this.recognition.onerror = (e) => {
+            clearTimeout(safetyTimeout);
+            if (silenceTimer) clearTimeout(silenceTimer);
+            if (processed) return;
+
+            this.setState('idle');
+            const code = e && e.error ? e.error : 'unknown';
+            const msg = _gvVoiceErrorMessage(code) + ' (code: ' + code + ')';
+            if (code === 'no-speech' && this.noSpeechRetryCount < 2) {
+                this.noSpeechRetryCount += 1;
+                this.noSpeechLangIndex = Math.min(this.noSpeechLangIndex + 1, langs.length - 1);
+                this.forcedRecognitionLang = langs[this.noSpeechLangIndex];
+                this.showPanel('', 'Aucune voix detectee. Nouvelle tentative automatique... (' + this.forcedRecognitionLang + ')');
+                setTimeout(() => this.startListening(), 2500);
+                return;
+            }
+            this.forcedRecognitionLang = null;
+            if (e.error !== 'aborted') this.showPanel('', msg);
+        };
+        this.recognition.onend = () => {
+            clearTimeout(safetyTimeout);
+            if (silenceTimer) clearTimeout(silenceTimer);
+            // If we have interim text that wasn't processed, use it
+            if (!processed && bestInterim) {
+                processed = true;
+                this.forcedRecognitionLang = null;
+                this.processCommand(bestInterim);
+                return;
+            }
+            if (this.state === 'listening') this.setState('idle');
+        };
+        this.recognition.start();
+    },
+
+    stopListening() {
+        if (this.recognition) { try { this.recognition.stop(); } catch(e){} }
+        this.setState('idle');
+    },
+
+    stopSpeaking() {
+        if (this.currentAudio) {
+            this.currentAudio.pause();
+            this.currentAudio.currentTime = 0;
+            this.currentAudio = null;
+        }
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        this.setState('idle');
+    },
+
+    emergencyStop() {
+        if (this.recognition) { try { this.recognition.stop(); } catch(e){} }
+        this.stopSpeaking();
+        this.showPanel('🛑', 'Arrêt d\'urgence. Assistant stoppé.');
+    },
+
+    toggleMute() {
+        if (typeof _gvTtsEnabled !== 'undefined') {
+            _gvTtsEnabled = !_gvTtsEnabled;
+            const btn = document.getElementById('gvBtnMute');
+            if (btn) {
+                btn.innerHTML = _gvTtsEnabled ? '🔇 Rendre Muet' : '🔊 Activer Voix';
+                btn.style.color = _gvTtsEnabled ? '#f59e0b' : '#10b981';
+            }
+            if (!_gvTtsEnabled) this.stopSpeaking();
+        }
+    },
+
+    async processCommand(transcript) {
+        this.lastTranscript = transcript;
+
+        if (_gvIsGreeting(transcript)) {
+            const greetingReply = 'Hello sir, how can I help you?';
+            this.playPing('success');
+            this.showPanel('"' + transcript + '"', greetingReply);
+            this.speak(greetingReply);
+            return;
+        }
+
+        this.setState('thinking');
+        this.showPanel('"' + transcript + '"', '⏳ Traitement...');
+
+        // Track voice usage
+        this.voiceCommandCount++;
+        localStorage.setItem('gvVoiceCmdCount', this.voiceCommandCount.toString());
+
+        const page = document.getElementById('gvVoiceWrap')?.dataset?.page || 'unknown';
+        try {
+            const resp = await fetch('{{ path('api_voice_command') }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ transcript: transcript, page: page })
+            });
+            const data = await resp.json();
+
+            if (data.success && data.action === 'navigate' && data.url) {
+                this.playPing('success');
+                this.showPanel('"' + transcript + '"', data.spoken_response || 'Navigation...');
+                this.speak(data.spoken_response || 'Navigation.');
+                setTimeout(() => { window.location.href = data.url; }, 1200);
+                return;
+            }
+
+            if (data.success && data.action === 'scroll_to' && data.target) {
+                this.playPing('success');
+                const el = document.querySelector(data.target);
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                this.speak(data.spoken_response || 'Voilà.');
+                this.setState('idle');
+                this.showPanel('"' + transcript + '"', data.spoken_response);
+                return;
+            }
+
+            if (data.success && data.action === 'trigger_payment') {
+                this.playPing('success');
+                const payBtn = document.querySelector('[data-stripe-pay]') || document.querySelector('form[action*="stripe"] button[type="submit"]');
+                if (payBtn) { this.speak(data.spoken_response); setTimeout(() => payBtn.click(), 1500); }
+                else { this.speak('Aucun bouton de paiement trouvé sur cette page.'); }
+                this.setState('idle');
+                return;
+            }
+
+            if (data.success && data.action === 'read_summary') {
+                const summary = document.querySelector('.gv-booking-summary, .checkout-summary, .card-body');
+                this.speak(summary ? summary.textContent.substring(0, 400) : 'Résumé non trouvé.');
+                this.setState('idle');
+                return;
+            }
+
+            if (data.success && data.action === 'read_total') {
+                const priceEl = document.querySelector('.gv-vl-total, .checkout-total, [data-total-price]');
+                if (priceEl) {
+                    this.speak('Le total est de ' + priceEl.textContent.trim());
+                } else {
+                    this.speak('Prix non visible sur cette page.');
+                }
+                this.setState('idle');
+                return;
+            }
+
+            if (data.success && data.action === 'describe_screen') {
+                this.playPing('success');
+                
+                let textToRead = "Vous êtes sur " + document.title.replace('— GoVibe', '').replace('| GoVibe', '') + ". ";
+                
+                let headers = document.querySelectorAll('h1, h2, .gv-hero-title, .gv-section-title');
+                if (headers.length > 0) {
+                    textToRead += "Les sections principales sont : ";
+                    let addedCount = 0;
+                    headers.forEach(h => {
+                        let t = h.innerText.trim();
+                        // ignore small/empty headers or duplicates
+                        if (t.length > 3 && addedCount < 3 && !textToRead.includes(t)) {
+                            textToRead += t + ". ";
+                            addedCount++;
+                        }
+                    });
+                }
+                
+                let buttons = document.querySelectorAll('a.btn, button, .gv-hero-cta, .gv-filter-pill');
+                if (buttons.length > 0) {
+                    textToRead += "Quelques actions disponibles : ";
+                    let addedCount = 0;
+                    buttons.forEach(b => {
+                        let t = b.innerText.trim().replace(/[\r\n]+/g, " ");
+                        if (t.length > 2 && addedCount < 4 && !t.includes('mic') && !t.includes('Rafraîchir')) {
+                            textToRead += t + ". ";
+                            addedCount++;
+                        }
+                    });
+                }
+                
+                this.showPanel('"' + transcript + '"', "Description de la page...");
+                this.speak(textToRead);
+                return;
+            }
+
+            if (data.success && data.action === 'go_back') {
+                this.playPing('success');
+                this.speak(data.spoken_response || 'Retour.');
+                setTimeout(() => window.history.back(), 1200);
+                this.setState('idle');
+                return;
+            }
+
+            if (data.success && data.action === 'stop_speaking') {
+                window.speechSynthesis.cancel();
+                this.setState('idle');
+                this.showPanel('🔇', 'Arrêt de la synthèse vocale.');
+                return;
+            }
+
+            if (data.success && data.action === 'speak_only') {
+                this.playPing('success');
+                this.showPanel('"' + transcript + '"', data.spoken_response);
+                this.speak(data.spoken_response);
+                return;
+            }
+
+            if (data.success && data.action === 'cancel_booking') {
+                this.playPing('success');
+                this.showPanel('"' + transcript + '"', data.spoken_response);
+                this.speak(data.spoken_response);
+                return;
+            }
+
+            if (data.success && data.action === 'ai_response') {
+                const reply = data.spoken_response || 'Réponse reçue.';
+                this.showPanel('"' + transcript + '"', reply);
+                this.speak(reply);
+                return;
+            }
+
+            // Fallback: pipe through Gemini/Groq chat
+            this.fallbackToChat(transcript);
+
+        } catch (err) {
+            console.error('[Voice] Command error:', err);
+            this.fallbackToChat(transcript);
+        }
+    },
+
+    fallbackToChat(transcript) {
+        const model = document.getElementById('aiModelSelectorValue')?.value || 'gemini';
+        const route = model === 'groq' ? '{{ path('app_groq_chat') }}' : '{{ path('app_gemini_chat') }}';
+
+        fetch(route, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ message: transcript })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const reply = data.response || data.error || 'Pas de réponse.';
+            this.showPanel('"' + transcript + '"', reply.substring(0, 300));
+            this.speak(reply);
+        })
+        .catch(() => {
+            this.setState('idle');
+            this.showPanel('"' + transcript + '"', 'Service temporairement indisponible.');
+        });
+    },
+
+    async speak(text) {
+        if (!text || !_gvTtsEnabled) { this.setState('idle'); return Promise.resolve(); }
+        return new Promise(async (resolve) => {
+            let clean = text
+                .replace(/[\u{1F600}-\u{1F9FF}\u{2600}-\u{2B55}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}]/gu, '')
+                .replace(/https?:\/\/[^\s]+/g, '').replace(/[*_`#>\[\]]/g, '').replace(/\n+/g, '. ').trim();
+            if (!clean || clean.length < 3) { this.setState('idle'); resolve(); return; }
+            if (clean.length > 250) clean = clean.substring(0, 250) + '...'; // [FIX] Max response length
+
+            this.lastResponse = clean;
+            this.setState('speaking');
+
+            this.stopSpeaking();
+
+            try {
+                const resp = await fetch('/api/voice/speak', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: clean, voice: 'qween' })
+                });
+
+                if (!resp.ok) throw new Error('TTS failed');
+                
+                const blob = await resp.blob();
+                this.currentAudio = new Audio(URL.createObjectURL(blob));
+                
+                this.currentAudio.addEventListener('ended', () => {
+                    this.setState('idle');
+                    this.currentAudio = null;
+                    resolve();
+                    // [FIX] Auto-resume mic safely if we were listening before
+                    if (this.wasListeningBeforeSpeak) {
+                        this.wasListeningBeforeSpeak = false;
+                        setTimeout(() => this.startListening(), 300);
+                    }
+                });
+                this.currentAudio.addEventListener('error', () => {
+                    this.setState('idle');
+                    this.currentAudio = null;
+                    resolve();
+                });
+                
+                this.currentAudio.play();
+            } catch (e) {
+                console.error('TTS error:', e);
+                this.setState('idle');
+                resolve();
+            }
+        });
+    },
+
+    replay() {
+        if (this.lastResponse) this.speak(this.lastResponse);
+    },
+
+    showPanel(transcript, response) {
+        const panel = document.getElementById('gvVoicePanel');
+        const tEl = document.getElementById('gvVoiceTranscript');
+        const rEl = document.getElementById('gvVoiceResponse');
+        if (tEl && transcript !== undefined) tEl.textContent = transcript;
+        if (rEl && response !== undefined) rEl.textContent = response;
+        if (panel) panel.classList.add('active');
+    },
+
+    closePanel() {
+        const panel = document.getElementById('gvVoicePanel');
+        if (panel) panel.classList.remove('active');
+    },
+
+    togglePanel() {
+        const panel = document.getElementById('gvVoicePanel');
+        if (panel) panel.classList.toggle('active');
+    }
+};
+
+// ═══ Page Load Init ═════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    chatModal = new bootstrap.Modal(document.getElementById('chatModal'));
+    gvVoice.init();
+
+    document.addEventListener('click', (e) => {
+        const selector = document.getElementById('aiSelector');
+        if (selector && !selector.contains(e.target)) closeAISelector();
+        // Close voice panel if clicking outside
+        const wrap = document.getElementById('gvVoiceWrap');
+        if (wrap && !wrap.contains(e.target)) gvVoice.closePanel();
+    });
+    // Check AI health on load
+    checkAiHealth();
+    // Preload TTS voices
+    _loadVoices();
+    if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = _loadVoices;
+    }
+});
+
+let _gvEnglishVoice = null;
+function _loadVoices() {
+    if (!window.speechSynthesis) return;
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return;
+    
+    // Load French
+    const frPriorities = ['vivian', 'hortense', 'amélie', 'amelie', 'thomas', 'lea', 'céline', 'celine'];
+    for (const name of frPriorities) {
+        const v = voices.find(v => v.name.toLowerCase().includes(name) && v.lang.startsWith('fr'));
+        if (v) { _gvFrenchVoice = v; break; }
+    }
+    if (!_gvFrenchVoice) _gvFrenchVoice = voices.find(v => v.lang === 'fr-FR') || voices.find(v => v.lang.startsWith('fr')) || null;
+
+    // Load English
+    _gvEnglishVoice = voices.find(v => v.name.toLowerCase().includes('google uk english female')) ||
+                      voices.find(v => v.lang.toLowerCase().startsWith('en-gb')) ||
+                      voices.find(v => v.lang.toLowerCase().startsWith('en')) ||
+                      voices[0];
+}
+
+function checkAiHealth() {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 2000);
+    fetch('/api/ai/health', { signal: ctrl.signal }).then(r => r.json()).then(d => {
+        clearTimeout(tid);
+        const dot = document.getElementById('aiHealthDot');
+        if (dot) dot.style.background = (d.success || d.status === 'healthy') ? '#10b981' : '#ef4444';
+    }).catch(() => {
+        clearTimeout(tid);
+        const dot = document.getElementById('aiHealthDot');
+        if (dot) dot.style.background = '#f59e0b';
+    });
+}
+
+function toggleAISelector() {
+    const c = document.getElementById('aiSelector'), m = document.getElementById('aiMenu');
+    c.classList.toggle('open');
+    m.style.display = c.classList.contains('open') ? 'block' : 'none';
+}
+function closeAISelector() {
+    const c = document.getElementById('aiSelector'), m = document.getElementById('aiMenu');
+    if(c) c.classList.remove('open'); if(m) m.style.display = 'none';
+}
+
+function selectAI(value, name) {
+    document.getElementById('aiModelSelectorValue').value = value;
+    document.getElementById('selectedAIName').innerText = name;
+    updateWelcomeMessage(value);
+    document.querySelectorAll('.gv-ai-selector-item').forEach(item => {
+        item.classList.remove('active');
+        const t = item.innerText;
+        if ((value==='gemini'&&t.includes('Gemini'))||(value==='groq'&&t.includes('Groq'))||(value==='voice'&&t.includes('Voice'))) item.classList.add('active');
+    });
+    closeAISelector();
+}
+
+function openChatModal() { chatModal.show(); }
+
+function quickCommand(text) {
+    document.getElementById('chatInput').value = text;
+    sendMessage();
+}
+
+// Global voice command trigger (used by page-level shortcut chips)
+function voiceCommand(text) {
+    gvVoice.processCommand(text);
+}
+
+// ── Smart Command Detection ──────────────────────────────────
+function detectNavigation(text) {
+    const t = text.toLowerCase();
+    const navMap = [
+        { keys: ['vol', 'flight', 'avion', 'billet'], route: 'vols', label: 'Vols', icon: '✈️' },
+        { keys: ['hotel', 'hôtel', 'hébergement', 'chambre'], route: 'hotels', label: 'Hôtels', icon: '🏨' },
+        { keys: ['voiture', 'car', 'location', 'louer'], route: 'voitures', label: 'Voitures', icon: '🚗' },
+        { keys: ['activit', 'excursion', 'visite', 'loisir'], route: 'activites', label: 'Activités', icon: '🎯' },
+        { keys: ['checkout', 'réservation de vol', 'mes checkout'], route: 'checkout', label: 'Checkouts', icon: '🎫' },
+        { keys: ['réservation', 'booking', 'mes réserv'], route: 'reservations', label: 'Réservations', icon: '📋' },
+        { keys: ['profil', 'mon compte', 'paramètres'], route: 'profil', label: 'Mon Profil', icon: '👤' },
+        { keys: ['accueil', 'home', 'page principale'], route: 'accueil', label: 'Accueil', icon: '🏠' },
+        { keys: ['publication', 'post', 'forum', 'blog'], route: 'publications', label: 'Publications', icon: '📝' },
+        { keys: ['réclamation', 'plainte', 'problème'], route: 'reclamations', label: 'Réclamations', icon: '📢' },
+    ];
+    for (const nav of navMap) {
+        for (const key of nav.keys) {
+            if (t.includes(key)) return nav;
+        }
+    }
+    return null;
+}
+
+function addNavigationChip(container, nav) {
+    const chip = document.createElement('span');
+    chip.className = 'gv-action-chip';
+    chip.innerHTML = `${nav.icon} Aller vers ${nav.label}`;
+    chip.onclick = () => { chatModal.hide(); window.location.href = _gvAiNavRoutes[nav.route]; };
+    container.appendChild(chip);
+}
+
+// ── Destination-aware flight search ──────────────────────────
+function extractDestination(text) {
+    const t = text.toLowerCase();
+    const patterns = [/(?:vol|flight|aller|voyager|partir)\s+(?:à|a|vers|pour|to)\s+([a-zàâéèêëïîôùûüç\s-]+)/i,
+                      /(?:destination|direction)\s+([a-zàâéèêëïîôùûüç\s-]+)/i];
+    for (const p of patterns) {
+        const m = t.match(p);
+        if (m) return m[1].trim();
+    }
+    return null;
+}
+
+// ── Main send ────────────────────────────────────────────────
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    if (_gvIsGreeting(text)) {
+        const greetingReply = 'Hello sir, how can I help you?';
+        appendMessage('user', text);
+        input.value = '';
+        appendMessage('ai', greetingReply);
+        speakText(greetingReply);
+        return;
+    }
+
+    appendMessage('user', text);
+    input.value = '';
+
+    // Detect navigation intent
+    const nav = detectNavigation(text);
+    const dest = extractDestination(text);
+
+    const indicator = showTypingIndicator();
+    const model = document.getElementById('aiModelSelectorValue').value;
+    if (model === 'voice') { callVoiceAssistant(text, false, indicator); return; }
+
+    const route = model === 'groq' ? '{{ path('app_groq_chat') }}' : '{{ path('app_gemini_chat') }}';
+
+    fetch(route, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ message: text })
+    })
+    .then(r => r.json())
+    .then(data => {
+        indicator.remove();
+        if (data.error) { appendMessage('ai', 'Erreur : ' + data.error); return; }
+        const msgEl = appendMessage('ai', data.response);
+
+        // Auto-navigation capability
+        if (nav && msgEl) {
+            let targetUrl = _gvAiNavRoutes[nav.route];
+            let label = nav.label;
+            if (dest && nav.route === 'vols') {
+                targetUrl += '?destination=' + encodeURIComponent(dest);
+                label = 'Vols vers ' + dest;
+            }
+            
+            // Add visual indication
+            const chip = document.createElement('div');
+            chip.className = 'mt-3 p-2 bg-success text-white rounded-3 small fw-bold d-inline-block shadow-sm';
+            chip.innerHTML = `${nav.icon || '🚀'} Redirection vers ${label}... <div class="spinner-border spinner-border-sm text-light ms-2" role="status"></div>`;
+            msgEl.appendChild(chip);
+
+            // Auto-navigate after a short delay so the user hears/sees the response
+            setTimeout(() => {
+                const cm = document.getElementById('chatModal');
+                if (cm && window.bootstrap) { bootstrap.Modal.getInstance(cm)?.hide(); }
+                window.location.href = targetUrl;
+            }, 3500);
+        }
+
+        // Speak the AI response aloud
+        speakText(data.response);
+    })
+    .catch(() => {
+        indicator.remove();
+        appendMessage('ai', 'Désolé, une erreur de connexion est survenue.');
+    });
+}
+
+// ── Voice Assistant ──────────────────────────────────────────
+function callVoiceAssistant(text, confirmed, indicator) {
+    fetch('{{ path('app_api_python_assistant_flow') }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ user_input: text, confirmed: confirmed })
+    })
+    .then(r => r.json())
+    .then(data => {
+        indicator.remove();
+        if (data.error) { appendMessage('ai', 'Voice Agent: ' + data.error); return; }
+        const payload = data.data || {}, plan = payload.plan || {};
+        if (payload.requires_confirmation && !confirmed) {
+            const reason = payload.confirmation_prompt || plan.reason || 'Cette commande demande une confirmation.';
+            appendMessage('ai', 'Plan sécurisé (dry-run): ' + reason);
+            if (window.confirm(reason + '\n\nConfirmer l\'exécution ?')) {
+                callVoiceAssistant(text, true, showTypingIndicator());
+            } else { appendMessage('ai', 'Commande annulée.'); }
+            return;
+        }
+        appendMessage('ai', formatVoiceAssistantResponse(payload));
+        speakText(getVoiceReplyText(payload));
+    })
+    .catch(() => { indicator.remove(); appendMessage('ai', 'Voice Agent indisponible actuellement.'); });
+}
+function formatVoiceAssistantResponse(p) {
+    const e = p.execution||{}, plan = p.plan||e.plan||{};
+    return `Intent: ${p.intent||e.intent||'unknown'}\nRéponse: ${getVoiceReplyText(p)}\nPlan: blocked=${plan.blocked?'oui':'non'}, confirmation=${plan.requires_confirmation?'oui':'non'}\nReason: ${plan.reason||'—'}`;
+}
+function getVoiceReplyText(p) {
+    const e = p.execution||{};
+    return e.response||e.message||e.output||e.result||'Commande traitée.';
+}
+
+function updateWelcomeMessage(model) {
+    const f = document.querySelector('#chatMessages .chat-message.ai');
+    if (!f) return;
+    if (model==='voice') { f.innerHTML = "Bonjour ! Je suis <b>Voice Agent</b>. Je prépare vos commandes en mode sécurisé avant exécution."; return; }
+    if (model==='groq') { f.innerHTML = "Bonjour ! Je suis <b>Groq</b>, assistant voyage ultra-rapide. Que souhaitez-vous faire ?"; return; }
+    f.innerHTML = 'Bonjour ! Je suis votre assistant voyage <b>GoVibe AI</b>. 🌍✈️<br><br>Je peux vous aider à :<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;"><span class="gv-action-chip" onclick="quickCommand(\'Trouve un vol pas cher\')">✈️ Trouver un vol</span><span class="gv-action-chip" onclick="quickCommand(\'Meilleur hôtel\')">🏨 Hôtels</span><span class="gv-action-chip" onclick="quickCommand(\'Mes réservations\')">📋 Réservations</span></div>';
+}
+
+// ── Voice: Enhanced with visual feedback ─────────────────────
+async function startVoiceInput() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { appendMessage('ai', 'La reconnaissance vocale n\'est pas supportée sur ce navigateur.'); return; }
+
+    const mic = await _gvEnsureMicAccess();
+    if (!mic.ok) {
+        appendMessage('ai', mic.message);
+        return;
+    }
+
+    const langs = _gvVoiceRecognitionLangs();
+    let langIdx = 0;
+    const r = new SR();
+    r.lang = langs[langIdx];
+    r.interimResults = true;
+    r.maxAlternatives = 1;
+    r.continuous = true;
+    const micBtn = document.getElementById('voiceMicBtn');
+    const status = document.getElementById('voiceStatus');
+    let retryCount = 0;
+
+    r.onstart = () => {
+        if (micBtn) micBtn.classList.add('gv-voice-recording');
+        if (status) { status.style.display = 'block'; status.innerHTML = '<span class="gv-voice-status">🎙️ Écoute en cours...</span>'; }
+    };
+    r.onend = () => {
+        if (micBtn) micBtn.classList.remove('gv-voice-recording');
+        if (status) status.style.display = 'none';
+    };
+    r.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+                transcript += (event.results[i][0]?.transcript || '') + ' ';
+            }
+        }
+        transcript = transcript.trim();
+        if (transcript) { document.getElementById('chatInput').value = transcript; sendMessage(); }
+    };
+    r.onerror = (e) => {
+        if (micBtn) micBtn.classList.remove('gv-voice-recording');
+        if (status) status.style.display = 'none';
+        if (e.error !== 'aborted') {
+            const code = e && e.error ? e.error : 'unknown';
+            if (code === 'no-speech' && retryCount < 2) {
+                retryCount += 1;
+                langIdx = Math.min(langIdx + 1, langs.length - 1);
+                r.lang = langs[langIdx];
+                appendMessage('ai', 'Je n\'ai rien capte, je relance l\'ecoute automatiquement... (' + r.lang + ')');
+                _gvRecalibrateNoiseProfile();
+                setTimeout(() => { try { r.start(); } catch (_) {} }, 400);
+                return;
+            }
+            appendMessage('ai', _gvVoiceErrorMessage(code) + ' (code: ' + code + ')');
+        }
+    };
+    r.start();
+}
+
+window._speechUtterances = window._speechUtterances || [];
+function detectLanguage(text) {
+    const enWords = /\b(the|is|and|with|for|to|of|in|this|that|are|you|we)\b/gi;
+    const frWords = /\b(le|la|les|de|des|un|une|et|est|avec|pour|ce|cette|vous|nous|pas)\b/gi;
+    const enCount = (text.match(enWords) || []).length;
+    const frCount = (text.match(frWords) || []).length;
+    return enCount > frCount ? 'en' : 'fr';
+}
+
+function speakText(text) {
+    if (!window.speechSynthesis || !text || !_gvTtsEnabled) return;
+    let clean = text
+        .replace(/[\u{1F600}-\u{1F9FF}\u{2600}-\u{2B55}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}]/gu, '')
+        .replace(/https?:\/\/[^\s]+/g, '').replace(/[*_`#>\[\]]/g, '').replace(/\n+/g, '. ').trim();
+    if (!clean || clean.length < 3) return;
+    if (clean.length > 250) clean = clean.substring(0, 250) + '...';
+
+    gvVoice.setState('speaking');
+    window.speechSynthesis.cancel();
+    
+    const lang = detectLanguage(clean);
+    const u = new SpeechSynthesisUtterance(clean);
+    u.rate = 1.05; u.pitch = 1.0; u.volume = 1.0;
+    
+    if (lang === 'en') {
+        u.lang = 'en-US';
+        if (_gvEnglishVoice) u.voice = _gvEnglishVoice;
+    } else {
+        u.lang = 'fr-FR';
+        if (_gvFrenchVoice) u.voice = _gvFrenchVoice;
+    }
+
+    // Prevent GC bug in Chrome that stops onend from firing
+    window._speechUtterances.push(u);
+
+    const status = document.getElementById('voiceStatus');
+    if (status) { status.style.display = 'block'; status.innerHTML = '<span class="gv-voice-status" style="color:#10b981; padding: 4px 10px; background: rgba(16, 185, 129, 0.1); border-radius: 12px; margin-bottom: 8px; display: inline-block;">🔊 GoVibe parle...</span>'; }
+    
+    u.onend = () => { 
+        if (status) status.style.display = 'none'; 
+        gvVoice.setState('idle'); 
+        window._speechUtterances = window._speechUtterances.filter(item => item !== u);
+        if (typeof gvVoice !== 'undefined' && gvVoice.wasListeningBeforeSpeak) {
+            gvVoice.wasListeningBeforeSpeak = false;
+            setTimeout(() => gvVoice.startListening(), 300);
+        }
+    };
+    u.onerror = () => { 
+        if (status) status.style.display = 'none'; 
+        gvVoice.setState('idle'); 
+        window._speechUtterances = window._speechUtterances.filter(item => item !== u);
+    };
+
+    window.speechSynthesis.speak(u);
+}
+
+function toggleTts() {
+    _gvTtsEnabled = !_gvTtsEnabled;
+    const btn = document.getElementById('ttsToggleBtn');
+    if (btn) {
+        const icon = btn.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = _gvTtsEnabled ? 'volume_up' : 'volume_off';
+        btn.title = _gvTtsEnabled ? 'Couper la voix' : 'Activer la voix';
+        btn.style.color = _gvTtsEnabled ? '#10b981' : '#94a3b8';
+    }
+    if (!_gvTtsEnabled && window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
+// ── Append Message (with navigation intelligence) ────────────
+function appendMessage(type, text) {
+    const container = document.getElementById('chatMessages');
+    const msg = document.createElement('div');
+    msg.className = `chat-message ${type}`;
+
+    if (type === 'ai' && typeof text === 'string' && text.includes('[POST_SUGGESTION]')) {
+        const parts = text.split('[POST_SUGGESTION]');
+        const normalText = parts[0];
+        let suggestionBlock = parts[1].split('[/POST_SUGGESTION]')[0];
+        try {
+            const suggestion = JSON.parse(suggestionBlock);
+            const safeSuggestion = suggestionBlock.replace(/'/g, "&apos;");
+            msg.innerHTML = `<div>${parseMarkdown(normalText)}</div>
+                <div class="mt-3 p-3 bg-white border rounded-3 shadow-sm" style="color:#00342d;">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="material-symbols-outlined text-success" style="font-size:1.1rem;">auto_awesome</span>
+                        <span class="fw-bold small">Suggestion de Publication</span>
+                    </div>
+                    <div class="small mb-3 text-muted" style="font-style:italic;">"${suggestion.contenu.substring(0, 80)}..."</div>
+                    <button class="btn btn-sm btn-success w-100 rounded-pill py-2 fw-bold" onclick='fillPostForm(${safeSuggestion})'>Remplir le formulaire</button>
+                </div>
+                <div class="mt-2"><button class="btn btn-sm text-muted px-0" style="font-size:0.75rem;" onclick="speakText(this.dataset.rawText)"><i class="bi bi-volume-up-fill me-1"></i>Lire à haute voix</button></div>`;
+            msg.querySelector('button.text-muted').dataset.rawText = normalText;
+        } catch (e) { 
+            msg.innerHTML = parseMarkdown(text) + `<div class="mt-2"><button class="btn btn-sm text-muted px-0" style="font-size:0.75rem;" onclick="speakText(this.dataset.rawText)"><i class="bi bi-volume-up-fill me-1"></i>Lire à haute voix</button></div>`; 
+            msg.querySelector('button.text-muted').dataset.rawText = text; 
+        }
+    } else {
+        if (type === 'ai') {
+            msg.innerHTML = parseMarkdown(text) + `<div class="mt-2"><button class="btn btn-sm text-muted px-0" style="font-size:0.75rem;" onclick="speakText(this.dataset.rawText)"><i class="bi bi-volume-up-fill me-1"></i>Lire à haute voix</button></div>`;
+            msg.querySelector('button.text-muted').dataset.rawText = text;
+        } else {
+            msg.textContent = text;
+        }
+    }
+    container.appendChild(msg);
+    container.scrollTop = container.scrollHeight;
+    return msg;
+}
+
+function parseMarkdown(text) {
+    if (!text) return '';
+    let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    html = html.replace(/`(.*?)`/g, '<code style="background:#f1f5f9;padding:2px 4px;border-radius:4px;color:#0f172a;">$1</code>');
+    html = html.replace(/\n\n/g, '<br><br>');
+    return html;
+}
+
+function fillPostForm(data) {
+    openPostModal('{{ path('app_poste_new') }}');
+    chatModal.hide();
+    const checkExist = setInterval(() => {
+        const form = document.getElementById('publication-form');
+        if (form) {
+            clearInterval(checkExist);
+            const textarea = form.querySelector('textarea');
+            const locInput = document.getElementById('poste_localisation');
+            if (textarea) textarea.value = data.contenu;
+            if (locInput) locInput.value = data.localisation || '';
+            if (data.type === 'MEDIA') {
+                const btnPhoto = document.getElementById('btn-photo-video');
+                if (btnPhoto) btnPhoto.click();
+                if (data.imageUrl) {
+                    const extInput = document.getElementById('poste_externalImageUrl');
+                    if (extInput) extInput.value = data.imageUrl;
+                    const imgP = document.getElementById('image-preview'), pc = document.getElementById('preview-image-container'), np = document.getElementById('no-preview');
+                    if (imgP) { imgP.src = data.imageUrl; if(pc) pc.style.display='block'; if(np) np.style.display='none'; }
+                }
+            } else { const bt = document.getElementById('btn-status-texte'); if(bt) bt.click(); }
+            if (textarea) textarea.dispatchEvent(new Event('input'));
+        }
+    }, 100);
+}
+
+function showTypingIndicator() {
+    const c = document.getElementById('chatMessages');
+    const d = document.createElement('div');
+    d.className = 'chat-message ai';
+    d.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+    c.appendChild(d); c.scrollTop = c.scrollHeight;
+    return d;
+}
+</script>
     {% block javascripts %}{% endblock %}
 </body>
 </html>

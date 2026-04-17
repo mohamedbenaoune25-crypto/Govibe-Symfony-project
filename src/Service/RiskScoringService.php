@@ -16,7 +16,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 class RiskScoringService
 {
-    private const API_URL = 'http://localhost:5001/predict-risk';
+    private const API_URL = 'http://127.0.0.1:5001/predict-risk';
     private const API_TIMEOUT = 3; // seconds
 
     private HttpClientInterface $httpClient;

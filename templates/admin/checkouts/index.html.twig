@@ -1,164 +1,245 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block page_title %}Gestion des Checkouts{% endblock %}
+{% block page_title %}Gestion des réservations{% endblock %}
 
 {% block body %}
+<!-- ═══ Tropical Emerald Admin UI Styles ═══ -->
 <style>
-    .dashboard-hero {
-        background: linear-gradient(135deg, rgba(8, 58, 45, 0.06), rgba(34, 197, 94, 0.05));
-        border: 1px solid rgba(34, 197, 94, 0.08);
-        border-radius: 24px;
-        padding: 26px 28px;
-        margin-bottom: 28px;
+    /* Premium Glassmorphism Heritage */
+    :root {
+        --govibe-emerald: #00c896;
+        --govibe-emerald-dark: #00a47a;
+        --govibe-dark: #0f172a;
+        --govibe-light: #f8fafc;
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.4);
     }
-    .checkout-stat {
+    
+    .admin-hero-dashboard {
+        background: linear-gradient(135deg, var(--govibe-dark) 0%, #1e293b 100%);
         border-radius: 24px;
-        background: linear-gradient(135deg, rgba(34, 197, 94, 0.10), rgba(8, 58, 45, 0.06));
-        border: 1px solid rgba(34, 197, 94, 0.10);
-    }
-    .checkout-card {
-        background: #fff;
-        border-radius: 24px;
-        border: 1px solid #E5E7EB;
-        box-shadow: 0 14px 36px rgba(15, 23, 42, 0.07);
+        padding: 30px;
+        margin-bottom: 30px;
+        color: white;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        position: relative;
         overflow: hidden;
     }
-    .checkout-badge {
-        border-radius: 999px;
-        padding: .40rem .80rem;
-        font-size: .68rem;
-        font-weight: 800;
-        letter-spacing: .08em;
+    .admin-hero-dashboard::before {
+        content: '';
+        position: absolute;
+        top: -50%; right: -10%;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(0,200,150,0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
     }
-    .checkout-card-anim {
-        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-        transform: translateY(0);
-        box-shadow: 0 6px 16px rgba(0,0,0,0.04);
-        background: #fff;
+
+    .stat-glass-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 20px;
+        transition: transform 0.3s ease;
     }
-    .checkout-card-anim:hover {
+    .stat-glass-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Checkout Card Redesign */
+    .checkout-pro-card {
+        background: #ffffff;
+        border-radius: 24px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    .checkout-pro-card:hover {
         transform: translateY(-8px);
-        box-shadow: 0 24px 48px rgba(34, 197, 94, 0.12);
-        border-color: rgba(34, 197, 94, 0.3) !important;
+        box-shadow: 0 20px 40px rgba(0, 200, 150, 0.08);
+        border-color: rgba(0, 200, 150, 0.3);
+    }
+
+    /* Risk Borders */
+    .border-risk-high { border: 2px solid rgba(239, 68, 68, 0.6) !important; box-shadow: 0 10px 30px rgba(239,68,68,0.1) !important; }
+    .border-risk-medium { border: 1px solid rgba(245, 158, 11, 0.5) !important; }
+    .border-risk-safe { border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+
+    .risk-badge-high { background: rgba(239, 68, 68, 0.1); color: #dc2626; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 11px; border: 1px solid rgba(239,68,68,0.2); }
+    .risk-badge-medium { background: rgba(245, 158, 11, 0.1); color: #d97706; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 11px; border: 1px solid rgba(245,158,11,0.2); }
+    .risk-badge-safe { background: rgba(16, 185, 129, 0.1); color: #10b981; padding: 4px 10px; border-radius: 8px; font-weight: 700; font-size: 11px; border: 1px solid rgba(16,185,129,0.2); }
+
+    .chart-bar-wrap {
+        height: 8px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+    .chart-bar-fill {
+        height: 100%;
+        background: var(--govibe-emerald);
+        border-radius: 4px;
     }
 </style>
 
-<div class="dashboard-hero">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div>
-            <h2 class="mb-2 fw-bold" style="color: var(--admin-primary);">Reservations Tracking</h2>
-            <p class="mb-0 text-muted">Monitor and moderate all passenger bookings</p>
+<!-- ═══ 1. Main Analytics Dashboard (Stripe / Revenue / Stats) ═══ -->
+<div class="admin-hero-dashboard">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-7">
+            <h2 class="fw-bold mb-1" style="letter-spacing: -1px;"><i class="bi bi-wallet2 text-success me-2"></i> Transactions & Checkouts</h2>
+            <p class="text-white-50 mb-0">Surveillance native des paiements Stripe et analyse de risque IA sans latence.</p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="{{ path('app_admin_vols_index') }}" class="btn btn-pro rounded-pill px-4"><i class="bi bi-airplane me-2"></i> Vols</a>
-            <a href="{{ path('app_admin_dashboard') }}" class="btn btn-primary-pro rounded-pill px-4"><i class="bi bi-arrow-clockwise me-2"></i> Actualiser</a>
+        <div class="col-md-5 text-end">
+            <div class="btn-group bg-white bg-opacity-10 rounded-pill p-1">
+                <a href="{{ path('app_admin_checkouts_index', {status: 'all'}) }}" class="btn btn-sm btn-dark rounded-pill px-4 {% if currentStatus == 'all' %}active bg-success border-success{% endif %}">Tous</a>
+                <a href="{{ path('app_admin_checkouts_index', {status: 'EN_ATTENTE'}) }}" class="btn btn-sm btn-dark rounded-pill px-3 {% if currentStatus == 'EN_ATTENTE' %}active bg-success border-success{% endif %}">Attente ({{ stats.pendingOrders }})</a>
+                <a href="{{ path('app_admin_checkouts_index', {status: 'CONFIRMEE'}) }}" class="btn btn-sm btn-dark rounded-pill px-3 {% if currentStatus == 'CONFIRMEE' %}active bg-success border-success{% endif %}">Confirmés</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <!-- Revenue Stat -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-glass-card">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1" style="letter-spacing: 0.5px;">Revenus Globlaux</div>
+                <h3 class="fw-bold text-white mb-0 h4">{{ stats.totalRevenue|number_format(0, ',', ' ') }} DT</h3>
+                <div class="mt-2 text-white-50 small"><i class="bi bi-graph-up-arrow text-success"></i> +{{ stats.revenueMonth|number_format(0, ',', ' ') }} ce mois</div>
+            </div>
+        </div>
+        <!-- Risk Stat -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-glass-card border-danger border-opacity-25">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1" style="letter-spacing: 0.5px;">Haut Risque (IA)</div>
+                <h3 class="fw-bold text-white mb-0 h4 text-danger">{{ stats.highRiskOrders }} <span class="fs-6 fw-normal text-white-50">réservations</span></h3>
+                <div class="mt-2 text-white-50 small"><i class="bi bi-shield-exclamation text-danger"></i> Surveillance requise</div>
+            </div>
+        </div>
+        <!-- Top Destination -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-glass-card">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1" style="letter-spacing: 0.5px;">Destination Top</div>
+                <h3 class="fw-bold text-white mb-0 h4">{{ stats.topDestination }}</h3>
+                <div class="mt-2 text-white-50 small"><i class="bi bi-geo-alt text-info"></i> {{ stats.destinations[stats.topDestination]|default(0) }} réservations</div>
+            </div>
+        </div>
+        <!-- Stripe Methods -->
+        <div class="col-lg-3 col-sm-6">
+            <div class="stat-glass-card">
+                <div class="text-white-50 small text-uppercase fw-bold mb-1" style="letter-spacing: 0.5px;">Paiements</div>
+                {% for method, count in stats.paymentMethods %}
+                    {% set pct = (count / stats.totalOrders * 100) %}
+                    <div class="d-flex justify-content-between align-items-end mt-2">
+                        <span class="text-white small">{{ method }}</span>
+                        <span class="text-white fw-bold small">{{ pct|round }}%</span>
+                    </div>
+                    <div class="chart-bar-wrap mb-1"><div class="chart-bar-fill" style="width: {{ pct }}%"></div></div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4 mb-4">
-    <div class="col-lg-4">
-        <div class="admin-card checkout-stat h-100">
-            <div class="admin-card-body">
-                <div class="text-muted small text-uppercase fw-semibold mb-2">En attente</div>
-                <div class="display-6 fw-bold text-success">{{ pendingCount }}</div>
-                <div class="text-muted">Checkouts à confirmer</div>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-8">
-        <div class="admin-card h-100">
-            <div class="admin-card-header d-flex justify-content-between align-items-center">
-                <span>Filtrer les checkouts</span>
-                <div class="btn-group btn-group-sm" role="group">
-                    <a href="{{ path('app_admin_checkouts_index', {status: 'all'}) }}" class="btn btn-pro">Tous</a>
-                    <a href="{{ path('app_admin_checkouts_index', {status: 'EN_ATTENTE'}) }}" class="btn btn-pro">Attente</a>
-                    <a href="{{ path('app_admin_checkouts_index', {status: 'CONFIRMEE'}) }}" class="btn btn-pro">Confirmés</a>
-                    <a href="{{ path('app_admin_checkouts_index', {status: 'REFUSEE'}) }}" class="btn btn-pro">Refusés</a>
-                </div>
-            </div>
-            <div class="admin-card-body">
-                <p class="mb-0 text-muted">Les vols sont réservés par les utilisateurs via le checkout. Confirmez ou refusez les demandes en attente.</p>
-            </div>
-        </div>
-    </div>
-</div>
-
+<!-- ═══ 2. Checkouts Grid ═══ -->
 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
     {% for checkout in checkouts %}
-    <div class="col" data-card-animate>
-        <div class="admin-card h-100 position-relative d-flex flex-column checkout-card-anim" style="padding: 25px; border-radius: 20px; border: 1px solid #E5E7EB;">
-            <!-- Status Badge -->
-            <div class="position-absolute" style="top: 20px; right: 20px;">
-                {% if checkout.statusReservation == 'EN_ATTENTE' %}
-                    <span class="checkout-badge" style="background:rgba(245, 158, 11, 0.12);color:#D97706;border:1px solid rgba(245, 158, 11, 0.2);">EN ATTENTE</span>
-                {% elseif checkout.statusReservation == 'CONFIRMEE' %}
-                    <span class="checkout-badge" style="background:rgba(34, 197, 94, 0.12);color:#16A34A;border:1px solid rgba(34, 197, 94, 0.2);">CONFIRMÉE</span>
-                {% else %}
-                    <span class="checkout-badge" style="background:rgba(239, 68, 68, 0.12);color:#DC2626;border:1px solid rgba(239, 68, 68, 0.2);">REFUSÉE</span>
-                {% endif %}
-            </div>
-
-            <!-- Header: ID + Date -->
-            <div class="mb-4">
-                <div class="fw-bold" style="font-size:22px; color:var(--admin-primary);">#{{ checkout.checkoutId }}</div>
-                <div class="text-muted" style="font-size:13px; font-weight:500;"><i class="bi bi-calendar3 me-1"></i>{{ checkout.reservationDate ? checkout.reservationDate|date('d/m/Y à H:i') : '-' }}</div>
-            </div>
-
-            <!-- Passenger details -->
-            <div class="d-flex align-items-center gap-3 mb-4 pb-4" style="border-bottom: 1px dashed #E2E8F0;">
-                <div style="width:48px;height:48px;border-radius:14px;background:rgba(34, 197, 94, 0.08);color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:22px;border:1px solid rgba(34, 197, 94, 0.15);">
-                    <i class="bi bi-person-fill"></i>
+    <div class="col">
+        <div class="checkout-pro-card {% if checkout.riskLevel == 'HIGH' %}border-risk-high{% elseif checkout.riskLevel == 'MEDIUM' %}border-risk-medium{% else %}border-risk-safe{% endif %} p-4">
+            
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <span class="badge bg-light text-dark border mb-2">#{{ checkout.checkoutId }}</span>
+                    {% if checkout.statusReservation == 'EN_ATTENTE' %}
+                        <span class="badge bg-warning text-dark border-warning mb-2 bg-opacity-25 ms-1">EN ATTENTE</span>
+                    {% elseif checkout.statusReservation == 'CONFIRMEE' %}
+                        <span class="badge bg-success text-success border-success mb-2 bg-opacity-10 ms-1">CONFIRMÉE</span>
+                    {% else %}
+                        <span class="badge bg-danger text-danger border-danger mb-2 bg-opacity-10 ms-1">REFUSÉE</span>
+                    {% endif %}
+                    <div class="text-muted small fw-medium"><i class="bi bi-clock me-1"></i> {{ checkout.reservationDate ? checkout.reservationDate|date('d/m/Y H:i') : '-' }}</div>
                 </div>
-                <div style="overflow: hidden;">
-                    <h6 class="fw-bold mb-1 text-truncate" style="color:var(--admin-primary); font-family:'Outfit', sans-serif;">{{ checkout.passengerName }}</h6>
-                    <div class="text-muted text-truncate" style="font-size:12px;"><i class="bi bi-envelope me-1"></i>{{ checkout.passengerEmail }}</div>
+                
+                <!-- Native Risk Engine Display -->
+                <div class="text-end">
+                    <div class="text-muted" style="font-size:10px; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">IA Risque</div>
+                    {% if checkout.riskLevel == 'HIGH' %}
+                        <div class="risk-badge-high mt-1"><i class="bi bi-shield-x me-1"></i> ÉLEVÉ</div>
+                    {% elseif checkout.riskLevel == 'MEDIUM' %}
+                        <div class="risk-badge-medium mt-1"><i class="bi bi-shield-exclamation me-1"></i> MODÉRÉ</div>
+                    {% else %}
+                        <div class="risk-badge-safe mt-1"><i class="bi bi-shield-check me-1"></i> SÛR</div>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Flight & Payment -->
+            <!-- Passenger Info -->
+            <div class="d-flex align-items-center gap-3 mb-3 p-3 rounded-4" style="background:#f8fafc; border:1px solid #e2e8f0;">
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width:40px; height:40px; background:var(--govibe-dark);">
+                    <i class="bi bi-person"></i>
+                </div>
+                <div>
+                    <div class="fw-bold text-dark">{{ checkout.passengerName }}</div>
+                    <div class="text-muted" style="font-size:12px;">{{ checkout.passengerEmail }}</div>
+                </div>
+            </div>
+
+            <!-- Details -->
             <div class="row g-2 mb-4">
                 <div class="col-6">
-                    <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#94A3B8;letter-spacing:0.5px;">Vol Réservé</div>
-                    <div class="fw-bold text-dark mt-1 text-truncate" style="font-size:14px;">{{ checkout.flight }}</div>
-                    <div class="text-muted text-truncate" style="font-size:12px;">{{ checkout.flight.airline }}</div>
+                    <div class="text-muted" style="font-size:10px;text-transform:uppercase;font-weight:700;">Vol</div>
+                    <div class="fw-bold text-dark" style="font-size:13px;">{{ checkout.flight }}</div>
                 </div>
                 <div class="col-6 text-end">
-                    <div style="font-size:10px;text-transform:uppercase;font-weight:700;color:#94A3B8;letter-spacing:0.5px;">Détails</div>
-                    <div class="fw-bold text-dark mt-1" style="font-size:14px;">{{ checkout.passengerNbr }} passager(s)</div>
-                    <div class="text-muted" style="font-size:12px;">{{ checkout.paymentMethod }}</div>
+                    <div class="text-muted" style="font-size:10px;text-transform:uppercase;font-weight:700;">Détails ({{ checkout.passengerNbr }} pax)</div>
+                    <div class="fw-bold text-dark" style="font-size:13px;">{{ checkout.paymentMethod }}</div>
                 </div>
             </div>
-
-            <!-- Total Price box -->
-            <div class="d-flex justify-content-between align-items-center mb-4 p-3" style="background:#F8FAFC; border-radius:14px; border:1px solid #F1F5F9;">
-                <span style="font-size:11px;font-weight:700;text-transform:uppercase;color:#64748B;letter-spacing:0.5px;">Total Facturé</span>
-                <strong style="font-size:20px; color:#10B981; font-weight:800;">{{ checkout.totalPrix }} DT</strong>
+            
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="text-muted fw-bold text-uppercase" style="font-size:11px;">Total</div>
+                <div class="fw-bolder" style="font-size:22px; color:var(--govibe-emerald-dark);">{{ checkout.totalPrix }} DT</div>
             </div>
 
-            <!-- Actions -->
+            <!-- Actions (Zero Lag Server-Side Forms) -->
             <div class="mt-auto d-flex gap-2">
+                {% if checkout.riskLevel == 'HIGH' and checkout.statusReservation == 'EN_ATTENTE' %}
+                    <div class="w-100 mb-2 py-2 px-3 rounded-3 text-danger fw-bold lh-sm text-center" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); font-size:12px;">
+                        <i class="bi bi-exclamation-triangle-fill"></i> L'IA recommande de refuser
+                    </div>
+                {% endif %}
+            </div>
+            <div class="d-flex gap-2">
                 <form method="post" action="{{ path('app_admin_checkouts_confirm', {checkoutId: checkout.checkoutId}) }}" class="flex-grow-1" onsubmit="return confirm('Confirmer cette réservation ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('confirm' ~ checkout.checkoutId) }}">
-                    <button class="btn w-100 d-flex align-items-center justify-content-center gap-2" style="background:rgba(16, 185, 129, 0.1);color:#059669;border:1px solid rgba(16, 185, 129, 0.2);font-weight:600;padding:10px;border-radius:12px;font-size:14px;transition:all 0.2s;" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% else %}onmouseover="this.style.background='rgba(16, 185, 129, 1)'; this.style.color='white';" onmouseout="this.style.background='rgba(16, 185, 129, 0.1)'; this.style.color='#059669';"{% endif %}>
-                        <i class="bi bi-check-circle-fill"></i> Confirmer
+                    <button class="btn btn-light w-100 fw-bold border" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% endif %} style="color:#059669;">
+                        <i class="bi bi-check-lg"></i> Confirmer
                     </button>
                 </form>
                 <form method="post" action="{{ path('app_admin_checkouts_reject', {checkoutId: checkout.checkoutId}) }}" class="flex-grow-1" onsubmit="return confirm('Refuser cette réservation ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('reject' ~ checkout.checkoutId) }}">
-                    <button class="btn w-100 d-flex align-items-center justify-content-center gap-2" style="background:rgba(239, 68, 68, 0.05);color:#DC2626;border:1px solid rgba(239, 68, 68, 0.15);font-weight:600;padding:10px;border-radius:12px;font-size:14px;transition:all 0.2s;" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% else %}onmouseover="this.style.background='rgba(239, 68, 68, 1)'; this.style.color='white';" onmouseout="this.style.background='rgba(239, 68, 68, 0.05)'; this.style.color='#DC2626';"{% endif %}>
-                        <i class="bi bi-x-circle-fill"></i> Refuser
+                    <button class="btn w-100 fw-bold {% if checkout.riskLevel == 'HIGH' and checkout.statusReservation == 'EN_ATTENTE' %}btn-danger{% else %}btn-light border text-danger{% endif %}" {% if checkout.statusReservation != 'EN_ATTENTE' %}disabled{% endif %}>
+                        <i class="bi bi-x-lg"></i> Refuser
                     </button>
                 </form>
             </div>
+
         </div>
     </div>
     {% else %}
-    <div class="col-12 w-100">
-        <div class="admin-card text-center py-5" style="border-radius:24px;">
-            <div style="font-size:50px; color:#E2E8F0; margin-bottom:15px;"><i class="bi bi-inbox"></i></div>
-            <h5 class="fw-bold text-muted">Aucun checkout disponible</h5>
-            <p class="text-muted mb-0">Les demandes de réservation des utilisateurs apparaîtront ici.</p>
+    <div class="col-12">
+        <div class="text-center py-5 rounded-4" style="background:#f8fafc; border:2px dashed #e2e8f0;">
+            <i class="bi bi-clipboard-x text-muted" style="font-size:40px;"></i>
+            <h5 class="fw-bold text-muted mt-3">Aucune transaction trouvée</h5>
+            <p class="text-muted">Les paiements et checkouts apparaîtront ici.</p>
         </div>
     </div>
     {% endfor %}

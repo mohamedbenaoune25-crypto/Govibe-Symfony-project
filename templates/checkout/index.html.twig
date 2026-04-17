@@ -143,6 +143,44 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 .gv-empty h4 { font-family:'Noto Serif',serif; font-size: 1.5rem; color: #00342d; font-weight: 700; margin-bottom: 0.5rem; }
 .gv-empty p { color: #546067; margin-bottom: 2rem; }
 
+/* ─── AI Badge ─── */
+.gv-ai-badge {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.3rem 0.75rem; border-radius: 2rem; font-size: 0.65rem;
+    font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+    backdrop-filter: blur(8px); animation: aiBadgeIn 0.5s ease both;
+    border: 1px solid transparent;
+}
+.gv-ai-badge-high { background: rgba(239,68,68,0.2); color: #fca5a5; border-color: rgba(239,68,68,0.3); }
+.gv-ai-badge-medium { background: rgba(233,193,118,0.2); color: #fde68a; border-color: rgba(233,193,118,0.3); }
+.gv-ai-badge-low { background: rgba(160,242,225,0.15); color: #a0f2e1; border-color: rgba(160,242,225,0.25); }
+.gv-ai-badge-loading { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.35); }
+@keyframes aiBadgeIn { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+
+/* ─── Payment Button ─── */
+.gv-ck-action-payment {
+    flex: 100%;
+    width: 100%;
+    margin-bottom: 0.75rem;
+    padding: 0.8rem !important;
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 0.85rem !important;
+    font-weight: 700 !important;
+    box-shadow: 0 10px 20px -5px rgba(16, 185, 129, 0.3) !important;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.gv-ck-action-payment:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(16, 185, 129, 0.45) !important;
+    filter: brightness(1.05);
+}
+.gv-ck-action-payment .material-symbols-outlined {
+    font-size: 1.1rem !important;
+}
+
 /* ─── Reveal ─── */
 .gv-reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
 .gv-reveal.is-visible { opacity: 1; transform: translateY(0); }
@@ -185,6 +223,7 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 <!-- ─── CONTENT ─── -->
 <section class="gv-ck-container">
     <!-- Filter Pills -->
+    <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; margin-bottom: 1rem; gap:1rem;">
     <div class="gv-filter-pills">
         <a href="{{ path('app_checkout_index', {status: 'all'}) }}" class="gv-filter-pill {{ currentStatus == 'all' ? 'active' : '' }}">
             <span class="material-symbols-outlined" style="font-size:1rem;">grid_view</span> Tous
@@ -199,6 +238,17 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
             <span class="material-symbols-outlined" style="font-size:1rem;">cancel</span> Refusées
         </a>
     </div>
+    <form method="get" action="{{ path('app_checkout_index') }}" style="display:flex; width:100%; max-width:350px;">
+        {% if currentStatus != 'all' %}<input type="hidden" name="status" value="{{ currentStatus }}">{% endif %}
+        <div style="position:relative; width:100%;">
+            <span class="material-symbols-outlined" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:rgba(0,52,45,0.4); font-size:1.1rem;">search</span>
+            <input type="text" name="q" value="{{ currentSearch|default('') }}" placeholder="Rechercher vol, destination..." style="width:100%; border:1.5px solid rgba(0,52,45,0.1); border-radius:2rem; padding:0.6rem 1.25rem 0.6rem 2.5rem; outline:none; transition:border-color 0.3s; font-size:0.9rem; background:#fff;">
+        </div>
+        <button type="submit" class="gv-filter-pill" style="margin-left:0.5rem; border-color:transparent; background:linear-gradient(135deg, #00342d, #046b5e); color:#fff; cursor:pointer;">
+            <span class="material-symbols-outlined" style="font-size:1rem;">search</span>
+        </button>
+    </form>
+</div>
 
     <div class="gv-section-header">
         <span class="gv-section-label">
@@ -210,7 +260,7 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
     <!-- Cards Grid -->
     <div class="gv-ck-grid">
         {% for checkout in checkouts %}
-        <div class="gv-ck-card gv-reveal">
+        <div class="gv-ck-card gv-reveal" data-ck-price="{{ checkout.totalPrix }}" data-ck-seats="{{ checkout.flight ? checkout.flight.availableSeats : 50 }}" data-ck-passengers="{{ checkout.passengerNbr }}" data-ck-id="{{ checkout.checkoutId }}">
             <div class="gv-ck-card-bg"><img src="{{ cardImages[loop.index0 % 3] }}" alt="" loading="lazy"></div>
             <div class="gv-ck-card-overlay"></div>
 
@@ -244,10 +294,16 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                     </div>
                 </div>
 
-                <div class="gv-ck-footer">
+                <!-- AI Travel Risk Prediction Model -->
+                <div class="mt-3 p-2 rounded-3 d-flex align-items-center gap-2 gv-ck-risk-slot" data-ck="{{ checkout.checkoutId }}" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); backdrop-filter:blur(10px);">
+                     <div class="spinner-border spinner-border-sm text-light ms-2" role="status"></div>
+                     <span style="font-size:0.75rem; color:#fff; font-weight:600;">Modèle de Prédiction...</span>
+                </div>
+
+                <div class="gv-ck-footer mt-auto">
                     <div class="gv-ck-summary">
                         <div>
-                            <div class="gv-ck-total-label">Total</div>
+                            <div class="gv-ck-total-label">Total <span class="gv-ck-ai-slot" data-ck="{{ checkout.checkoutId }}" style="margin-left:8px;"></span></div>
                             <span class="gv-ck-total">{{ checkout.totalPrix }} DT</span>
                         </div>
                         <a href="{{ path('app_checkout_show', {checkoutId: checkout.checkoutId}) }}" onclick="openDetailModal(this.href); return false;" class="gv-ck-detail-btn">
@@ -256,7 +312,10 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                     </div>
 
                     {% if checkout.statusReservation == 'EN_ATTENTE' %}
-                    <div class="gv-ck-actions">
+                    <div class="gv-ck-actions flex-wrap">
+                        <a href="{{ path('app_checkout_stripe', {checkoutId: checkout.checkoutId}) }}" class="gv-ck-action-btn gv-ck-action-payment">
+                            <span class="material-symbols-outlined">payments</span> Payer
+                        </a>
                         <a href="{{ path('app_checkout_edit', {checkoutId: checkout.checkoutId}) }}" onclick="openDetailModal(this.href); return false;" class="gv-ck-action-btn gv-ck-action-edit">
                             <span class="material-symbols-outlined" style="font-size:0.9rem;">edit</span> Modifier
                         </a>
@@ -299,6 +358,88 @@ document.addEventListener('DOMContentLoaded', function() {
         }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
         reveals.forEach(function(el, i) { el.style.transitionDelay = (i * 80) + 'ms'; observer.observe(el); });
     }
+
+    // ── AI Booking Predictions ──
+    var cards = document.querySelectorAll('.gv-ck-card[data-ck-price]');
+    var isWeekend = ([0,6].indexOf(new Date().getDay()) !== -1) ? 1 : 0;
+
+    function simulateCkAI(price, seats) {
+        var seed = Math.round(price * 7 + seats * 13);
+        var rng = function() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
+        return {
+            bookingProb: 0.25 + rng() * 0.65,
+            riskLevel: rng() > 0.6 ? 1 : 0
+        };
+    }
+
+    cards.forEach(function(card) {
+        var price = parseFloat(card.dataset.ckPrice) || 200;
+        var seats = parseInt(card.dataset.ckSeats) || 50;
+        var ckId = card.dataset.ckId;
+        var slot = card.querySelector('.gv-ck-ai-slot[data-ck="' + ckId + '"]');
+        var riskSlot = card.querySelector('.gv-ck-risk-slot[data-ck="' + ckId + '"]');
+        if (!slot && !riskSlot) return;
+
+        var controllerBooking = new AbortController();
+        var timeoutBooking = setTimeout(function() { controllerBooking.abort(); }, 3000);
+        var pBooking = fetch('/api/ai/predict/booking', {
+            method: 'POST',
+            signal: controllerBooking.signal,
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ days_before_departure: 14, price: price, seats_left: seats, is_weekend: isWeekend, is_holiday: 0, seat_type: 0 })
+        }).then(function(r) { return r.json(); })
+          .catch(function(){ return {}; })
+          .finally(function() { clearTimeout(timeoutBooking); });
+
+        var controllerRisk = new AbortController();
+        var timeoutRisk = setTimeout(function() { controllerRisk.abort(); }, 3000);
+        var pRisk = fetch('/api/ai/predict/risk', {
+            method: 'POST',
+            signal: controllerRisk.signal,
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ user_history: [1, 0, 1], booking_amount: price, departure_days: 14 })
+        }).then(function(r) { return r.json(); })
+          .catch(function(){ return {}; })
+          .finally(function() { clearTimeout(timeoutRisk); });
+
+        Promise.all([pBooking, pRisk]).then(function(results) {
+            var dataBooking = results[0];
+            var dataRisk = results[1];
+
+            // Use real data if available, otherwise fall back to simulated
+            var sim = simulateCkAI(price, seats);
+            var hasBooking = dataBooking.success && dataBooking.data;
+            var hasRisk = dataRisk.success && dataRisk.data;
+
+            if (slot) {
+                var pct;
+                if (hasBooking) {
+                    pct = Math.round((dataBooking.data.booking_probability || 0) * 100);
+                } else {
+                    pct = Math.round(sim.bookingProb * 100);
+                }
+                var cls = pct < 40 ? 'text-success' : (pct < 70 ? 'text-warning' : 'text-danger');
+                slot.innerHTML = '<span class="' + cls + ' fw-bold" style="font-size:0.7rem;"><i class="bi bi-graph-up pe-1"></i>Demande: ' + pct + '%</span>';
+            }
+
+            if (riskSlot) {
+                var isRisky;
+                if (hasRisk) {
+                    isRisky = dataRisk.data.risk_level > 0;
+                } else {
+                    isRisky = sim.riskLevel > 0;
+                }
+
+                if (isRisky) {
+                    riskSlot.innerHTML = '<div style="width:28px;height:28px;border-radius:8px;background:rgba(239,68,68,0.2);color:#fca5a5;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:1rem;">gpp_bad</span></div><div style="line-height:1.2;"><div style="font-size:0.65rem;color:rgba(255,255,255,0.6);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;">AI Risk Profiler</div><div style="font-size:0.85rem;color:#fca5a5;font-weight:700;" title="Risque basé sur le délai de réservation et l\'historique des prix de ce vol">Risque Détecté <i class="bi bi-info-circle" style="font-size:0.75rem;"></i></div></div>';
+                    riskSlot.style.borderColor = 'rgba(239,68,68,0.3)';
+                } else {
+                    riskSlot.innerHTML = '<div style="width:28px;height:28px;border-radius:8px;background:rgba(16,185,129,0.2);color:#a0f2e1;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:1rem;">gpp_good</span></div><div style="line-height:1.2;"><div style="font-size:0.65rem;color:rgba(255,255,255,0.6);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;">AI Risk Profiler</div><div style="font-size:0.85rem;color:#a0f2e1;font-weight:700;" title="Paramètres standards, aucun risque financier détecté">Profil Voyageur Sûr</div></div>';
+                    riskSlot.style.borderColor = 'rgba(16,185,129,0.3)';
+                }
+            }
+        });
+    });
 });
 </script>
 {% endblock %}

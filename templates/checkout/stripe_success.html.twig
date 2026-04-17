@@ -1,0 +1,278 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement réussi - GoVibe{% endblock %}
+
+{% block body %}
+<style>
+    .success-page { padding-top: 140px; min-height: 80vh; }
+    .success-card {
+        max-width: 600px; margin: 0 auto; border-radius: 28px; overflow: hidden;
+        background: rgba(255,255,255,0.96); backdrop-filter: blur(16px);
+        box-shadow: 0 30px 80px rgba(1,50,32,0.12);
+    }
+    .success-header {
+        padding: 48px 36px 32px; text-align: center;
+        background: linear-gradient(135deg, #059669, #10b981, #34d399);
+        color: white; position: relative; overflow: hidden;
+    }
+    .success-header::before {
+        content: ''; position: absolute; inset: 0;
+        background: radial-gradient(circle at 30% 80%, rgba(255,255,255,0.15), transparent 50%);
+    }
+    .success-checkmark {
+        width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2);
+        display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+        animation: checkmarkPop 0.6s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+        font-size: 2.5rem;
+    }
+    @keyframes checkmarkPop { 0%{transform:scale(0);opacity:0} 100%{transform:scale(1);opacity:1} }
+    .success-body { padding: 32px 36px; }
+    .success-detail {
+        padding: 14px 18px; border-radius: 14px; background: #f0fdf4; border: 1px solid rgba(34,197,94,0.1);
+        margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .success-detail-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #546067; }
+    .success-detail-value { font-size: 0.95rem; font-weight: 700; color: #00342d; }
+    .confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9997; }
+</style>
+
+<canvas class="confetti-canvas" id="confettiCanvas"></canvas>
+
+<section class="success-page">
+    <div class="container">
+        <div class="success-card">
+            <div class="success-header">
+                <div class="success-checkmark">✓</div>
+                <h2 class="fw-bold mb-2" style="position:relative;z-index:1;">Paiement réussi !</h2>
+                <p class="mb-0" style="opacity:0.85;position:relative;z-index:1;">Votre réservation a été confirmée avec succès.</p>
+            </div>
+            <div class="success-body">
+                <div class="success-detail">
+                    <span class="success-detail-label">Réservation</span>
+                    <span class="success-detail-value">#{{ checkout.checkoutId }}</span>
+                </div>
+                <div class="success-detail">
+                    <span class="success-detail-label">Vol</span>
+                    <span class="success-detail-value">{{ checkout.flight }}</span>
+                </div>
+                <div class="success-detail">
+                    <span class="success-detail-label">Passager</span>
+                    <span class="success-detail-value">{{ checkout.passengerName }}</span>
+                </div>
+                <div class="success-detail">
+                    <span class="success-detail-label">Passagers</span>
+                    <span class="success-detail-value">{{ checkout.passengerNbr }}</span>
+                </div>
+                <div class="success-detail">
+                    <span class="success-detail-label">Classe</span>
+                    <span class="success-detail-value">{{ checkout.travelClass }}</span>
+                </div>
+                <div class="success-detail" style="background:linear-gradient(135deg,#dcfce7,#f0fdf4); border-color:rgba(16,185,129,0.2);">
+                    <span class="success-detail-label" style="color:#059669;">Total payé</span>
+                    <span class="success-detail-value" style="font-size:1.3rem; color:#059669;">{{ checkout.totalPrix }} DT</span>
+                </div>
+                <div class="success-detail">
+                    <span class="success-detail-label">Méthode</span>
+                    <span class="success-detail-value"><i class="bi bi-stripe me-1"></i> Stripe</span>
+                </div>
+                {% if checkout.paidAt %}
+                <div class="success-detail">
+                    <span class="success-detail-label">Payé le</span>
+                    <span class="success-detail-value">{{ checkout.paidAt|date('d/m/Y à H:i') }}</span>
+                </div>
+                {% endif %}
+
+                <div class="d-flex gap-3 mt-4">
+                    <a href="{{ path('app_checkout_ticket_download', {checkoutId: checkout.checkoutId}) }}" class="btn btn-success rounded-pill px-4 fw-semibold flex-grow-1" target="_blank">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Télécharger le billet PDF
+                    </a>
+                    <a href="{{ path('app_checkout_show', {checkoutId: checkout.checkoutId}) }}" class="btn btn-outline-success rounded-pill px-4 fw-semibold flex-grow-1">
+                        <i class="bi bi-eye me-1"></i> Voir la réservation
+                    </a>
+                </div>
+
+                <!-- Electronic Signature Section -->
+                <div id="signatureSection" class="mt-4 pt-4 border-top">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-success" style="font-size:1.2rem;">signature</span>
+                        <h6 class="fw-bold mb-0">Signature Électronique</h6>
+                    </div>
+                    <p class="small text-muted mb-3">Veuillez signer ci-dessous pour confirmer votre billet électronique.</p>
+                    
+                    <div id="statusAlert" class="alert d-none py-2 px-3 small rounded-3 mb-3"></div>
+
+                    <div class="signature-pad-container" style="background:#fff; border:2px dashed rgba(16,185,129,0.3); border-radius:18px; position:relative; overflow:hidden;">
+                        <canvas id="signaturePad" width="530" height="180" style="cursor:crosshair; width:100%; display:block;"></canvas>
+                        <div class="signature-actions" style="position:absolute; bottom:10px; right:10px; display:flex; gap:8px;">
+                            <button type="button" class="btn btn-sm btn-light rounded-pill px-3 shadow-sm" onclick="clearSignature()">Effacer</button>
+                            <button type="button" id="confirmSignatureBtn" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm" onclick="saveSignature()">Confirmer la signature</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-3 mt-4">
+                    <a href="{{ path('app_checkout_ticket_download', {checkoutId: checkout.checkoutId}) }}" id="downloadTicketBtn" class="btn btn-success rounded-pill px-4 fw-semibold flex-grow-1 {% if not checkout.signature %}disabled{% endif %}" target="_blank">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Télécharger le billet PDF
+                    </a>
+                    <a href="{{ path('app_checkout_show', {checkoutId: checkout.checkoutId}) }}" class="btn btn-outline-success rounded-pill px-4 fw-semibold flex-grow-1">
+                        <i class="bi bi-eye me-1"></i> Voir la réservation
+                    </a>
+                </div>
+
+                <!-- Voice AI -->
+                <div class="gv-voice-hints mt-4" style="margin-bottom:0;">
+                    <span class="material-symbols-outlined">mic</span>
+                    <span>Dites :</span>
+                    <button class="gv-voice-hint-chip" onclick="voiceCommand('Voir les vols')">✈️ "Voir les vols"</button>
+                    <button class="gv-voice-hint-chip" onclick="voiceCommand('Retour accueil')">🏠 "Retour accueil"</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Signature Pad Logic
+const canvas = document.getElementById('signaturePad');
+const ctx = canvas.getContext('2d');
+let drawing = false;
+
+// Optimization for retina displays
+const ratio = window.devicePixelRatio || 1;
+canvas.width = canvas.offsetWidth * ratio;
+canvas.height = canvas.offsetHeight * ratio;
+ctx.scale(ratio, ratio);
+
+ctx.strokeStyle = '#00342d';
+ctx.lineWidth = 2.5;
+ctx.lineCap = 'round';
+ctx.lineJoin = 'round';
+
+function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+    };
+}
+
+function startDrawing(e) {
+    drawing = true;
+    const pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    e.preventDefault();
+}
+
+function draw(e) {
+    if (!drawing) return;
+    const pos = getPos(e);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    e.preventDefault();
+}
+
+function stopDrawing() {
+    drawing = false;
+}
+
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+window.addEventListener('mouseup', stopDrawing);
+
+canvas.addEventListener('touchstart', startDrawing);
+canvas.addEventListener('touchmove', draw);
+canvas.addEventListener('touchend', stopDrawing);
+
+function clearSignature() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+async function saveSignature() {
+    // Check if canvas is empty (simplified check)
+    const blank = document.createElement('canvas');
+    blank.width = canvas.width;
+    blank.height = canvas.height;
+    if (canvas.toDataURL() === blank.toDataURL()) {
+        showAlert('Veuillez signer avant de confirmer.', 'danger');
+        return;
+    }
+
+    const btn = document.getElementById('confirmSignatureBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enregistrement...';
+
+    try {
+        const response = await fetch('{{ path('app_checkout_signature_save', {checkoutId: checkout.checkoutId}) }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ signature: canvas.toDataURL() })
+        });
+
+        if (response.ok) {
+            showAlert('Signature enregistrée avec succès !', 'success');
+            document.getElementById('downloadTicketBtn').classList.remove('disabled');
+            document.getElementById('signatureSection').style.opacity = '0.6';
+            document.getElementById('signatureSection').style.pointerEvents = 'none';
+            btn.innerHTML = 'Signé ✓';
+        } else {
+            throw new Error('Failed to save signature');
+        }
+    } catch (e) {
+        showAlert('Erreur lors de l\'enregistrement.', 'danger');
+        btn.disabled = false;
+        btn.innerHTML = 'Confirmer la signature';
+    }
+}
+
+function showAlert(msg, type) {
+    const el = document.getElementById('statusAlert');
+    el.className = `alert alert-${type} py-2 px-3 small rounded-3 mb-3`;
+    el.innerText = msg;
+    el.classList.remove('d-none');
+}
+
+// Confetti animation
+(function() {
+    const canvas = document.getElementById('confettiCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const colors = ['#10b981','#34d399','#6ee7b7','#fbbf24','#f472b6','#818cf8','#38bdf8'];
+    const particles = [];
+    for (let i = 0; i < 120; i++) {
+        particles.push({
+            x: Math.random() * canvas.width, y: Math.random() * canvas.height - canvas.height,
+            w: Math.random() * 10 + 5, h: Math.random() * 6 + 3,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            vx: (Math.random() - 0.5) * 3, vy: Math.random() * 3 + 2,
+            rotation: Math.random() * 360, rotSpeed: (Math.random() - 0.5) * 10,
+            opacity: 1
+        });
+    }
+    let frame = 0;
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        particles.forEach(p => {
+            if (p.opacity <= 0) return;
+            alive = true;
+            p.x += p.vx; p.y += p.vy; p.rotation += p.rotSpeed;
+            if (frame > 100) p.opacity -= 0.008;
+            ctx.save();
+            ctx.translate(p.x, p.y); ctx.rotate(p.rotation * Math.PI / 180);
+            ctx.globalAlpha = Math.max(0, p.opacity);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+            ctx.restore();
+        });
+        frame++;
+        if (alive) requestAnimationFrame(draw);
+        else canvas.remove();
+    }
+    draw();
+})();
+</script>
+{% endblock %}

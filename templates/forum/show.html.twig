@@ -340,6 +340,10 @@
                                     <span class="material-symbols-outlined gv-icon-groq">bolt</span>
                                     <span>Groq</span>
                                 </div>
+                                <div class="gv-ai-selector-item" onclick="selectAI('voice', 'Voice Agent (Docker)')">
+                                    <span class="material-symbols-outlined gv-icon-groq">mic</span>
+                                    <span>Voice Agent</span>
+                                </div>
                             </div>
                             <input type="hidden" id="aiModelSelectorValue" value="gemini">
                         </div>
@@ -355,6 +359,9 @@
                 </div>
                 <div class="chat-input-area">
                     <input type="text" id="chatInput" class="chat-input" placeholder="Posez votre question sur un voyage..." onkeypress="if(event.key === 'Enter') sendMessage()">
+                    <button class="chat-send-btn" type="button" onclick="startVoiceInput()" title="Parler">
+                        <span class="material-symbols-outlined">mic</span>
+                    </button>
                     <button class="chat-send-btn" onclick="sendMessage()">
                         <span class="material-symbols-outlined">send</span>
                     </button>
@@ -407,6 +414,7 @@
         query: '',
         selectedIndex: -1,
         users: [],
+        _fetchTimer: null,
 
         init() {
             document.addEventListener('input', (e) => {
@@ -432,7 +440,8 @@
                 this.activeInput = input;
                 this.query = match[1];
                 this.showList();
-                this.fetchUsers(this.query);
+                clearTimeout(this._fetchTimer);
+                this._fetchTimer = setTimeout(() => this.fetchUsers(this.query), 300);
             } else {
                 if (this.listEl) this.close();
             }
@@ -443,7 +452,7 @@
                 const res = await fetch(`{{ path('api_users_search') }}?q=${q}`);
                 this.users = await res.json();
                 this.renderList();
-            } catch (err) { console.error('Mentions fetch error:', err); }
+            } catch (err) { /* Mention fetch failed silently */ }
         },
 
         showList() {
@@ -539,7 +548,11 @@
     document.addEventListener('DOMContentLoaded', () => {
         MentionsManager.init();
         highlightMentions();
-        const observer = new MutationObserver(() => highlightMentions());
+        let _mentionObserverTimer;
+        const observer = new MutationObserver(() => {
+            clearTimeout(_mentionObserverTimer);
+            _mentionObserverTimer = setTimeout(highlightMentions, 300);
+        });
         observer.observe(document.body, { childList: true, subtree: true });
     });
 
@@ -573,11 +586,17 @@
     function selectAI(value, name) {
         document.getElementById('aiModelSelectorValue').value = value;
         document.getElementById('selectedAIName').innerText = name;
+        updateWelcomeMessage(value);
         
         // Update active class
         document.querySelectorAll('.gv-ai-selector-item').forEach(item => {
             item.classList.remove('active');
-            if (item.innerText.includes(value === 'gemini' ? 'Gemini' : 'Groq')) {
+            const itemText = item.innerText;
+            const isActive =
+                (value === 'gemini' && itemText.includes('Gemini')) ||
+                (value === 'groq' && itemText.includes('Groq')) ||
+                (value === 'voice' && itemText.includes('Voice Agent'));
+            if (isActive) {
                 item.classList.add('active');
             }
         });
@@ -599,6 +618,11 @@
 
         const indicator = showTypingIndicator();
         const model = document.getElementById('aiModelSelectorValue').value;
+        if (model === 'voice') {
+            callVoiceAssistant(text, false, indicator);
+            return;
+        }
+
         const route = model === 'groq' ? '{{ path('app_groq_chat') }}' : '{{ path('app_gemini_chat') }}';
 
         fetch(route, {
@@ -622,6 +646,126 @@
             indicator.remove();
             appendMessage('ai', "Désolé, une erreur de connexion est survenue.");
         });
+    }
+
+    function callVoiceAssistant(text, confirmed, indicator) {
+        fetch('{{ path('app_api_python_assistant_flow') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ user_input: text, confirmed: confirmed })
+        })
+        .then(response => response.json())
+        .then(data => {
+            indicator.remove();
+
+            if (data.error) {
+                appendMessage('ai', "Voice Agent: " + data.error);
+                return;
+            }
+
+            const payload = data.data || {};
+            const plan = payload.plan || {};
+
+            if (payload.requires_confirmation && !confirmed) {
+                const reason = payload.confirmation_prompt || plan.reason || 'Cette commande demande une confirmation.';
+                appendMessage('ai', "Plan sécurisé (dry-run): " + reason);
+
+                if (window.confirm(reason + "\n\nConfirmer l'exécution ?")) {
+                    const secondIndicator = showTypingIndicator();
+                    callVoiceAssistant(text, true, secondIndicator);
+                } else {
+                    appendMessage('ai', 'Commande annulée.');
+                }
+
+                return;
+            }
+
+            appendMessage('ai', formatVoiceAssistantResponse(payload));
+            speakText(getVoiceReplyText(payload));
+        })
+        .catch(() => {
+            indicator.remove();
+            appendMessage('ai', 'Voice Agent indisponible actuellement.');
+        });
+    }
+
+    function formatVoiceAssistantResponse(payload) {
+        const execution = payload.execution || {};
+        const intent = payload.intent || execution.intent || 'unknown';
+        const plan = payload.plan || execution.plan || {};
+
+        const textReply = getVoiceReplyText(payload);
+        const blocked = plan.blocked === true ? 'oui' : 'non';
+        const requires = plan.requires_confirmation === true ? 'oui' : 'non';
+        const reason = plan.reason || 'Aucune raison fournie';
+
+        return `Intent: ${intent}\nRéponse: ${textReply}\nPlan: blocked=${blocked}, requires_confirmation=${requires}\nReason: ${reason}`;
+    }
+
+    function getVoiceReplyText(payload) {
+        const execution = payload.execution || {};
+        return execution.response || execution.message || execution.output || execution.result || 'Commande traitée.';
+    }
+
+    function updateWelcomeMessage(model) {
+        const firstMessage = document.querySelector('#chatMessages .chat-message.ai');
+        if (!firstMessage) {
+            return;
+        }
+
+        if (model === 'voice') {
+            firstMessage.textContent = "Bonjour ! Je suis Voice Agent (Docker). Je peux préparer une commande en mode sécurisé puis demander votre confirmation avant exécution.";
+            return;
+        }
+
+        if (model === 'groq') {
+            firstMessage.textContent = "Bonjour ! Je suis Groq, assistant voyage rapide. Que souhaitez-vous faire ?";
+            return;
+        }
+
+        firstMessage.textContent = "Bonjour ! Je suis Gemini, votre assistant voyage personnel. Comment puis-je vous aider dans ce forum aujourd'hui ?";
+    }
+
+    function startVoiceInput() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            appendMessage('ai', 'La reconnaissance vocale n\'est pas supportée sur ce navigateur.');
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'fr-FR';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onresult = (event) => {
+            const transcript = event.results?.[0]?.[0]?.transcript || '';
+            if (transcript) {
+                const input = document.getElementById('chatInput');
+                input.value = transcript;
+                sendMessage();
+            }
+        };
+
+        recognition.onerror = () => {
+            appendMessage('ai', 'Impossible de lire votre voix pour le moment.');
+        };
+
+        recognition.start();
+    }
+
+    function speakText(text) {
+        if (!window.speechSynthesis || !text) {
+            return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'fr-FR';
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
     }
 
     function appendMessage(type, text) {

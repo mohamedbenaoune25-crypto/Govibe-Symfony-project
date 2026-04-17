@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+﻿{% extends 'base.html.twig' %}
 
 {% block title %}Détails checkout - GoVibe{% endblock %}
 
@@ -122,13 +122,48 @@
                             <div class="col-md-4"><div class="detail-info"><div class="info-label">Avion</div><div class="info-value">{{ aircraftNumber }}</div></div></div>
                         </div>
 
-                        <div class="detail-total d-flex justify-content-between align-items-center">
+                        <h6 style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:16px;">
+                            <i class="bi bi-globe me-1 text-success"></i> Découverte Destination
+                        </h6>
+                        <div class="mb-4">
+                            <button type="button" id="btnWikiDiscover" class="btn btn-success text-white w-100 rounded-pill px-4 py-2 fw-bold shadow-sm" style="font-size:15px; letter-spacing:0.5px;">
+                                <i class="bi bi-search me-2"></i> Découvrir {{ checkout.flight.destination }}
+                            </button>
+                            <div id="wikiCard" class="mt-3 p-4 rounded-4 d-none" style="background:rgba(16, 185, 129, 0.05); border:1px solid rgba(16, 185, 129, 0.2); position:relative;">
+                                <button type="button" id="btnWikiPlay" class="btn btn-sm btn-success rounded-circle position-absolute text-white shadow-sm" style="top:12px; right:12px; width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center;">
+                                    <i class="bi bi-play-fill" style="font-size:20px;"></i>
+                                </button>
+                                <h5 id="wikiTitle" class="fw-bold text-success mb-2"></h5>
+                                <p id="wikiExtract" class="mb-0" style="font-size:14px; color:var(--text-muted); line-height:1.6;"></p>
+                            </div>
+                        </div>
+
+                        <h6 style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin-bottom:16px;">
+                            <i class="bi bi-robot me-1 text-success"></i> AI Intelligent Trip Assistant
+                        </h6>
+                        <div class="row g-3 mb-4" id="aiTripInsights">
+                            <div class="col-md-12 text-center p-3 rounded" style="background:#f8f9fa;">
+                                <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                                <span class="ms-2 fw-semibold" style="color:var(--text-muted); font-size:13px;">Chargement des insights IA...</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-total d-flex justify-content-between align-items-center mb-3">
                             <span class="fw-semibold" style="font-size:16px; color:var(--dark-green);">Total payé</span>
                             <span class="total-price">{{ checkout.totalPrix }} DT</span>
                         </div>
 
+                        <!-- Voice AI Shortcuts -->
+                        <div class="gv-voice-hints mt-4" style="margin-bottom:0;">
+                            <span class="material-symbols-outlined">mic</span>
+                            <span>Dites :</span>
+                            <button class="gv-voice-hint-chip" onclick="voiceCommand('Répéter le résumé')">ðŸ“‹ "Répéter le résumé"</button>
+                            <button class="gv-voice-hint-chip" onclick="voiceCommand('Mes réservations')">âœˆï¸ "Mes réservations"</button>
+                            <button class="gv-voice-hint-chip" onclick="voiceCommand('Retour accueil')">ðŸ  "Retour accueil"</button>
+                        </div>
+
                         <div class="d-flex gap-3 justify-content-end mt-4">
-                            <a href="{{ path('app_checkout_edit', {checkoutId: checkout.checkoutId}) }}" onclick="openDetailModal(this.href); return false;" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                            <a href="{{ path('app_checkout_edit', {checkoutId: checkout.checkoutId}) }}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
                                 <i class="bi bi-pencil me-1"></i> Modifier
                             </a>
                             <a href="{{ path('app_checkout_index') }}" class="btn btn-success rounded-pill px-4 fw-semibold">
@@ -141,4 +176,113 @@
         </div>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var price = {{ checkout.totalPrix|default(200) }};
+    var isWeekend = ([0,6].indexOf(new Date().getDay()) !== -1) ? 1 : 0;
+    
+    // Simulate user history and seats left for the API payload
+    var pRisk = fetch('/api/ai/predict/risk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ user_history: [1, 0, 1], booking_amount: price, departure_days: 14 })
+    }).then(r => r.json()).catch(() => ({}));
+
+    var pBooking = fetch('/api/ai/predict/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ days_before_departure: 14, price: price, seats_left: 50, is_weekend: isWeekend, is_holiday: 0, seat_type: 0 })
+    }).then(r => r.json()).catch(() => ({}));
+
+    Promise.all([pRisk, pBooking]).then(function(results) {
+        var riskData = results[0];
+        var bookingData = results[1];
+        var container = document.getElementById('aiTripInsights');
+        if (!container) return;
+        
+        let html = '';
+        
+        // Block 1: Risk Assessment
+        if (riskData.success) {
+            var isRisky = riskData.prediction[0] > 0;
+            if (isRisky) {
+                 html += '<div class="col-md-6"><div class="detail-info" style="background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.2);"><div class="info-label text-danger">Profil Risque (IA)</div><div class="info-value text-danger">Risque Détecté <i class="bi bi-exclamation-triangle ms-1"></i></div></div></div>';
+            } else {
+                 html += '<div class="col-md-6"><div class="detail-info" style="background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2);"><div class="info-label text-success">Profil Risque (IA)</div><div class="info-value text-success">Profil Sà»r <i class="bi bi-check-circle ms-1"></i></div></div></div>';
+            }
+        }
+
+        // Block 2: Booking Flow / Demand
+        if (bookingData.success) {
+            var pct = Math.round(bookingData.booking_probability * 100);
+            html += '<div class="col-md-6"><div class="detail-info" style="background:rgba(37,99,235,0.05); border:1px solid rgba(37,99,235,0.2);"><div class="info-label text-success">Demande Estimée (IA)</div><div class="info-value text-success">' + pct + '% (Tendance Stable)</div></div></div>';
+        }
+
+        if (html === '') {
+            container.innerHTML = '<div class="col-12"><div class="alert alert-secondary py-2" style="font-size:13px;">IA Temporairement Indisponible</div></div>';
+        } else {
+            container.innerHTML = html;
+        }
+    });
+
+    // Speak checkout summary automatically if voice system is active
+    setTimeout(() => {
+        if (typeof window.speakText === 'function' && window.gvVoice && window.gvVoice.state === 'idle') {
+            window.speakText("Voici les détails de votre réservation pour {{ checkout.flight }}. Le total est de {{ checkout.totalPrix }} dinars.");
+        }
+    }, 1000);
+    // Wikipedia Integration
+    var btnWikiDiscover = document.getElementById('btnWikiDiscover');
+    var btnWikiPlay = document.getElementById('btnWikiPlay');
+    var wikiCard = document.getElementById('wikiCard');
+    var wikiTitle = document.getElementById('wikiTitle');
+    var wikiExtract = document.getElementById('wikiExtract');
+    var currentWikiText = '';
+
+    if (btnWikiDiscover) {
+        btnWikiDiscover.addEventListener('click', function() {
+            var btnText = this.innerHTML;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Recherche...';
+            this.disabled = true;
+
+            var destination = "{{ checkout.flight.destination|default('Paris')|e('js') }}";
+            
+            fetch('https://fr.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(destination))
+                .then(function(response) {
+                    if(!response.ok) throw new Error('Not found');
+                    return response.json();
+                })
+                .then(function(data) {
+                    wikiTitle.textContent = data.title || destination;
+                    currentWikiText = data.extract || "Aucune description trouvàƒÂ©e.";
+                    wikiExtract.textContent = currentWikiText;
+                    wikiCard.classList.remove('d-none');
+                    
+                    // Auto play text if voice is active
+                    if (typeof window.speakText === 'function' && currentWikiText) {
+                        window.speakText(currentWikiText);
+                    }
+                })
+                .catch(function(err) {
+                    wikiTitle.textContent = destination;
+                    wikiExtract.textContent = "Aucune information WikipàƒÂ©dia n'a pu àƒÂªtre trouvàƒÂ©e pour cette destination.";
+                    wikiCard.classList.remove('d-none');
+                })
+                .finally(function() {
+                    btnWikiDiscover.innerHTML = btnText;
+                    btnWikiDiscover.style.display = 'none'; // Hide the discover button after clicked
+                });
+        });
+    }
+
+    if (btnWikiPlay) {
+        btnWikiPlay.addEventListener('click', function() {
+            if (typeof window.speakText === 'function' && currentWikiText) {
+                window.speakText(currentWikiText);
+            }
+        });
+    }});
+</script>
 {% endblock %}
+

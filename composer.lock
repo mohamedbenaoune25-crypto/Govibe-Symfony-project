@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "00b5e1f4b1d730c60abc2f34430d819c",
+=======
+    "content-hash": "5b29b79d25fe8c3f2b309be7172b9754",
+>>>>>>> 25d65a9 (integartion avec vol api ai)
     "packages": [
         {
             "name": "composer/semver",
@@ -2968,6 +2972,7 @@
         },
         {
             "name": "stripe/stripe-php",
+<<<<<<< HEAD
             "version": "v16.0.0",
             "source": {
                 "type": "git",
@@ -2978,16 +2983,35 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/stripe/stripe-php/zipball/7a0b0283d492b66474ef9aa45a7acc938662b580",
                 "reference": "7a0b0283d492b66474ef9aa45a7acc938662b580",
+=======
+            "version": "v20.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stripe/stripe-php.git",
+                "reference": "7338bd140e641b1f9c7cb602e2de971e14db6b3b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/7338bd140e641b1f9c7cb602e2de971e14db6b3b",
+                "reference": "7338bd140e641b1f9c7cb602e2de971e14db6b3b",
+>>>>>>> 25d65a9 (integartion avec vol api ai)
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
                 "ext-mbstring": "*",
+<<<<<<< HEAD
                 "php": ">=5.6.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "3.5.0",
+=======
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "3.94.0",
+>>>>>>> 25d65a9 (integartion avec vol api ai)
                 "phpstan/phpstan": "^1.2",
                 "phpunit/phpunit": "^5.7 || ^9.0"
             },
@@ -2998,6 +3022,12 @@
                 }
             },
             "autoload": {
+<<<<<<< HEAD
+=======
+                "files": [
+                    "lib/version_check.php"
+                ],
+>>>>>>> 25d65a9 (integartion avec vol api ai)
                 "psr-4": {
                     "Stripe\\": "lib/"
                 }
@@ -3021,9 +3051,15 @@
             ],
             "support": {
                 "issues": "https://github.com/stripe/stripe-php/issues",
+<<<<<<< HEAD
                 "source": "https://github.com/stripe/stripe-php/tree/v16.0.0"
             },
             "time": "2024-10-01T18:34:44+00:00"
+=======
+                "source": "https://github.com/stripe/stripe-php/tree/v20.0.0"
+            },
+            "time": "2026-03-26T01:57:48+00:00"
+>>>>>>> 25d65a9 (integartion avec vol api ai)
         },
         {
             "name": "symfony/asset",
@@ -11314,5 +11350,5 @@
         "ext-iconv": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

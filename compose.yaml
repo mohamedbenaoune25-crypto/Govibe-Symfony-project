@@ -1,5 +1,27 @@
 
 services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: govibe-symfony-web
+    ports:
+      - "8000:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://app:!ChangeMe!@database:5432/app?serverVersion=16&charset=utf8"
+      APP_ENV: "dev"
+      APP_DEBUG: "1"
+    volumes:
+      - .:/app:cached
+      - /app/var
+      - /app/vendor
+    working_dir: /app
+    networks:
+      - internal
+
 ###> doctrine/doctrine-bundle ###
   database:
     image: postgres:${POSTGRES_VERSION:-16}-alpine
@@ -14,7 +36,31 @@ services:
       # - ./docker/db/data:/var/lib/postgresql/data:rw
 ###< doctrine/doctrine-bundle ###
 
+  python-assistant:
+    image: ${PYTHON_ASSISTANT_IMAGE:-python-assistant:latest}
+    restart: unless-stopped
+    expose:
+      - "5000"
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys, urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/api/health', timeout=3); sys.exit(0)"]
+      interval: 10s
+      timeout: 4s
+      retries: 5
+      start_period: 10s
+
+x-symfony-ai-depends-on: &symfony_ai_depends_on
+  depends_on:
+    python-assistant:
+      condition: service_healthy
+  environment:
+    PYTHON_ASSISTANT_API_BASE_URL: http://python-assistant:5000
+
 volumes:
 ###> doctrine/doctrine-bundle ###
   database_data:
 ###< doctrine/doctrine-bundle ###
+
+networks:
+  internal:

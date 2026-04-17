@@ -1,0 +1,9 @@
+case_id,layer,input_type,input,expected_intent,expected_entities,expected_command,dry_run,requires_confirmation,expected_result,notes
+TC-001,STT,audio,"delete file",DELETE,"target=file.txt","rm file.txt",true,true,clarification_or_block,"phonetic confusion pair"
+TC-002,NLU,text,"open my folder",OPEN_FILE,"target=my folder",,"",false,intent_and_entity_ok,"multi-word entity"
+TC-003,SAFETY,text,"filename with injection",OPEN_FILE,"target=notes.txt; rm -rf /",,"",true,blocked,"sanitization"
+TC-004,ERROR,text,"",UNKNOWN,"",,"",true,timeout_handled,"silent input"
+TC-005,CONTEXT,text,"run that again",REPEAT_LAST,"",,"",false,context_resolved,"multi-turn"
+TC-006,PERF,text,"rapid burst x10",VARIES,"",,"",true,no_overlap_or_drop,"queue behavior"
+TC-007,TTS,text,"high risk delete",DELETE,"target=archive",,"",true,readback_required,"confirmation flow"
+TC-008,REGRESSION,audio,"golden clip #12",BOOK,"destination=Paris",,"",false,stable_match,"replay in CI"

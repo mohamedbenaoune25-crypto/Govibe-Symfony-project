@@ -1,0 +1,22 @@
+[
+  {"phrase": "aide", "should_match": true},
+  {"phrase": "help", "should_match": true},
+  {"phrase": "commandes", "should_match": true},
+  {"phrase": "quoi", "should_match": true},
+  {"phrase": "describe screen", "should_match": false},
+  {"phrase": "récalibrer", "should_match": true},
+  {"phrase": "calibrer", "should_match": true},
+  {"phrase": "bruit", "should_match": true},
+  {"phrase": "book", "should_match": true},
+  {"phrase": "reserver", "should_match": true},
+  {"phrase": "mes reservations", "should_match": true},
+  {"phrase": "rechercher", "should_match": true},
+  {"phrase": "annuler", "should_match": true},
+  {"phrase": "payer", "should_match": true},
+  {"phrase": "deconnexion", "should_match": true},
+  {"phrase": "blah blah random", "should_match": false},
+  {"phrase": "", "should_match": false},
+  {"phrase": "123456", "should_match": false},
+  {"phrase": "please recalibrer le bruit", "should_match": true},
+  {"phrase": "i need some help now", "should_match": true}
+]

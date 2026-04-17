@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Billet GoVibe #{{ checkout.checkoutId }}</title>
+    <style>
+        body { font-family: Helvetica, Arial, sans-serif; margin: 0; padding: 20px; color: #333; }
+        .ticket-wrapper { border: 2px solid #10b981; border-radius: 12px; overflow: hidden; max-width: 800px; margin: 0 auto; background: #fff; }
+        .ticket-header { background: #10b981; color: white; padding: 20px; text-align: center; }
+        .ticket-header h1 { margin: 0; font-size: 24px; text-transform: uppercase; letter-spacing: 2px; }
+        .ticket-body { padding: 30px; }
+        .row { width: 100%; display: table; margin-bottom: 20px; }
+        .col { display: table-cell; width: 50%; padding-right: 15px; vertical-align: top; }
+        .label { font-size: 11px; color: #6b7280; text-transform: uppercase; font-weight: bold; letter-spacing: 1px; display: block; margin-bottom: 4px; }
+        .value { font-size: 16px; color: #111827; font-weight: bold; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
+        .value-large { font-size: 22px; color: #047857; font-weight: bold; }
+        .footer { background: #f9fafb; padding: 15px; text-align: center; font-size: 12px; border-top: 1px dashed #d1d5db; color: #6b7280; }
+        .flight-path { text-align: center; margin: 30px 0; padding: 20px; background: #f0fdf4; border-radius: 8px; border: 1px solid #a7f3d0; }
+        .flight-path span { display: inline-block; vertical-align: middle; }
+        .airplane-icon { font-size: 24px; color: #10b981; margin: 0 15px; }
+    </style>
+</head>
+<body>
+
+<div class="ticket-wrapper">
+    <div class="ticket-header">
+        <h1>Billet Électronique GoVibe</h1>
+    </div>
+
+    <div class="ticket-body">
+        
+        <div class="flight-path">
+            <span class="value-large" style="width: 40%; text-align: right;">{{ checkout.flight.departureAirport }}</span>
+            <span class="airplane-icon">✈</span>
+            <span class="value-large" style="width: 40%; text-align: left;">{{ checkout.flight.destination }}</span>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <span class="label">Passager Principal</span>
+                <span class="value">{{ checkout.passengerName }}</span>
+            </div>
+            <div class="col">
+                <span class="label">Référence Réservation</span>
+                <span class="value">#{{ checkout.checkoutId }}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <span class="label">Heure de départ</span>
+                <span class="value">{{ checkout.flight.departureTime|date('H:i') }}</span>
+            </div>
+            <div class="col">
+                <span class="label">Heure d'arrivée</span>
+                <span class="value">{{ checkout.flight.arrivalTime|date('H:i') }}</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <span class="label">Classe & Passagers</span>
+                <span class="value">{{ checkout.travelClass }} - {{ checkout.passengerNbr }} Passager(s)</span>
+            </div>
+            <div class="col">
+                <span class="label">Montant Payé</span>
+                <span class="value" style="color: #059669;">{{ checkout.totalPrix }} DT (Via {{ checkout.paymentMethod }})</span>
+            </div>
+        </div>
+
+        {% if checkout.signature %}
+        <div class="row" style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px;">
+            <div class="col" style="width: 100%; text-align: center;">
+                <span class="label">Signature Électronique du passager</span>
+                <div style="margin-top: 10px;">
+                    <img src="{{ checkout.signature }}" style="max-width: 200px; max-height: 80px;" alt="Signature">
+                </div>
+                <div style="font-size: 9px; color: #999; margin-top: 5px;">Signé numériquement le {{ (checkout.paidAt ?: "now")|date('d/m/Y à H:i') }}</div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <div class="footer">
+        Document généré automatiquement le {{ 'now'|date('d/m/Y à H:i') }}. Ce billet est personnel et non cessible.<br>
+        Signature électronique certifiée par <strong>GoVibe SafePass</strong>. Bon voyage !
+    </div>
+</div>
+
+</body>
+</html>

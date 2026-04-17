@@ -1,0 +1,23 @@
+services:
+  python-assistant:
+    build:
+      context: ./ai_system/python_assistant
+      dockerfile: Dockerfile
+    container_name: govibe-python-assistant
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      FLASK_HOST: 0.0.0.0
+      FLASK_PORT: 5000
+      OLLAMA_BASE: ${OLLAMA_BASE:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      NOISE_CALIB_LOW_RMS_CUTOFF: ${NOISE_CALIB_LOW_RMS_CUTOFF:-180}
+      NOISE_LOW_GATE_FACTOR: ${NOISE_LOW_GATE_FACTOR:-0.75}
+      NOISE_SPEECH_OFF_CONFIRM_FRAMES: ${NOISE_SPEECH_OFF_CONFIRM_FRAMES:-3}
+      AGENT_SCRIPT_PATH: /app/scripts/voice_agent.py
+      LOG_LEVEL: INFO
+    volumes:
+      - ./ai_system/src/main/resources/scripts:/app/scripts:ro
+    ports:
+      - "5000:5000"
+    restart: unless-stopped

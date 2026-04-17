@@ -19,5 +19,7 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
-# Face Recognition API virtual environment
-/face_recognition_api/venv/
+# Python sidecar virtual environments
+/services/face-recognition-api/venv/
+/services/prediction-api/venv/
+/services/voice-assistant-api/.venv/

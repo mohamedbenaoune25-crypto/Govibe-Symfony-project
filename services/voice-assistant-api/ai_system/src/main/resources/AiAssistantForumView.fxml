@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Circle?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="org.example.controllers.AiAssistantForumController"
+      spacing="20" styleClass="glass-panel-accent-emerald" 
+      prefWidth="500" prefHeight="700"
+      style="-fx-background-radius: 25; -fx-padding: 30; -fx-border-color: rgba(80, 200, 120, 0.4); -fx-border-width: 2;">
+
+    <!-- Header Section -->
+    <HBox spacing="20" alignment="CENTER_LEFT">
+        <StackPane styleClass="icon-circle-emerald" prefWidth="60" prefHeight="60">
+            <Label text="🤖" style="-fx-font-size: 35;"/>
+        </StackPane>
+        <VBox spacing="5">
+            <Label text="Assistant GoVibe Pro" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 20;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Circle radius="4" fill="#50C878"/>
+                <Label text="Connecté à DeepSeek v3" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11;"/>
+            </HBox>
+        </VBox>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button onAction="#handleClose" text="✕" styleClass="icon-btn-ghost-small" style="-fx-font-size: 16;"/>
+    </HBox>
+
+    <Separator style="-fx-opacity: 0.1;"/>
+
+    <!-- Greeting Section -->
+    <HBox spacing="15" alignment="TOP_LEFT">
+        <VBox styleClass="glass-panel" style="-fx-background-radius: 15 15 15 0; -fx-padding: 15; -fx-background-color: rgba(80, 200, 120, 0.1);">
+            <Label text="Comment puis-je vous aider ? ✨" style="-fx-text-fill: white; -fx-font-size: 15; -fx-font-weight: bold;"/>
+            <Label text="Je peux trouver la voiture parfaite sur le web ou dans notre flotte locale en fonction de votre budget et destination." 
+                   wrapText="true" maxWidth="350" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 12;"/>
+        </VBox>
+    </HBox>
+
+    <!-- Inputs Section -->
+    <VBox spacing="15">
+        <VBox spacing="8">
+            <Label text="Votre Budget Journalier" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 12;"/>
+            <TextField fx:id="budgetField" promptText="ex: 120 TND" styleClass="transparent-field" 
+                       style="-fx-background-color: rgba(255,255,255,0.05); -fx-background-radius: 10; -fx-padding: 12;"/>
+        </VBox>
+        <VBox spacing="8">
+            <Label text="Votre Destination" style="-fx-text-fill: rgba(255,255,255,0.7); -fx-font-size: 12;"/>
+            <TextField fx:id="destinationField" promptText="ex: La Marsa, Tunis" styleClass="transparent-field" 
+                       style="-fx-background-color: rgba(255,255,255,0.05); -fx-background-radius: 10; -fx-padding: 12;"/>
+        </VBox>
+        <Button onAction="#handleGenerate" maxWidth="Infinity" styleClass="btn-primary-emerald" 
+                text="🚀 Générer une recommandation AI" style="-fx-padding: 15; -fx-font-size: 14; -fx-font-weight: bold;"/>
+    </VBox>
+
+    <!-- Results Section -->
+    <VBox fx:id="resultsContainer" spacing="15" VBox.vgrow="ALWAYS">
+        <Label fx:id="statusLabel" text="En attente de vos critères..." style="-fx-text-fill: rgba(255,255,255,0.4); -fx-font-size: 12;"/>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" hbarPolicy="NEVER">
+            <VBox fx:id="carsList" spacing="10"/>
+        </ScrollPane>
+    </VBox>
+
+</VBox>

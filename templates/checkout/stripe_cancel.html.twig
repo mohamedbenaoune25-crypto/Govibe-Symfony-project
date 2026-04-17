@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement annulé - GoVibe{% endblock %}
+
+{% block body %}
+<style>
+    .cancel-page { padding-top: 140px; min-height: 80vh; }
+    .cancel-card {
+        max-width: 550px; margin: 0 auto; border-radius: 28px; overflow: hidden;
+        background: rgba(255,255,255,0.96); backdrop-filter: blur(16px);
+        box-shadow: 0 30px 80px rgba(1,50,32,0.12);
+    }
+    .cancel-header {
+        padding: 48px 36px 32px; text-align: center;
+        background: linear-gradient(135deg, #f59e0b, #d97706, #b45309);
+        color: white; position: relative;
+    }
+    .cancel-icon {
+        width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.2);
+        display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;
+        font-size: 2.5rem;
+    }
+    .cancel-body { padding: 32px 36px; text-align: center; }
+</style>
+
+<section class="cancel-page">
+    <div class="container">
+        <div class="cancel-card">
+            <div class="cancel-header">
+                <div class="cancel-icon">✕</div>
+                <h2 class="fw-bold mb-2">Paiement annulé</h2>
+                <p class="mb-0" style="opacity:0.85;">Votre paiement n'a pas été finalisé.</p>
+            </div>
+            <div class="cancel-body">
+                <p class="text-muted mb-4">
+                    Aucun montant n'a été débité. Votre réservation <strong>#{{ checkout.checkoutId }}</strong>
+                    reste en attente. Vous pouvez réessayer à tout moment.
+                </p>
+
+                <div class="d-flex gap-3 justify-content-center">
+                    <form method="post" action="{{ path('app_checkout_stripe', {checkoutId: checkout.checkoutId}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('stripe' ~ checkout.checkoutId) }}">
+                        <button type="submit" class="btn btn-success rounded-pill px-4 fw-semibold" data-stripe-pay>
+                            <i class="bi bi-arrow-clockwise me-1"></i> Réessayer le paiement
+                        </button>
+                    </form>
+                    <a href="{{ path('app_checkout_index') }}" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold">
+                        <i class="bi bi-arrow-left me-1"></i> Retour
+                    </a>
+                </div>
+
+                <!-- Voice AI -->
+                <div class="gv-voice-hints mt-4" style="margin-bottom:0;">
+                    <span class="material-symbols-outlined">mic</span>
+                    <span>Dites :</span>
+                    <button class="gv-voice-hint-chip" onclick="voiceCommand('Payer maintenant')">💳 "Payer"</button>
+                    <button class="gv-voice-hint-chip" onclick="voiceCommand('Mes réservations')">📋 "Mes réservations"</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

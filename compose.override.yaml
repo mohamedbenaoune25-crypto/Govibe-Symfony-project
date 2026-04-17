@@ -6,6 +6,10 @@ services:
       - "5432"
 ###< doctrine/doctrine-bundle ###
 
+  python-assistant:
+    ports:
+      - "${PYTHON_ASSISTANT_HOST_PORT:-5001}:5000"
+
 ###> symfony/mailer ###
   mailer:
     image: axllent/mailpit
@@ -16,3 +20,11 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 ###< symfony/mailer ###
+
+# If your Symfony runtime service is declared in another compose file,
+# add this directly under that service:
+#   depends_on:
+#     python-assistant:
+#       condition: service_healthy
+#   environment:
+#     PYTHON_ASSISTANT_API_BASE_URL: http://python-assistant:5000

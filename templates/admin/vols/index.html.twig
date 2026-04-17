@@ -1,59 +1,190 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block page_title %}Gestion des Vols{% endblock %}
+{% block page_title %}Flotte & Vols Programmés{% endblock %}
 
 {% block body %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4 class="fw-bold" style="color:var(--admin-primary); margin:0;">
-        <i class="bi bi-airplane-fill me-2" style="color:var(--admin-accent);"></i> Flotte & Vols Programmés
-    </h4>
-    <a href="{{ path('app_admin_vols_new') }}" onclick="openDetailModal(this.href); return false;" class="btn btn-sm" style="background:var(--admin-accent);color:white;font-weight:600;"><i class="bi bi-plus-lg me-1"></i> Nouveau Vol</a>
+<!-- ═══ Tropical Emerald Admin UI Styles ═══ -->
+<style>
+    :root {
+        --govibe-emerald: #00c896;
+        --govibe-emerald-dark: #00a47a;
+        --govibe-dark: #0f172a;
+        --govibe-light: #f8fafc;
+    }
+    
+    .admin-hero-dashboard {
+        background: linear-gradient(135deg, var(--govibe-dark) 0%, #1e293b 100%);
+        border-radius: 24px;
+        padding: 30px;
+        margin-bottom: 30px;
+        color: white;
+        box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    .admin-hero-dashboard::before {
+        content: '';
+        position: absolute;
+        top: -50%; right: -10%;
+        width: 500px; height: 500px;
+        background: radial-gradient(circle, rgba(0,200,150,0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+
+    /* Modal Animation */
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    @keyframes popOut {
+      from { transform: scale(1);    opacity: 1; }
+      to   { transform: scale(0.85); opacity: 0; }
+    }
+    .modal-anim-in { animation: popIn 0.25s ease-out forwards; }
+    .modal-anim-out { animation: popOut 0.2s ease-in forwards; }
+
+    /* Calendar Modal Trigger Button */
+    .btn-calendar-trigger {
+        background: #00c896;
+        color: white;
+        border-radius: 12px;
+        padding: 12px 24px;
+        border: none;
+        transition: background 0.2s;
+    }
+    .btn-calendar-trigger:hover {
+        background: #00a47a;
+        color: white;
+    }
+
+    /* FullCalendar Overrides for Modal */
+    .fc { font-family: inherit; }
+    .fc-toolbar-title { color: white; font-size: 1.4rem !important; }
+    .fc th { color: rgba(255,255,255,0.7); background: transparent; border-color: rgba(255,255,255,0.1) !important; font-weight:600; padding:10px 0; }
+    .fc td { border-color: rgba(255,255,255,0.1) !important; }
+    .fc-daygrid-day-number { color: white !important; text-decoration:none; }
+    .fc-theme-standard .fc-scrollgrid { border-color: rgba(255,255,255,0.1) !important; }
+    
+    .fc-button { 
+        background: rgba(255,255,255,0.15) !important; 
+        border: 1px solid rgba(255,255,255,0.3) !important; 
+        color: white !important; 
+        border-radius: 8px !important;
+        text-transform: capitalize;
+    }
+    .fc-button:hover { background: rgba(0,200,100,0.4) !important; }
+    .fc-button-active { background: rgba(0,200,150,0.6) !important; border-color: #00c896 !important; }
+    
+    .fc-event { 
+        backdrop-filter: blur(4px);
+        border-radius: 6px;
+        padding: 2px 6px;
+        font-size: 0.78rem;
+        border: none !important; 
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+        cursor: pointer; 
+        transition: transform 0.2s; 
+        color: white !important; 
+        margin-bottom: 3px !important;
+    }
+    .fc-event:hover { transform: scale(1.03); }
+    .fc a { color: white !important; text-decoration: none !important; }
+    
+    /* Custom event statuses mapping the user rules */
+    .event-confirmed { background: rgba(22, 163, 74, 0.8) !important; } /* #16a34a */
+    .event-pending { background: rgba(249, 115, 22, 0.8) !important; } /* #f97316 */
+    .event-cancelled { background: rgba(220, 38, 38, 0.8) !important; } /* #dc2626 */
+
+    /* Glass Cards for Index List */
+    .vol-pro-card {
+        background: #ffffff;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.03);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+    }
+    .vol-pro-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 200, 150, 0.08);
+        border-color: rgba(0, 200, 150, 0.3);
+    }
+</style>
+
+<div class="admin-hero-dashboard">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 position-relative z-1">
+        <div>
+            <h2 class="mb-1 fw-bold"><i class="bi bi-airplane-fill text-success me-2"></i> Centre de Contrôle des Vols</h2>
+            <p class="text-white-50 mb-0">Visualisez le calendrier et gérez votre flotte aérienne.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <!-- TRIGGER BUTTON -->
+            <button id="openCalendarBtn" class="btn-calendar-trigger fw-bold shadow-sm">
+                <i class="bi bi-calendar3 me-2"></i> Voir le Calendrier des Vols
+            </button>
+            <a href="{{ path('app_admin_vols_new') }}" onclick="openDetailModal(this.href); return false;" class="btn btn-light rounded-pill px-4 fw-bold" style="color:var(--govibe-emerald-dark);">
+                <i class="bi bi-plus-lg me-1"></i> Nouveau Vol
+            </a>
+        </div>
+    </div>
 </div>
 
+<h4 class="fw-bold mb-4" style="color:var(--govibe-dark);">Base de données des vols</h4>
+
+<!-- Flights Grid -->
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
     {% for vol in vols %}
     <div class="col">
-        <div class="admin-card h-100 position-relative d-flex flex-column" style="overflow: hidden; padding: 25px;">
-            <div class="position-absolute" style="top: 20px; right: 20px;">
-                <span class="badge" style="background:rgba(13, 110, 253, 0.1);color:#0d6efd;border:1px solid rgba(13, 110, 253, 0.2);padding:6px 12px;font-weight:600;">{{ vol.classeChaise }}</span>
+        <div class="vol-pro-card p-4 gv-flight-card" data-flight-id="{{ vol.flightId }}" data-route="{{ vol.departureAirport }} → {{ vol.destination }}" data-seats="{{ vol.availableSeats }}" data-airline="{{ vol.airline }}" data-status="{% if vol.status is defined %}{{ vol.status|lower }}{% else %}confirmed{% endif %}">
+            <!-- Badge -->
+            <div class="text-end mb-2">
+                <span class="badge" style="background:rgba(13, 110, 253, 0.1);color:#0d6efd;border:1px solid rgba(13, 110, 253, 0.2);padding:6px 12px;font-weight:700; border-radius:10px;">{{ vol.classeChaise }}</span>
             </div>
 
-            <div class="text-center mt-3 mb-4">
-                <div style="width:70px;height:70px;border-radius:16px;background:rgba(10, 25, 47, 0.04);color:var(--admin-primary);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid var(--border-color);margin:0 auto 15px;">
-                    <i class="bi bi-airplane"></i>
+            <!-- Route Info -->
+            <div class="text-center mt-2 mb-4">
+                <div class="mx-auto shadow-sm" style="width:60px;height:60px;border-radius:18px;background:rgba(0, 200, 150, 0.08);color:var(--govibe-emerald-dark);display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid rgba(0,200,150,0.15);margin-bottom:15px;">
+                    <i class="bi bi-airplane-engines"></i>
                 </div>
-                <h5 class="fw-bold mb-1" style="color:var(--admin-primary); font-family:'Outfit', sans-serif;">{{ vol.departureAirport }} <i class="bi bi-arrow-right text-muted mx-1" style="font-size:14px;"></i> {{ vol.destination }}</h5>
-                <p class="text-muted mb-0" style="font-size: 13px;">Vol ID <strong>{{ vol.flightId }}</strong> &bull; {{ vol.airline }}</p>
-                <div class="mt-3 d-flex justify-content-center gap-4 text-muted" style="font-size: 11px; text-transform:uppercase; letter-spacing:0.5px;">
-                    <div>Départ<br><strong style="font-size:14px;color:#333;">{{ vol.departureTime ? vol.departureTime|date('H:i') : '-' }}</strong></div>
-                    <div>Arrivée<br><strong style="font-size:14px;color:#333;">{{ vol.arrivalTime ? vol.arrivalTime|date('H:i') : '-' }}</strong></div>
+                <h5 class="fw-bold mb-1 text-dark">{{ vol.departureAirport }} <i class="bi bi-arrow-right text-muted mx-1" style="font-size:14px;"></i> {{ vol.destination }}</h5>
+                <p class="text-muted mb-0 small">Vol #<strong>{{ vol.flightId }}</strong> &bull; {{ vol.airline }}</p>
+                
+                <div class="mt-4 d-flex justify-content-center gap-4 text-muted" style="font-size: 11px; text-transform:uppercase; letter-spacing:0.5px;">
+                    <div>Départ<br><strong class="text-dark" style="font-size:14px;">{{ vol.departureTime ? vol.departureTime|date('d/m H:i') : '-' }}</strong></div>
+                    <div>Arrivée<br><strong class="text-dark" style="font-size:14px;">{{ vol.arrivalTime ? vol.arrivalTime|date('d/m H:i') : '-' }}</strong></div>
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-3 p-3" style="background:#F8FAFC; border-radius:12px; border:1px solid #E2E8F0;">
-                <div class="text-center w-50" style="border-right: 1px solid #E2E8F0;">
-                    <div style="font-size:10px; font-weight:600; text-transform:uppercase; color:#64748B;">Places</div>
+            <!-- Stats Bar -->
+            <div class="d-flex justify-content-between align-items-center mb-4 p-3 rounded-4" style="background:#F8FAFC; border:1px solid #E2E8F0;">
+                <div class="text-center" style="flex:1; border-right: 1px solid #e2e8f0;">
+                    <div style="font-size:10px; font-weight:700; text-transform:uppercase; color:#64748B;">Places</div>
                     {% if vol.availableSeats < 10 %}
-                        <div class="text-danger fw-bold"><i class="bi bi-exclamation-circle"></i> {{ vol.availableSeats }}</div>
+                        <div class="text-danger fw-bold"><i class="bi bi-exclamation-circle text-danger"></i> {{ vol.availableSeats }}</div>
                     {% else %}
                         <div class="text-success fw-bold">{{ vol.availableSeats }}</div>
                     {% endif %}
                 </div>
-                <div class="text-center w-50">
-                    <div style="font-size:10px; font-weight:600; text-transform:uppercase; color:#64748B;">Prix</div>
-                    <div style="font-size:16px; font-weight:700; color:var(--admin-primary);">{{ vol.prix }} €</div>
+                <div class="text-center" style="flex:1;">
+                    <div style="font-size:10px; font-weight:700; text-transform:uppercase; color:#64748B;">Prix</div>
+                    <div class="fw-bold text-dark" style="font-size:14px;">{{ vol.prix }} €</div>
                 </div>
             </div>
 
+            <!-- Actions -->
             <div class="mt-auto d-flex gap-2">
-                <a href="{{ path('app_admin_vols_edit', {'flightId': vol.flightId}) }}" onclick="openDetailModal(this.href); return false;" class="btn flex-grow-1" style="background:#F8FAFC;color:#0F172A;border:1px solid #E2E8F0;font-size:14px;font-weight:500;">
+                <a href="{{ path('app_admin_vols_edit', {'flightId': vol.flightId}) }}" onclick="openDetailModal(this.href); return false;" class="btn btn-light border flex-grow-1 fw-bold text-dark" style="font-size:14px;">
                     <i class="bi bi-pencil-square me-1"></i> Modifier
                 </a>
                 
-                <form method="post" action="{{ path('app_admin_vols_delete', {'flightId': vol.flightId}) }}" class="flex-grow-1" onsubmit="return confirm('Êtes-vous sûr de vouloir annuler et supprimer ce vol ?');">
+                <form method="post" action="{{ path('app_admin_vols_delete', {'flightId': vol.flightId}) }}" class="flex-grow-1" onsubmit="return confirm('Supprimer définitivement ce vol ?');">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ vol.flightId) }}">
-                    <button class="btn w-100" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;font-size:14px;font-weight:500;">
-                        <i class="bi bi-trash3-fill me-1"></i> Supprimer
+                    <button class="btn w-100 fw-bold border border-danger text-danger bg-danger bg-opacity-10 opacity-75 hover-opacity-100" style="font-size:14px;">
+                        <i class="bi bi-trash3 me-1"></i> Supprimer
                     </button>
                 </form>
             </div>
@@ -61,11 +192,146 @@
     </div>
     {% else %}
     <div class="col-12 w-100">
-        <div class="admin-card text-center py-5">
+        <div class="admin-card text-center py-5 rounded-4" style="background:#f8fafc; border:2px dashed #e2e8f0;">
             <i class="bi bi-cloud-slash text-muted" style="font-size:40px;"></i>
-            <p class="text-muted mt-2">Aucun vol n'est actuellement programmé.</p>
+            <h5 class="fw-bold text-muted mt-3">Aucun vol programmé</h5>
+            <p class="text-muted">Votre flotte est actuellement au sol.</p>
         </div>
     </div>
     {% endfor %}
 </div>
+
+<!-- ============================================== -->
+<!-- CALENDAR MODAL STRUCTURE                       -->
+<!-- ============================================== -->
+<div id="calendarModalOverlay" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; display: none; align-items: center; justify-content: center; z-index: 9999; background: rgba(0, 0, 0, 0.85);">
+    <div id="calendarModalCard" style="position: relative; width: 90%; max-width: 1100px; max-height: 85vh; overflow-y: auto; border-radius: 20px; padding: 30px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6); background-image: url('{{ asset('images/admin/calendar-bg.jpg') }}'); background-size: cover; background-position: center;">
+        <!-- Dark Overlay for readablity -->
+        <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0, 15, 30, 0.70); z-index: 1;"></div>
+        
+        <!-- Close Button -->
+        <div id="calendarCloseBtn" style="position: absolute; top: 15px; right: 20px; font-size: 1.5rem; color: white; cursor: pointer; z-index: 20; padding:10px;">
+            <i class="bi bi-x-lg"></i>
+        </div>
+        
+        <!-- Calendar Container -->
+        <div style="position: relative; z-index: 10;">
+            <div id="flightCalendar"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<!-- FullCalendar JS CDN -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales/fr.global.min.js'></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // 1. Flight Metadata Setup
+    var flightMetadata = {};
+    document.querySelectorAll('.gv-flight-card').forEach(function(card) {
+        var id = card.dataset.flightId;
+        flightMetadata[id] = {
+            route: card.dataset.route,
+            seats: parseInt(card.dataset.seats, 10),
+            airline: card.dataset.airline,
+            status: card.dataset.status
+        };
+    });
+
+    // 2. Modal References
+    var triggerBtn = document.getElementById('openCalendarBtn');
+    var overlay = document.getElementById('calendarModalOverlay');
+    var modalCard = document.getElementById('calendarModalCard');
+    var closeBtn = document.getElementById('calendarCloseBtn');
+    var calendarEl = document.getElementById('flightCalendar');
+    
+    var calendarInstance = null; // Will initialize once
+
+    function initCalendar() {
+        if (!calendarEl || calendarInstance) {
+            if (calendarInstance) calendarInstance.render(); // Ensure sizing is correct on reopen
+            return;
+        }
+
+        var baseEventsData = {{ calendarEvents|raw }};
+        
+        calendarInstance = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            height: 'auto',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listWeek'
+            },
+            events: baseEventsData,
+            eventDidMount: function(info) {
+                // Strip inline controller colors so our custom CSS classes take priority
+                info.el.style.backgroundColor = '';
+                info.el.style.borderColor = '';
+                
+                var meta = flightMetadata[info.event.id] || {};
+                var status = meta.status || 'confirmed';
+                
+                if (status === 'removed' || status === 'cancelled' || status === 'refuse') {
+                    info.el.classList.add('event-cancelled');
+                } else if (status === 'pending' || meta.seats < 10) {
+                    info.el.classList.add('event-pending');
+                } else {
+                    info.el.classList.add('event-confirmed');
+                }
+
+                // Tooltip
+                var tooltipText = (meta.route || info.event.title) + "\n" +
+                                  "Compagnie: " + (meta.airline || 'N/A') + "\n" +
+                                  "Places dispo: " + (meta.seats || 'N/A');
+                info.el.setAttribute('title', tooltipText);
+            }
+        });
+        calendarInstance.render();
+    }
+
+    // 3. Modal Behaviors
+    function openModal() {
+        overlay.style.display = 'flex';
+        modalCard.classList.remove('modal-anim-out');
+        modalCard.classList.add('modal-anim-in');
+        
+        // Initialize or re-render FC when modal is visible
+        setTimeout(initCalendar, 100); 
+    }
+
+    function closeModal() {
+        modalCard.classList.remove('modal-anim-in');
+        modalCard.classList.add('modal-anim-out');
+        
+        // Wait for reverse popIn animation to finish before hiding overlay
+        setTimeout(function() {
+            overlay.style.display = 'none';
+        }, 200);
+    }
+
+    if (triggerBtn) triggerBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            // Close if clicking exactly on the overlay bg, not inside the card
+            if (e.target === overlay) closeModal();
+        });
+    }
+
+    // Escape Key logic
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && overlay.style.display === 'flex') {
+            closeModal();
+        }
+    });
+});
+</script>
 {% endblock %}
