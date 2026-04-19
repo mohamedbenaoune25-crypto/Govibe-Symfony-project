@@ -1,0 +1,1135 @@
+{% extends 'admin/base_admin.html.twig' %}
+
+{% block title %}{{ 'admin.hotel.prediction.title'|trans|auto_translate }}{% endblock %}
+{% block page_title %}{{ 'admin.hotel.prediction.page_title'|trans|auto_translate }}{% endblock %}
+
+{% block body %}
+{% set trendDirection = prediction.trendDirection|default('stable') %}
+{% set chartWidth = 620 %}
+{% set chartHeight = 210 %}
+{% set pointCount = prediction.history.points|length %}
+{% set denominator = pointCount > 1 ? pointCount - 1 : 1 %}
+{% set maxPoint = prediction.historyMaxPoint|default(1) %}
+{% set pathCoords = '' %}
+{% for idx, value in prediction.history.points %}
+    {% set x = ((idx / denominator) * chartWidth)|round(1, 'floor') %}
+    {% set y = (chartHeight - ((value / maxPoint) * (chartHeight - 24)) - 12)|round(1, 'floor') %}
+    {% set pathCoords = pathCoords ~ (idx == 0 ? 'M' : ' L') ~ x ~ ',' ~ y %}
+{% endfor %}
+{% set areaCoords = pointCount > 0 ? pathCoords ~ ' L' ~ chartWidth ~ ',' ~ chartHeight ~ ' L0,' ~ chartHeight ~ ' Z' : '' %}
+
+<section class="prediction-page">
+    <div class="prediction-hero mb-4">
+            <div class="prediction-hero-content">
+            <div class="prediction-kicker">{{ 'admin.hotel.prediction.hero.kicker'|trans|auto_translate }}</div>
+            <h2 class="prediction-hero-title mb-2">{{ 'admin.hotel.prediction.hero.title'|trans|auto_translate }}</h2>
+            <p class="prediction-hero-subtitle mb-0">
+                {{ 'admin.hotel.prediction.hero.subtitle'|trans|auto_translate }}
+            </p>
+        </div>
+        <div class="prediction-hero-actions d-flex gap-2 align-items-center">
+            <span class="prediction-badge">
+                {% if trendDirection == 'up' %}
+                    <i class="bi bi-graph-up-arrow"></i> {{ 'admin.hotel.prediction.trend.up'|trans|auto_translate }}
+                {% elseif trendDirection == 'down' %}
+                    <i class="bi bi-graph-down-arrow"></i> {{ 'admin.hotel.prediction.trend.down'|trans|auto_translate }}
+                {% else %}
+                    <i class="bi bi-dash-circle"></i> {{ 'admin.hotel.prediction.trend.stable'|trans|auto_translate }}
+                {% endif %}
+            </span>
+            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>{{ 'common.back_to_list'|trans|auto_translate }}
+            </a>
+        </div>
+    </div>
+
+    <section class="prediction-block" id="prediction-kpis">
+        <div class="row g-3 mb-4 prediction-kpis">
+        <div class="col-md-6 col-xl-3">
+            <article class="prediction-stat-card stat-emerald">
+                <div class="stat-label">{{ 'admin.hotel.prediction.kpis.past_reservations'|trans|auto_translate }}</div>
+                <div class="stat-value">{{ prediction.totals.pastReservations }}</div>
+                <div class="stat-meta">{{ 'admin.hotel.prediction.kpis.analyzed_months'|trans({'%count%': prediction.totals.analyzedMonths})|auto_translate }}</div>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <article class="prediction-stat-card stat-blue">
+                <div class="stat-label">{{ 'admin.hotel.prediction.kpis.predicted_reservations'|trans|auto_translate }}</div>
+                <div class="stat-value">{{ prediction.totals.predictedReservations }}</div>
+                <div class="stat-meta">
+                    {% set growth = prediction.insights.forecastGrowthPct|default(0) %}
+                    {% if growth >= 0 %}+{% endif %}{{ growth|number_format(1, '.', ' ') }}% {{ 'admin.hotel.prediction.kpis.vs_recent'|trans|auto_translate }}
+                </div>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <article class="prediction-stat-card stat-amber">
+                <div class="stat-label">{{ 'admin.hotel.prediction.kpis.top_hotel_share'|trans|auto_translate }}</div>
+                <div class="stat-value">{{ prediction.insights.leaderHotelSharePct|number_format(1, '.', ' ') }}%</div>
+                <div class="stat-meta">{{ 'admin.hotel.prediction.kpis.demand_concentration'|trans|auto_translate }}</div>
+            </article>
+        </div>
+        <div class="col-md-6 col-xl-3">
+            <article class="prediction-stat-card stat-rose">
+                <div class="stat-label">{{ 'admin.hotel.prediction.kpis.top_room_share'|trans|auto_translate }}</div>
+                <div class="stat-value">{{ prediction.insights.leaderRoomSharePct|number_format(1, '.', ' ') }}%</div>
+                <div class="stat-meta">{{ 'admin.hotel.prediction.kpis.best_product'|trans|auto_translate }}</div>
+            </article>
+        </div>
+    </div>
+    </section>
+
+    {% set dropCount = 0 %}
+    {% set peakCount = 0 %}
+    {% for anomaly in prediction.anomalies|default([]) %}
+        {% if anomaly.type == 'drop' %}
+            {% set dropCount = dropCount + 1 %}
+        {% elseif anomaly.type == 'peak' %}
+            {% set peakCount = peakCount + 1 %}
+        {% endif %}
+    {% endfor %}
+
+    <section class="prediction-block" id="prediction-alerts">
+    <div class="alert-section mb-4" id="ai-alert-section">
+        <div class="alert-header">
+            <div class="alert-header-content">
+                <h5 class="mb-1">
+                    <i class="bi bi-exclamation-triangle"></i> {{ 'admin.hotel.prediction.alerts.title'|trans|auto_translate }}
+                </h5>
+                <p class="text-muted mb-0">{{ 'admin.hotel.prediction.alerts.subtitle'|trans|auto_translate }}</p>
+            </div>
+            <span class="alert-count">{{ prediction.anomalies|length }}</span>
+        </div>
+        <div class="alert-filters mb-3">
+            <button type="button" class="alert-filter-btn is-active" data-alert-filter="all">
+                {{ 'admin.hotel.prediction.alerts.filters.all'|trans({'%count%': prediction.anomalies|length})|auto_translate }}
+            </button>
+            <button type="button" class="alert-filter-btn" data-alert-filter="drop">
+                {{ 'admin.hotel.prediction.alerts.filters.drop'|trans({'%count%': dropCount})|auto_translate }}
+            </button>
+            <button type="button" class="alert-filter-btn" data-alert-filter="peak">
+                {{ 'admin.hotel.prediction.alerts.filters.peak'|trans({'%count%': peakCount})|auto_translate }}
+            </button>
+        </div>
+        <div class="alert-items">
+            {% if prediction.anomalies|length > 0 %}
+                {% for anomaly in prediction.anomalies %}
+                    {% set isLow = anomaly.type == 'drop' %}
+                    <div class="alert-item {% if isLow %}alert-danger-light{% else %}alert-success-light{% endif %}" data-alert-type="{{ anomaly.type }}">
+                        <div class="alert-icon">
+                            {% if isLow %}
+                                <i class="bi bi-exclamation-circle-fill"></i>
+                            {% else %}
+                                <i class="bi bi-star-fill"></i>
+                            {% endif %}
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-message">
+                                {% if isLow %}
+                                    {{ 'admin.hotel.prediction.alerts.message.drop'|trans({'%pct%': anomaly.absoluteVariation, '%hotel%': anomaly.hotelNom|auto_translate})|auto_translate }}
+                                {% else %}
+                                    {{ 'admin.hotel.prediction.alerts.message.peak'|trans({'%pct%': anomaly.variation, '%hotel%': anomaly.hotelNom|auto_translate})|auto_translate }}
+                                {% endif %}
+                            </div>
+                            <div class="alert-detail">
+                                {{ 'admin.hotel.prediction.alerts.detail.comparison'|trans({'%recent%': anomaly.recentCount, '%previous%': anomaly.previousCount})|auto_translate }}
+                                {% if anomaly.expectedCount|default(0) > 0 %}
+                                    <span class="ms-2">| {{ 'admin.hotel.prediction.alerts.expected'|trans|auto_translate }}: {{ anomaly.expectedCount }}</span>
+                                {% endif %}
+                                {% if anomaly.nombreEtoiles > 0 %}
+                                    <span class="ms-2 text-warning">{% for i in 1..anomaly.nombreEtoiles %}⭐{% endfor %}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="alert-badge">
+                            {% if isLow %}
+                                <span class="badge bg-danger">{{ 'admin.hotel.prediction.alerts.badge.drop'|trans|auto_translate }} {{ anomaly.absoluteVariation }}% ↓</span>
+                            {% else %}
+                                <span class="badge bg-success">{{ 'admin.hotel.prediction.alerts.badge.peak'|trans|auto_translate }} +{{ anomaly.variation }}%</span>
+                            {% endif %}
+                            <span class="badge bg-dark ms-2">{{ anomaly.confidence }}% {{ 'admin.hotel.prediction.alerts.badge.confidence'|trans|auto_translate }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert-empty" id="alert-empty-static">
+                    <i class="bi bi-shield-check"></i>
+                    <span>{{ 'admin.hotel.prediction.alerts.empty.none'|trans|auto_translate }}</span>
+                </div>
+            {% endif %}
+            <div class="alert-empty" id="alert-empty-filtered" style="display:none;">
+                <i class="bi bi-funnel"></i>
+                <span>{{ 'admin.hotel.prediction.alerts.empty.filtered'|trans|auto_translate }}</span>
+            </div>
+        </div>
+    </div>
+    </section>
+
+    <section class="prediction-block" id="prediction-trends">
+    <div class="d-grid gap-4 mb-4">
+        <div>
+            <div class="prediction-panel h-100">
+                <div class="prediction-panel-head">
+                    <h5 class="mb-1">{{ 'admin.hotel.prediction.chart.title'|trans|auto_translate }}</h5>
+                    <span class="text-muted small">{{ 'admin.hotel.prediction.chart.subtitle'|trans|auto_translate }}</span>
+                </div>
+                <div class="prediction-chart-wrap">
+                    {% if pointCount > 0 %}
+                        <svg viewBox="0 0 {{ chartWidth }} {{ chartHeight + 20 }}" class="prediction-line-chart" role="img" aria-label="{{ 'admin.hotel.prediction.chart.aria'|trans|auto_translate }}">
+                            <defs>
+                                <linearGradient id="predictionArea" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#22c55e" stop-opacity="0.35"/>
+                                    <stop offset="100%" stop-color="#22c55e" stop-opacity="0.02"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="{{ areaCoords }}" fill="url(#predictionArea)"></path>
+                            <path d="{{ pathCoords }}" fill="none" stroke="#0ea5e9" stroke-width="3"></path>
+                        </svg>
+                        <div class="prediction-axis mt-2">
+                            {% for label in prediction.history.labels %}
+                                <span>{{ label }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-muted">{{ 'admin.hotel.prediction.empty'|trans|auto_translate }}</div>
+                    {% endif %}
+                </div>
+                <div class="prediction-inline-note mt-3">
+                    <i class="bi bi-info-circle"></i>
+                    <span>{{ 'La courbe présente le comportement récent de la demande et sert de base au calcul prévisionnel.'|auto_translate }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="prediction-monthly">
+            <div class="prediction-panel h-100">
+                <div class="prediction-panel-head">
+                    <h5 class="mb-1">{{ 'Prévisions mensuelles'|auto_translate }}</h5>
+                    <span class="text-muted small">{{ 'Projection des prochains mois basée sur la tendance actuelle'|auto_translate }}</span>
+                </div>
+                <div class="forecast-grid mt-2">
+                    {% for item in prediction.forecast %}
+                        <div class="forecast-pill">
+                            <span>{{ item.label }}</span>
+                            <strong>{{ item.value }}</strong>
+                        </div>
+                    {% else %}
+                        <div class="text-muted">{{ 'admin.hotel.prediction.empty'|trans|auto_translate }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+
+    {% set globalYearlyProjection = prediction.globalYearlyProjection|default(null) %}
+    {% if globalYearlyProjection %}
+        <section class="prediction-block" id="prediction-global">
+        <div class="prediction-panel mb-4">
+            <div class="prediction-panel-head d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div>
+                    <h5 class="mb-1">{{ 'admin.hotel.prediction.global.title'|trans|auto_translate }} - {{ globalYearlyProjection.year }}</h5>
+                    <span class="text-muted small">{{ 'admin.hotel.prediction.global.subtitle'|trans|auto_translate }}</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <span class="prediction-badge"><i class="bi bi-check2-circle"></i> {{ 'admin.hotel.prediction.global.past'|trans|auto_translate }}: {{ globalYearlyProjection.actualYtd }}</span>
+                    <span class="prediction-badge"><i class="bi bi-calendar-plus"></i> {{ 'admin.hotel.prediction.global.estimated'|trans|auto_translate }}: {{ globalYearlyProjection.predictedRemainder }}</span>
+                    <span class="prediction-badge confidence-high"><i class="bi bi-bar-chart"></i> {{ 'admin.hotel.prediction.global.annual_total'|trans|auto_translate }}: {{ globalYearlyProjection.projectedYearTotal }}</span>
+                </div>
+            </div>
+
+            <div class="global-year-wrap">
+                <table class="table admin-table align-middle mb-0 global-year-table">
+                    <thead>
+                        <tr>
+                            <th class="text-nowrap">{{ 'admin.hotel.prediction.global.series'|trans|auto_translate }}</th>
+                            {% for row in globalYearlyProjection.months %}
+                                <th class="text-center text-nowrap">{{ row.label }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-semibold text-nowrap">{{ 'admin.hotel.prediction.global.past_reservations'|trans|auto_translate }}</td>
+                            {% for row in globalYearlyProjection.months %}
+                                <td class="text-center">{{ row.actual }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td class="fw-semibold text-nowrap">{{ 'admin.hotel.prediction.global.forecast_reservations'|trans|auto_translate }}</td>
+                            {% for row in globalYearlyProjection.months %}
+                                <td class="text-center {% if row.isFuture %}global-forecast-cell{% endif %}">{{ row.predicted }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr class="global-total-row">
+                            <td class="fw-bold text-nowrap">{{ 'admin.hotel.prediction.global.consolidated_total'|trans|auto_translate }}</td>
+                            {% for row in globalYearlyProjection.months %}
+                                <td class="text-center fw-bold">{{ row.total }}</td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </section>
+    {% endif %}
+
+    <section class="prediction-block" id="prediction-ranking">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="prediction-panel h-100">
+                <div class="prediction-panel-head">
+                    <h5 class="mb-1">{{ 'admin.hotel.prediction.top_hotels'|trans|auto_translate }}</h5>
+                    <span class="text-muted small">{{ 'admin.hotel.prediction.top_hotels.subtitle'|trans|auto_translate }}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>{{ 'admin.hotel.prediction.table.image'|trans|auto_translate }}</th>
+                                <th>{{ 'common.hotel'|trans|auto_translate }}</th>
+                                <th>{{ 'admin.hotel.prediction.table.stars'|trans|auto_translate }}</th>
+                                <th>{{ 'admin.hotel.prediction.reservations_count'|trans|auto_translate }}</th>
+                                <th>{{ 'admin.hotel.prediction.estimated_revenue'|trans|auto_translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in prediction.topHotels %}
+                                <tr>
+                                    <td>
+                                        <span class="hotel-avatar hotel-avatar-table">
+                                            {% if row.photoUrl %}
+                                                <img src="{{ row.photoUrl }}" alt="{{ row.hotelNom ?: ('Hotel #' ~ row.hotelId) }}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+                                                <span class="hotel-avatar-fallback" style="display:none;"><i class="bi bi-building"></i></span>
+                                            {% else %}
+                                                <span class="hotel-avatar-fallback"><i class="bi bi-building"></i></span>
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold">{{ row.hotelNom|auto_translate ?: ('#' ~ row.hotelId) }}</td>
+                                    <td class="text-warning">{% for i in 1..row.nombreEtoiles|default(0) %}⭐{% endfor %}</td>
+                                    <td>{{ row.reservationsCount }}</td>
+                                    <td>{{ row.revenueEstimate|number_format(0, '.', ' ') }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">{{ 'admin.hotel.prediction.empty'|trans|auto_translate }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="prediction-panel h-100">
+                <div class="prediction-panel-head">
+                    <h5 class="mb-1">{{ 'admin.hotel.prediction.top_rooms'|trans|auto_translate }}</h5>
+                    <span class="text-muted small">{{ 'admin.hotel.prediction.top_rooms.subtitle'|trans|auto_translate }}</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>{{ 'common.type'|trans|auto_translate }}</th>
+                                <th>{{ 'common.hotel'|trans|auto_translate }}</th>
+                                <th>{{ 'admin.hotel.prediction.reservations_count'|trans|auto_translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in prediction.topRooms %}
+                                <tr>
+                                    <td class="fw-semibold">{{ row.chambreType|auto_translate ?: ('#' ~ row.chambreId) }}</td>
+                                    <td>{{ row.hotelNom|auto_translate ?: ('#' ~ row.hotelId) }}</td>
+                                    <td>{{ row.reservationsCount }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">{{ 'admin.hotel.prediction.empty'|trans|auto_translate }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+
+    <section class="prediction-block" id="prediction-annual">
+    <div class="prediction-panel mt-4">
+        {% set annualConfidence = prediction.totals.annualForecastConfidence|default(0) %}
+        {% set annualConfidenceLabel = prediction.totals.annualForecastConfidenceLabel|default('Faible') %}
+        <div class="prediction-panel-head d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <h5 class="mb-1">{{ 'admin.hotel.prediction.annual.title'|trans|auto_translate }}</h5>
+                <span class="text-muted small">{{ 'admin.hotel.prediction.annual.subtitle'|trans|auto_translate }}</span>
+                <div class="annual-confidence-note mt-2">
+                    <i class="bi bi-info-circle"></i>
+                    <span>{{ 'admin.hotel.prediction.annual.reliability'|trans|auto_translate }}: {{ annualConfidenceLabel|auto_translate }} ({{ annualConfidence }}%)</span>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="prediction-badge">
+                    <i class="bi bi-calendar3"></i>
+                    {{ 'admin.hotel.prediction.annual.total_estimated'|trans|auto_translate }}: {{ prediction.totals.predictedReservationsYear|default(0) }} {{ 'admin.hotel.prediction.annual.reservations'|trans|auto_translate }}
+                </span>
+                <span class="prediction-badge {% if annualConfidence >= 75 %}confidence-high{% elseif annualConfidence >= 50 %}confidence-medium{% else %}confidence-low{% endif %}">
+                    <i class="bi bi-shield-check"></i>
+                    {{ 'admin.hotel.prediction.annual.confidence'|trans|auto_translate }}: {{ annualConfidenceLabel|auto_translate }} ({{ annualConfidence }}%)
+                </span>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-1">
+            <div class="col-lg-6">
+                <h6 class="mb-3">{{ 'admin.hotel.prediction.annual.hotels_leaders'|trans|auto_translate }}</h6>
+                <div class="d-grid gap-3">
+                    {% for row in prediction.predictedTopHotelsYear|default([]) %}
+                        <div class="annual-item">
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                                <span class="fw-semibold d-flex align-items-center gap-2">
+                                    <span class="hotel-avatar hotel-avatar-table">
+                                        {% if row.photoUrl %}
+                                            <img src="{{ row.photoUrl }}" alt="{{ row.hotelNom ?: ('Hotel #' ~ row.hotelId) }}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+                                            <span class="hotel-avatar-fallback" style="display:none;"><i class="bi bi-building"></i></span>
+                                        {% else %}
+                                            <span class="hotel-avatar-fallback"><i class="bi bi-building"></i></span>
+                                        {% endif %}
+                                    </span>
+                                    <div>
+                                        <div>{{ row.hotelNom|auto_translate ?: ('#' ~ row.hotelId) }}</div>
+                                        <div class="small text-warning">{% for i in 1..row.nombreEtoiles|default(0) %}⭐{% endfor %}</div>
+                                    </div>
+                                </span>
+                                <span class="annual-metric">{{ row.predictedReservations }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                <span>{{ 'admin.hotel.prediction.annual.estimated_share'|trans|auto_translate }}</span>
+                                <span>{{ row.sharePct|number_format(1, '.', ' ') }}%</span>
+                            </div>
+                            <div class="prediction-progress"><span style="width: {{ row.sharePct }}%"></span></div>
+                        </div>
+                    {% else %}
+                        <div class="text-muted">{{ 'admin.hotel.prediction.empty'|trans|auto_translate }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <h6 class="mb-3">{{ 'admin.hotel.prediction.annual.rooms_leaders'|trans|auto_translate }}</h6>
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>{{ 'admin.hotel.prediction.annual.room_type'|trans|auto_translate }}</th>
+                                <th>{{ 'admin.hotel.prediction.annual.reservations_planned'|trans|auto_translate }}</th>
+                                <th>{{ 'admin.hotel.prediction.annual.estimated_share'|trans|auto_translate }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in prediction.predictedTopRoomTypesYear|default([]) %}
+                                <tr>
+                                    <td class="fw-semibold">{{ row.roomType|auto_translate ?: '-' }}</td>
+                                    <td>{{ row.predictedReservations }}</td>
+                                    <td>{{ row.sharePct|number_format(1, '.', ' ') }}%</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">{{ 'admin.hotel.prediction.empty'|trans|auto_translate }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </section>
+
+</section>
+
+<style>
+.prediction-page {
+    --pred-bg-soft: linear-gradient(130deg, #f7fdf9 0%, #eef6ff 62%, #f8fafe 100%);
+    --pred-card-bg: #ffffff;
+    --pred-border: #d5e6de;
+    --pred-text: #163527;
+    --pred-shadow: 0 14px 34px -28px rgba(15, 41, 31, 0.35);
+    --pred-shadow-soft: 0 8px 24px -20px rgba(20, 35, 58, 0.4);
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 0;
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0 auto;
+    overflow-x: visible;
+}
+
+.prediction-page * {
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.prediction-hero {
+    background: var(--pred-bg-soft);
+    border: 1px solid var(--pred-border);
+    border-radius: 20px;
+    padding: 1.1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    box-shadow: var(--pred-shadow);
+}
+
+.prediction-hero > div:first-child {
+    flex: 1 1 420px;
+    min-width: 0;
+}
+
+.prediction-hero-actions {
+    flex: 0 1 auto;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.prediction-hero-actions .btn {
+    white-space: nowrap;
+}
+
+.prediction-kicker {
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .72rem;
+    font-weight: 700;
+    color: #0f766e;
+}
+
+.prediction-hero-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--pred-text);
+}
+
+.prediction-hero-subtitle {
+    color: #4b6358;
+    max-width: 620px;
+    font-size: 0.94rem;
+    line-height: 1.32;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.prediction-block {
+    scroll-margin-top: 128px;
+}
+
+.prediction-page .prediction-block,
+.prediction-page .mb-4 {
+    margin-bottom: 1rem !important;
+}
+
+.prediction-page .row.g-3,
+.prediction-page .row.g-4 {
+    --bs-gutter-x: 0.75rem;
+    --bs-gutter-y: 0.75rem;
+}
+
+.prediction-hero-subtitle,
+.prediction-stat-card .stat-label,
+.prediction-panel-head .text-muted,
+.alert-message,
+.alert-detail {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.prediction-badge {
+    background: #ffffff;
+    border: 1px solid #d5e5dc;
+    border-radius: 999px;
+    padding: .42rem .8rem;
+    font-size: .74rem;
+    font-weight: 600;
+    color: #135d4a;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    white-space: nowrap;
+}
+
+.prediction-badge.confidence-high {
+    border-color: #86efac;
+    background: #ecfdf5;
+    color: #166534;
+}
+
+.prediction-badge.confidence-medium {
+    border-color: #fde68a;
+    background: #fffbeb;
+    color: #92400e;
+}
+
+.prediction-badge.confidence-low {
+    border-color: #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.prediction-stat-card {
+    border-radius: 16px;
+    border: 1px solid #d9e8e2;
+    background: var(--pred-card-bg);
+    padding: .75rem;
+    min-height: 112px;
+    box-shadow: var(--pred-shadow-soft);
+}
+
+.prediction-stat-card .stat-label {
+    font-size: .76rem;
+    color: #5f776b;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    font-weight: 700;
+    line-height: 1.24;
+    min-height: 2.4em;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.prediction-stat-card .stat-value {
+    margin-top: .45rem;
+    font-size: 1.55rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #123f31;
+}
+
+.prediction-stat-card .stat-meta {
+    margin-top: .25rem;
+    font-size: .84rem;
+    color: #61796e;
+}
+
+.stat-emerald { border-top: 4px solid #16a34a; }
+.stat-blue { border-top: 4px solid #0284c7; }
+.stat-amber { border-top: 4px solid #f59e0b; }
+.stat-rose { border-top: 4px solid #f43f5e; }
+
+.prediction-panel {
+    border: 1px solid #d8e5df;
+    border-radius: 18px;
+    background: #ffffff;
+    padding: .78rem;
+    box-shadow: var(--pred-shadow-soft);
+}
+
+.prediction-panel-head {
+    margin-bottom: .65rem;
+    padding-bottom: .45rem;
+    border-bottom: 1px dashed #dde8e3;
+}
+
+.prediction-panel-head h5 {
+    color: #123f31;
+    font-weight: 700;
+    font-size: 1.02rem;
+}
+
+.prediction-chart-wrap {
+    border: 1px solid #e1ece6;
+    border-radius: 12px;
+    padding: .78rem;
+    background: #fcfffd;
+}
+
+.prediction-line-chart {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.prediction-axis {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: .4rem;
+    font-size: .72rem;
+    color: #61796f;
+}
+
+.forecast-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .6rem;
+}
+
+.forecast-pill {
+    border: 1px solid #dce8e2;
+    border-radius: 12px;
+    padding: .45rem .6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fcfa;
+    font-size: .8rem;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.forecast-pill strong {
+    color: #0f766e;
+    font-size: 1.05rem;
+}
+
+.prediction-inline-note {
+    border: 1px dashed #d4e4dd;
+    background: #f8fcfa;
+    border-radius: 10px;
+    padding: .55rem .7rem;
+    color: #4b6358;
+    font-size: .82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+}
+
+.prediction-progress {
+    width: 100%;
+    height: 8px;
+    background: #e7f0eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.prediction-progress > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #10b981 0%, #0ea5e9 100%);
+}
+
+.hotel-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #d4e4dd;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3faf6;
+}
+
+.hotel-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.hotel-avatar-fallback {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #26705b;
+    font-size: .95rem;
+}
+
+.hotel-avatar-table {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+}
+
+.annual-item {
+    border: 1px solid #deebe5;
+    border-radius: 12px;
+    padding: .75rem;
+    background: #fbfefc;
+}
+
+.global-year-wrap {
+    border: 1px solid #deebe5;
+    border-radius: 12px;
+    overflow-x: auto;
+    background: #fbfefc;
+}
+
+.global-year-table {
+    min-width: 980px;
+}
+
+.global-year-table thead th {
+    background: #f2faf6;
+    border-bottom: 1px solid #deebe5;
+    font-size: .78rem;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: #45695b;
+}
+
+.global-forecast-cell {
+    background: #eef9ff;
+    color: #0b5f8a;
+    font-weight: 700;
+}
+
+.global-total-row td {
+    background: #f6fbf8;
+}
+
+.annual-confidence-note {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .35rem .65rem;
+    border-radius: 999px;
+    background: #f8fafc;
+    border: 1px solid #dbe4ea;
+    color: #475569;
+    font-size: .82rem;
+    font-weight: 600;
+}
+
+.annual-metric {
+    font-weight: 800;
+    color: #0f766e;
+    font-size: 1.05rem;
+}
+
+.alert-section {
+    background: linear-gradient(180deg, #fff6f6 0%, #fff0f0 100%);
+    border: 1px solid #f5c2c7;
+    border-radius: 16px;
+    padding: .78rem;
+    box-shadow: var(--pred-shadow-soft);
+}
+
+.alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.alert-header-content {
+    flex: 1 1 340px;
+    min-width: 0;
+}
+
+.alert-header h5 {
+    color: #991b1b;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.02rem;
+}
+
+.alert-count {
+    background: #b42318;
+    color: white;
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.alert-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.alert-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.alert-filter-btn {
+    border: 1px solid #f0b2b8;
+    background: #fff8f8;
+    color: #7f1d1d;
+    border-radius: 999px;
+    padding: .35rem .75rem;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.alert-filter-btn:hover {
+    border-color: #dc6b76;
+}
+
+.alert-filter-btn.is-active {
+    border-color: #b42318;
+    background: #ffe3e6;
+    color: #7f1d1d;
+}
+
+.alert-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 0.75rem;
+    row-gap: 0.5rem;
+    padding: .75rem;
+    border-radius: 12px;
+    border: 1px solid;
+    background-color: white;
+    box-shadow: 0 10px 24px -22px rgba(15, 23, 42, 0.6);
+}
+
+.alert-danger-light {
+    border-color: #fee2e2;
+    background-color: #fef2f2;
+}
+
+.alert-success-light {
+    border-color: #dcfce7;
+    background-color: #f0fdf4;
+}
+
+.alert-icon {
+    flex-shrink: 0;
+    font-size: 1.5rem;
+    margin-top: 0.1rem;
+}
+
+.alert-danger-light .alert-icon {
+    color: #dc2626;
+}
+
+.alert-success-light .alert-icon {
+    color: #16a34a;
+}
+
+.alert-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.alert-message {
+    color: #1f2937;
+    font-size: 0.84rem;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.alert-detail {
+    color: #6b7280;
+    font-size: 0.76rem;
+}
+
+.alert-badge {
+    flex-shrink: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: .35rem;
+    align-items: center;
+    margin-inline-start: 0;
+    max-width: 100%;
+}
+
+.alert-badge .badge {
+    font-size: 0.74rem;
+    padding: 0.4rem 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Final FR density alignment with EN while keeping the same component structure. */
+html[lang^="fr"] .prediction-hero {
+    padding: 0.95rem;
+}
+
+html[lang^="fr"] .prediction-page {
+    font-size: 0.84rem;
+    line-height: 1.24;
+}
+
+html[lang^="fr"] .prediction-hero-title {
+    font-size: 1rem;
+}
+
+html[lang^="fr"] .prediction-hero-subtitle {
+    font-size: 0.8rem;
+    max-width: 500px;
+}
+
+html[lang^="fr"] .prediction-stat-card {
+    min-height: 92px;
+    padding: 0.55rem;
+}
+
+html[lang^="fr"] .prediction-stat-card .stat-label {
+    font-size: 0.66rem;
+}
+
+html[lang^="fr"] .prediction-stat-card .stat-value {
+    font-size: 1.28rem;
+}
+
+html[lang^="fr"] .prediction-panel,
+html[lang^="fr"] .prediction-chart-wrap,
+html[lang^="fr"] .alert-section {
+    padding: 0.56rem;
+}
+
+html[lang^="fr"] .prediction-panel-head h5,
+html[lang^="fr"] .alert-header h5 {
+    font-size: 0.9rem;
+}
+
+html[lang^="fr"] .prediction-page .prediction-block,
+html[lang^="fr"] .prediction-page .mb-4 {
+    margin-bottom: 0.8rem !important;
+}
+
+html[lang^="fr"] .prediction-page .row.g-3,
+html[lang^="fr"] .prediction-page .row.g-4 {
+    --bs-gutter-x: 0.6rem;
+    --bs-gutter-y: 0.6rem;
+}
+
+@media (min-width: 992px) {
+    html[lang^="fr"] .prediction-page {
+        transform: scale(0.97);
+        transform-origin: top center;
+    }
+}
+
+.prediction-panel-head .text-muted,
+.alert-header .text-muted {
+    font-size: 0.86rem;
+    line-height: 1.32;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+}
+
+.alert-empty {
+    border: 1px dashed #cbd5e1;
+    background: #f8fafc;
+    color: #334155;
+    border-radius: 12px;
+    padding: .95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    font-weight: 600;
+}
+
+@media (max-width: 992px) {
+    .prediction-hero {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .prediction-axis {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .forecast-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .alert-items {
+        grid-template-columns: 1fr;
+    }
+
+    .alert-item {
+        grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .alert-badge {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+    }
+
+    .prediction-hero-actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 576px) {
+    .prediction-hero {
+        padding: 1.05rem;
+    }
+
+    .forecast-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .alert-filters {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .prediction-hero-title {
+        font-size: 1.2rem;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var section = document.getElementById('ai-alert-section');
+    if (!section) {
+        return;
+    }
+
+    var buttons = section.querySelectorAll('[data-alert-filter]');
+    var items = section.querySelectorAll('.alert-item[data-alert-type]');
+    var emptyFiltered = document.getElementById('alert-empty-filtered');
+    var emptyStatic = document.getElementById('alert-empty-static');
+
+    function applyFilter(type) {
+        var visibleCount = 0;
+
+        items.forEach(function (item) {
+            var itemType = item.getAttribute('data-alert-type');
+            var visible = (type === 'all') || (itemType === type);
+            item.style.display = visible ? '' : 'none';
+            if (visible) {
+                visibleCount += 1;
+            }
+        });
+
+        if (emptyStatic) {
+            emptyStatic.style.display = items.length === 0 ? 'inline-flex' : 'none';
+        }
+
+        if (emptyFiltered) {
+            emptyFiltered.style.display = (items.length > 0 && visibleCount === 0) ? 'inline-flex' : 'none';
+        }
+    }
+
+    buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            var type = button.getAttribute('data-alert-filter') || 'all';
+            buttons.forEach(function (btn) { btn.classList.remove('is-active'); });
+            button.classList.add('is-active');
+            applyFilter(type);
+        });
+    });
+
+    applyFilter('all');
+});
+</script>
+{% endblock %}

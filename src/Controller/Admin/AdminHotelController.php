@@ -8,12 +8,11 @@ use App\Entity\Reservation;
 use App\Form\HotelType;
 use App\Repository\HotelRepository;
 use App\Service\AdminStatsService;
+use App\Service\HotelPredictionService;
 use App\Service\HotelDescriptionTranslationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Throwable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -56,21 +55,25 @@ class AdminHotelController extends AbstractController
         $form = $this->createForm(HotelType::class, $hotel);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            $this->validateHotelInput($hotel, $form);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($hotel);
+            $entityManager->flush();
+            $hotelDescriptionTranslationService->translateAndStore($hotel);
 
-            if ($form->isValid()) {
-                $entityManager->persist($hotel);
-                $entityManager->flush();
-                $hotelDescriptionTranslationService->translateAndStore($hotel);
-
-                return $this->redirectToRoute('app_admin_hotels_index', [], Response::HTTP_SEE_OTHER);
-            }
+            return $this->redirectToRoute('app_admin_hotels_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('admin/hotel/new.html.twig', [
             'hotel' => $hotel,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/prediction', name: 'app_admin_hotels_prediction', methods: ['GET'])]
+    public function prediction(Request $request, HotelPredictionService $hotelPredictionService): Response
+    {
+        return $this->render('admin/hotel/prediction.html.twig', [
+            'prediction' => $hotelPredictionService->buildPredictionDashboard($request->getLocale()),
         ]);
     }
 
@@ -112,15 +115,11 @@ class AdminHotelController extends AbstractController
             ->setMethod('POST')
             ->getForm();
 
-        if ($form->isSubmitted()) {
-            $this->validateHotelInput($hotel, $form);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+            $hotelDescriptionTranslationService->translateAndStore($hotel);
 
-            if ($form->isValid()) {
-                $entityManager->flush();
-                $hotelDescriptionTranslationService->translateAndStore($hotel);
-
-                return $this->redirectToRoute('app_admin_hotels_index', [], Response::HTTP_SEE_OTHER);
-            }
+            return $this->redirectToRoute('app_admin_hotels_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('admin/hotel/edit.html.twig', [
@@ -171,32 +170,5 @@ class AdminHotelController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_hotels_index', [], Response::HTTP_SEE_OTHER);
-    }
-
-    private function validateHotelInput(Hotel $hotel, FormInterface $form): void
-    {
-        if (trim((string) $hotel->getNom()) === '') {
-            $form->get('nom')->addError(new FormError("Le nom de l'hotel est obligatoire."));
-        }
-
-        if (trim((string) $hotel->getAdresse()) === '') {
-            $form->get('adresse')->addError(new FormError("L'adresse est obligatoire."));
-        }
-
-        if (trim((string) $hotel->getVille()) === '') {
-            $form->get('ville')->addError(new FormError('La ville est obligatoire.'));
-        }
-
-        if ($hotel->getNombreEtoiles() !== null && ($hotel->getNombreEtoiles() < 1 || $hotel->getNombreEtoiles() > 5)) {
-            $form->get('nombreEtoiles')->addError(new FormError("Le nombre d'etoiles doit etre compris entre 1 et 5."));
-        }
-
-        if ($hotel->getBudget() !== null && $hotel->getBudget() < 0) {
-            $form->get('budget')->addError(new FormError('Le budget doit etre positif ou nul.'));
-        }
-
-        if ($hotel->getPhotoUrl() !== null && trim($hotel->getPhotoUrl()) !== '' && filter_var($hotel->getPhotoUrl(), FILTER_VALIDATE_URL) === false) {
-            $form->get('photoUrl')->addError(new FormError('Veuillez saisir une URL valide.'));
-        }
     }
 }

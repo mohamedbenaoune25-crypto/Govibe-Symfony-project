@@ -1,41 +1,70 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}{{ 'admin.chambre.edit.title'|trans }}{% endblock %}
-{% block page_title %}{{ 'admin.chambre.edit.page_title'|trans }}{% endblock %}
+{% block title %}{{ 'admin.chambre.edit.title'|trans|auto_translate }}{% endblock %}
+{% block page_title %}{{ 'admin.chambre.edit.page_title'|trans|auto_translate }}{% endblock %}
 
 {% block body %}
 <div class="admin-card mb-4">
     <div class="admin-card-body">
         {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-        {% if form.vars.errors|length > 0 %}
-            <div class="alert alert-danger" role="alert">
-                {{ form_errors(form) }}
-            </div>
-        {% endif %}
         <div class="row g-3">
-            {{ form_row(form.type, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.capacite, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.nombreDeChambres, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.equipements, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.prixStandard, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.prixHauteSaison, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.prixBasseSaison, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.hotel, {'attr': {'class': 'form-select'}}) }}
+            {{ form_row(form.type, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.type.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.capacite, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.capacite.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.nombreDeChambres, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.nombreDeChambres.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.equipements, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.equipements.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.prixStandard, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.prixStandard.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.prixHauteSaison, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.prixHauteSaison.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.prixBasseSaison, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.prixBasseSaison.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.hotel, {'attr': {'class': 'form-select' ~ (form.vars.submitted and not form.hotel.vars.valid ? ' is-invalid' : '')}}) }}
         </div>
         <div class="mt-4 d-flex gap-2">
-            <button class="btn btn-primary-pro" type="submit">{{ 'common.update'|trans }}</button>
-            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro">{{ 'admin.chambre.actions.back_hotels'|trans }}</a>
+            <button class="btn btn-primary-pro" type="submit">{{ 'common.update'|trans|auto_translate }}</button>
+            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro">{{ 'admin.chambre.actions.back_hotels'|trans|auto_translate }}</a>
         </div>
         {{ form_end(form) }}
     </div>
 </div>
 
 <div class="admin-card">
-    <div class="admin-card-header text-danger">{{ 'common.deletion'|trans }}</div>
+    <div class="admin-card-header text-danger">{{ 'common.deletion'|trans|auto_translate }}</div>
     <div class="admin-card-body">
         {{ form_start(delete_form) }}
-        <button class="btn btn-danger" type="submit">{{ 'common.delete'|trans }}</button>
+        <button class="btn btn-danger" type="submit">{{ 'common.delete'|trans|auto_translate }}</button>
         {{ form_end(delete_form) }}
     </div>
 </div>
+
+<style>
+.admin-card .form-control.is-invalid,
+.admin-card .form-select.is-invalid,
+.admin-card .form-control.is-invalid:focus,
+.admin-card .form-select.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.2) !important;
+}
+
+.admin-card .invalid-feedback,
+.admin-card .form-error-message {
+    color: #b42318;
+    font-weight: 600;
+}
+
+.admin-card .invalid-feedback ul,
+.admin-card .invalid-feedback li,
+.admin-card .form-error-message li {
+    color: #b42318;
+}
+
+.admin-card .invalid-feedback ul,
+.admin-card .form-error-message {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-card .invalid-feedback li,
+.admin-card .form-error-message li {
+    margin: 0;
+}
+</style>
 {% endblock %}

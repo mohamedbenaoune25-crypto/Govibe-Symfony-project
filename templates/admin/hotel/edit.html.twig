@@ -1,32 +1,27 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}{{ 'admin.hotel.edit.title'|trans }}{% endblock %}
-{% block page_title %}{{ 'admin.hotel.edit.page_title'|trans }}{% endblock %}
+{% block title %}{{ 'admin.hotel.edit.title'|trans|auto_translate }}{% endblock %}
+{% block page_title %}{{ 'admin.hotel.edit.page_title'|trans|auto_translate }}{% endblock %}
 
 {% block body %}
 <div class="admin-card mb-4">
     <div class="admin-card-body">
         {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-        {% if form.vars.errors|length > 0 %}
-            <div class="alert alert-danger" role="alert">
-                {{ form_errors(form) }}
-            </div>
-        {% endif %}
         <div class="row g-3">
-            {{ form_row(form.nom, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.adresse, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.ville, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.nombreEtoiles, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.budget, {'attr': {'class': 'form-control'}}) }}
-            {{ form_row(form.description, {'attr': {'class': 'form-control', 'rows': 5}}) }}
-            {{ form_row(form.photoUrl, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.nom, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.nom.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.adresse, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.adresse.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.ville, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.ville.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.nombreEtoiles, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.nombreEtoiles.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.budget, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.budget.vars.valid ? ' is-invalid' : '')}}) }}
+            {{ form_row(form.description, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.description.vars.valid ? ' is-invalid' : ''), 'rows': 5}}) }}
+            {{ form_row(form.photoUrl, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.photoUrl.vars.valid ? ' is-invalid' : '')}}) }}
         </div>
         <div class="mt-4 d-flex gap-2">
             <button class="btn btn-primary-pro" type="submit">
-                <i class="bi bi-check2-square me-1"></i>{{ 'common.update'|trans }}
+                <i class="bi bi-check2-square me-1"></i>{{ 'common.update'|trans|auto_translate }}
             </button>
             <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i>{{ 'common.back_to_list'|trans }}
+                <i class="bi bi-arrow-left me-1"></i>{{ 'common.back_to_list'|trans|auto_translate }}
             </a>
         </div>
         {{ form_end(form) }}
@@ -34,11 +29,48 @@
 </div>
 
 <div class="admin-card">
-    <div class="admin-card-header text-danger">{{ 'common.deletion'|trans }}</div>
+    <div class="admin-card-header text-danger">{{ 'common.deletion'|trans|auto_translate }}</div>
     <div class="admin-card-body">
         {{ form_start(delete_form) }}
-        <button class="btn btn-danger" type="submit" onclick="return confirm('{{ 'admin.hotel.confirm_delete'|trans }}');">{{ 'admin.hotel.actions.delete'|trans }}</button>
+        <button class="btn btn-danger" type="submit" onclick="return confirm('{{ 'admin.hotel.confirm_delete'|trans|auto_translate }}');">{{ 'admin.hotel.actions.delete'|trans|auto_translate }}</button>
         {{ form_end(delete_form) }}
     </div>
 </div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+.admin-card .form-control.is-invalid,
+.admin-card .form-control.is-invalid:focus,
+.admin-card .form-select.is-invalid,
+.admin-card .form-select.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.2) !important;
+}
+
+.admin-card .invalid-feedback,
+.admin-card .form-error-message {
+    color: #b42318;
+    font-weight: 600;
+}
+
+.admin-card .invalid-feedback ul,
+.admin-card .invalid-feedback li,
+.admin-card .form-error-message li {
+    color: #b42318;
+}
+
+.admin-card .invalid-feedback ul,
+.admin-card .form-error-message {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-card .invalid-feedback li,
+.admin-card .form-error-message li {
+    margin: 0;
+}
+</style>
 {% endblock %}

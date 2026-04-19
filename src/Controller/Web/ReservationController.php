@@ -9,8 +9,6 @@ use App\Form\ReservationType;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -108,13 +106,14 @@ class ReservationController extends AbstractController
         if ($form->isSubmitted()) {
             $reservation->setUser($this->getUser());
             $reservation->setStatut('EN_ATTENTE');
+            if ($reservation->getHotel() === null && $reservation->getChambre()?->getHotel() !== null) {
+                $reservation->setHotel($reservation->getChambre()->getHotel());
+            }
             if ($selectedHotel) {
                 $reservation->setHotel($selectedHotel);
             }
 
             $this->applyCalculatedTotal($reservation);
-
-            $this->validateReservationInput($reservation, $form);
 
             if ($form->isValid()) {
                 $entityManager->persist($reservation);
@@ -309,8 +308,10 @@ class ReservationController extends AbstractController
 
         if ($form->isSubmitted()) {
             $reservation->setUser($this->getUser());
+            if ($reservation->getHotel() === null && $reservation->getChambre()?->getHotel() !== null) {
+                $reservation->setHotel($reservation->getChambre()->getHotel());
+            }
             $this->applyCalculatedTotal($reservation);
-            $this->validateReservationInput($reservation, $form);
 
             if ($form->isValid()) {
                 $entityManager->flush();
@@ -362,45 +363,6 @@ class ReservationController extends AbstractController
         $request->getSession()->set('reservation_user_id', $userId);
 
         return (int) $request->getSession()->get('reservation_user_id');
-    }
-
-    private function validateReservationInput(Reservation $reservation, FormInterface $form): void
-    {
-        if (!$reservation->getDateDebut() instanceof \DateTimeInterface) {
-            $form->get('dateDebut')->addError(new FormError('La date de debut est obligatoire et doit etre valide.'));
-        }
-
-        if (!$reservation->getDateFin() instanceof \DateTimeInterface) {
-            $form->get('dateFin')->addError(new FormError('La date de fin est obligatoire et doit etre valide.'));
-        }
-
-        if ($reservation->getDateDebut() instanceof \DateTimeInterface && $reservation->getDateFin() instanceof \DateTimeInterface && $reservation->getDateFin() <= $reservation->getDateDebut()) {
-            $form->get('dateFin')->addError(new FormError('La date de fin doit etre posterieure a la date de debut.'));
-        }
-
-        if ($form->has('statut') && trim((string) $reservation->getStatut()) === '') {
-            $form->get('statut')->addError(new FormError('Le statut est obligatoire.'));
-        }
-
-        if ($reservation->getChambre() === null) {
-            $form->get('chambre')->addError(new FormError('La chambre est obligatoire.'));
-        }
-
-        if ($reservation->getChambre() !== null && $reservation->getHotel() !== null && $reservation->getChambre()?->getHotel()?->getId() !== $reservation->getHotel()?->getId()) {
-            $form->get('chambre')->addError(new FormError('La chambre selectionnee ne correspond pas a l\'hotel choisi.'));
-        }
-
-        if ($reservation->getPrixTotal() === null || $reservation->getPrixTotal() <= 0) {
-            if ($reservation->getChambre() === null) {
-                $form->get('chambre')->addError(new FormError('Impossible de calculer le prix total sans chambre.'));
-            } else {
-                $form->get('chambre')->addError(new FormError('La chambre selectionnee ne contient pas de prix valide.'));
-            }
-
-            if (!$reservation->getDateDebut() instanceof \DateTimeInterface || !$reservation->getDateFin() instanceof \DateTimeInterface) {
-                $form->addError(new FormError('Le prix total est calcule automatiquement apres selection des dates.'));
-            }
-        }
     }
 
     private function applyCalculatedTotal(Reservation $reservation): void

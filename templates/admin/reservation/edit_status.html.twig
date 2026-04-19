@@ -10,6 +10,11 @@
         <span class="text-muted">{{ 'admin.reservation.edit_status.subtitle'|trans }}</span>
     </div>
     <div class="admin-card-body">
+        {% if status_error is defined and status_error %}
+            <div class="alert alert-danger" role="alert">
+                {{ status_error }}
+            </div>
+        {% endif %}
         <form method="post" action="{{ path('app_admin_reservations_edit_status', {'id': reservation.id}) }}">
             <input type="hidden" name="_token" value="{{ csrf_token('reservation_edit_status_' ~ reservation.id) }}">
             <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
@@ -45,13 +50,16 @@
                 </div>
                 <div class="col-md-3">
                     <label for="statut" class="form-label">{{ 'reservation.form.status'|trans }}</label>
-                    <select id="statut" name="statut" class="form-select">
+                    <select id="statut" name="statut" class="form-select{{ status_error is defined and status_error ? ' is-invalid' : '' }}">
                         {% for value in status_choices %}
-                            <option value="{{ value }}" {% if reservation.statut == value %}selected{% endif %}>
+                            <option value="{{ value }}" {% if (selected_status is defined and selected_status ? selected_status : reservation.statut) == value %}selected{% endif %}>
                                 {% if value == 'EN_ATTENTE' %}{{ 'reservation.status.pending'|trans }}{% elseif value == 'CONFIRMEE' %}{{ 'reservation.status.accepted'|trans }}{% else %}{{ 'reservation.status.refused'|trans }}{% endif %}
                             </option>
                         {% endfor %}
                     </select>
+                    {% if status_error is defined and status_error %}
+                        <div class="invalid-feedback d-block">{{ status_error }}</div>
+                    {% endif %}
                 </div>
             </div>
 

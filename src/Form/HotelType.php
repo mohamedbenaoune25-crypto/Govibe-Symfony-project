@@ -3,7 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Hotel;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -20,40 +19,34 @@ class HotelType extends AbstractType
             ->add('nom', TextType::class, [
                 'label' => 'Nom de l\'hôtel',
                 'required' => true,
-                'invalid_message' => 'Veuillez saisir un nom valide.',
+                'invalid_message' => 'Format invalide.',
                 'trim' => true,
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'Le nom de l\'hôtel est obligatoire.']),
-                    new Assert\Length(['min' => 2, 'max' => 100]),
+                'attr' => [
+                    'maxlength' => 100,
                 ],
             ])
             ->add('adresse', TextType::class, [
                 'label' => 'Adresse',
                 'required' => true,
-                'invalid_message' => 'Veuillez saisir une adresse valide.',
+                'invalid_message' => 'Format invalide.',
                 'trim' => true,
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'L\'adresse est obligatoire.']),
-                    new Assert\Length(['min' => 5, 'max' => 150]),
+                'attr' => [
+                    'maxlength' => 150,
                 ],
             ])
             ->add('ville', TextType::class, [
                 'label' => 'Ville',
                 'required' => true,
-                'invalid_message' => 'Veuillez saisir une ville valide.',
+                'invalid_message' => 'Format invalide.',
                 'trim' => true,
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'La ville est obligatoire.']),
-                    new Assert\Length(['min' => 2, 'max' => 100]),
+                'attr' => [
+                    'maxlength' => 100,
                 ],
             ])
             ->add('nombreEtoiles', IntegerType::class, [
                 'label' => 'Nombre d\'étoiles',
                 'required' => false,
-                'invalid_message' => 'Le nombre d\'étoiles doit être un entier.',
-                'constraints' => [
-                    new Assert\Range(['min' => 1, 'max' => 5]),
-                ],
+                'invalid_message' => 'Nombre entier attendu.',
                 'attr' => [
                     'min' => 1,
                     'max' => 5,
@@ -62,31 +55,29 @@ class HotelType extends AbstractType
             ->add('budget', NumberType::class, [
                 'label' => 'Budget',
                 'required' => false,
-                'invalid_message' => 'Le budget doit être un nombre valide.',
-                'constraints' => [
-                    new Assert\PositiveOrZero(),
-                ],
+                'invalid_message' => 'Nombre valide attendu.',
                 'attr' => [
                     'min' => 0,
+                    'max' => 1000000,
                     'step' => '0.01',
                 ],
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,
-                'invalid_message' => 'Veuillez saisir une description valide.',
+                'invalid_message' => 'Format invalide.',
                 'trim' => true,
-                'constraints' => [
-                    new Assert\Length(['max' => 2000]),
+                'attr' => [
+                    'maxlength' => 2000,
                 ],
             ])
             ->add('photoUrl', TextType::class, [
                 'label' => 'URL de la photo',
                 'required' => false,
-                'invalid_message' => 'Veuillez saisir une URL valide.',
+                'invalid_message' => 'URL invalide.',
                 'trim' => true,
-                'constraints' => [
-                    new Assert\Url(),
+                'attr' => [
+                    'maxlength' => 255,
                 ],
             ])
         ;

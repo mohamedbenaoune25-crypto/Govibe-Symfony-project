@@ -1,79 +1,100 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}{{ 'admin.hotel.new.title'|trans }}{% endblock %}
-{% block page_title %}{{ 'admin.hotel.new.page_title'|trans }}{% endblock %}
+{% block title %}{{ 'admin.hotel.new.title'|trans|auto_translate }}{% endblock %}
+{% block page_title %}{{ 'admin.hotel.new.page_title'|trans|auto_translate }}{% endblock %}
 
 {% block body %}
 <div class="go-form-page">
     <div class="go-form-card hotel-form-card">
         <div class="go-form-card-header hotel-form-header">
-            <h2 class="mb-1 fs-4"><i class="bi bi-building-add me-2"></i>{{ 'admin.hotel.new.heading'|trans }}</h2>
-            <p class="mb-0 opacity-75">{{ 'admin.hotel.new.subtitle'|trans }}</p>
+            <h2 class="mb-1 fs-4"><i class="bi bi-building-add me-2"></i>{{ 'admin.hotel.new.heading'|trans|auto_translate }}</h2>
+            <p class="mb-0 opacity-75">{{ 'admin.hotel.new.subtitle'|trans|auto_translate }}</p>
         </div>
 
         <div class="go-form-card-body hotel-form-body">
             {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-            {% if form.vars.errors|length > 0 %}
-                <div class="alert alert-danger" role="alert">
-                    {{ form_errors(form) }}
-                </div>
-            {% endif %}
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-card-heading me-2"></i>{{ 'admin.hotel.form.identity'|trans }}</h5>
+                <h5 class="form-section-title"><i class="bi bi-card-heading me-2"></i>{{ 'admin.hotel.form.identity'|trans|auto_translate }}</h5>
                 <div class="row g-3">
                     <div class="col-md-7">
                         {{ form_row(form.nom, {
-                            'label': 'admin.hotel.form.name'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': 'admin.hotel.form.name_placeholder'|trans}
+                            'label': 'admin.hotel.form.name'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.nom.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': 'admin.hotel.form.name_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                     <div class="col-md-5">
                         {{ form_row(form.nombreEtoiles, {
-                            'label': 'admin.hotel.form.stars'|trans,
-                            'attr': {'class': 'form-control', 'min': 1, 'max': 5, 'placeholder': 'admin.hotel.form.stars_placeholder'|trans}
+                            'label': 'admin.hotel.form.stars'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.nombreEtoiles.vars.valid ? ' is-invalid' : ''),
+                                'min': 1,
+                                'max': 5,
+                                'placeholder': 'admin.hotel.form.stars_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                 </div>
             </section>
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-geo-alt me-2"></i>{{ 'admin.hotel.form.location'|trans }}</h5>
+                <h5 class="form-section-title"><i class="bi bi-geo-alt me-2"></i>{{ 'admin.hotel.form.location'|trans|auto_translate }}</h5>
                 <div class="row g-3">
                     <div class="col-md-8">
                         {{ form_row(form.adresse, {
-                            'label': 'admin.hotel.form.full_address'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': 'admin.hotel.form.address_placeholder'|trans}
+                            'label': 'admin.hotel.form.full_address'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.adresse.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': 'admin.hotel.form.address_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                     <div class="col-md-4">
                         {{ form_row(form.ville, {
-                            'label': 'common.city'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': 'admin.hotel.form.city_placeholder'|trans}
+                            'label': 'common.city'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.ville.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': 'admin.hotel.form.city_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                 </div>
             </section>
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-cash-coin me-2"></i>{{ 'admin.hotel.form.pricing_and_presentation'|trans }}</h5>
+                <h5 class="form-section-title"><i class="bi bi-cash-coin me-2"></i>{{ 'admin.hotel.form.pricing_and_presentation'|trans|auto_translate }}</h5>
                 <div class="row g-3">
                     <div class="col-md-4">
                         {{ form_row(form.budget, {
-                            'label': 'admin.hotel.form.avg_budget_night'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': 'admin.hotel.form.budget_placeholder'|trans, 'step': '0.01', 'min': 0}
+                            'label': 'admin.hotel.form.avg_budget_night'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.budget.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': 'admin.hotel.form.budget_placeholder'|trans|auto_translate,
+                                'step': '0.01',
+                                'min': 0
+                            }
                         }) }}
                     </div>
                     <div class="col-md-8">
                         {{ form_row(form.photoUrl, {
-                            'label': 'admin.hotel.form.main_photo_url'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': 'https://...'}
+                            'label': 'admin.hotel.form.main_photo_url'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.photoUrl.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': 'https://...'
+                            }
                         }) }}
                     </div>
                     <div class="col-12">
                         {{ form_row(form.description, {
-                            'label': 'admin.hotel.form.description'|trans,
-                            'attr': {'class': 'form-control', 'rows': 6, 'placeholder': 'admin.hotel.form.description_placeholder'|trans}
+                            'label': 'admin.hotel.form.description'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.description.vars.valid ? ' is-invalid' : ''),
+                                'rows': 6,
+                                'placeholder': 'admin.hotel.form.description_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                 </div>
@@ -81,10 +102,10 @@
 
             <div class="mt-4 d-flex flex-wrap justify-content-end gap-2">
                 <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>{{ 'common.back_to_list'|trans }}
+                    <i class="bi bi-arrow-left me-1"></i>{{ 'common.back_to_list'|trans|auto_translate }}
                 </a>
                 <button class="btn btn-primary-pro" type="submit">
-                    <i class="bi bi-check-circle me-1"></i>{{ 'admin.hotel.actions.create'|trans }}
+                    <i class="bi bi-check-circle me-1"></i>{{ 'admin.hotel.actions.create'|trans|auto_translate }}
                 </button>
             </div>
 
@@ -123,6 +144,38 @@
     font-weight: 700;
     font-size: 15px;
     margin-bottom: 14px;
+}
+
+.hotel-form-body .form-control.is-invalid,
+.hotel-form-body .form-control.is-invalid:focus,
+.hotel-form-body .form-select.is-invalid,
+.hotel-form-body .form-select.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.2) !important;
+}
+
+.hotel-form-body .invalid-feedback,
+.hotel-form-body .form-error-message {
+    color: #b42318;
+    font-weight: 600;
+}
+
+.hotel-form-body .invalid-feedback ul,
+.hotel-form-body .invalid-feedback li,
+.hotel-form-body .form-error-message li {
+    color: #b42318;
+}
+
+.hotel-form-body .invalid-feedback ul,
+.hotel-form-body .form-error-message {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hotel-form-body .invalid-feedback li,
+.hotel-form-body .form-error-message li {
+    margin: 0;
 }
 </style>
 {% endblock %}

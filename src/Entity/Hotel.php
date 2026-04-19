@@ -20,44 +20,44 @@ class Hotel
     private ?int $id = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Assert\NotBlank(message: "Le nom de l'hotel est obligatoire.")]
+    #[Assert\NotBlank(message: "Nom obligatoire.")]
     #[Assert\Length(
         min: 2,
         max: 100,
-        minMessage: "Le nom de l'hotel doit contenir au moins {{ limit }} caracteres.",
-        maxMessage: "Le nom de l'hotel ne peut pas depasser {{ limit }} caracteres."
+        minMessage: "Min. {{ limit }} caractères.",
+        maxMessage: "Max. {{ limit }} caractères."
     )]
     #[Assert\Regex(
         pattern: "/^[\p{L}0-9 .,'-]+$/u",
-        message: "Le nom de l'hotel contient des caracteres invalides."
+        message: "Format invalide."
     )]
     private ?string $nom = null;
 
     #[ORM\Column(length: 150, nullable: true)]
-    #[Assert\NotBlank(message: "L'adresse est obligatoire.")]
+    #[Assert\NotBlank(message: "Adresse obligatoire.")]
     #[Assert\Length(
         min: 5,
         max: 150,
-        minMessage: "L'adresse doit contenir au moins {{ limit }} caracteres.",
-        maxMessage: "L'adresse ne peut pas depasser {{ limit }} caracteres."
+        minMessage: "Min. {{ limit }} caractères.",
+        maxMessage: "Max. {{ limit }} caractères."
     )]
     #[Assert\Regex(
         pattern: "/^[\p{L}0-9\s,.'\/-]+$/u",
-        message: "L'adresse contient des caracteres invalides."
+        message: "Format invalide."
     )]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Assert\NotBlank(message: "La ville est obligatoire.")]
+    #[Assert\NotBlank(message: "Ville obligatoire.")]
     #[Assert\Length(
         min: 2,
         max: 100,
-        minMessage: "La ville doit contenir au moins {{ limit }} caracteres.",
-        maxMessage: "La ville ne peut pas depasser {{ limit }} caracteres."
+        minMessage: "Min. {{ limit }} caractères.",
+        maxMessage: "Max. {{ limit }} caractères."
     )]
     #[Assert\Regex(
         pattern: "/^[\p{L}\s'\-]+$/u",
-        message: "Le nom de la ville contient des caracteres invalides."
+        message: "Format invalide."
     )]
     private ?string $ville = null;
 
@@ -65,23 +65,27 @@ class Hotel
     #[Assert\Range(
         min: 1,
         max: 5,
-        notInRangeMessage: "Le nombre d'etoiles doit etre compris entre {{ min }} et {{ max }}."
+        notInRangeMessage: "Entre {{ min }} et {{ max }}."
     )]
     private ?int $nombreEtoiles = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\PositiveOrZero(message: "Le budget doit etre une valeur positive.")]
+    #[Assert\PositiveOrZero(message: "Valeur positive requise.")]
+    #[Assert\LessThanOrEqual(
+        value: 1000000,
+        message: "Maximum {{ compared_value }}."
+    )]
     private ?float $budget = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\Length(
         max: 2000,
-        maxMessage: "La description ne peut pas depasser {{ limit }} caracteres."
+        maxMessage: "Max. {{ limit }} caractères."
     )]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Url(message: "Veuillez saisir une URL valide.")]
+    #[Assert\Url(message: "URL invalide.")]
     private ?string $photoUrl = null;
 
     #[ORM\Column]

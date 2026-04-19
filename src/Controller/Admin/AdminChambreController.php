@@ -8,7 +8,6 @@ use App\Form\ChambreType;
 use App\Repository\ChambreRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -96,13 +95,12 @@ class AdminChambreController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            $this->validateChambreInput($chambre, $form, !$selectedHotel instanceof Hotel);
-
             if (!$form->isValid()) {
                 if ($request->isXmlHttpRequest()) {
                     return new JsonResponse([
                         'success' => false,
                         'message' => 'Le formulaire contient des erreurs.',
+                        'fieldErrors' => $this->extractFormErrors($form),
                     ], Response::HTTP_UNPROCESSABLE_ENTITY);
                 }
 
@@ -178,8 +176,6 @@ class AdminChambreController extends AbstractController
             ->getForm();
 
         if ($form->isSubmitted()) {
-            $this->validateChambreInput($chambre, $form);
-
             if ($form->isValid()) {
                 $entityManager->flush();
 
@@ -205,41 +201,28 @@ class AdminChambreController extends AbstractController
         return $this->redirectToRoute('app_admin_chambres_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    private function validateChambreInput(Chambre $chambre, FormInterface $form, bool $requireHotel = true): void
+    /**
+     * @return array<string, string[]>
+     */
+    private function extractFormErrors(FormInterface $form): array
     {
-        if (trim((string) $chambre->getType()) === '') {
-            $form->get('type')->addError(new FormError('Le type de chambre est obligatoire.'));
+        $errors = [];
+
+        foreach ($form->getErrors(true) as $error) {
+            $origin = $error->getOrigin();
+            if ($origin === null) {
+                continue;
+            }
+
+            $name = $origin->getName();
+            if ($name === $form->getName()) {
+                continue;
+            }
+
+            $errors[$name] ??= [];
+            $errors[$name][] = $error->getMessage();
         }
 
-        if ($chambre->getCapacite() === null || $chambre->getCapacite() <= 0) {
-            $form->get('capacite')->addError(new FormError('La capacite doit etre un entier superieur a 0.'));
-        }
-
-        if ($chambre->getNombreDeChambres() === null || $chambre->getNombreDeChambres() <= 0) {
-            $form->get('nombreDeChambres')->addError(new FormError('Le nombre de chambres doit etre un entier superieur a 0.'));
-        }
-
-        if ($chambre->getPrixStandard() !== null && $chambre->getPrixStandard() < 0) {
-            $form->get('prixStandard')->addError(new FormError('Le prix standard doit etre positif ou nul.'));
-        }
-
-        if ($chambre->getPrixHauteSaison() !== null && $chambre->getPrixHauteSaison() < 0) {
-            $form->get('prixHauteSaison')->addError(new FormError('Le prix haute saison doit etre positif ou nul.'));
-        }
-
-        if ($chambre->getPrixBasseSaison() !== null && $chambre->getPrixBasseSaison() < 0) {
-            $form->get('prixBasseSaison')->addError(new FormError('Le prix basse saison doit etre positif ou nul.'));
-        }
-
-        $prixStandard = (float) ($chambre->getPrixStandard() ?? 0);
-        $prixHaute = (float) ($chambre->getPrixHauteSaison() ?? 0);
-        $prixBasse = (float) ($chambre->getPrixBasseSaison() ?? 0);
-        if ($prixStandard <= 0 && $prixHaute <= 0 && $prixBasse <= 0) {
-            $form->get('prixStandard')->addError(new FormError('Au moins un prix doit etre strictement positif.'));
-        }
-
-        if ($requireHotel && $form->has('hotel') && $chambre->getHotel() === null) {
-            $form->get('hotel')->addError(new FormError("L'hotel associe est obligatoire."));
-        }
+        return $errors;
     }
 }

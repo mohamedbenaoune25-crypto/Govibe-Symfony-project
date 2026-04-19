@@ -5,17 +5,16 @@ namespace App\Service;
 use App\Entity\Hotel;
 use App\Entity\HotelDescriptionTranslation;
 use App\Repository\HotelDescriptionTranslationRepository;
-use App\Service\LibreTranslateService;
 use Doctrine\DBAL\Exception as DbalException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class HotelDescriptionTranslationService
 {
-    private const TARGET_LOCALES = ['en', 'de', 'it', 'es'];
+    private const TARGET_LOCALES = ['en', 'de', 'it', 'es', 'ar'];
     private const TRANSLATABLE_FIELDS = ['nom', 'adresse', 'ville', 'description'];
 
     public function __construct(
-        private readonly LibreTranslateService $libreTranslateService,
+        private readonly GoogleCloudTranslationService $googleCloudTranslationService,
         private readonly HotelDescriptionTranslationRepository $hotelDescriptionTranslationRepository,
         private readonly EntityManagerInterface $entityManager
     ) {
@@ -146,7 +145,7 @@ class HotelDescriptionTranslationService
             return null;
         }
 
-        $translated = $this->libreTranslateService->translateText($sourceText, $targetLocale, $sourceLocale);
+        $translated = $this->googleCloudTranslationService->translateText($sourceText, $targetLocale, $sourceLocale);
         if (!is_string($translated) || trim($translated) === '') {
             return null;
         }

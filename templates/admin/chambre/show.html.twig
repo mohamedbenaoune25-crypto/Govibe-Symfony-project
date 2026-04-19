@@ -1,39 +1,39 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}{{ 'admin.chambre.show.title'|trans }}{% endblock %}
-{% block page_title %}{{ 'admin.chambre.show.page_title'|trans }}{% endblock %}
+{% block title %}{{ 'admin.chambre.show.title'|trans|auto_translate }}{% endblock %}
+{% block page_title %}{{ 'admin.chambre.show.page_title'|trans|auto_translate }}{% endblock %}
 
 {% block body %}
 <div class="row g-4">
     <div class="col-lg-8">
         <div class="admin-card">
             <div class="admin-card-header d-flex justify-content-between align-items-center">
-                <span>{{ chambre.type }}</span>
-                <span class="badge bg-success">{{ chambre.hotel ? translated_hotel_value(chambre.hotel, 'nom') : ('admin.chambre.show.without_hotel'|trans) }}</span>
+                <span>{{ chambre.type|auto_translate }}</span>
+                <span class="badge bg-success">{{ chambre.hotel ? translated_hotel_value(chambre.hotel, 'nom') : ('admin.chambre.show.without_hotel'|trans|auto_translate) }}</span>
             </div>
             <div class="admin-card-body">
-                <p><strong>{{ 'common.capacity'|trans }}:</strong> {{ chambre.capacite ?: '-' }}</p>
-                <p><strong>{{ 'common.equipments'|trans }}:</strong> {{ chambre.equipements ?: '-' }}</p>
-                <p><strong>{{ 'common.standard_price'|trans }}:</strong> {{ chambre.prixStandard ?: '-' }}</p>
-                <p><strong>{{ 'common.high_season_price'|trans }}:</strong> {{ chambre.prixHauteSaison ?: '-' }}</p>
-                <p><strong>{{ 'common.low_season_price'|trans }}:</strong> {{ chambre.prixBasseSaison ?: '-' }}</p>
-                <p><strong>{{ 'common.hotel'|trans }}:</strong> {{ chambre.hotel ? translated_hotel_value(chambre.hotel, 'nom') : '-' }}</p>
+                <p><strong>{{ 'common.capacity'|trans|auto_translate }}:</strong> {{ chambre.capacite ?: '-' }}</p>
+                <p><strong>{{ 'common.equipments'|trans|auto_translate }}:</strong> {{ chambre.equipements ?: '-' }}</p>
+                <p><strong>{{ 'common.standard_price'|trans|auto_translate }}:</strong> {{ chambre.prixStandard ?: '-' }}</p>
+                <p><strong>{{ 'common.high_season_price'|trans|auto_translate }}:</strong> {{ chambre.prixHauteSaison ?: '-' }}</p>
+                <p><strong>{{ 'common.low_season_price'|trans|auto_translate }}:</strong> {{ chambre.prixBasseSaison ?: '-' }}</p>
+                <p><strong>{{ 'common.hotel'|trans|auto_translate }}:</strong> {{ chambre.hotel ? translated_hotel_value(chambre.hotel, 'nom') : '-' }}</p>
             </div>
         </div>
     </div>
     <div class="col-lg-4">
         <div class="admin-card mb-4">
-            <div class="admin-card-header">{{ 'common.actions'|trans }}</div>
+            <div class="admin-card-header">{{ 'common.actions'|trans|auto_translate }}</div>
             <div class="admin-card-body d-grid gap-2">
-                <a href="{{ path('app_admin_chambres_edit', {'id': chambre.id}) }}" class="btn btn-primary-pro">{{ 'common.edit'|trans }}</a>
-                <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro">{{ 'admin.chambre.actions.back_hotels'|trans }}</a>
+                <a href="{{ path('app_admin_chambres_edit', {'id': chambre.id}) }}" class="btn btn-primary-pro">{{ 'common.edit'|trans|auto_translate }}</a>
+                <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro">{{ 'admin.chambre.actions.back_hotels'|trans|auto_translate }}</a>
             </div>
         </div>
         <div class="admin-card">
-            <div class="admin-card-header text-danger">{{ 'common.deletion'|trans }}</div>
+            <div class="admin-card-header text-danger">{{ 'common.deletion'|trans|auto_translate }}</div>
             <div class="admin-card-body">
                 {{ form_start(delete_form) }}
-                <button class="btn btn-danger" type="submit">{{ 'common.delete'|trans }}</button>
+                <button class="btn btn-danger" type="submit">{{ 'common.delete'|trans|auto_translate }}</button>
                 {{ form_end(delete_form) }}
             </div>
         </div>

@@ -1,49 +1,49 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}{{ 'admin.chambre.index.title'|trans }}{% endblock %}
-{% block page_title %}{{ 'admin.chambre.index.page_title'|trans }}{% endblock %}
+{% block title %}{{ 'admin.chambre.index.title'|trans|auto_translate }}{% endblock %}
+{% block page_title %}{{ 'admin.chambre.index.page_title'|trans|auto_translate }}{% endblock %}
 
 {% block body %}
 <div class="admin-card mb-4">
     <div class="admin-card-header d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-door-open me-2 text-muted"></i> {{ 'admin.chambre.index.heading'|trans }}{% if hotel %} {{ 'admin.chambre.index.of_hotel'|trans }} {{ translated_hotel_value(hotel, 'nom') }}{% endif %}</span>
+        <span><i class="bi bi-door-open me-2 text-muted"></i> {{ 'admin.chambre.index.heading'|trans|auto_translate }}{% if hotel %} {{ 'admin.chambre.index.of_hotel'|trans|auto_translate }} {{ translated_hotel_value(hotel, 'nom') }}{% endif %}</span>
         <div class="d-flex gap-2">
-            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro py-1 px-3">{{ 'admin.chambre.actions.back_hotels'|trans }}</a>
+            <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-pro py-1 px-3">{{ 'admin.chambre.actions.back_hotels'|trans|auto_translate }}</a>
             {% if hotel and quick_add_form is defined and quick_add_form %}
                 <button type="button" class="btn btn-primary-pro py-1 px-3" data-bs-toggle="modal" data-bs-target="#addChambreModal">
-                    {{ 'admin.chambre.actions.add_room'|trans }}
+                    {{ 'admin.chambre.actions.add_room'|trans|auto_translate }}
                 </button>
             {% else %}
-                <a href="{{ path('app_admin_chambres_new') }}" class="btn btn-primary-pro py-1 px-3">{{ 'common.add'|trans }}</a>
+                <a href="{{ path('app_admin_chambres_new') }}" class="btn btn-primary-pro py-1 px-3">{{ 'common.add'|trans|auto_translate }}</a>
             {% endif %}
         </div>
     </div>
     <div class="admin-card-body">
         {% if hotel %}
             <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
-                <span>{{ 'admin.chambre.index.active_filter_hotel'|trans }} <strong>{{ translated_hotel_value(hotel, 'nom') }}</strong></span>
-                <a href="{{ path('app_admin_chambres_index') }}" class="btn btn-sm btn-outline-secondary">{{ 'admin.chambre.actions.view_all'|trans }}</a>
+                <span>{{ 'admin.chambre.index.active_filter_hotel'|trans|auto_translate }} <strong>{{ translated_hotel_value(hotel, 'nom') }}</strong></span>
+                <a href="{{ path('app_admin_chambres_index') }}" class="btn btn-sm btn-outline-secondary">{{ 'admin.chambre.actions.view_all'|trans|auto_translate }}</a>
             </div>
         {% endif %}
         <form method="get" class="row g-3 align-items-end mb-4">
             <div class="col-md-5">
-                <label class="form-label">{{ 'common.search'|trans }}</label>
-                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="{{ 'admin.chambre.index.search_placeholder'|trans }}">
+                <label class="form-label">{{ 'common.search'|trans|auto_translate }}</label>
+                <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="{{ 'admin.chambre.index.search_placeholder'|trans|auto_translate }}">
             </div>
             <div class="col-md-3">
-                <label class="form-label">{{ 'common.sort_by'|trans }}</label>
+                <label class="form-label">{{ 'common.sort_by'|trans|auto_translate }}</label>
                 <select name="sortBy" class="form-select">
-                    <option value="type" {% if sortBy == 'type' %}selected{% endif %}>{{ 'common.type'|trans }}</option>
-                    <option value="capacite" {% if sortBy == 'capacite' %}selected{% endif %}>{{ 'common.capacity'|trans }}</option>
-                    <option value="nombreDeChambres" {% if sortBy == 'nombreDeChambres' %}selected{% endif %}>{{ 'common.number_of_rooms'|trans }}</option>
-                    <option value="prixStandard" {% if sortBy == 'prixStandard' %}selected{% endif %}>{{ 'common.standard_price'|trans }}</option>
-                    <option value="prixHauteSaison" {% if sortBy == 'prixHauteSaison' %}selected{% endif %}>{{ 'common.high_season'|trans }}</option>
-                    <option value="prixBasseSaison" {% if sortBy == 'prixBasseSaison' %}selected{% endif %}>{{ 'common.low_season'|trans }}</option>
-                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>{{ 'common.creation'|trans }}</option>
+                    <option value="type" {% if sortBy == 'type' %}selected{% endif %}>{{ 'common.type'|trans|auto_translate }}</option>
+                    <option value="capacite" {% if sortBy == 'capacite' %}selected{% endif %}>{{ 'common.capacity'|trans|auto_translate }}</option>
+                    <option value="nombreDeChambres" {% if sortBy == 'nombreDeChambres' %}selected{% endif %}>{{ 'common.number_of_rooms'|trans|auto_translate }}</option>
+                    <option value="prixStandard" {% if sortBy == 'prixStandard' %}selected{% endif %}>{{ 'common.standard_price'|trans|auto_translate }}</option>
+                    <option value="prixHauteSaison" {% if sortBy == 'prixHauteSaison' %}selected{% endif %}>{{ 'common.high_season'|trans|auto_translate }}</option>
+                    <option value="prixBasseSaison" {% if sortBy == 'prixBasseSaison' %}selected{% endif %}>{{ 'common.low_season'|trans|auto_translate }}</option>
+                    <option value="createdAt" {% if sortBy == 'createdAt' %}selected{% endif %}>{{ 'common.creation'|trans|auto_translate }}</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label class="form-label">{{ 'common.order'|trans }}</label>
+                <label class="form-label">{{ 'common.order'|trans|auto_translate }}</label>
                 <select name="sortDir" class="form-select">
                     <option value="ASC" {% if sortDir|upper == 'ASC' %}selected{% endif %}>ASC</option>
                     <option value="DESC" {% if sortDir|upper == 'DESC' %}selected{% endif %}>DESC</option>
@@ -53,8 +53,8 @@
                 {% if hotel %}
                     <input type="hidden" name="hotel" value="{{ hotel.id }}">
                 {% endif %}
-                <button class="btn btn-pro w-100" type="submit">{{ 'common.filter'|trans }}</button>
-                <a class="btn btn-outline-secondary w-100" href="{{ path('app_admin_chambres_index') }}">{{ 'common.reset'|trans }}</a>
+                <button class="btn btn-pro w-100" type="submit">{{ 'common.filter'|trans|auto_translate }}</button>
+                <a class="btn btn-outline-secondary w-100" href="{{ path('app_admin_chambres_index') }}">{{ 'common.reset'|trans|auto_translate }}</a>
             </div>
         </form>
 
@@ -62,30 +62,30 @@
             <table class="table admin-table align-middle">
                 <thead>
                     <tr>
-                        <th>{{ 'common.type'|trans }}</th>
-                        <th>{{ 'common.hotel'|trans }}</th>
-                        <th>{{ 'common.capacity'|trans }}</th>
-                        <th>{{ 'common.number_of_rooms'|trans }}</th>
-                        <th>{{ 'common.standard_price'|trans }}</th>
-                        <th class="text-end">{{ 'common.actions'|trans }}</th>
+                        <th>{{ 'common.type'|trans|auto_translate }}</th>
+                        <th>{{ 'common.hotel'|trans|auto_translate }}</th>
+                        <th>{{ 'common.capacity'|trans|auto_translate }}</th>
+                        <th>{{ 'common.number_of_rooms'|trans|auto_translate }}</th>
+                        <th>{{ 'common.standard_price'|trans|auto_translate }}</th>
+                        <th class="text-end">{{ 'common.actions'|trans|auto_translate }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for chambre in chambres %}
                         <tr>
-                            <td class="fw-semibold">{{ chambre.type }}</td>
+                            <td class="fw-semibold">{{ chambre.type|auto_translate }}</td>
                             <td>{{ chambre.hotel ? translated_hotel_value(chambre.hotel, 'nom') : '-' }}</td>
                             <td>{{ chambre.capacite ?: '-' }}</td>
                             <td>{{ chambre.nombreDeChambres ?: '-' }}</td>
                             <td>{{ chambre.prixStandard ?: '-' }}</td>
                             <td class="text-end">
-                                <a href="{{ path('app_admin_chambres_show', {'id': chambre.id}) }}" class="btn btn-sm btn-pro">{{ 'common.view'|trans }}</a>
-                                <a href="{{ path('app_admin_chambres_edit', {'id': chambre.id}) }}" class="btn btn-sm btn-primary-pro">{{ 'common.edit'|trans }}</a>
+                                <a href="{{ path('app_admin_chambres_show', {'id': chambre.id}) }}" class="btn btn-sm btn-pro">{{ 'common.view'|trans|auto_translate }}</a>
+                                <a href="{{ path('app_admin_chambres_edit', {'id': chambre.id}) }}" class="btn btn-sm btn-primary-pro">{{ 'common.edit'|trans|auto_translate }}</a>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4" id="empty-chambres-row">{{ 'admin.chambre.index.empty'|trans }}</td>
+                            <td colspan="6" class="text-center text-muted py-4" id="empty-chambres-row">{{ 'admin.chambre.index.empty'|trans|auto_translate }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -100,51 +100,51 @@
             <div class="modal-content">
                 <div class="modal-header quick-add-header">
                     <div>
-                        <h5 class="modal-title" id="addChambreModalLabel">{{ 'admin.chambre.actions.add_room'|trans }}</h5>
-                        <small class="text-white-50">{{ 'common.hotel'|trans }}: {{ translated_hotel_value(hotel, 'nom') }}</small>
+                        <h5 class="modal-title" id="addChambreModalLabel">{{ 'admin.chambre.actions.add_room'|trans|auto_translate }}</h5>
+                        <small class="text-white-50">{{ 'common.hotel'|trans|auto_translate }}: {{ translated_hotel_value(hotel, 'nom') }}</small>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body quick-add-body">
                     <div id="quick-add-error" class="alert alert-danger d-none" role="alert"></div>
-                    {{ form_start(quick_add_form, {'attr': {'id': 'quick-add-chambre-form'}}) }}
+                    {{ form_start(quick_add_form, {'attr': {'id': 'quick-add-chambre-form', 'novalidate': 'novalidate'}}) }}
 
                     <div class="quick-add-section mb-3">
-                        <h6 class="quick-add-title"><i class="bi bi-info-circle me-2"></i>{{ 'admin.chambre.form.info'|trans }}</h6>
+                        <h6 class="quick-add-title"><i class="bi bi-info-circle me-2"></i>{{ 'admin.chambre.form.info'|trans|auto_translate }}</h6>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 {{ form_row(quick_add_form.type, {
-                                    'label': 'admin.chambre.form.type'|trans,
-                                    'attr': {'placeholder': 'admin.chambre.form.type_placeholder'|trans}
+                                    'label': 'admin.chambre.form.type'|trans|auto_translate,
+                                    'attr': {'placeholder': 'admin.chambre.form.type_placeholder'|trans|auto_translate}
                                 }) }}
                             </div>
                             <div class="col-md-6">
                                 {{ form_row(quick_add_form.capacite, {
-                                    'label': 'common.capacity'|trans,
-                                    'attr': {'min': 1, 'placeholder': 'admin.chambre.form.capacity_placeholder'|trans}
+                                    'label': 'common.capacity'|trans|auto_translate,
+                                    'attr': {'min': 1, 'placeholder': 'admin.chambre.form.capacity_placeholder'|trans|auto_translate}
                                 }) }}
                             </div>
                             <div class="col-12">
                                 {{ form_row(quick_add_form.equipements, {
-                                    'label': 'common.equipments'|trans,
-                                    'attr': {'placeholder': 'admin.chambre.form.equipments_placeholder'|trans}
+                                    'label': 'common.equipments'|trans|auto_translate,
+                                    'attr': {'placeholder': 'admin.chambre.form.equipments_placeholder'|trans|auto_translate}
                                 }) }}
                             </div>
                         </div>
                     </div>
 
                     <div class="quick-add-section mb-2">
-                        <h6 class="quick-add-title"><i class="bi bi-cash-stack me-2"></i>{{ 'admin.chambre.form.pricing'|trans }}</h6>
+                        <h6 class="quick-add-title"><i class="bi bi-cash-stack me-2"></i>{{ 'admin.chambre.form.pricing'|trans|auto_translate }}</h6>
                         <div class="row g-3">
-                            <div class="col-md-4">{{ form_row(quick_add_form.prixStandard, {'label': 'common.standard_price'|trans, 'attr': {'step': '0.01', 'min': 0, 'placeholder': '0.00'}}) }}</div>
-                            <div class="col-md-4">{{ form_row(quick_add_form.prixHauteSaison, {'label': 'common.high_season'|trans, 'attr': {'step': '0.01', 'min': 0, 'placeholder': '0.00'}}) }}</div>
-                            <div class="col-md-4">{{ form_row(quick_add_form.prixBasseSaison, {'label': 'common.low_season'|trans, 'attr': {'step': '0.01', 'min': 0, 'placeholder': '0.00'}}) }}</div>
+                            <div class="col-md-4">{{ form_row(quick_add_form.prixStandard, {'label': 'common.standard_price'|trans|auto_translate, 'attr': {'step': '0.01', 'min': 0, 'placeholder': '0.00'}}) }}</div>
+                            <div class="col-md-4">{{ form_row(quick_add_form.prixHauteSaison, {'label': 'common.high_season'|trans|auto_translate, 'attr': {'step': '0.01', 'min': 0, 'placeholder': '0.00'}}) }}</div>
+                            <div class="col-md-4">{{ form_row(quick_add_form.prixBasseSaison, {'label': 'common.low_season'|trans|auto_translate, 'attr': {'step': '0.01', 'min': 0, 'placeholder': '0.00'}}) }}</div>
                         </div>
                     </div>
 
                     <div class="mt-4 d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ 'common.cancel'|trans }}</button>
-                        <button type="submit" class="btn btn-primary-pro" id="quick-add-submit-btn">{{ 'common.add'|trans }}</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ 'common.cancel'|trans|auto_translate }}</button>
+                        <button type="submit" class="btn btn-primary-pro" id="quick-add-submit-btn">{{ 'common.add'|trans|auto_translate }}</button>
                     </div>
                     {{ form_end(quick_add_form) }}
                 </div>
@@ -169,12 +169,51 @@
         const editUrlTemplate = '{{ path('app_admin_chambres_edit', {'id': '__id__'}) }}';
 
         const formatValue = (value) => (value === null || value === undefined || value === '' ? '-' : value);
+        const fieldSelectors = ['input', 'select', 'textarea'];
+
+        const clearFieldErrors = () => {
+            form.querySelectorAll(fieldSelectors.join(',')).forEach((field) => {
+                field.classList.remove('is-invalid');
+                const parent = field.closest('.mb-3, .col-md-4, .col-md-6, .col-12');
+                if (!parent) {
+                    return;
+                }
+
+                parent.querySelectorAll('.quick-add-inline-error').forEach((node) => node.remove());
+            });
+        };
+
+        const setFieldErrors = (fieldErrors) => {
+            if (!fieldErrors || typeof fieldErrors !== 'object') {
+                return;
+            }
+
+            Object.entries(fieldErrors).forEach(([fieldName, messages]) => {
+                const field = form.querySelector(`[name$="[${fieldName}]"]`);
+                if (!field) {
+                    return;
+                }
+
+                field.classList.add('is-invalid');
+
+                const parent = field.closest('.mb-3, .col-md-4, .col-md-6, .col-12');
+                if (!parent) {
+                    return;
+                }
+
+                const feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback d-block quick-add-inline-error';
+                feedback.textContent = Array.isArray(messages) && messages.length > 0 ? messages[0] : '{{ 'admin.chambre.index.quick_add_error'|trans|auto_translate }}';
+                parent.appendChild(feedback);
+            });
+        };
 
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
             submitButton.disabled = true;
             errorBox.classList.add('d-none');
             errorBox.textContent = '';
+            clearFieldErrors();
 
             try {
                 const response = await fetch(form.action, {
@@ -188,7 +227,11 @@
                 const payload = await response.json();
 
                 if (!response.ok || !payload.success) {
-                    throw new Error(payload.message || '{{ 'admin.chambre.index.quick_add_error'|trans }}');
+                    if (payload.fieldErrors) {
+                        setFieldErrors(payload.fieldErrors);
+                    }
+
+                    throw new Error(payload.message || '{{ 'admin.chambre.index.quick_add_error'|trans|auto_translate }}');
                 }
 
                 const emptyRow = document.getElementById('empty-chambres-row');
@@ -208,8 +251,8 @@
                     <td>${formatValue(chambre.nombreDeChambres)}</td>
                     <td>${formatValue(chambre.prixStandard)}</td>
                     <td class="text-end">
-                        <a href="${showUrl}" class="btn btn-sm btn-pro">{{ 'common.view'|trans }}</a>
-                        <a href="${editUrl}" class="btn btn-sm btn-primary-pro">{{ 'common.edit'|trans }}</a>
+                        <a href="${showUrl}" class="btn btn-sm btn-pro">{{ 'common.view'|trans|auto_translate }}</a>
+                        <a href="${editUrl}" class="btn btn-sm btn-primary-pro">{{ 'common.edit'|trans|auto_translate }}</a>
                     </td>
                 `;
 
@@ -218,10 +261,13 @@
                 }
 
                 form.reset();
+                clearFieldErrors();
                 modalInstance.hide();
             } catch (error) {
-                errorBox.textContent = error.message;
-                errorBox.classList.remove('d-none');
+                if (!form.querySelector('.quick-add-inline-error')) {
+                    errorBox.textContent = error.message;
+                    errorBox.classList.remove('d-none');
+                }
             } finally {
                 submitButton.disabled = false;
             }

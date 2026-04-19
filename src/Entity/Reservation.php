@@ -176,5 +176,52 @@ class Reservation
                 ->atPath('chambre')
                 ->addViolation();
         }
+
+        if ($this->chambre !== null && ($this->prixTotal === null || $this->prixTotal <= 0) && !$this->canInferPositiveTotal()) {
+            $context->buildViolation('Impossible de calculer un prix total valide pour la chambre et les dates selectionnees.')
+                ->atPath('chambre')
+                ->addViolation();
+        }
+
+        if ($this->chambre !== null && (($this->chambre->getNombreDeChambres() ?? 0) <= 0)) {
+            $context->buildViolation('La chambre selectionnee n\'est pas disponible actuellement.')
+                ->atPath('chambre')
+                ->addViolation();
+        }
+    }
+
+    private function canInferPositiveTotal(): bool
+    {
+        if (!$this->chambre instanceof Chambre || !$this->dateDebut instanceof \DateTimeInterface || !$this->dateFin instanceof \DateTimeInterface) {
+            return false;
+        }
+
+        if ($this->dateFin <= $this->dateDebut) {
+            return false;
+        }
+
+        $nights = (int) $this->dateDebut->diff($this->dateFin)->days;
+        if ($nights <= 0) {
+            return false;
+        }
+
+        return $this->resolveRoomUnitPrice($this->chambre) > 0;
+    }
+
+    private function resolveRoomUnitPrice(Chambre $chambre): float
+    {
+        $standard = (float) ($chambre->getPrixStandard() ?? 0);
+        if ($standard > 0) {
+            return $standard;
+        }
+
+        $highSeason = (float) ($chambre->getPrixHauteSaison() ?? 0);
+        if ($highSeason > 0) {
+            return $highSeason;
+        }
+
+        $lowSeason = (float) ($chambre->getPrixBasseSaison() ?? 0);
+
+        return $lowSeason > 0 ? $lowSeason : 0.0;
     }
 }

@@ -1,90 +1,114 @@
 {% extends 'admin/base_admin.html.twig' %}
 
-{% block title %}{{ 'admin.chambre.new.title'|trans }}{% endblock %}
-{% block page_title %}{{ 'admin.chambre.new.page_title'|trans }}{% endblock %}
+{% block title %}{{ 'admin.chambre.new.title'|trans|auto_translate }}{% endblock %}
+{% block page_title %}{{ 'admin.chambre.new.page_title'|trans|auto_translate }}{% endblock %}
 
 {% block body %}
 <div class="go-form-page">
     <div class="go-form-card chambre-form-card">
         <div class="go-form-card-header chambre-form-header">
-            <h2 class="mb-1 fs-4"><i class="bi bi-door-open me-2"></i>{{ 'admin.chambre.new.heading'|trans }}</h2>
-            <p class="mb-0 opacity-75">{{ 'admin.chambre.new.subtitle'|trans }}</p>
+            <h2 class="mb-1 fs-4"><i class="bi bi-door-open me-2"></i>{{ 'admin.chambre.new.heading'|trans|auto_translate }}</h2>
+            <p class="mb-0 opacity-75">{{ 'admin.chambre.new.subtitle'|trans|auto_translate }}</p>
         </div>
         <div class="go-form-card-body chambre-form-body">
             {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-            {% if form.vars.errors|length > 0 %}
-                <div class="alert alert-danger" role="alert">
-                    {{ form_errors(form) }}
-                </div>
-            {% endif %}
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-info-circle me-2"></i>{{ 'admin.chambre.form.general_info'|trans }}</h5>
+                <h5 class="form-section-title"><i class="bi bi-info-circle me-2"></i>{{ 'admin.chambre.form.general_info'|trans|auto_translate }}</h5>
                 <div class="row g-3">
                     <div class="col-md-6">
                         {{ form_row(form.type, {
-                            'label': 'admin.chambre.form.type'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': 'admin.chambre.form.type_placeholder'|trans}
+                            'label': 'admin.chambre.form.type'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.type.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': 'admin.chambre.form.type_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                     <div class="col-md-6">
                         {{ form_row(form.capacite, {
-                            'label': 'admin.chambre.form.capacity_people'|trans,
-                            'attr': {'class': 'form-control', 'min': 1, 'placeholder': 'admin.chambre.form.capacity_placeholder'|trans}
+                            'label': 'admin.chambre.form.capacity_people'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.capacite.vars.valid ? ' is-invalid' : ''),
+                                'min': 1,
+                                'placeholder': 'admin.chambre.form.capacity_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                     <div class="col-md-6">
                         {{ form_row(form.nombreDeChambres, {
-                            'label': 'common.number_of_rooms'|trans,
-                            'attr': {'class': 'form-control', 'min': 1, 'placeholder': 'admin.chambre.form.number_placeholder'|trans}
+                            'label': 'common.number_of_rooms'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.nombreDeChambres.vars.valid ? ' is-invalid' : ''),
+                                'min': 1,
+                                'placeholder': 'admin.chambre.form.number_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                     <div class="col-12">
                         {{ form_row(form.equipements, {
-                            'label': 'common.equipments'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': 'admin.chambre.form.equipments_placeholder'|trans}
+                            'label': 'common.equipments'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.equipements.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': 'admin.chambre.form.equipments_placeholder'|trans|auto_translate
+                            }
                         }) }}
                     </div>
                 </div>
             </section>
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-cash-stack me-2"></i>{{ 'admin.chambre.form.pricing'|trans }}</h5>
+                <h5 class="form-section-title"><i class="bi bi-cash-stack me-2"></i>{{ 'admin.chambre.form.pricing'|trans|auto_translate }}</h5>
                 <div class="row g-3">
                     <div class="col-md-4">
                         {{ form_row(form.prixStandard, {
-                            'label': 'common.standard_price'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
+                            'label': 'common.standard_price'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.prixStandard.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': '0.00',
+                                'step': '0.01',
+                                'min': 0
+                            }
                         }) }}
                     </div>
                     <div class="col-md-4">
                         {{ form_row(form.prixHauteSaison, {
-                            'label': 'common.high_season_price'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
+                            'label': 'common.high_season_price'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.prixHauteSaison.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': '0.00',
+                                'step': '0.01',
+                                'min': 0
+                            }
                         }) }}
                     </div>
                     <div class="col-md-4">
                         {{ form_row(form.prixBasseSaison, {
-                            'label': 'common.low_season_price'|trans,
-                            'attr': {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': 0}
+                            'label': 'common.low_season_price'|trans|auto_translate,
+                            'attr': {
+                                'class': 'form-control' ~ (form.vars.submitted and not form.prixBasseSaison.vars.valid ? ' is-invalid' : ''),
+                                'placeholder': '0.00',
+                                'step': '0.01',
+                                'min': 0
+                            }
                         }) }}
                     </div>
                 </div>
             </section>
 
             <section class="form-section mb-4">
-                <h5 class="form-section-title"><i class="bi bi-building me-2"></i>{{ 'admin.chambre.form.association'|trans }}</h5>
+                <h5 class="form-section-title"><i class="bi bi-building me-2"></i>{{ 'admin.chambre.form.association'|trans|auto_translate }}</h5>
                 <div class="row g-3">
                     {% if form.hotel is defined %}
                         <div class="col-12">
                             {{ form_row(form.hotel, {
-                                'label': 'admin.chambre.form.associated_hotel'|trans,
-                                'attr': {'class': 'form-select'}
+                                'label': 'admin.chambre.form.associated_hotel'|trans|auto_translate,
+                                'attr': {'class': 'form-select' ~ (form.vars.submitted and not form.hotel.vars.valid ? ' is-invalid' : '')}
                             }) }}
                         </div>
                     {% elseif hotel is defined and hotel %}
                         <div class="col-12">
-                            <label class="form-label">{{ 'admin.chambre.form.associated_hotel'|trans }}</label>
+                            <label class="form-label">{{ 'admin.chambre.form.associated_hotel'|trans|auto_translate }}</label>
                             <input type="text" class="form-control" value="{{ translated_hotel_value(hotel, 'nom') }}" readonly>
                         </div>
                     {% endif %}
@@ -93,10 +117,10 @@
 
             <div class="mt-4 d-flex flex-wrap justify-content-end gap-2">
                 <a href="{{ path('app_admin_hotels_index') }}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left me-1"></i>{{ 'admin.chambre.actions.back_hotels'|trans }}
+                    <i class="bi bi-arrow-left me-1"></i>{{ 'admin.chambre.actions.back_hotels'|trans|auto_translate }}
                 </a>
                 <button class="btn btn-primary-pro" type="submit">
-                    <i class="bi bi-check-circle me-1"></i>{{ 'admin.chambre.actions.save'|trans }}
+                    <i class="bi bi-check-circle me-1"></i>{{ 'admin.chambre.actions.save'|trans|auto_translate }}
                 </button>
             </div>
 
@@ -135,6 +159,38 @@
     font-weight: 700;
     font-size: 15px;
     margin-bottom: 14px;
+}
+
+.chambre-form-body .form-control.is-invalid,
+.chambre-form-body .form-select.is-invalid,
+.chambre-form-body .form-control.is-invalid:focus,
+.chambre-form-body .form-select.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.2) !important;
+}
+
+.chambre-form-body .invalid-feedback,
+.chambre-form-body .form-error-message {
+    color: #b42318;
+    font-weight: 600;
+}
+
+.chambre-form-body .invalid-feedback ul,
+.chambre-form-body .invalid-feedback li,
+.chambre-form-body .form-error-message li {
+    color: #b42318;
+}
+
+.chambre-form-body .invalid-feedback ul,
+.chambre-form-body .form-error-message {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.chambre-form-body .invalid-feedback li,
+.chambre-form-body .form-error-message li {
+    margin: 0;
 }
 </style>
 {% endblock %}

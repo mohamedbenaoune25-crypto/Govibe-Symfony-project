@@ -58,14 +58,5 @@ body {
 .form-error-message li,
 .invalid-feedback {
     position: relative;
-    padding-left: 1rem;
-}
-
-.form-error-message li::before,
-.invalid-feedback::before {
-    content: "!";
-    position: absolute;
-    left: 0;
-    top: 0;
-    font-weight: 800;
+    padding-left: 0;
 }

@@ -18,52 +18,72 @@ class Chambre
     private ?int $id = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Assert\NotBlank(message: "Le type de chambre est obligatoire.")]
+    #[Assert\NotBlank(message: "Type obligatoire.")]
     #[Assert\Length(
         min: 2,
         max: 100,
-        minMessage: "Le type de chambre doit contenir au moins {{ limit }} caracteres.",
-        maxMessage: "Le type de chambre ne peut pas depasser {{ limit }} caracteres."
+        minMessage: "Min. {{ limit }} caractères.",
+        maxMessage: "Max. {{ limit }} caractères."
+    )]
+    #[Assert\Regex(
+        pattern: "/^[\\p{L}0-9 .,'-]+$/u",
+        message: "Format invalide."
     )]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\NotNull(message: "La capacite est obligatoire.")]
-    #[Assert\Positive(message: "La capacite doit etre superieure a 0.")]
+    #[Assert\NotNull(message: "Capacité obligatoire.")]
+    #[Assert\Positive(message: "Valeur positive requise.")]
     #[Assert\Range(
         min: 1,
         max: 20,
-        notInRangeMessage: "La capacite doit etre comprise entre {{ min }} et {{ max }}."
+        notInRangeMessage: "Entre {{ min }} et {{ max }}."
     )]
     private ?int $capacite = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\NotNull(message: "Le nombre de chambres est obligatoire.")]
-    #[Assert\Positive(message: "Le nombre de chambres doit etre superieur a 0.")]
+    #[Assert\NotNull(message: "Nombre obligatoire.")]
+    #[Assert\Positive(message: "Valeur positive requise.")]
     #[Assert\Range(
         min: 1,
         max: 500,
-        notInRangeMessage: "Le nombre de chambres doit etre compris entre {{ min }} et {{ max }}."
+        notInRangeMessage: "Entre {{ min }} et {{ max }}."
     )]
     private ?int $nombreDeChambres = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Length(
         max: 255,
-        maxMessage: "Les equipements ne peuvent pas depasser {{ limit }} caracteres."
+        maxMessage: "Max. {{ limit }} caractères."
+    )]
+    #[Assert\Regex(
+        pattern: "/^[\\p{L}0-9\\s,.'()\\/+_-]*$/u",
+        message: "Format invalide."
     )]
     private ?string $equipements = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\PositiveOrZero(message: "Le prix standard doit etre positif ou nul.")]
+    #[Assert\PositiveOrZero(message: "Valeur positive requise.")]
+    #[Assert\LessThanOrEqual(
+        value: 100000,
+        message: "Maximum {{ compared_value }}."
+    )]
     private ?float $prixStandard = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\PositiveOrZero(message: "Le prix haute saison doit etre positif ou nul.")]
+    #[Assert\PositiveOrZero(message: "Valeur positive requise.")]
+    #[Assert\LessThanOrEqual(
+        value: 100000,
+        message: "Maximum {{ compared_value }}."
+    )]
     private ?float $prixHauteSaison = null;
 
     #[ORM\Column(nullable: true)]
-    #[Assert\PositiveOrZero(message: "Le prix basse saison doit etre positif ou nul.")]
+    #[Assert\PositiveOrZero(message: "Valeur positive requise.")]
+    #[Assert\LessThanOrEqual(
+        value: 100000,
+        message: "Maximum {{ compared_value }}."
+    )]
     private ?float $prixBasseSaison = null;
 
     #[ORM\Column]
@@ -74,7 +94,7 @@ class Chambre
 
     #[ORM\ManyToOne(targetEntity: Hotel::class, inversedBy: 'chambres')]
     #[ORM\JoinColumn(name: 'hotel_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
-    #[Assert\NotNull(message: "L'hotel associe est obligatoire.")]
+    #[Assert\NotNull(message: "Hôtel obligatoire.")]
     private ?Hotel $hotel = null;
 
     public function __construct()

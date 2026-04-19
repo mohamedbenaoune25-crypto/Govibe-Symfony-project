@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class LocaleSubscriber implements EventSubscriberInterface
 {
-    private const SUPPORTED_LOCALES = ['fr', 'en', 'de', 'it', 'es'];
+    private const SUPPORTED_LOCALES = ['fr', 'en', 'ar', 'de', 'it', 'es'];
 
     public function onKernelRequest(RequestEvent $event): void
     {

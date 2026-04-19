@@ -247,13 +247,9 @@ class AdminController extends AbstractController
         $newRole = $request->request->get('role');
         // Dans Personne.php, le rôle est une string 'user' ou 'admin'
         if (in_array($newRole, ['user', 'admin'])) {
-             if (method_exists($user, 'setRole')) {
-                 $user->setRole($newRole); 
-             } else if (method_exists($user, 'setRoles')) {
-                 $user->setRoles([strtoupper('ROLE_' . $newRole)]);
-             }
-             $entityManager->flush();
-             $this->addFlash('success', 'Rôle mis à jour avec succès.');
+            $user->setRole($newRole);
+            $entityManager->flush();
+            $this->addFlash('success', 'Rôle mis à jour avec succès.');
         }
 
         return $this->redirectToRoute('app_admin_users');

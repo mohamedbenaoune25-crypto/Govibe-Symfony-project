@@ -1,57 +1,52 @@
 {{ form_start(form, {'attr': {'class': 'hotel-form', 'novalidate': 'novalidate'}}) }}
-    {% if form.vars.errors|length > 0 %}
-        <div class="alert alert-danger" role="alert">
-            {{ form_errors(form) }}
-        </div>
-    {% endif %}
     <div class="row g-3">
         <div class="col-md-6">
             <div class="hotel-form__field">
                 {{ form_label(form.nom, 'hotel.form.name'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
-                {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.nom.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.name'|trans}}) }}
-                {{ form_errors(form.nom) }}
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.nom.vars.valid ? ' is-invalid' : ''), 'placeholder': 'hotel.form.name'|trans}}) }}
+                {% if form.nom.vars.errors|length %}<div class="invalid-feedback d-block">{{ form_errors(form.nom) }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-6">
             <div class="hotel-form__field">
                 {{ form_label(form.ville, 'common.city'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
-                {{ form_widget(form.ville, {'attr': {'class': 'form-control' ~ (form.ville.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.city'|trans}}) }}
-                {{ form_errors(form.ville) }}
+                {{ form_widget(form.ville, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.ville.vars.valid ? ' is-invalid' : ''), 'placeholder': 'common.city'|trans}}) }}
+                {% if form.ville.vars.errors|length %}<div class="invalid-feedback d-block">{{ form_errors(form.ville) }}</div>{% endif %}
             </div>
         </div>
         <div class="col-12">
             <div class="hotel-form__field">
                 {{ form_label(form.adresse, 'common.address'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
-                {{ form_widget(form.adresse, {'attr': {'class': 'form-control' ~ (form.adresse.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.full_address'|trans}}) }}
-                {{ form_errors(form.adresse) }}
+                {{ form_widget(form.adresse, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.adresse.vars.valid ? ' is-invalid' : ''), 'placeholder': 'hotel.form.full_address'|trans}}) }}
+                {% if form.adresse.vars.errors|length %}<div class="invalid-feedback d-block">{{ form_errors(form.adresse) }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-6">
             <div class="hotel-form__field">
                 {{ form_label(form.nombreEtoiles, 'common.stars'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
-                {{ form_widget(form.nombreEtoiles, {'attr': {'class': 'form-control' ~ (form.nombreEtoiles.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.stars'|trans}}) }}
-                {{ form_errors(form.nombreEtoiles) }}
+                {{ form_widget(form.nombreEtoiles, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.nombreEtoiles.vars.valid ? ' is-invalid' : ''), 'placeholder': 'common.stars'|trans}}) }}
+                {% if form.nombreEtoiles.vars.errors|length %}<div class="invalid-feedback d-block">{{ form_errors(form.nombreEtoiles) }}</div>{% endif %}
             </div>
         </div>
         <div class="col-md-6">
             <div class="hotel-form__field">
                 {{ form_label(form.budget, 'hotel.form.budget_eur'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
-                {{ form_widget(form.budget, {'attr': {'class': 'form-control' ~ (form.budget.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'common.budget'|trans}}) }}
-                {{ form_errors(form.budget) }}
+                {{ form_widget(form.budget, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.budget.vars.valid ? ' is-invalid' : ''), 'placeholder': 'common.budget'|trans}}) }}
+                {% if form.budget.vars.errors|length %}<div class="invalid-feedback d-block">{{ form_errors(form.budget) }}</div>{% endif %}
             </div>
         </div>
         <div class="col-12">
             <div class="hotel-form__field">
                 {{ form_label(form.photoUrl, 'hotel.form.photo_url'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
-                {{ form_widget(form.photoUrl, {'attr': {'class': 'form-control' ~ (form.photoUrl.vars.errors|length ? ' is-invalid' : ''), 'placeholder': 'hotel.form.photo_url'|trans}}) }}
-                {{ form_errors(form.photoUrl) }}
+                {{ form_widget(form.photoUrl, {'attr': {'class': 'form-control' ~ (form.vars.submitted and not form.photoUrl.vars.valid ? ' is-invalid' : ''), 'placeholder': 'hotel.form.photo_url'|trans}}) }}
+                {% if form.photoUrl.vars.errors|length %}<div class="invalid-feedback d-block">{{ form_errors(form.photoUrl) }}</div>{% endif %}
             </div>
         </div>
         <div class="col-12">
             <div class="hotel-form__field">
                 {{ form_label(form.description, 'common.description'|trans, {'label_attr': {'class': 'hotel-form__label'}}) }}
-                {{ form_widget(form.description, {'attr': {'class': 'form-control hotel-form__textarea' ~ (form.description.vars.errors|length ? ' is-invalid' : ''), 'rows': 4, 'placeholder': 'common.description'|trans}}) }}
-                {{ form_errors(form.description) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control hotel-form__textarea' ~ (form.vars.submitted and not form.description.vars.valid ? ' is-invalid' : ''), 'rows': 4, 'placeholder': 'common.description'|trans}}) }}
+                {% if form.description.vars.errors|length %}<div class="invalid-feedback d-block">{{ form_errors(form.description) }}</div>{% endif %}
             </div>
         </div>
     </div>
@@ -92,11 +87,40 @@
     box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
 }
 
+.hotel-form .form-control.is-invalid,
+.hotel-form .form-control.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.2);
+}
+
+.hotel-form__field:has(.is-invalid) .hotel-form__label {
+    color: #b42318;
+}
+
 .hotel-form .invalid-feedback {
     display: block;
     color: #dc3545;
     font-size: 0.875rem;
     margin-top: 0.4rem;
+}
+
+.hotel-form .invalid-feedback ul,
+.hotel-form .invalid-feedback li,
+.hotel-form .form-error-message,
+.hotel-form .form-error-message li {
+    color: #dc3545;
+}
+
+.hotel-form .invalid-feedback ul,
+.hotel-form .form-error-message {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hotel-form .invalid-feedback li,
+.hotel-form .form-error-message li {
+    margin: 0;
 }
 
 .btn-primary {

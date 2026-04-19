@@ -103,7 +103,13 @@ class AdminReservationController extends AbstractController
 
             $newStatus = strtoupper((string) $request->request->get('statut', ''));
             if (!in_array($newStatus, self::ALLOWED_STATUS, true)) {
-                $this->addFlash('error', 'Statut non valide.');
+                return $this->render('admin/reservation/edit_status.html.twig', [
+                    'reservation' => $reservation,
+                    'status_choices' => self::ALLOWED_STATUS,
+                    'redirect_to' => (string) $request->request->get('redirect_to', ''),
+                    'selected_status' => $newStatus,
+                    'status_error' => 'Statut non valide.',
+                ], new Response('', Response::HTTP_UNPROCESSABLE_ENTITY));
             } else {
                 $reservation->setStatut($newStatus);
                 $entityManager->flush();
@@ -122,6 +128,8 @@ class AdminReservationController extends AbstractController
             'reservation' => $reservation,
             'status_choices' => self::ALLOWED_STATUS,
             'redirect_to' => (string) $request->query->get('redirect_to', ''),
+            'selected_status' => $reservation->getStatut(),
+            'status_error' => null,
         ]);
     }
 }
