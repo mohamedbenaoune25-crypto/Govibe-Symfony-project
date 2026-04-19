@@ -6,6 +6,7 @@
 {{ parent() }}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
 /* ═══════════════════════════════════════════════════
    GoVibe Activities — Ultra Premium Design
@@ -475,6 +476,59 @@ body {
     transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .gv-reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+/* ─── Recommendations ─── */
+.gv-rec-section { margin-bottom:4rem; }
+.gv-rec-title { font-family:'Noto Serif',serif; color:#00342d; font-size:1.5rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem; }
+.gv-rec-slider { display:flex; gap:1.5rem; overflow-x:auto; padding:0.5rem 0.5rem 1.5rem; scrollbar-width:none; -ms-overflow-style:none; }
+.gv-rec-slider::-webkit-scrollbar { display:none; }
+.gv-rec-card { flex:0 0 300px; background:#fff; border-radius:1.25rem; border:1px solid rgba(0,52,45,0.06); box-shadow:0 10px 30px rgba(0,0,0,0.04); padding:1.25rem; transition:all 0.3s; position:relative; overflow:hidden; }
+.gv-rec-card:hover { transform:translateY(-5px); border-color:#10B981; }
+.gv-rec-type { position:absolute; top:0; right:0; background:rgba(16,185,129,0.1); color:#005046; padding:0.4rem 1rem; border-radius:0 0 0 1rem; font-size:0.65rem; font-weight:800; text-transform:uppercase; }
+
+/* ─── Context Badges ─── */
+.gv-ctx-badges { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1rem; }
+.gv-ctx-badge { display:inline-flex; align-items:center; gap:0.25rem; font-size:0.6rem; font-weight:800; text-transform:uppercase; padding:0.3rem 0.6rem; border-radius:0.4rem; }
+.gv-ctx-open { background:rgba(16,185,129,0.15); color:#046b5e; border:1px solid rgba(16,185,129,0.2); }
+.gv-ctx-weather { background:rgba(233,193,118,0.15); color:#92400e; border:1px solid rgba(233,193,118,0.2); }
+.gv-ctx-time { background:rgba(0,52,45,0.06); color:#00342d; border:1px solid rgba(0,52,45,0.1); }
+
+/* ─── Trending ─── */
+.gv-trend-card { background:linear-gradient(135deg, #1c1b1b, #333); color:#fff; padding:1.25rem; border-radius:1rem; display:flex; gap:1rem; align-items:center; border:1px solid rgba(255,255,255,0.1); }
+.gv-trend-tag { background:#e9c176; color:#3d2a00; font-size:0.6rem; font-weight:800; padding:0.2rem 0.5rem; border-radius:0.3rem; text-transform:uppercase; }
+
+/* ─── Sorting ─── */
+.gv-sort-bar { display:flex; align-items:center; gap:0.5rem; background:rgba(255,255,255,0.6); border:1px solid rgba(0,52,45,0.06); padding:0.4rem 0.8rem; border-radius:0.75rem; font-size:0.85rem; font-weight:700; color:#546067; }
+.gv-sort-select { border:none; background:transparent; font-size:0.85rem; font-weight:800; color:#00342d; cursor:pointer; outline:none; }
+
+.gv-stars { display:flex; gap:2px; color:#e9c176; margin-bottom:0.5rem; }
+.gv-stars .material-symbols-outlined { font-size:1.1rem; font-variation-settings:'FILL' 1; }
+.gv-stars .empty { color:#ddd; font-variation-settings:'FILL' 0; }
+
+/* ─── Map Integration ─── */
+#gv-map-container { 
+    height: 0; 
+    overflow: hidden; 
+    transition: all 0.5s ease; 
+    border-radius: 1.5rem; 
+    margin-bottom: 3rem;
+    border: 1px solid rgba(0,52,45,0.06);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+}
+#gv-map-container.active { height: 500px; padding: 0.5rem; background: #fff; }
+#gv-map { height: 100%; border-radius: 1rem; }
+
+.gv-map-popup { font-family: 'Manrope', sans-serif; }
+.leaflet-popup-content-wrapper { border-radius: 1rem; padding: 0.5rem; }
+.gv-btn-map-toggle.active { background: #00342d; color: #fff; }
+
+/* ─── Preferences Form ─── */
+.gv-pref-card { background:linear-gradient(135deg, #00342d, #01443b); color:#fff; border-radius:1.5rem; padding:2rem; margin-bottom:3rem; position:relative; overflow:hidden; }
+.gv-pref-card::before { content:'tuning'; font-family:'Material Symbols Outlined'; position:absolute; bottom:-20px; right:-20px; font-size:8rem; opacity:0.1; }
+.gv-pref-tags { display:flex; flex-wrap:wrap; gap:0.75rem; margin:1.5rem 0; }
+.gv-pref-check { display:none; }
+.gv-pref-label { padding:0.6rem 1.25rem; border-radius:2rem; border:1.5px solid rgba(255,255,255,0.2); cursor:pointer; font-size:0.85rem; font-weight:700; transition:all 0.2s; }
+.gv-pref-check:checked + .gv-pref-label { background:#e9c176; border-color:#e9c176; color:#3d2a00; box-shadow:0 5px 15px rgba(233,193,118,0.3); }
 </style>
 {% endblock %}
 
@@ -518,6 +572,70 @@ body {
         </form>
     </div>
 
+    {% if recommendations is defined and recommendations|length > 0 %}
+    <!-- Recommendations Section -->
+    <div class="gv-rec-section">
+        <h3 class="gv-rec-title">
+            <span class="material-symbols-outlined" style="color:#ca9028; font-variation-settings:'FILL' 1;">auto_awesome</span>
+            Sélectionné pour vous
+        </h3>
+        <div class="gv-rec-slider">
+            {% for rec in recommendations %}
+            <a href="{{ path('app_activite_show', {'id': rec.id}) }}" class="gv-rec-card" style="text-decoration:none;">
+                <span class="gv-rec-type">{{ rec.type }}</span>
+                <h4 style="font-family:'Noto Serif',serif; font-size:1.1rem; color:#00342d; margin-bottom:0.75rem;">{{ rec.name }}</h4>
+                
+                <div class="gv-ctx-badges">
+                    {% if rec.isCurrentlyOpen is defined and rec.isCurrentlyOpen %}
+                        <span class="gv-ctx-badge gv-ctx-open">
+                            <span class="material-symbols-outlined" style="font-size:0.8rem;">fiber_manual_record</span> Ouvert
+                        </span>
+                    {% endif %}
+                    {% if rec.weatherMatch is defined and rec.weatherMatch %}
+                        <span class="gv-ctx-badge gv-ctx-weather">
+                            <span class="material-symbols-outlined" style="font-size:0.8rem;">partly_cloudy_day</span> Météo Idéale
+                        </span>
+                    {% endif %}
+                    {% if rec.timeMatch is defined and rec.timeMatch %}
+                        <span class="gv-ctx-badge gv-ctx-time">
+                            <span class="material-symbols-outlined" style="font-size:0.8rem;">schedule</span> Timing Parfait
+                        </span>
+                    {% endif %}
+                </div>
+
+                <p style="font-size:0.8rem; color:#546067; margin-bottom:1rem; display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ rec.description }}</p>
+                <div style="display:flex; align-items:center; gap:0.5rem; color:#10B981; font-weight:700; font-size:0.85rem;">
+                    <span class="material-symbols-outlined" style="font-size:1rem;">location_on</span>
+                    {{ rec.localisation }}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Preferences Onboarding (Simple version) -->
+    {% if not is_granted('ROLE_ADMIN') %}
+    <div class="gv-pref-card">
+        <h3 style="font-family:'Noto Serif',serif; font-weight:700; margin-bottom:0.5rem;">Affinez vos recommandations</h3>
+        <p style="opacity:0.8; font-size:0.9rem;">Dites-nous ce que vous aimez pour que nous puissions vous proposer les meilleures expériences.</p>
+        
+        {# Ce formulaire pourrait être géré via AJAX ou une méthode POST dédiée #}
+        <form action="#" method="get">
+            <div class="gv-pref-tags">
+                {% set cats = ['Sport', 'Espace de loisirs', 'Culture', 'Restaurant', 'Nature', 'Bien-être'] %}
+                {% for cat in cats %}
+                    <input type="checkbox" id="pref_{{ loop.index }}" class="gv-pref-check">
+                    <label for="pref_{{ loop.index }}" class="gv-pref-label">{{ cat }}</label>
+                {% endfor %}
+            </div>
+            <button type="button" class="gv-btn-primary" style="background:#fff; color:#00342d; box-shadow:none;" onclick="alert('Préférences enregistrées ! (Simulation)')">
+                Enregistrer mes goûts
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
     <!-- Flash Messages -->
     {% for label, messages in app.flashes %}
         {% for message in messages %}
@@ -527,13 +645,60 @@ body {
         {% endfor %}
     {% endfor %}
 
+    {% if trending is defined and trending|length > 0 %}
+    <!-- Trending Section -->
+    <div style="margin-bottom:4rem;">
+        <h3 class="gv-rec-title">
+            <span class="material-symbols-outlined" style="color:#ba1a1a; font-variation-settings:'FILL' 1;">local_fire_department</span>
+            En ce moment
+        </h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1.5rem;">
+            {% for trend in trending %}
+                <a href="{{ path('app_activite_show', {'id': trend.id}) }}" class="gv-trend-card" style="text-decoration:none;">
+                    <div style="flex-shrink:0; width:60px; height:60px; background:rgba(255,255,255,0.1); border-radius:0.75rem; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined">rocket_launch</span>
+                    </div>
+                    <div>
+                        <span class="gv-trend-tag">Populaire</span>
+                        <h4 style="margin:0.2rem 0; font-size:0.95rem;">{{ trend.name }}</h4>
+                        <div style="display:flex; align-items:center; gap:0.3rem; font-size:0.75rem; color:#aaa;">
+                            <span class="material-symbols-outlined" style="font-size:0.9rem;">map</span> {{ trend.localisation }}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Section Header -->
     <div class="gv-section-header">
         <h2 class="gv-section-title">Explorez les expériences</h2>
-        <span class="gv-count-badge">
-            <span class="material-symbols-outlined" style="font-size:1rem;">grid_view</span>
-            {{ activites|length }} activité{{ activites|length > 1 ? 's' : '' }}
-        </span>
+        
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <div class="gv-sort-bar">
+                <span class="material-symbols-outlined" style="font-size:1rem;">swap_vert</span>
+                Trier par :
+                <select class="gv-sort-select" onchange="window.location.href='{{ path('app_activite_index') }}?sort=' + this.value">
+                    <option value="rank" {{ current_sort == 'rank' ? 'selected' : '' }}>Recommandations</option>
+                    <option value="rating" {{ current_sort == 'rating' ? 'selected' : '' }}>Mieux notés</option>
+                    <option value="popular" {{ current_sort == 'popular' ? 'selected' : '' }}>Les plus populaires</option>
+                </select>
+            </div>
+            <button class="gv-btn-primary gv-btn-map-toggle" id="mapModeToggle" style="background: rgba(0,52,45,0.06); color: #00342d; box-shadow: none;">
+                <span class="material-symbols-outlined">map</span>
+                Mode Carte
+            </button>
+            <span class="gv-count-badge">
+                <span class="material-symbols-outlined" style="font-size:1rem;">grid_view</span>
+                {{ activites|length }} activité{{ activites|length > 1 ? 's' : '' }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="gv-map-container">
+        <div id="gv-map"></div>
     </div>
 
     <!-- Activities Grid -->
@@ -558,6 +723,15 @@ body {
                     </div>
                 </div>
                 <div class="gv-act-card-body">
+                    {% if activite.averageRating > 0 %}
+                    <div class="gv-stars" title="Note moyenne : {{ activite.averageRating }}">
+                        {% set fullStars = activite.averageRating|round(0, 'floor') %}
+                        {% for i in 1..5 %}
+                            <span class="material-symbols-outlined {{ i > fullStars ? 'empty' : '' }}">star</span>
+                        {% endfor %}
+                        <span style="font-size:0.75rem; color:#546067; margin-left:0.4rem; font-weight:800;">({{ activite.reviewCount }})</span>
+                    </div>
+                    {% endif %}
                     <h3 class="gv-act-name">{{ activite.name }}</h3>
                     <p class="gv-act-desc">{{ activite.description }}</p>
                     <div class="gv-act-meta">
@@ -607,8 +781,10 @@ body {
 
 {% block javascripts %}
 {{ parent() }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // ─── Animations ───
     var reveals = document.querySelectorAll('.gv-reveal');
     if (reveals.length) {
         var observer = new IntersectionObserver(function(entries) {
@@ -624,6 +800,68 @@ document.addEventListener('DOMContentLoaded', function() {
             el.style.transitionDelay = (i * 80) + 'ms';
             observer.observe(el);
         });
+    }
+
+    // ─── Map Logic ───
+    const mapToggle = document.getElementById('mapModeToggle');
+    const mapContainer = document.getElementById('gv-map-container');
+    let mapInitialized = false;
+    let map;
+
+    const activities = [
+        {% for a in activites %}
+            {% if a.latitude and a.longitude %}
+            {
+                id: {{ a.id }},
+                name: "{{ a.name|escape('js') }}",
+                lat: {{ a.latitude }},
+                lng: {{ a.longitude }},
+                price: "{{ a.prix }}",
+                url: "{{ path('app_activite_show', {id: a.id}) }}"
+            },
+            {% endif %}
+        {% endfor %}
+    ];
+
+    mapToggle.addEventListener('click', function() {
+        mapContainer.classList.toggle('active');
+        mapToggle.classList.toggle('active');
+
+        if (mapContainer.classList.contains('active')) {
+            if (!mapInitialized) {
+                initMap();
+                mapInitialized = true;
+            } else {
+                setTimeout(() => map.invalidateSize(), 300);
+            }
+        }
+    });
+
+    function initMap() {
+        // Center on Tunisia by default
+        map = L.map('gv-map').setView([36.8065, 10.1815], 7);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        const markers = [];
+        activities.forEach(a => {
+            const marker = L.marker([a.lat, a.lng]).addTo(map);
+            marker.bindPopup(`
+                <div class="gv-map-popup">
+                    <h5 style="margin:0 0 5px; font-weight:700;">${a.name}</h5>
+                    <p style="margin:0 0 10px; color:#10B981; font-weight:800;">${a.price} TND</p>
+                    <a href="${a.url}" class="gv-btn-primary" style="padding:0.4rem 0.8rem; font-size:0.8rem; height:auto; width:100%; justify-content:center;">Détails</a>
+                </div>
+            `);
+            markers.push([a.lat, a.lng]);
+        });
+
+        if (markers.length > 0) {
+            const bounds = L.latLngBounds(markers);
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
     }
 });
 </script>
