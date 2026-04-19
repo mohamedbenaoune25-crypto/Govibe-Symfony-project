@@ -1,24 +1,40 @@
 {# Rendered directly into the Bootstrap modal body #}
-<div class="px-2">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h4 class="fw-bold mb-1 text-dark">
-                {% if forum.forumId %}
-                    <i class="bi bi-pencil-square me-2 text-success"></i>Modifier le Forum
-                {% else %}
-                    <i class="bi bi-plus-circle-fill me-2 text-success"></i>Créer un Forum
-                {% endif %}
-            </h4>
-            <p class="text-muted small mb-0">
-                {% if forum.forumId %}
-                    Forum <strong>{{ forum.name }}</strong> &bull; créé le {{ forum.dateCreation|date('d M Y') }}
-                {% else %}
-                    Lancez une nouvelle communauté sur GoVibe
-                {% endif %}
-            </p>
+<div class="gv-modal-premium-wrapper">
+    <!-- Top Status Bar -->
+    <div class="gv-modal-top-bar d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <div class="gv-icon-box">
+                <span class="material-symbols-outlined">{{ forum.forumId ? 'group_work' : 'diversity_3' }}</span>
+            </div>
+            <span class="gv-modal-main-title">Communauté Forum</span>
         </div>
-        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="gv-btn-close-minimal" data-bs-dismiss="modal">
+            <span class="material-symbols-outlined">close</span>
+        </button>
     </div>
+
+    <!-- Inner Content Padding -->
+    <div class="px-3 px-md-4 pb-4">
+        <!-- Main Form Header -->
+        <div class="d-flex align-items-center justify-content-between mt-4 mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="gv-action-icon {{ forum.forumId ? 'edit' : 'add' }}">
+                    <span class="material-symbols-outlined">{{ forum.forumId ? 'settings_suggest' : 'hub' }}</span>
+                </div>
+                <div>
+                    <h4 class="gv-modal-hero-title mb-0">
+                        {{ forum.forumId ? 'Gérer le Forum' : 'Lancer un nouveau Forum' }}
+                    </h4>
+                    <p class="gv-modal-subtitle mb-0">
+                        {{ forum.forumId ? 'Paramètres de ' ~ forum.name : 'Lancez une nouvelle communauté sur GoVibe' }}
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="gv-btn-close-minimal opacity-50" data-bs-dismiss="modal">
+                <span class="material-symbols-outlined" style="font-size: 1.5rem;">close</span>
+            </button>
+        </div>
+
 
     {{ form_start(form, {'attr': {'id': 'forum-form', 'class': 'needs-validation', 'novalidate': 'novalidate', 'enctype': 'multipart/form-data'}}) }}
         <div class="mb-4">
@@ -59,74 +75,105 @@
             </button>
         </div>
     {{ form_end(form) }}
-
-    <script>
-        (function() {
-            const form = document.getElementById('forum-form');
-            const nameInput = form.querySelector('[name*="[name]"]');
-            const descInput = form.querySelector('[name*="[description]"]');
-            const imgInput = form.querySelector('[name*="[imageFile]"]');
-            const charCount = document.getElementById('forum-char-count');
-
-            const validate = () => {
-                let isValid = true;
-
-                // Name
-                if (nameInput.value.trim() === '') {
-                    nameInput.classList.add('is-invalid-custom');
-                    document.getElementById('error-name').style.display = 'block';
-                    isValid = false;
-                } else {
-                    nameInput.classList.remove('is-invalid-custom');
-                    document.getElementById('error-name').style.display = 'none';
-                }
-
-                // Description
-                const descLen = descInput.value.length;
-                charCount.textContent = descLen;
-                if (descInput.value.trim() === '' || descLen > 500) {
-                    descInput.classList.add('is-invalid-custom');
-                    document.getElementById('error-desc').style.display = 'block';
-                    if (descLen > 500) charCount.classList.add('text-danger', 'fw-bold');
-                    isValid = false;
-                } else {
-                    descInput.classList.remove('is-invalid-custom');
-                    document.getElementById('error-desc').style.display = 'none';
-                    charCount.classList.remove('text-danger', 'fw-bold');
-                }
-
-                // Image (Mandatory for new forum)
-                {% if not forum.forumId %}
-                if (!imgInput.files || imgInput.files.length === 0) {
-                    imgInput.classList.add('is-invalid-custom');
-                    document.getElementById('error-image').style.display = 'block';
-                    isValid = false;
-                } else {
-                    imgInput.classList.remove('is-invalid-custom');
-                    document.getElementById('error-image').style.display = 'none';
-                }
-                {% endif %}
-
-                return isValid;
-            };
-
-            nameInput.oninput = validate;
-            descInput.oninput = validate;
-            imgInput.onchange = validate;
-
-            // Run on load to show initial red borders
-            validate();
-
-            form.onsubmit = (e) => {
-                if (!validate()) {
-                    e.preventDefault();
-                    return false;
-                }
-            };
-        })();
-    </script>
 </div>
 
+<script>
+    (function() {
+        const form = document.getElementById('forum-form');
+        const nameInput = form.querySelector('[name*="[name]"]');
+        const descInput = form.querySelector('[name*="[description]"]');
+        const imgInput = form.querySelector('[name*="[imageFile]"]');
+        const charCount = document.getElementById('forum-char-count');
+
+        const validate = () => {
+            let isValid = true;
+            if (nameInput.value.trim() === '') {
+                nameInput.classList.add('is-invalid-custom');
+                document.getElementById('error-name').style.display = 'block';
+                isValid = false;
+            } else {
+                nameInput.classList.remove('is-invalid-custom');
+                document.getElementById('error-name').style.display = 'none';
+            }
+            const descLen = descInput.value.length;
+            charCount.textContent = descLen;
+            if (descInput.value.trim() === '' || descLen > 500) {
+                descInput.classList.add('is-invalid-custom');
+                document.getElementById('error-desc').style.display = 'block';
+                if (descLen > 500) charCount.classList.add('text-danger', 'fw-bold');
+                isValid = false;
+            } else {
+                descInput.classList.remove('is-invalid-custom');
+                document.getElementById('error-desc').style.display = 'none';
+                charCount.classList.remove('text-danger', 'fw-bold');
+            }
+            {% if not forum.forumId %}
+            if (!imgInput.files || imgInput.files.length === 0) {
+                imgInput.classList.add('is-invalid-custom');
+                document.getElementById('error-image').style.display = 'block';
+                isValid = false;
+            } else {
+                imgInput.classList.remove('is-invalid-custom');
+                document.getElementById('error-image').style.display = 'none';
+            }
+            {% endif %}
+            return isValid;
+        };
+        nameInput.oninput = validate;
+        descInput.oninput = validate;
+        imgInput.onchange = validate;
+        validate();
+        form.onsubmit = (e) => { if (!validate()) { e.preventDefault(); return false; } };
+    })();
+</script>
+
 <style>
+    .gv-modal-premium-wrapper {
+        background: #fff;
+        border-radius: 30px;
+        overflow: hidden;
+    }
+    .gv-modal-top-bar {
+        padding: 1.25rem 2rem;
+        background: rgba(0, 52, 45, 0.02);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    .gv-icon-box {
+        width: 38px; height: 38px;
+        background: #f0f7f4;
+        color: #00342d;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .gv-icon-box .material-symbols-outlined { font-size: 1.25rem; font-weight: 300; }
+    .gv-modal-main-title {
+        font-weight: 800; color: #00342d; font-size: 1.1rem; letter-spacing: -0.01em;
+    }
+    .gv-btn-close-minimal {
+        background: none; border: none; color: #64748b; padding: 0.5rem;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s; border-radius: 50%;
+    }
+    .gv-btn-close-minimal:hover { background: rgba(0,0,0,0.05); color: #000; }
+
+    .gv-action-icon {
+        width: 32px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .gv-action-icon.add { color: #10B981; }
+    .gv-action-icon.edit { color: #52BE80; }
+    .gv-action-icon .material-symbols-outlined { font-size: 1.8rem; font-variation-settings: 'FILL' 1; }
+
+    .gv-modal-hero-title {
+        font-weight: 800; color: #1c1b1b; font-size: 1.45rem; letter-spacing: -0.02em;
+    }
+    .gv-modal-subtitle {
+        color: #64748b; font-size: 0.95rem; font-weight: 500;
+    }
+
     .ls-1 { letter-spacing: 1px; }
+
+    .invalid-feedback-custom {
+        display: none;
+    }
 </style>

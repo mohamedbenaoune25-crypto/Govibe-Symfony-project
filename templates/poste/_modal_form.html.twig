@@ -1,27 +1,100 @@
 {# Rendered directly into the Bootstrap modal body via AJAX #}
-<div class="px-2">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h4 class="fw-bold mb-1 text-dark">
-                {% if poste.postId %}
-                    <i class="bi bi-pencil-square me-2 text-success"></i>Modifier la Publication
-                {% else %}
-                    <i class="bi bi-plus-circle-fill me-2 text-success"></i>Nouvelle Publication
-                {% endif %}
-            </h4>
-            <p class="text-muted small mb-0">
-                {% if poste.postId %}
-                    Publication #{{ poste.postId }} &bull; créée le {{ poste.dateCreation|date('d M Y') }}
-                {% else %}
-                    Partagez quelque chose avec la communauté GoVibe
-                {% endif %}
-            </p>
+<div class="gv-modal-premium-wrapper">
+    <!-- Top Status Bar -->
+    <div class="gv-modal-top-bar d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-3">
+            <div class="gv-icon-box">
+                <span class="material-symbols-outlined">{{ poste.postId ? 'edit_note' : 'edit' }}</span>
+            </div>
+            <span class="gv-modal-main-title">Publication</span>
         </div>
-        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="gv-btn-close-minimal" data-bs-dismiss="modal">
+            <span class="material-symbols-outlined">close</span>
+        </button>
     </div>
 
-    {{ include('poste/_form.html.twig') }}
+    <!-- Inner Content Padding -->
+    <div class="px-3 px-md-4 pb-4">
+        <!-- Main Form Header -->
+        <div class="d-flex align-items-center justify-content-between mt-4 mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="gv-action-icon {{ poste.postId ? 'edit' : 'add' }}">
+                    <span class="material-symbols-outlined">{{ poste.postId ? 'border_color' : 'add_circle' }}</span>
+                </div>
+                <div>
+                    <h4 class="gv-modal-hero-title mb-0">
+                        {{ poste.postId ? 'Modifier la Publication' : 'Nouvelle Publication' }}
+                    </h4>
+                    <p class="gv-modal-subtitle mb-0">
+                        {{ poste.postId ? 'Mise à jour de votre contenu #' ~ poste.postId : 'Partagez quelque chose avec la communauté GoVibe' }}
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="gv-btn-close-minimal opacity-50" data-bs-dismiss="modal">
+                <span class="material-symbols-outlined" style="font-size: 1.5rem;">close</span>
+            </button>
+        </div>
+
+        <div class="gv-form-scroll-area">
+            {{ include('poste/_form.html.twig') }}
+        </div>
+    </div>
 </div>
+
+<style>
+    .gv-modal-premium-wrapper {
+        background: #fff;
+        border-radius: 30px;
+        overflow: hidden;
+    }
+    .gv-modal-top-bar {
+        padding: 1.25rem 2rem;
+        background: rgba(0, 52, 45, 0.02);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    .gv-icon-box {
+        width: 38px; height: 38px;
+        background: #f0f7f4;
+        color: #00342d;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .gv-icon-box .material-symbols-outlined { font-size: 1.25rem; font-weight: 300; }
+    .gv-modal-main-title {
+        font-weight: 800; color: #00342d; font-size: 1.1rem; letter-spacing: -0.01em;
+    }
+    .gv-btn-close-minimal {
+        background: none; border: none; color: #64748b; padding: 0.5rem;
+        display: flex; align-items: center; justify-content: center;
+        transition: all 0.2s; border-radius: 50%;
+    }
+    .gv-btn-close-minimal:hover { background: rgba(0,0,0,0.05); color: #000; }
+
+    .gv-action-icon {
+        width: 32px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .gv-action-icon.add { color: #10B981; }
+    .gv-action-icon.edit { color: #52BE80; }
+    .gv-action-icon .material-symbols-outlined { font-size: 1.8rem; font-variation-settings: 'FILL' 1; }
+
+    .gv-modal-hero-title {
+        font-weight: 800; color: #1c1b1b; font-size: 1.45rem; letter-spacing: -0.02em;
+    }
+    .gv-modal-subtitle {
+        color: #64748b; font-size: 0.95rem; font-weight: 500;
+    }
+
+    .gv-form-scroll-area {
+        max-height: 70vh;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+    .gv-form-scroll-area::-webkit-scrollbar { width: 5px; }
+    .gv-form-scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .gv-form-scroll-area::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+</style>
+
 
 <script>
     if (typeof initPosteForm === 'function') {

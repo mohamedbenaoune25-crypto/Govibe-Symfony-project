@@ -51,6 +51,21 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 .gv-btn-outline:hover { border-color:rgba(0,52,45,0.2); background:rgba(0,52,45,0.03); color:#00342d; }
 .gv-btn-emerald { display:inline-flex; align-items:center; gap:0.4rem; font-weight:700; font-size:0.9rem; color:#fff; text-decoration:none; padding:0.75rem 1.5rem; border-radius:0.75rem; background:linear-gradient(135deg,#00342d,#046b5e); transition:all 0.3s; box-shadow:0 8px 20px -6px rgba(0,52,45,0.4); }
 .gv-btn-emerald:hover { transform:translateY(-2px); box-shadow:0 12px 30px -6px rgba(0,52,45,0.5); color:#fff; }
+
+/* ─── Participants Table ─── */
+.gv-part-section { margin-top:3rem; }
+.gv-part-title { font-family:'Noto Serif',serif; font-weight:700; color:#00342d; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.6rem; }
+.gv-part-table { width:100%; background:#fff; border-radius:1rem; border:1px solid rgba(0,52,45,0.06); overflow:hidden; border-collapse:collapse; font-size:0.9rem; }
+.gv-part-table th { background:#f8f7f5; padding:1rem; text-align:left; font-weight:700; text-transform:uppercase; font-size:0.65rem; color:#546067; letter-spacing:0.06em; }
+.gv-part-table td { padding:1rem; border-top:1px solid rgba(0,52,45,0.04); vertical-align:middle; }
+.gv-badge-status { display:inline-flex; align-items:center; gap:0.3rem; padding:0.3rem 0.75rem; border-radius:2rem; font-size:0.65rem; font-weight:800; text-transform:uppercase; }
+.gv-st-confirmed { background:rgba(16,185,129,0.1); color:#005046; }
+.gv-st-waiting { background:rgba(233,193,118,0.15); color:#92400e; }
+.gv-st-absent { background:rgba(186,26,26,0.1); color:#93000a; }
+
+.btn-absent { padding:0.4rem 0.8rem; border-radius:0.5rem; border:1.5px solid rgba(186,26,26,0.2); background:transparent; color:#93000a; font-weight:700; font-size:0.75rem; transition:all 0.2s; }
+.btn-absent:hover:not(:disabled) { background:#ba1a1a; color:#fff; border-color:#ba1a1a; }
+.btn-absent:disabled { opacity:0.5; cursor:not-allowed; }
 </style>
 {% endblock %}
 
@@ -100,16 +115,86 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
             </div>
         </div>
 
+        {% if is_granted('ROLE_ADMIN') and session.createdBy %}
+        <div class="gv-detail-row" style="margin-top:1rem; padding-bottom:0; border-bottom:none;">
+            <div class="gv-detail-icon" style="background:rgba(233,193,118,0.15); width:40px; height:40px;">
+                <span class="material-symbols-outlined" style="color:#ca9028; font-size:1.2rem;">person</span>
+            </div>
+            <div>
+                <div class="gv-detail-label">Créé par</div>
+                <div class="gv-detail-value" style="font-size:1rem;">{{ session.createdBy.prenom }} {{ session.createdBy.nom }}</div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="gv-show-actions">
+            {% set isOwner = session.createdBy and app.user and session.createdBy.id == app.user.id %}
+            
             <a href="{{ path('app_activite_session_index') }}" class="gv-btn-outline">
                 <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
                 Planning complet
             </a>
+
+            {% if is_granted('ROLE_ADMIN') or isOwner %}
             <a href="{{ path('app_activite_session_edit', {'idSession': session.idSession}) }}" class="gv-btn-emerald">
                 <span class="material-symbols-outlined" style="font-size:1rem;">edit</span>
                 Modifier
             </a>
+            {% endif %}
         </div>
     </div>
+
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="gv-part-section">
+        <h3 class="gv-part-title">
+            <span class="material-symbols-outlined">group</span>
+            Participants & Gestion des Absences
+        </h3>
+        <table class="gv-part-table">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Places</th>
+                    <th>Statut</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for reservation in reservations %}
+                <tr>
+                    <td style="font-weight:600; color:#00342d;">{{ reservation.userRef }}</td>
+                    <td style="font-weight:700;">{{ reservation.nbPlaces }}</td>
+                    <td>
+                        {% if reservation.isAbsent %}
+                            <span class="gv-badge-status gv-st-absent">Absent</span>
+                        {% elseif reservation.status == 'confirmed' %}
+                            <span class="gv-badge-status gv-st-confirmed">Confirmé</span>
+                        {% else %}
+                            <span class="gv-badge-status gv-st-waiting">En attente</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align:right;">
+                        {% if reservation.status == 'confirmed' and not reservation.isAbsent %}
+                            <form method="post" action="{{ path('app_reservation_session_mark_absent', {'idReservation': reservation.idReservation}) }}" onsubmit="return confirm('Marquer cet utilisateur comme absent ? Cela incrémentera son compteur de pénalités.');">
+                                <button type="submit" class="btn-absent">
+                                    <span class="material-symbols-outlined" style="font-size:0.9rem; vertical-align:-2px;">person_off</span> Marquer Absent
+                                </button>
+                            </form>
+                        {% elseif reservation.isAbsent %}
+                            <span style="font-size:0.75rem; color:#93000a; font-weight:700;">PÉNALISÉ</span>
+                        {% else %}
+                            <span style="font-size:0.75rem; color:#aaa;">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" style="text-align:center; padding:2rem; color:#707975;">Aucun participant pour le moment.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

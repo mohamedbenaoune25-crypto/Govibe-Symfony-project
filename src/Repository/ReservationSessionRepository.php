@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ReservationSession;
+use App\Entity\ActiviteSession;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -49,5 +50,21 @@ class ReservationSessionRepository extends ServiceEntityRepository
             ->setMaxResults(5)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Finds the oldest waiting reservation for a session that could potentially fit.
+     */
+    public function findFirstWaiting(ActiviteSession $session): ?ReservationSession
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.session = :session')
+            ->andWhere('r.status = :status')
+            ->setParameter('session', $session)
+            ->setParameter('status', 'waiting')
+            ->orderBy('r.reservedAt', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

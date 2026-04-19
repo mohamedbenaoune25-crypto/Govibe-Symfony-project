@@ -60,6 +60,24 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $faceEncoding = null;
 
+    #[ORM\Column(options: ['default' => 0])]
+    private ?int $absenceCount = 0;
+
+    #[ORM\Column(length: 20, options: ['default' => 'standard'])]
+    private ?string $customerType = 'standard';
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $subscriptionExpiresAt = null;
+
+    #[ORM\Column(options: ['default' => 0])]
+    private ?int $sessionCredits = 0;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $preferredCategories = null;
+
+    #[ORM\Column(length: 150, nullable: true)]
+    private ?string $residenceCity = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -233,6 +251,78 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFaceEncoding(?array $faceEncoding): self
     {
         $this->faceEncoding = $faceEncoding;
+        return $this;
+    }
+
+    public function getAbsenceCount(): ?int
+    {
+        return $this->absenceCount;
+    }
+
+    public function setAbsenceCount(int $absenceCount): self
+    {
+        $this->absenceCount = $absenceCount;
+        return $this;
+    }
+
+    public function incrementAbsenceCount(): self
+    {
+        $this->absenceCount++;
+        return $this;
+    }
+
+    public function getCustomerType(): ?string
+    {
+        return $this->customerType;
+    }
+
+    public function setCustomerType(string $customerType): self
+    {
+        $this->customerType = $customerType;
+        return $this;
+    }
+
+    public function getSubscriptionExpiresAt(): ?\DateTimeInterface
+    {
+        return $this->subscriptionExpiresAt;
+    }
+
+    public function setSubscriptionExpiresAt(?\DateTimeInterface $subscriptionExpiresAt): self
+    {
+        $this->subscriptionExpiresAt = $subscriptionExpiresAt;
+        return $this;
+    }
+
+    public function getSessionCredits(): ?int
+    {
+        return $this->sessionCredits;
+    }
+
+    public function setSessionCredits(int $sessionCredits): self
+    {
+        $this->sessionCredits = $sessionCredits;
+        return $this;
+    }
+
+    public function getPreferredCategories(): ?array
+    {
+        return $this->preferredCategories;
+    }
+
+    public function setPreferredCategories(?array $preferredCategories): self
+    {
+        $this->preferredCategories = $preferredCategories;
+        return $this;
+    }
+
+    public function getResidenceCity(): ?string
+    {
+        return $this->residenceCity;
+    }
+
+    public function setResidenceCity(?string $residenceCity): self
+    {
+        $this->residenceCity = $residenceCity;
         return $this;
     }
 }

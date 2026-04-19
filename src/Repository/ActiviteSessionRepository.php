@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ActiviteSession;
+use App\Entity\Personne;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,7 +18,8 @@ class ActiviteSessionRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return ActiviteSession[] Returns an array of ActiviteSession objects sorted by Activity name
+     * Returns ALL sessions sorted by activity name (admin use).
+     * @return ActiviteSession[]
      */
     public function findAllSortedByActiviteName(): array
     {
@@ -27,4 +29,20 @@ class ActiviteSessionRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Returns only the sessions created by a specific user.
+     * @return ActiviteSession[]
+     */
+    public function findByUser(Personne $user): array
+    {
+        return $this->createQueryBuilder('s')
+            ->join('s.activite', 'a')
+            ->where('s.createdBy = :user')
+            ->setParameter('user', $user)
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
+
