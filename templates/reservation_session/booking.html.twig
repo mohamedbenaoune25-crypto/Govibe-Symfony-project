@@ -108,29 +108,6 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
     font-size:0.9rem; text-decoration:none; padding:0.6rem; border-radius:0.5rem; transition:all 0.2s;
 }
 .gv-btn-cancel-link:hover { background:rgba(0,52,45,0.04); color:#00342d; }
-
-.gv-waitlist-notice { background:rgba(233,193,118,0.1); border:1.5px solid rgba(233,193,118,0.3); border-radius:1rem; padding:1.25rem; margin:1.5rem 0; display:flex; gap:0.75rem; color:#92400e; }
-.gv-waitlist-notice .material-symbols-outlined { color:#ca9028; font-size:1.5rem; flex-shrink:0; }
-.gv-waitlist-text { font-size:0.85rem; font-weight:600; line-height:1.4; }
-
-/* ─── Pricing & Payment ─── */
-.gv-pricing-card { background:rgba(0,52,45,0.03); border:1px solid rgba(0,52,45,0.06); border-radius:1rem; padding:1.25rem; margin:1.5rem 0; }
-.gv-price-item { display:flex; justify-content:space-between; margin-bottom:0.5rem; font-size:0.85rem; }
-.gv-price-item.discount { color:#10B981; font-weight:600; }
-.gv-price-item.extra { color:#ba1a1a; font-weight:600; }
-.gv-price-item.total { border-top:1px solid rgba(0,52,45,0.1); margin-top:0.75rem; padding-top:0.75rem; font-weight:800; color:#00342d; font-size:1rem; }
-
-.gv-input-promo { width:100%; padding:0.8rem 1rem; border-radius:0.75rem; border:1.5px solid rgba(0,52,45,0.08); font-family:'Manrope',sans-serif; font-weight:700; font-size:0.9rem; text-transform:uppercase; margin-bottom:1.5rem; }
-.gv-input-promo:focus { border-color:#10B981; outline:none; background:rgba(16,185,129,0.02); }
-
-.gv-credit-toggle { background:rgba(233,193,118,0.1); border:1.5px solid rgba(233,193,118,0.3); border-radius:1rem; padding:1rem; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between; }
-.gv-credit-info { display:flex; align-items:center; gap:0.6rem; color:#92400e; font-size:0.85rem; font-weight:700; }
-.gv-switch { position:relative; display:inline-block; width:44px; height:24px; }
-.gv-switch input { opacity:0; width:0; height:0; }
-.gv-slider { position:absolute; cursor:pointer; inset:0; background-color:#ccc; transition:.4s; border-radius:24px; }
-.gv-slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%; }
-input:checked + .gv-slider { background-color:#ca9028; }
-input:checked + .gv-slider:before { transform:translateX(20px); }
 </style>
 {% endblock %}
 
@@ -184,54 +161,19 @@ input:checked + .gv-slider:before { transform:translateX(20px); }
                     <button type="button" class="gv-stepper-btn" id="btnMinus">
                         <span class="material-symbols-outlined">remove</span>
                     </button>
-                    <input type="number" name="nbPlaces" id="nbPlaces" class="gv-stepper-input" value="1" min="1">
+                    <input type="number" name="nbPlaces" id="nbPlaces" class="gv-stepper-input" value="1" min="1" max="{{ session.nbrPlacesRestant }}">
                     <button type="button" class="gv-stepper-btn" id="btnPlus">
                         <span class="material-symbols-outlined">add</span>
                     </button>
                 </div>
-
-                <div class="gv-pricing-card">
-                    <div class="gv-price-item">
-                        <span>Prix de base unit.</span>
-                        <span>{{ pricing.basePrice }} DT</span>
-                    </div>
-                    {% for item in pricing.breakdown %}
-                        <div class="gv-price-item {{ item|contains('-') ? 'discount' : 'extra' }}">
-                            {{ item }}
-                        </div>
-                    {% endfor %}
-                    <div class="gv-price-item total">
-                        <span>Prix unitaire réduit</span>
-                        <span id="unitReduced">{{ pricing.finalPrice }} DT</span>
-                    </div>
-                </div>
-
-                <label class="gv-form-label">Code Promo</label>
-                <input type="text" name="couponCode" class="gv-input-promo" placeholder="ENTRER LE CODE ICI">
-
-                {% if user and user.sessionCredits > 0 %}
-                <div class="gv-credit-toggle">
-                    <div class="gv-credit-info">
-                        <span class="material-symbols-outlined">payments</span>
-                        Payer avec mes crédits ({{ user.sessionCredits }} restants)
-                    </div>
-                    <label class="gv-switch">
-                        <input type="checkbox" name="useCredits" id="useCredits">
-                        <span class="gv-slider"></span>
-                    </label>
-                </div>
-                {% endif %}
-
-                <div id="waitlistNotice" class="gv-waitlist-notice {{ session.nbrPlacesRestant > 0 ? 'd-none' : '' }}">
-                    <span class="material-symbols-outlined">hourglass_empty</span>
-                    <div class="gv-waitlist-text">
-                        Attention : Cette session est complète. En validant, vous serez inscrit(e) sur la liste d'attente.
-                    </div>
+                <div class="gv-form-help">
+                    <span class="material-symbols-outlined">info</span>
+                    {{ session.nbrPlacesRestant }} places disponibles
                 </div>
 
                 <div class="gv-total-box">
                     <span class="gv-total-label">Total à payer</span>
-                    <span class="gv-total-value" id="totalPrice">{{ pricing.finalPrice }} DT</span>
+                    <span class="gv-total-value" id="totalPrice">{{ activite.prix }} DT</span>
                 </div>
 
                 <button type="submit" class="gv-btn-confirm">
@@ -253,48 +195,22 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnMinus = document.getElementById('btnMinus');
     const btnPlus = document.getElementById('btnPlus');
     const totalSpan = document.getElementById('totalPrice');
-    const waitlistNotice = document.getElementById('waitlistNotice');
-    const creditToggle = document.getElementById('useCredits');
-    
-    // Pricing data from backend
-    const unitPrice = parseFloat("{{ pricing.finalPrice }}");
+    const unitPrice = parseFloat("{{ activite.prix }}");
     const maxPlaces = parseInt("{{ session.nbrPlacesRestant }}");
 
     function updateTotal() {
         const count = parseInt(nbInput.value) || 1;
         const total = (count * unitPrice).toFixed(2);
-        
-        if (creditToggle && creditToggle.checked) {
-            totalSpan.textContent = '0.00 DT (Crédits)';
-        } else {
-            totalSpan.textContent = total + ' DT';
-        }
-
-        // Update waitlist notice
-        if (count > maxPlaces) {
-            waitlistNotice.classList.remove('d-none');
-            if (maxPlaces <= 0) {
-                waitlistNotice.querySelector('.gv-waitlist-text').textContent = 'La session est complète. Vous serez placé(e) en liste d\'attente.';
-            } else {
-                waitlistNotice.querySelector('.gv-waitlist-text').textContent = 'Il ne reste que ' + maxPlaces + ' places. Les ' + (count - maxPlaces) + ' places supplémentaires seront en liste d\'attente.';
-            }
-        } else {
-            waitlistNotice.classList.add('d-none');
-        }
+        totalSpan.textContent = total + ' DT';
     }
 
     btnMinus.addEventListener('click', () => { if (nbInput.value > 1) { nbInput.value--; updateTotal(); } });
-    btnPlus.addEventListener('click', () => { nbInput.value++; updateTotal(); });
+    btnPlus.addEventListener('click', () => { if (nbInput.value < maxPlaces) { nbInput.value++; updateTotal(); } });
     nbInput.addEventListener('change', () => {
         if (nbInput.value < 1) nbInput.value = 1;
+        if (nbInput.value > maxPlaces) nbInput.value = maxPlaces;
         updateTotal();
     });
-    
-    if (creditToggle) {
-        creditToggle.addEventListener('change', updateTotal);
-    }
-    
-    updateTotal();
 });
 </script>
 {% endblock %}

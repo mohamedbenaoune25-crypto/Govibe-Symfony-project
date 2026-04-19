@@ -29,27 +29,26 @@ class GrokController extends AbstractController
 
         $model = $_ENV['GROQ_MODEL'] ?? $this->getParameter('groq_model');
         $payload = [
-            'model' => $model ?: 'llama-3.3-70b-versatile',
+            'model' => $model ?: 'llama-3.1-70b-versatile',
             'messages' => [
                 [
                     'role' => 'system',
                     'content' => "You are a professional travel assistant for 'GoVibe'. 
                     HELPFUL COMMANDS:
-                    If the user wants to create a post, ask for advice on what to share, or describes a trip, you MUST propose a publication.
+                    If the user wants to create a post or share an experience, you can propose a publication.
                     To propose a post, provide your normal conversational response, then append a block in exactly this format:
                     [POST_SUGGESTION]
                     {
                       \"type\": \"STATUS\" or \"MEDIA\",
-                      \"contenu\": \"A catchy caption with emojis (e.g., 'Exploring Paris! 🗼')\",
+                      \"contenu\": \"The suggested post text (concise and engaging)\",
                       \"localisation\": \"City, Country\",
-                      \"imageUrl\": \"A relevant Unsplash image URL (high resolution)\"
+                      \"imageUrl\": \"A relevant Unsplash image URL if type is MEDIA, otherwise null\"
                     }
                     [/POST_SUGGESTION]
                     
                     IMPORTANT: 
-                    - For images, use specific Unsplash photo URLs.
-                    - Never wrap the JSON block in backticks inside the tags.
-                    - Be Enthusiastic."
+                    - For images, use high-quality Unsplash URLs.
+                    - Be enthusiastic and travel-oriented."
                 ],
                 [
                     'role' => 'user',
@@ -112,7 +111,7 @@ class GrokController extends AbstractController
 
         $model = $_ENV['GROQ_MODEL'] ?? $this->getParameter('groq_model');
         $payload = [
-            'model' => $model ?: 'llama-3.3-70b-versatile',
+            'model' => $model ?: 'llama-3.1-70b-versatile',
             'messages' => [
                 ['role' => 'user', 'content' => $prompt]
             ],

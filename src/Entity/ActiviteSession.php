@@ -31,10 +31,6 @@ class ActiviteSession
     #[ORM\JoinColumn(name: 'activite_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Activite $activite = null;
 
-    #[ORM\ManyToOne(targetEntity: Personne::class)]
-    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
-    private ?Personne $createdBy = null;
-
     public function getIdSession(): ?int
     {
         return $this->idSession;
@@ -92,17 +88,6 @@ class ActiviteSession
     public function setActivite(?Activite $activite): self
     {
         $this->activite = $activite;
-        return $this;
-    }
-
-    public function getCreatedBy(): ?Personne
-    {
-        return $this->createdBy;
-    }
-
-    public function setCreatedBy(?Personne $createdBy): self
-    {
-        $this->createdBy = $createdBy;
         return $this;
     }
 

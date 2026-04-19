@@ -112,7 +112,6 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                         <th>Heure</th>
                         <th>Capacité</th>
                         <th>Restant</th>
-                        {% if is_granted('ROLE_ADMIN') %}<th>Créé par</th>{% endif %}
                         <th style="text-align:right;">Actions</th>
                     </tr>
                 </thead>
@@ -134,28 +133,13 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                                 {{ session.nbrPlacesRestant }} Places
                             </span>
                         </td>
-                        {% if is_granted('ROLE_ADMIN') %}
-                        <td style="font-size:0.82rem; color:#546067;">
-                            {% if session.createdBy %}
-                                <span style="font-weight:600; color:#00342d;">{{ session.createdBy.prenom }} {{ session.createdBy.nom }}</span>
-                            {% else %}
-                                <span style="color:#aaa;">—</span>
-                            {% endif %}
-                        </td>
-                        {% endif %}
                         <td style="text-align:right;">
-                            {# Show actions only if admin OR current user is the owner #}
-                            {% set isOwner = session.createdBy and app.user and session.createdBy.id == app.user.id %}
-                            {% if is_granted('ROLE_ADMIN') or isOwner %}
                             <div class="d-flex gap-2 justify-content-end">
                                 <a href="{{ path('app_activite_session_edit', {'idSession': session.idSession}) }}" class="gv-icon-btn gv-icon-btn-edit" title="Modifier">
                                     <span class="material-symbols-outlined" style="font-size:1.1rem;">edit</span>
                                 </a>
                                 {{ include('activite_session/_delete_form.html.twig', {'session': session}) }}
                             </div>
-                            {% else %}
-                            <span style="font-size:0.75rem; color:#aaa; font-style:italic;">Lecture seule</span>
-                            {% endif %}
                         </td>
                     </tr>
                 {% else %}

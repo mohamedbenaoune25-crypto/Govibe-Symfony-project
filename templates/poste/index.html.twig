@@ -350,23 +350,6 @@ body {
 }
 .gv-empty p { color: #546067; font-size: 0.9rem; }
 
-    display: flex;
-    flex-direction: column;
-}
-
-.gv-mention-name {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #00342d;
-}
-
-.gv-mention-tag {
-    font-size: 0.75rem;
-    color: #10B981;
-    font-weight: 600;
-}
-
-
 </style>
 {% endblock %}
 
@@ -510,10 +493,256 @@ body {
         </div>
     </div>
 
-
+    <!-- ─── Post Modal ─── -->
+    <div class="modal fade" id="postModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px);">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div class="modal-content border-0 rounded-4 shadow-lg" style="border-radius:1.5rem!important;">
+                <div class="modal-header border-0 pb-0 px-4 pt-4 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex align-items-center justify-content-center rounded-3" style="width:40px; height:40px; background:rgba(0,52,45,0.08);">
+                            <span class="material-symbols-outlined" style="color:#00342d;">edit_square</span>
+                        </div>
+                        <h5 class="modal-title fw-bold" style="font-family: 'Noto Serif', serif; color:#00342d;">Publication</h5>
+                    </div>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div id="modalBody" class="modal-body p-4 custom-scrollbar">
+                    <div class="text-center py-5">
+                        <div class="spinner-border" role="status" style="color:#10B981;"></div>
+                        <p class="mt-3 text-muted small">Chargement du formulaire...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
+<script>
+    let postModal;
+    let modalEl;
+    let modalBody;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        modalEl = document.getElementById('postModal');
+        modalBody = document.getElementById('modalBody');
+        postModal = new bootstrap.Modal(modalEl);
+    });
+
+    function openPostModal(url) {
+        if (!postModal) {
+            const el = document.getElementById('postModal');
+            postModal = new bootstrap.Modal(el);
+            modalBody = document.getElementById('modalBody');
+        }
+
+        modalBody.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border" role="status" style="color:#10B981;"></div>
+                <p class="mt-3 text-muted small">Connexion au serveur...</p>
+            </div>
+        `;
+        postModal.show();
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(response => response.text())
+            .then(html => {
+                const range = document.createRange();
+                const fragment = range.createContextualFragment(html);
+                modalBody.innerHTML = '';
+                modalBody.appendChild(fragment);
+                
+                setTimeout(() => {
+                    if (window.initPosteForm) {
+                        window.initPosteForm();
+                    }
+                }, 20);
+            })
+            .catch(error => {
+                modalBody.innerHTML = '<div class="alert alert-danger m-4 rounded-4">Erreur de chargement.</div>';
+            });
+    }
+
+    // --- Mentions Manager ---
+    const MentionsManager = {
+        activeInput: null,
+        listEl: null,
+        query: '',
+        selectedIndex: -1,
+        users: [],
+        _fetchTimer: null,
+
+        init() {
+            // Use capture to handle inputs in modals and post items
+            document.addEventListener('input', (e) => {
+                const tag = e.target.tagName;
+                if (tag === 'TEXTAREA' || (tag === 'INPUT' && e.target.type === 'text')) {
+                    this.handleInput(e);
+                }
+            }, true);
+
+            document.addEventListener('keydown', (e) => this.handleKeyDown(e), true);
+            document.addEventListener('click', (e) => {
+                if (this.listEl && !this.listEl.contains(e.target)) this.close();
+            });
+        },
+
+        handleInput(e) {
+            const input = e.target;
+            const cursor = input.selectionStart;
+            const text = input.value.substring(0, cursor);
+            const match = text.match(/@(\w*)$/);
+
+            if (match) {
+                this.activeInput = input;
+                this.query = match[1];
+                this.showList();
+                clearTimeout(this._fetchTimer);
+                this._fetchTimer = setTimeout(() => this.fetchUsers(this.query), 300);
+            } else {
+                if (this.listEl) this.close();
+            }
+        },
+
+        async fetchUsers(q) {
+            try {
+                const res = await fetch(`{{ path('api_users_search') }}?q=${q}`);
+                this.users = await res.json();
+                this.renderList();
+            } catch (err) {
+                // Mention fetch failed silently
+            }
+        },
+
+        showList() {
+            if (!this.listEl) {
+                this.listEl = document.createElement('div');
+                this.listEl.className = 'gv-mentions-list';
+                document.body.appendChild(this.listEl);
+            }
+            this.positionList();
+        },
+
+        positionList() {
+            if (!this.activeInput || !this.listEl) return;
+            const rect = this.activeInput.getBoundingClientRect();
+            
+            // Positioning below input
+            this.listEl.style.top = `${window.scrollY + rect.bottom + 8}px`;
+            this.listEl.style.left = `${window.scrollX + rect.left}px`;
+            
+            // Avoid overflowing right
+            const listRect = this.listEl.getBoundingClientRect();
+            if (listRect.right > window.innerWidth) {
+                this.listEl.style.left = `${window.innerWidth - listRect.width - 20}px`;
+            }
+        },
+
+        renderList() {
+            if (!this.listEl) return;
+            if (this.users.length === 0) {
+                this.listEl.innerHTML = '<div class="p-3 text-muted small text-center">Aucun utilisateur trouvé</div>';
+                return;
+            }
+
+            this.listEl.innerHTML = this.users.map((u, i) => `
+                <div class="gv-mention-item ${i === this.selectedIndex ? 'active' : ''}" data-index="${i}">
+                    <img src="${u.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.name)}" class="gv-mention-avatar">
+                    <div class="gv-mention-info">
+                        <span class="gv-mention-name">${u.name}</span>
+                        <span class="gv-mention-tag">@${u.tag}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            this.listEl.querySelectorAll('.gv-mention-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.selectUser(parseInt(item.dataset.index));
+                });
+            });
+        },
+
+        handleKeyDown(e) {
+            if (!this.listEl) return;
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                this.selectedIndex = (this.selectedIndex + 1) % this.users.length;
+                this.renderList();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                this.selectedIndex = (this.selectedIndex - 1 + this.users.length) % this.users.length;
+                this.renderList();
+            } else if (e.key === 'Enter' && this.selectedIndex >= 0) {
+                e.preventDefault();
+                this.selectUser(this.selectedIndex);
+            } else if (e.key === 'Escape') {
+                this.close();
+            }
+        },
+
+        selectUser(index) {
+            const user = this.users[index];
+            if (!user || !this.activeInput) return;
+
+            const cursor = this.activeInput.selectionStart;
+            const text = this.activeInput.value;
+            const before = text.substring(0, cursor).replace(/@\w*$/, `@${user.tag} `);
+            const after = text.substring(cursor);
+
+            this.activeInput.value = before + after;
+            this.activeInput.focus();
+            this.activeInput.setSelectionRange(before.length, before.length);
+            
+            // Trigger input event for constraints (like char counter)
+            this.activeInput.dispatchEvent(new Event('input', { bubbles: true }));
+            
+            this.close();
+        },
+
+        close() {
+            if (this.listEl) {
+                this.listEl.remove();
+                this.listEl = null;
+            }
+            this.activeInput = null;
+            this.users = [];
+            this.selectedIndex = -1;
+        }
+    };
+
+    /* --- Mentions Logic --- */
+    function highlightMentions() {
+        // Targets post text and comment contents
+        const elements = document.querySelectorAll('.post-text, .comment-bubble p');
+        elements.forEach(el => {
+            // We use textContent for analysis to avoid infinite loops with innerHTML
+            const originalHTML = el.innerHTML;
+            // Simple regex to find @word but avoiding matches inside tags already
+            // Actually, for safety with nl2br, we can just do a replace on the HTML
+            // but carefully.
+            if (el.dataset.mentionsProcessed) return;
+            
+            el.innerHTML = el.innerHTML.replace(/(@[a-zA-Z0-9_]+)/g, '<span class="text-primary fw-bold" style="color: #2563eb !important;">$1</span>');
+            el.dataset.mentionsProcessed = 'true';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        MentionsManager.init();
+        highlightMentions();
+        
+        // Debounced observer to avoid running on every micro DOM change
+        let _mentionObserverTimer;
+        const observer = new MutationObserver((mutations) => {
+            clearTimeout(_mentionObserverTimer);
+            _mentionObserverTimer = setTimeout(highlightMentions, 300);
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    });
+</script>
 {% endblock %}

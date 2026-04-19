@@ -9,27 +9,8 @@
         {{ form_row(form.description) }}
     </div>
     <div class="col-md-6">
-        <label class="form-label" style="font-weight:700;">Localisation</label>
-        <div class="input-group">
-            {{ form_widget(form.localisation) }}
-            <button type="button" class="btn btn-dark px-3" id="btn-geocode" title="Localiser sur la carte">
-                <span class="material-symbols-outlined" style="font-size:1.1rem; vertical-align:middle;">my_location</span>
-            </button>
-        </div>
+        {{ form_row(form.localisation) }}
     </div>
-    <div class="col-md-3">
-        {{ form_row(form.latitude) }}
-    </div>
-    <div class="col-md-3">
-        {{ form_row(form.longitude) }}
-    </div>
-    
-    <!-- Map Picker Row -->
-    <div class="col-12">
-        <div id="gv-map-picker" style="height: 350px; border-radius: 1rem; border: 1px solid rgba(0,52,45,0.1); margin: 0.5rem 0;"></div>
-        <small class="text-muted"><span class="material-symbols-outlined" style="font-size:0.9rem; vertical-align:middle;">info</span> Déplacez le marqueur sur la carte pour affiner la position exacte.</small>
-    </div>
-
     <div class="col-md-3">
         {{ form_row(form.prix) }}
     </div>

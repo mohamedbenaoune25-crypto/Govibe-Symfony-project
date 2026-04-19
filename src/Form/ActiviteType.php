@@ -47,16 +47,6 @@ class ActiviteType extends AbstractType
                 'label' => 'Localisation',
                 'attr' => ['placeholder' => 'Ex: Tunis, Marsa...', 'class' => 'form-control rounded-pill']
             ])
-            ->add('latitude', TextType::class, [
-                'label' => 'Latitude',
-                'required' => false,
-                'attr' => ['placeholder' => 'Ex: 36.8065', 'class' => 'form-control rounded-pill']
-            ])
-            ->add('longitude', TextType::class, [
-                'label' => 'Longitude',
-                'required' => false,
-                'attr' => ['placeholder' => 'Ex: 10.1815', 'class' => 'form-control rounded-pill']
-            ])
             ->add('prix', MoneyType::class, [
                 'label' => 'Prix (TND)',
                 'currency' => 'TND',
@@ -72,30 +62,6 @@ class ActiviteType extends AbstractType
                     'Confirmé' => 'Confirmed',
                     'En attente' => 'Pending',
                     'Annulé' => 'Cancelled',
-                ],
-                'attr' => ['class' => 'form-select rounded-pill']
-            ])
-            ->add('ambiance', TextType::class, [
-                'label' => 'Ambiance',
-                'required' => false,
-                'attr' => ['placeholder' => 'Ex: Relaxante, Festif...', 'class' => 'form-control rounded-pill']
-            ])
-            ->add('bestMoment', ChoiceType::class, [
-                'label' => 'Meilleur moment',
-                'choices' => [
-                    'Matin' => 'morning',
-                    'Après-midi' => 'afternoon',
-                    'Soirée' => 'evening',
-                    'Nuit' => 'night'
-                ],
-                'attr' => ['class' => 'form-select rounded-pill']
-            ])
-            ->add('weatherType', ChoiceType::class, [
-                'label' => 'Type de météo',
-                'choices' => [
-                    'Ensoleillé' => 'sunny',
-                    'Pluvieux' => 'rainy',
-                    'Indifférent' => 'both'
                 ],
                 'attr' => ['class' => 'form-select rounded-pill']
             ])

@@ -6,7 +6,6 @@
 {{ parent() }}
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Manrope:wght@200..800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
 body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !important; }
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
@@ -173,13 +172,6 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
     transition:all 0.25s; font-family:'Manrope',sans-serif; cursor:pointer;
 }
 .gv-btn-reject:hover { background:#ba1a1a; color:#fff; border-color:transparent; }
-
-/* ─── Map ─── */
-#gv-mini-map { height:300px; border-radius:1rem; border:1px solid rgba(0,52,45,0.06); margin-top:1rem; z-index:1; }
-
-.gv-hero-stars { display:flex; gap:3px; color:#e9c176; justify-content:center; margin-bottom:1rem; }
-.gv-hero-stars .material-symbols-outlined { font-size:1.3rem; font-variation-settings:'FILL' 1; }
-.gv-hero-stars .empty { color:rgba(255,255,255,0.2); font-variation-settings:'FILL' 0; }
 </style>
 {% endblock %}
 
@@ -192,18 +184,20 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
             <span class="gv-hero-badge gv-badge-type">
                 <span class="material-symbols-outlined" style="font-size:0.85rem;">category</span> {{ activite.type }}
             </span>
+            {% if activite.status == 'Accepted' or activite.status == 'Active' %}
+                <span class="gv-hero-badge gv-badge-status-active">
+                    <span class="material-symbols-outlined" style="font-size:0.85rem;">verified</span> {{ activite.status }}
+                </span>
+            {% elseif activite.status == 'Pending' %}
+                <span class="gv-hero-badge gv-badge-status-pending">
+                    <span class="material-symbols-outlined" style="font-size:0.85rem;">pending</span> {{ activite.status }}
+                </span>
+            {% else %}
+                <span class="gv-hero-badge gv-badge-status-rejected">
+                    <span class="material-symbols-outlined" style="font-size:0.85rem;">cancel</span> {{ activite.status }}
+                </span>
+            {% endif %}
         </div>
-        
-        {% if activite.averageRating > 0 %}
-        <div class="gv-hero-stars">
-            {% set fullStars = activite.averageRating|round(0, 'floor') %}
-            {% for i in 1..5 %}
-                <span class="material-symbols-outlined {{ i > fullStars ? 'empty' : '' }}">star</span>
-            {% endfor %}
-            <span style="font-size:0.9rem; color:rgba(255,255,255,0.6); margin-left:0.5rem; font-weight:700;">({{ activite.averageRating }}/5)</span>
-        </div>
-        {% endif %}
-
         <h1>{{ activite.name }}</h1>
         <div class="hero-location">
             <span class="material-symbols-outlined">location_on</span>
@@ -235,29 +229,6 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                     <div class="gv-stat-chip">
                         <div class="gv-stat-label">Type</div>
                         <div class="gv-stat-value">{{ activite.type }}</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- New: Context Card -->
-            <div class="gv-card">
-                <div class="gv-card-title">
-                    <span class="material-symbols-outlined">schedule</span> Horaires & Ambiance
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
-                    <div>
-                        <div class="gv-stat-label">Ouverture</div>
-                        <div style="font-weight:800; color:#00342d;">
-                            {% if activite.openingTime %}
-                                {{ activite.openingTime|date('H:i') }} — {{ activite.closingTime|date('H:i') }}
-                            {% else %}
-                                24h / 24h
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div>
-                        <div class="gv-stat-label">Ambiance</div>
-                        <div style="font-weight:800; color:#00342d;">{{ activite.ambiance ?: 'Non spécifiée' }}</div>
                     </div>
                 </div>
             </div>
@@ -313,20 +284,6 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                     {% endfor %}
                 </div>
             </div>
-
-            <!-- New: Map Card -->
-            <div class="gv-card">
-                <div class="gv-card-title">
-                    <span class="material-symbols-outlined">map</span> Localisation exacte
-                </div>
-                <div id="gv-mini-map"></div>
-                {% if not activite.latitude or not activite.longitude %}
-                    <div style="margin-top:1rem; font-size:0.8rem; color:#ba1a1a; display:flex; align-items:center; gap:0.4rem;">
-                        <span class="material-symbols-outlined" style="font-size:1rem;">info</span>
-                        Coordonnées précises non renseignées. Affichage du centre ville.
-                    </div>
-                {% endif %}
-            </div>
         </div>
     </div>
 
@@ -355,21 +312,4 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
         {% endif %}
     </div>
 </div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const lat = {{ activite.latitude ?: '36.8065' }};
-    const lng = {{ activite.longitude ?: '10.1815' }};
-    const map = L.map('gv-mini-map').setView([lat, lng], 13);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    L.marker([lat, lng]).addTo(map)
-        .bindPopup('{{ activite.name|escape('js') }}')
-        .openPopup();
-});
-</script>
 {% endblock %}

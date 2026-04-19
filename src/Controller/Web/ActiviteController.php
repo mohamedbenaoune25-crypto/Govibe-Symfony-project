@@ -4,8 +4,6 @@ namespace App\Controller\Web;
 use App\Entity\Activite;
 use App\Form\ActiviteType;
 use App\Repository\ActiviteRepository;
-use App\Repository\PersonneRepository;
-use App\Service\RecommendationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,40 +17,23 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ActiviteController extends AbstractController
 {
     #[Route('/', name: 'app_activite_index', methods: ['GET'])]
-    public function index(Request $request, ActiviteRepository $activiteRepository, RecommendationService $recommendationService, PersonneRepository $userRepo): Response
+    public function index(Request $request, ActiviteRepository $activiteRepository): Response
     {
         $query = $request->query->get('q');
-        $sortBy = $request->query->get('sort', 'rank');
         $isAdmin = $this->isGranted('ROLE_ADMIN');
         $statusFilter = $isAdmin ? null : 'Confirmed';
-
-        /** @var \App\Entity\Personne|null $user */
-        $user = $userRepo->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
 
         if ($query) {
             $activites = $activiteRepository->findBySearch($query, $statusFilter);
         } else {
             $activites = $isAdmin 
                 ? $activiteRepository->findAll() 
-                : $activiteRepository->findOptimized($user ? $user->getResidenceCity() : null, $sortBy);
-        }
-
-        $recommendations = [];
-        $trending = [];
-
-        if (!$isAdmin && !$query) {
-            if ($user) {
-                $recommendations = $recommendationService->getRecommendations($user);
-            }
-            $trending = $activiteRepository->findTrending(3);
+                : $activiteRepository->findBy(['status' => 'Confirmed']);
         }
 
         return $this->render('activite/index.html.twig', [
             'activites' => $activites,
-            'recommendations' => $recommendations,
-            'trending' => $trending,
             'search_query' => $query,
-            'current_sort' => $sortBy
         ]);
     }
 

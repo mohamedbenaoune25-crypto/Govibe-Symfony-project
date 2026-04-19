@@ -68,12 +68,58 @@
     </div>
 </div>
 
-
+<!-- Global Forum Modal -->
+<div class="modal fade" id="forumModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 rounded-5 shadow-lg p-4">
+            <div id="forumModalBody">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-success" role="status"></div>
+                    <p class="mt-3 text-muted small">Chargement...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
+<script>
+    let forumModal;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        forumModal = new bootstrap.Modal(document.getElementById('forumModal'));
+    });
+
+    function openForumModal(url) {
+        if (!forumModal) {
+            forumModal = new bootstrap.Modal(document.getElementById('forumModal'));
+        }
+
+        const body = document.getElementById('forumModalBody');
+        body.innerHTML = `
+            <div class="text-center py-5">
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="mt-3 text-muted small">Connexion au serveur...</p>
+            </div>
+        `;
+        forumModal.show();
+
+        fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.text())
+            .then(html => {
+                const range = document.createRange();
+                const fragment = range.createContextualFragment(html);
+                body.innerHTML = '';
+                body.appendChild(fragment);
+            })
+            .catch(() => {
+                body.innerHTML = '<div class="alert alert-danger m-4">Erreur de chargement.</div>';
+            });
+    }
+</script>
 {% endblock %}
 
 {% block stylesheets %}

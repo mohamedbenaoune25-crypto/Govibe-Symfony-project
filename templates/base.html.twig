@@ -51,6 +51,7 @@
             padding-top: 0;
             min-height: 100vh;
             position: relative;
+            isolation: isolate;
             overflow-x: hidden;
         }
 
@@ -368,30 +369,12 @@
             opacity: 1;
         }
 
-        .modal {
-            z-index: 100000 !important;
-        }
-        .modal-dialog {
-            z-index: 100001 !important;
-        }
-        .modal-backdrop {
-            z-index: 99990 !important;
-            background-color: rgba(1, 40, 30, 0.4) !important;
-            opacity: 1 !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-        }
-        #gv-modal-blur-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 99985;
-            display: none;
-            backdrop-filter: blur(12px) saturate(160%);
-            -webkit-backdrop-filter: blur(12px) saturate(160%);
-            pointer-events: none;
-        }
-        body.modal-open #gv-modal-blur-layer {
-            display: block !important;
+        .govibe-detail-modal .modal-backdrop.show,
+        .modal-backdrop.show {
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            background-color: rgba(1, 50, 32, 0.55);
+            opacity: 1;
         }
 
         /* ─── Card Reveal Animations ─── */
@@ -599,31 +582,6 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 52, 45, 0.3); }
 
 .modal-body { max-height: 80vh; }
-
-        /* ─── Mentions Manager UI ─── */
-        .gv-mentions-list {
-            position: absolute; z-index: 100010;
-            background: rgba(255, 255, 255, 0.98);
-            border: 1px solid rgba(0, 52, 45, 0.08);
-            border-radius: 1rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
-            min-width: 220px; max-height: 260px;
-            overflow-y: auto; padding: 0.5rem;
-            backdrop-filter: blur(10px);
-        }
-        .gv-mention-item {
-            padding: 0.75rem 1rem; cursor: pointer;
-            display: flex; align-items: center; gap: 0.85rem;
-            border-radius: 0.75rem; transition: all 0.2s ease;
-            text-decoration: none; color: inherit;
-        }
-        .gv-mention-item:hover, .gv-mention-item.active {
-            background: rgba(16, 185, 129, 0.08); color: #00342d;
-        }
-        .gv-mention-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; background: #eee; }
-        .gv-mention-info { display: flex; flex-direction: column; }
-        .gv-mention-name { font-weight: 700; font-size: 0.9rem; color: #00342d; }
-        .gv-mention-tag { font-size: 0.75rem; color: #64748b; }
 
 /* ═══ AI Voice Command Center ═══ */
 .gv-ai-orb-wrap {
@@ -986,69 +944,6 @@
     }
     .gv-mention-name { font-weight: 700; font-size: 0.9rem; }
     .gv-mention-tag { font-size: 0.75rem; color: #64748b; }
-
-    /* ── Quick Action Pills (Chatbot) ── */
-    .gv-quick-pills-bar {
-        padding: 12px 14px 8px;
-        background: linear-gradient(180deg, #f0fdf8 0%, #f8faf9 100%);
-        display: flex;
-        gap: 7px;
-        flex-wrap: wrap;
-        border-bottom: 1px solid rgba(0,52,45,0.07);
-    }
-    .gv-quick-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: #ffffff;
-        border: 1.5px solid rgba(16, 185, 129, 0.2);
-        border-radius: 14px;
-        padding: 6px 13px;
-        font-size: 0.78rem;
-        font-weight: 700;
-        color: #00342d;
-        cursor: pointer;
-        font-family: 'Inter', sans-serif;
-        transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.07);
-        letter-spacing: 0.01em;
-        position: relative;
-        overflow: hidden;
-    }
-    .gv-quick-pill::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(16,185,129,0.07), rgba(0,52,45,0.04));
-        opacity: 0;
-        transition: opacity 0.22s;
-        pointer-events: none;
-    }
-    .gv-quick-pill:hover {
-        transform: translateY(-2px);
-        border-color: rgba(16, 185, 129, 0.5);
-        box-shadow: 0 6px 18px rgba(16, 185, 129, 0.18), 0 2px 6px rgba(0,0,0,0.05);
-        color: #006d4e;
-    }
-    .gv-quick-pill:hover::before { opacity: 1; }
-    .gv-quick-pill:active {
-        transform: translateY(0px) scale(0.97);
-        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.1);
-    }
-    .gv-quick-pill .pill-icon {
-        width: 21px;
-        height: 21px;
-        border-radius: 7px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
-        flex-shrink: 0;
-    }
-    .gv-quick-pill.pill-vols    .pill-icon { background: rgba(59,130,246,0.12); }
-    .gv-quick-pill.pill-hotels  .pill-icon { background: rgba(245,158,11,0.12); }
-    .gv-quick-pill.pill-resa    .pill-icon { background: rgba(139,92,246,0.12); }
-    .gv-quick-pill.pill-inspire .pill-icon { background: rgba(16,185,129,0.12); }
 </style>
     {% block stylesheets %}{% endblock %}
 </head>
@@ -1084,8 +979,9 @@
                     {% endif %}
                 </ul>
                 <div class="d-flex align-items-center">
+<<<<<<< HEAD
                     {% if showLocaleSelector %}
-                        <div class="dropdown me-3">
+                        <div class="dropdown me-2">
                             <button class="btn user-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-translate"></i>
                                 <span>{{ activeLocale|upper }}</span>
@@ -1102,14 +998,15 @@
                             </ul>
                         </div>
                     {% endif %}
-
+=======
                     <!-- Global Search -->
                     <div class="gv-global-search">
                         <input type="text" id="gvGlobalSearchInput" placeholder="Rechercher vol, hôtel, voiture..." autocomplete="off">
                         <span class="material-symbols-outlined">search</span>
                         <div class="gv-search-dropdown" id="gvSearchDropdown"></div>
                     </div>
-
+                    
+>>>>>>> 25d65a9 (integartion avec vol api ai)
                     {% if app.user %}
                         <div class="dropdown">
                             <button class="btn user-dropdown-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -1192,47 +1089,10 @@
     {% endblock %}
     </div>
 
-    <div id="gv-modal-blur-layer"></div>
-
-    <!-- ═══ Modals & Overlays (Outside animation wrapper to prevent stacking context freeze or blur) ═══ -->
-    <div class="modal fade" id="postModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-            <div class="modal-content border-0 rounded-4 shadow-lg" style="background: #ffffff !important; box-shadow: 0 25px 80px rgba(0,0,0,0.3) !important; filter: none !important; backdrop-filter: none !important;">
-                <div class="modal-header border-0 pb-0 px-4 pt-4 d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="d-flex align-items-center justify-content-center rounded-3" style="width:40px; height:40px; background:rgba(0,52,45,0.08);">
-                            <span class="material-symbols-outlined" style="color:#00342d;">edit_square</span>
-                        </div>
-                        <h5 class="modal-title fw-bold" style="font-family: 'Outfit', sans-serif; color:#00342d;">Publication</h5>
-                    </div>
-                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div id="postModalBody" class="modal-body p-4 custom-scrollbar">
-                    <div class="text-center py-5">
-                        <div class="spinner-border" role="status" style="color:#10B981;"></div>
-                        <p class="mt-3 text-muted small">Chargement du formulaire...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade animate-fade-in" id="forumModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content border-0 rounded-5 shadow-lg">
-                <div id="forumModalBody" class="modal-body p-0">
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-success" role="status"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
+    <!-- ═══ Modals & Overlays (Outside animation wrapper to prevent stacking context freeze) ═══ -->
     <div class="modal fade govibe-detail-modal" id="detailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content" style="background: #ffffff !important; border-radius: 2rem; border: none; box-shadow: 0 25px 80px rgba(0,0,0,0.3) !important;">
+            <div class="modal-content">
                 <div id="detailModalBody" class="modal-body p-0">
                     <div class="text-center py-5">
                         <div class="spinner-border text-success" role="status"></div>
@@ -1243,7 +1103,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="chatModal" tabindex="-1" aria-hidden="true" style="z-index: 100005 !important;">
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-hidden="true" style="backdrop-filter: blur(8px);">
         <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
             <div class="modal-content border-0 overflow-hidden shadow-lg" style="border-radius:1.5rem;">
                 <div class="modal-header border-0 p-4" style="background: linear-gradient(135deg, #00342d 0%, #013220 100%); color: white;">
@@ -1279,19 +1139,11 @@
                     </div>
                     <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="gv-quick-pills-bar">
-                    <button onclick="quickCommand('Trouve-moi un vol pas cher')" class="gv-quick-pill pill-vols">
-                        <span class="pill-icon">✈️</span> Vols
-                    </button>
-                    <button onclick="quickCommand('Montre-moi les hôtels')" class="gv-quick-pill pill-hotels">
-                        <span class="pill-icon">🏨</span> Hôtels
-                    </button>
-                    <button onclick="quickCommand('Mes réservations')" class="gv-quick-pill pill-resa">
-                        <span class="pill-icon">📋</span> Réservations
-                    </button>
-                    <button onclick="quickCommand('Recommande-moi un voyage')" class="gv-quick-pill pill-inspire">
-                        <span class="pill-icon">🌍</span> Inspire-moi
-                    </button>
+                <div style="padding:10px 16px 2px;background:#f8faf9;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid rgba(0,52,45,0.06);">
+                    <button onclick="quickCommand('Trouve-moi un vol pas cher')" class="gv-quick-pill">✈️ Vols</button>
+                    <button onclick="quickCommand('Montre-moi les hôtels')" class="gv-quick-pill">🏨 Hôtels</button>
+                    <button onclick="quickCommand('Mes réservations')" class="gv-quick-pill">📋 Réservations</button>
+                    <button onclick="quickCommand('Recommande-moi un voyage')" class="gv-quick-pill">🌍 Inspire-moi</button>
                 </div>
                 <div class="chat-container">
                     <div id="chatMessages" class="chat-messages custom-scrollbar">
@@ -1425,56 +1277,6 @@
                     })
                     .catch(function() {
                         body.innerHTML = '<div class="alert alert-danger m-4 rounded-4">Impossible de charger les détails.</div>';
-                    });
-            };
-
-            window.openPostModal = function(url) {
-                const modalEl = document.getElementById('postModal');
-                if (!modalEl) return;
-                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                const body = document.getElementById('postModalBody');
-                body.innerHTML = '<div class="text-center py-5"><div class="spinner-border" role="status" style="color:#10B981;"></div><p class="mt-3 text-muted small">Chargement du formulaire...</p></div>';
-                modal.show();
-                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                    .then(r => r.text())
-                    .then(html => {
-                        body.innerHTML = html;
-                        const scripts = body.querySelectorAll('script');
-                        scripts.forEach(s => {
-                            const ns = document.createElement('script');
-                            ns.text = s.innerHTML;
-                            document.body.appendChild(ns).parentNode.removeChild(ns);
-                        });
-                        // Specific check for post creation/edit scripts
-                        setTimeout(() => {
-                            if (window.initPosteForm) window.initPosteForm();
-                        }, 50);
-                    })
-                    .catch(() => {
-                        body.innerHTML = '<div class="alert alert-danger m-4 rounded-4">Erreur de chargement.</div>';
-                    });
-            };
-
-            window.openForumModal = function(url) {
-                const modalEl = document.getElementById('forumModal');
-                if (!modalEl) return;
-                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                const body = document.getElementById('forumModalBody');
-                body.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-success" role="status"></div><p class="mt-3 text-muted small">Chargement...</p></div>';
-                modal.show();
-                fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                    .then(function(response) { return response.text(); })
-                    .then(function(html) { 
-                        body.innerHTML = html; 
-                        var scripts = body.querySelectorAll('script');
-                        scripts.forEach(function(s) {
-                            var ns = document.createElement('script');
-                            ns.text = s.innerHTML;
-                            document.body.appendChild(ns).parentNode.removeChild(ns);
-                        });
-                    })
-                    .catch(function() {
-                        body.innerHTML = '<div class="alert alert-danger m-4 rounded-4">Erreur de chargement.</div>';
                     });
             };
 
@@ -2359,8 +2161,7 @@ function sendMessage() {
         const msgEl = appendMessage('ai', data.response);
 
         // Auto-navigation capability
-        const isSuggestion = data.response && data.response.includes('[POST_SUGGESTION]');
-        if (nav && msgEl && !isSuggestion) {
+        if (nav && msgEl) {
             let targetUrl = _gvAiNavRoutes[nav.route];
             let label = nav.label;
             if (dest && nav.route === 'vols') {
@@ -2375,56 +2176,15 @@ function sendMessage() {
             msgEl.appendChild(chip);
 
             // Auto-navigate after a short delay so the user hears/sees the response
-            // [FIX] Disable auto-redirect for publications to allow reading the AI suggestion
-            if (nav.route !== 'publications') {
-                setTimeout(() => {
-                    const cm = document.getElementById('chatModal');
-                    if (cm && window.bootstrap) { 
-                        const m = bootstrap.Modal.getInstance(cm);
-                        if (m) m.hide();
-                    }
-                    window.location.href = targetUrl;
-                }, 3500);
-            } else {
-                // For publications, just update the chip to be a clickable link without timer
-                chip.innerHTML = `${nav.icon || '📝'} Cliquez ici pour voir les ${nav.label}`;
-                chip.style.cursor = 'pointer';
-                chip.onclick = () => {
-                    window.location.href = targetUrl;
-                };
-            }
-        }
-
-
-                // Speak the AI response aloud
-        speakText(data.response);
-
-                // [Grok Feature] Automatic modal open if suggestion found
-        if (model === 'groq' && isSuggestion) {
-            // Add a small notification chip to the message
-            const waitChip = document.createElement('div');
-            waitChip.className = 'mt-2 p-2 rounded-3 small fw-bold d-inline-block animate-fade-in';
-            waitChip.style.background = 'rgba(16, 185, 129, 0.1)';
-            waitChip.style.color = '#10b981';
-            waitChip.innerHTML = '<i class="bi bi-clock-history me-1"></i> Préparation du formulaire...';
-            msgEl.appendChild(waitChip);
-
             setTimeout(() => {
-                try {
-                    const block = data.response.split('[POST_SUGGESTION]')[1].split('[/POST_SUGGESTION]')[0];
-                    const jsonStr = block.replace(/```json\s*|\s*```/g, '').trim();
-                    const suggestion = JSON.parse(jsonStr);
-                    if (window.fillPostForm) {
-                        // Pass false to NOT hide the chat modal automatically
-                        window.fillPostForm(suggestion, false);
-                        waitChip.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Formulaire prêt !';
-                        waitChip.style.background = 'rgba(16, 185, 129, 0.2)';
-                    }
-                } catch (e) {
-                    console.error('Failed to auto-open post modal:', e);
-                }
-            }, 3500); // Increased to 3.5s so they can read the response
+                const cm = document.getElementById('chatModal');
+                if (cm && window.bootstrap) { bootstrap.Modal.getInstance(cm)?.hide(); }
+                window.location.href = targetUrl;
+            }, 3500);
         }
+
+        // Speak the AI response aloud
+        speakText(data.response);
     })
     .catch(() => {
         indicator.remove();
@@ -2653,198 +2413,40 @@ function parseMarkdown(text) {
     return html;
 }
 
-function fillPostForm(data, hideChat = true) {
-    if (!data) return;
-    
-    // Determine the correct creation URL: forum context or general feed
-    const forumId = window.GV_CURRENT_FORUM_ID || null;
-    const newPostUrl = forumId 
-        ? `{{ path('app_poste_new') }}/${forumId}`
-        : '{{ path('app_poste_new') }}';
-
-    // Open the creation modal with the right URL
-    if (window.openPostModal) {
-        window.openPostModal(newPostUrl);
-    }
-    
-    // Hide the chat ONLY if requested (usually for manual clicks)
-    if (hideChat) {
-        const cm = document.getElementById('chatModal');
-        if (cm) {
-            const modal = bootstrap.Modal.getInstance(cm);
-            if (modal) modal.hide();
-        }
-        if (typeof chatModal !== 'undefined' && chatModal && chatModal.hide) chatModal.hide();
-    }
-
-    let attempts = 0;
-    const maxAttempts = 50; // 5 seconds max
-
+function fillPostForm(data) {
+    openPostModal('{{ path('app_poste_new') }}');
+    chatModal.hide();
     const checkExist = setInterval(() => {
-        attempts++;
-        const form = document.querySelector('#publication-form');
+        const form = document.getElementById('publication-form');
         if (form) {
             clearInterval(checkExist);
-            
-            const textarea = form.querySelector('textarea#poste_contenu') || form.querySelector('textarea');
-            const locInput = document.getElementById('localisation-search') || form.querySelector('#poste_localisation');
-            const typeInput = form.querySelector('#poste_type') || document.getElementById('poste_type');
-
-            
-            if (textarea) {
-                textarea.value = data.contenu || '';
-                textarea.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-            
-            if (locInput) {
-                locInput.value = data.localisation || '';
-                locInput.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-
+            const textarea = form.querySelector('textarea');
+            const locInput = document.getElementById('poste_localisation');
+            if (textarea) textarea.value = data.contenu;
+            if (locInput) locInput.value = data.localisation || '';
             if (data.type === 'MEDIA') {
-                if (data.imageUrl) {
-                    const extInput = document.getElementById('poste_externalImageUrl');
-                    const fakeInput = document.getElementById('fake-file-input');
-                    if (extInput) {
-                        extInput.value = data.imageUrl;
-                        extInput.dispatchEvent(new Event('input', { bubbles: true }));
-                    }
-                    if (fakeInput) {
-                        fakeInput.value = "Image suggérée par l'IA";
-                    }
-                    
-                    // Force preview update before mode switch
-                    const imgP = document.getElementById('image-preview');
-                    const pc = document.getElementById('preview-image-container');
-                    const np = document.getElementById('no-preview');
-                    if (imgP) {
-                        imgP.src = data.imageUrl;
-                        if (pc) pc.style.display = 'block';
-                        if (np) np.style.display = 'none';
-                    }
-                }
-                
-                // Now switch to photo mode
                 const btnPhoto = document.getElementById('btn-photo-video');
                 if (btnPhoto) btnPhoto.click();
-            } else {
-                const bt = document.getElementById('btn-status-texte');
-                if (bt) bt.click();
-            }
-
-            
-            // Highlight the filled fields briefly
-            if (textarea) {
-                textarea.style.transition = 'background 0.5s';
-                textarea.style.background = 'rgba(16, 185, 129, 0.1)';
-                setTimeout(() => textarea.style.background = '', 1500);
-            }
-        } 
-        
-        if (attempts >= maxAttempts) {
-            clearInterval(checkExist);
-            console.error('AI Fill: Form not found after timeout');
+                if (data.imageUrl) {
+                    const extInput = document.getElementById('poste_externalImageUrl');
+                    if (extInput) extInput.value = data.imageUrl;
+                    const imgP = document.getElementById('image-preview'), pc = document.getElementById('preview-image-container'), np = document.getElementById('no-preview');
+                    if (imgP) { imgP.src = data.imageUrl; if(pc) pc.style.display='block'; if(np) np.style.display='none'; }
+                }
+            } else { const bt = document.getElementById('btn-status-texte'); if(bt) bt.click(); }
+            if (textarea) textarea.dispatchEvent(new Event('input'));
         }
     }, 100);
 }
 
-
-    function showTypingIndicator() {
-        const c = document.getElementById('chatMessages');
-        const d = document.createElement('div');
-        d.className = 'chat-message ai';
-        d.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
-        c.appendChild(d); c.scrollTop = c.scrollHeight;
-        return d;
-    }
-
-    // --- Mentions Manager ---
-    const MentionsManager = {
-        activeInput: null, listEl: null, query: '', selectedIndex: -1, users: [], _fetchTimer: null,
-        init() {
-            document.addEventListener('input', (e) => {
-                const tag = e.target.tagName;
-                if (tag === 'TEXTAREA' || (tag === 'INPUT' && e.target.type === 'text')) { this.handleInput(e); }
-            }, true);
-            document.addEventListener('keydown', (e) => this.handleKeyDown(e), true);
-            document.addEventListener('click', (e) => { if (this.listEl && !this.listEl.contains(e.target)) this.close(); });
-        },
-        handleInput(e) {
-            const input = e.target, cursor = input.selectionStart;
-            const text = input.value.substring(0, cursor), match = text.match(/@(\w*)$/);
-            if (match) {
-                this.activeInput = input; this.query = match[1]; this.showList();
-                clearTimeout(this._fetchTimer);
-                this._fetchTimer = setTimeout(() => this.fetchUsers(this.query), 300);
-            } else if (this.listEl) { this.close(); }
-        },
-        async fetchUsers(q) {
-            try {
-                const res = await fetch(`{{ path('api_users_search') }}?q=${q}`);
-                this.users = await res.json(); this.renderList();
-            } catch (err) {}
-        },
-                        showList() {
-            if (!this.listEl) {
-                this.listEl = document.createElement('div');
-                this.listEl.className = 'gv-mentions-list';
-                this.listEl.style.position = 'fixed';
-                this.listEl.style.zIndex = '999999';
-            }
-            document.body.appendChild(this.listEl);
-            this.positionList();
-        },
-        positionList() {
-            if (!this.activeInput || !this.listEl) return;
-            const rect = this.activeInput.getBoundingClientRect();
-            this.listEl.style.top = (rect.bottom + 4) + 'px';
-            this.listEl.style.left = rect.left + 'px';
-            this.listEl.style.width = rect.width + 'px';
-        },
-        renderList() {
-            if (!this.listEl) return;
-            if (this.users.length === 0) { this.listEl.innerHTML = '<div class="p-3 text-muted small text-center">Aucun utilisateur trouvé</div>'; return; }
-            this.listEl.innerHTML = this.users.map((u, i) => `
-                <div class="gv-mention-item ${i === this.selectedIndex ? 'active' : ''}" data-index="${i}">
-                    <img src="${u.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(u.name)}" class="gv-mention-avatar">
-                    <div class="gv-mention-info"><span class="gv-mention-name">${u.name}</span><span class="gv-mention-tag">@${u.tag}</span></div>
-                </div>`).join('');
-            this.listEl.querySelectorAll('.gv-mention-item').forEach(item => {
-                item.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); this.selectUser(parseInt(item.dataset.index)); });
-            });
-        },
-        handleKeyDown(e) {
-            if (!this.listEl) return;
-            if (e.key === 'ArrowDown') { e.preventDefault(); this.selectedIndex = (this.selectedIndex + 1) % this.users.length; this.renderList(); }
-            else if (e.key === 'ArrowUp') { e.preventDefault(); this.selectedIndex = (this.selectedIndex - 1 + this.users.length) % this.users.length; this.renderList(); }
-            else if (e.key === 'Enter' && this.selectedIndex >= 0) { e.preventDefault(); this.selectUser(this.selectedIndex); }
-            else if (e.key === 'Escape') { this.close(); }
-        },
-        selectUser(index) {
-            const user = this.users[index]; if (!user || !this.activeInput) return;
-            const cursor = this.activeInput.selectionStart, text = this.activeInput.value;
-            const before = text.substring(0, cursor).replace(/@\w*$/, `@${user.tag} `), after = text.substring(cursor);
-            this.activeInput.value = before + after; this.activeInput.focus();
-            this.activeInput.setSelectionRange(before.length, before.length);
-            this.activeInput.dispatchEvent(new Event('input', { bubbles: true }));
-            this.close();
-        },
-        close() { if (this.listEl) { this.listEl.remove(); this.listEl = null; } this.activeInput = null; this.users = []; this.selectedIndex = -1; }
-    };
-
-    function highlightMentions() {
-        document.querySelectorAll('.post-text, .comment-bubble p').forEach(el => {
-            if (el.dataset.mentionsProcessed) return;
-            el.innerHTML = el.innerHTML.replace(/(@[a-zA-Z0-9_]+)/g, '<span class="text-primary fw-bold" style="color:#22c55e !important;">$1</span>');
-            el.dataset.mentionsProcessed = 'true';
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        MentionsManager.init();
-        highlightMentions();
-        new MutationObserver(() => highlightMentions()).observe(document.body, { childList: true, subtree: true });
-    });
+function showTypingIndicator() {
+    const c = document.getElementById('chatMessages');
+    const d = document.createElement('div');
+    d.className = 'chat-message ai';
+    d.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+    c.appendChild(d); c.scrollTop = c.scrollHeight;
+    return d;
+}
 </script>
     {% block javascripts %}{% endblock %}
 </body>
