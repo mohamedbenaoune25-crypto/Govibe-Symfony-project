@@ -7,6 +7,66 @@
     <h4 class="fw-bold" style="color:var(--admin-primary); margin:0;">
         <i class="bi bi-people-fill me-2" style="color:var(--admin-accent);"></i> Annuaire des Comptes
     </h4>
+    <button type="button" class="btn btn-primary-pro" data-bs-toggle="modal" data-bs-target="#createAdminModal">
+        <i class="bi bi-person-plus-fill me-2"></i> Ajouter un Compte
+    </button>
+</div>
+
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success rounded-4 border-0 mb-3" style="background:rgba(16,185,129,0.08);color:#059669;border:1px solid rgba(16,185,129,0.15)!important;font-weight:600;">
+        <i class="bi bi-check-circle-fill me-2"></i> {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="alert alert-danger rounded-4 border-0 mb-3" style="background:rgba(220,38,38,0.06);color:#dc2626;border:1px solid rgba(220,38,38,0.12)!important;font-weight:600;">
+        <i class="bi bi-exclamation-circle-fill me-2"></i> {{ message }}
+    </div>
+{% endfor %}
+
+<!-- Create Admin Modal -->
+<div class="modal fade" id="createAdminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color:var(--admin-primary);">
+                    <i class="bi bi-person-plus-fill me-2" style="color:var(--admin-accent);"></i> Créer un nouveau compte
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form method="post" action="{{ path('app_admin_user_create') }}">
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;">Prénom</label>
+                            <input type="text" name="prenom" class="form-control" placeholder="Prénom" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;">Nom</label>
+                            <input type="text" name="nom" class="form-control" placeholder="Nom" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;">Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="admin@govibe.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;">Mot de passe</label>
+                        <input type="password" name="password" class="form-control" placeholder="8 caractères minimum" minlength="8" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;">Rôle</label>
+                        <select name="role" class="form-select">
+                            <option value="admin" selected>Administrateur</option>
+                            <option value="user">Utilisateur</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary-pro w-100">
+                        <i class="bi bi-check-lg me-1"></i> Créer le compte
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">

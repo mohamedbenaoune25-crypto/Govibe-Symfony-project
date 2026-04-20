@@ -17,7 +17,7 @@
 
 body {
     font-family: 'Manrope', sans-serif !important;
-    background: transparent !important;
+    background: #fcf9f8 !important;
     color: #1c1b1b !important;
     overflow-x: hidden !important;
     margin: 0 !important;
@@ -57,6 +57,7 @@ body {
     position: absolute;
     inset: 0;
     z-index: 0;
+    background: url('{{ asset('images/home-hero5.png') }}') center/cover no-repeat;
 }
 .gv-hero-canvas canvas {
     width: 100%;
@@ -761,9 +762,9 @@ body {
 /* ═══ CUSTOM NAVBAR OVERRIDE ─── */
 .govibe-navbar {
     position: fixed !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    box-shadow: none !important;
+    background: rgba(1, 50, 32, 0.95) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15) !important;
 }
 .govibe-navbar.scrolled {
     background: rgba(1, 50, 32, 0.95) !important;
@@ -772,7 +773,8 @@ body {
 }
 
 /* ─── Remove base template margin for homepage ─── */
-body > .container.position-relative { margin-top: 0 !important; display: none; }
+.gv-content-fade-in { display: contents; }
+.gv-content-fade-in > .container.position-relative { margin-top: 0 !important; display: none; }
 
 /* ─── Footer spacing ─── */
 .govibe-footer { margin-top: 0 !important; }

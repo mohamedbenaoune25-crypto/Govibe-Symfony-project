@@ -46,67 +46,14 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #0a192f; /* Dark nautical fallback */
+            background: linear-gradient(165deg, rgba(1, 50, 32, 0.45), rgba(5, 35, 24, 0.35)),
+                        url('{{ asset('images/home-hero5.png') }}') center/cover fixed no-repeat;
             color: #333;
             padding-top: 0;
             min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
         }
 
-        /* ─── Tropical Emerald Background ─── */
-        #gv-tropical-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -20;
-            background-color: #013220; /* Dark green fallback */
-            background-image: url('{{ asset('images/home-hero5.png') }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            will-change: transform;
-            animation: gv-tropical-breeze 30s ease-in-out infinite alternate;
-        }
 
-        @keyframes gv-tropical-breeze {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.08); }
-        }
-
-        /* ─── Modern Glassmorphism ─── */
-        .glass-emerald-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(1, 50, 32, 0.1);
-        }
-
-        /* ─── Content Reveal Animation ─── */
-        .gv-content-fade-in {
-            animation: gv-content-lift 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-            position: relative;
-            z-index: 10;
-        }
-
-        .gv-tropical-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: -10;
-            background: radial-gradient(circle at 50% 50%, rgba(1, 50, 32, 0.1) 0%, rgba(0,0,0,0.4) 100%);
-            pointer-events: none;
-        }
-
-        @keyframes gv-content-lift {
-            0% {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
 
         body[dir="rtl"] {
             direction: rtl;
@@ -360,14 +307,13 @@
             color: var(--primary-emerald) !important;
         }
 
-        /* ─── Detail Modal (global) ─── */
         .govibe-detail-modal .modal-content {
             border: 0;
-            border-radius: 32px; /* Smoother, more premium corners */
+            border-radius: 24px;
             overflow: hidden;
-            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.4);
-            background: #000; /* Match wrapper black base */
-            max-height: calc(100vh - 5rem);
+            box-shadow: 0 40px 100px rgba(1, 50, 32, 0.25);
+            background: rgba(255, 255, 255, 0.98);
+            max-height: calc(100vh - 2rem);
         }
 
         .govibe-detail-modal .modal-dialog {
@@ -396,30 +342,10 @@
             opacity: 1;
         }
 
-        .modal {
-            z-index: 100000 !important;
-        }
-        .modal-dialog {
-            z-index: 100001 !important;
-        }
         .modal-backdrop {
-            z-index: 99990 !important;
-            background-color: rgba(1, 40, 30, 0.4) !important;
-            opacity: 1 !important;
-            backdrop-filter: none !important;
-            -webkit-backdrop-filter: none !important;
-        }
-        #gv-modal-blur-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 99985;
-            display: none;
-            backdrop-filter: blur(12px) saturate(160%);
-            -webkit-backdrop-filter: blur(12px) saturate(160%);
-            pointer-events: none;
-        }
-        body.modal-open #gv-modal-blur-layer {
-            display: block !important;
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            background-color: rgba(1, 50, 32, 0.55);
         }
 
         /* ─── Card Reveal Animations ─── */
@@ -595,30 +521,16 @@
             padding: 128px 0 72px;
         }
 
-        /* Glass-Style Form Cards */
         .go-form-card {
             border: 0;
             border-radius: 28px;
             overflow: hidden;
-            box-shadow: 0 40px 100px rgba(1, 50, 32, 0.18);
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            transform-origin: center center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 30px 80px rgba(1, 50, 32, 0.12);
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
         }
 
 
-        @media (prefers-reduced-motion: reduce) {
-            #gv-ocean-bg,
-            .go-form-card,
-            .gv-content-fade-in,
-            .modal.fade .modal-dialog,
-            .modal.show .modal-dialog {
-                animation: none !important;
-                transition: none !important;
-            }
-        }
 
 
         .go-form-card-header {
@@ -1121,8 +1033,7 @@
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
-    <div id="gv-tropical-bg"></div>
-    <div class="gv-tropical-overlay"></div>
+
 
 
     {% block header %}

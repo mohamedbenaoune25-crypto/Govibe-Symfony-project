@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/admin')]
 #[IsGranted('ROLE_ADMIN')]
@@ -407,5 +408,51 @@ class AdminController extends AbstractController
         }
 
         return $this->redirectToRoute('app_admin_attention');
+    }
+
+    #[Route('/users/create', name: 'app_admin_user_create', methods: ['POST'])]
+    public function createAdmin(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+    {
+        $prenom = trim($request->request->get('prenom', ''));
+        $nom = trim($request->request->get('nom', ''));
+        $email = trim($request->request->get('email', ''));
+        $plainPassword = $request->request->get('password', '');
+        $role = $request->request->get('role', 'admin');
+
+        // Validation
+        if (empty($prenom) || empty($nom) || empty($email) || empty($plainPassword)) {
+            $this->addFlash('error', 'Veuillez remplir tous les champs.');
+            return $this->redirectToRoute('app_admin_users');
+        }
+
+        if (strlen($plainPassword) < 8) {
+            $this->addFlash('error', 'Le mot de passe doit contenir au moins 8 caractères.');
+            return $this->redirectToRoute('app_admin_users');
+        }
+
+        // Check duplicate email
+        $existing = $entityManager->getRepository(Personne::class)->findOneBy(['email' => $email]);
+        if ($existing) {
+            $this->addFlash('error', 'Un compte existe déjà avec cette adresse email.');
+            return $this->redirectToRoute('app_admin_users');
+        }
+
+        // Create user
+        $user = new Personne();
+        $user->setPrenom($prenom);
+        $user->setNom($nom);
+        $user->setEmail($email);
+        $user->setRole(in_array($role, ['user', 'admin']) ? $role : 'admin');
+        $user->setProvider('local');
+
+        $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+        $user->setPassword($hashedPassword);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Le compte ' . ($role === 'admin' ? 'administrateur' : 'utilisateur') . ' a été créé avec succès.');
+
+        return $this->redirectToRoute('app_admin_users');
     }
 }
