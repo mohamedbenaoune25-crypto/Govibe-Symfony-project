@@ -80,6 +80,60 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
 .gv-info-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #546067; margin-bottom: 0.3rem; }
 .gv-info-value { font-weight: 700; color: #00342d; font-size: 1rem; }
 
+.gv-weather-panel {
+    background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(233,193,118,0.10));
+    border: 1px solid rgba(0,52,45,0.06);
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.gv-weather-icon {
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.72);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #00342d;
+    flex: 0 0 auto;
+}
+.gv-weather-icon .material-symbols-outlined { font-size: 1.6rem; }
+.gv-weather-copy { flex: 1; }
+.gv-weather-temp { font-size: 1.8rem; font-weight: 800; color: #00342d; line-height: 1; }
+.gv-weather-label { font-size: 0.85rem; color: #546067; margin-top: 0.25rem; }
+.gv-weather-meta { margin-top: 0.5rem; font-size: 0.8rem; color: #707975; }
+
+.gv-weather-forecast {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+.gv-weather-day {
+    background: rgba(255,255,255,0.72);
+    border-radius: 1rem;
+    padding: 0.85rem;
+    border: 1px solid rgba(0,52,45,0.05);
+}
+.gv-weather-day-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+}
+.gv-weather-day-name { font-size: 0.82rem; font-weight: 800; color: #00342d; }
+.gv-weather-day-icon .material-symbols-outlined { font-size: 1.1rem; color: #00342d; }
+.gv-weather-day-temps { font-weight: 800; color: #00342d; font-size: 0.95rem; }
+.gv-weather-day-meta { margin-top: 0.25rem; font-size: 0.76rem; color: #707975; }
+
+@media (max-width: 576px) {
+    .gv-weather-forecast { grid-template-columns: 1fr; }
+}
+
 .gv-description { color: #546067; line-height: 1.7; font-size: 0.95rem; }
 
 /* Chambres */
@@ -201,6 +255,37 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                     </div>
                     {% endif %}
                 </div>
+                {% if weather and weather.success %}
+                <div class="gv-weather-panel">
+                    <div class="gv-weather-icon">
+                        <span class="material-symbols-outlined">{{ weather.icon }}</span>
+                    </div>
+                    <div class="gv-weather-copy">
+                        <div class="gv-weather-temp">{{ weather.temperature }}°C</div>
+                        <div class="gv-weather-label">{{ weather.label }} - {{ weather.summary }}</div>
+                        <div class="gv-weather-meta">{{ weather_city }} - ressenti {{ weather.apparent_temperature }}°C, vent {{ weather.wind_speed }} km/h</div>
+                    </div>
+                </div>
+                {% if weather.forecast is defined and weather.forecast|length > 0 %}
+                <div class="gv-weather-forecast">
+                    {% for day in weather.forecast %}
+                    <div class="gv-weather-day">
+                        <div class="gv-weather-day-top">
+                            <div class="gv-weather-day-name">{{ day.day_label }}</div>
+                            <div class="gv-weather-day-icon">
+                                <span class="material-symbols-outlined">{{ day.icon }}</span>
+                            </div>
+                        </div>
+                        <div class="gv-weather-day-temps">{{ day.temperature_max }}° / {{ day.temperature_min }}°</div>
+                        <div class="gv-weather-day-meta">{{ day.label }}</div>
+                        {% if day.rain_probability is not null %}
+                        <div class="gv-weather-day-meta">Pluie: {{ day.rain_probability }}%</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endif %}
             </div>
 
             <!-- Description Card -->
@@ -256,6 +341,39 @@ body { font-family: 'Manrope', sans-serif !important; background: #fcf9f8 !impor
                     <span class="material-symbols-outlined" style="font-size:1rem;">arrow_back</span>
                     {{ 'common.back_to_list'|trans }}
                 </a>
+            </div>
+
+            <div class="gv-sidebar-card">
+                <h5>Météo de la ville</h5>
+                {% if weather and weather.success %}
+                    <div class="gv-weather-panel" style="padding:1rem; align-items:flex-start;">
+                        <div class="gv-weather-icon" style="width:2.8rem; height:2.8rem;">
+                            <span class="material-symbols-outlined">{{ weather.icon }}</span>
+                        </div>
+                        <div class="gv-weather-copy">
+                            <div class="gv-weather-temp" style="font-size:1.55rem;">{{ weather.temperature }}°C</div>
+                            <div class="gv-weather-label">{{ weather.label }}</div>
+                            <div class="gv-weather-meta">{{ weather.summary }}</div>
+                            <div class="gv-weather-meta">Ressenti {{ weather.apparent_temperature }}°C · Vent {{ weather.wind_speed }} km/h</div>
+                        </div>
+                    </div>
+                    {% if weather.forecast is defined and weather.forecast|length > 0 %}
+                        <div class="gv-weather-forecast" style="margin-top:0.85rem; grid-template-columns:1fr;">
+                            {% for day in weather.forecast %}
+                                <div class="gv-weather-day">
+                                    <div class="gv-weather-day-top">
+                                        <div class="gv-weather-day-name">{{ day.day_label }}</div>
+                                        <div class="gv-weather-day-icon"><span class="material-symbols-outlined">{{ day.icon }}</span></div>
+                                    </div>
+                                    <div class="gv-weather-day-temps">{{ day.temperature_max }}° / {{ day.temperature_min }}°</div>
+                                    <div class="gv-weather-day-meta">{{ day.label }}</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="gv-note">{{ weather.label|default('Météo indisponible pour le moment.') }}</div>
+                {% endif %}
             </div>
 
             <div class="gv-sidebar-card">

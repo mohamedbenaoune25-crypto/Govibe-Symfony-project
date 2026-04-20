@@ -328,6 +328,31 @@ body {
 }
 .gv-hotel-location .material-symbols-outlined { font-size: 0.95rem; color: #10B981; }
 
+.gv-hotel-weather {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.8rem 1rem;
+    border-radius: 1rem;
+    background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(233,193,118,0.10));
+    border: 1px solid rgba(0,52,45,0.06);
+    margin-bottom: 1rem;
+}
+.gv-hotel-weather-icon {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.7);
+    color: #00342d;
+}
+.gv-hotel-weather-icon .material-symbols-outlined { font-size: 1.2rem; }
+.gv-hotel-weather-text { line-height: 1.2; }
+.gv-hotel-weather-temp { font-weight: 800; color: #00342d; font-size: 1rem; }
+.gv-hotel-weather-label { font-size: 0.78rem; color: #546067; }
+
 .gv-hotel-desc {
     color: #707975;
     font-size: 0.88rem;
@@ -482,6 +507,7 @@ body {
             {% set hotelAddress = translated_hotel_value(hotel, 'adresse') %}
             {% set hotelCity = translated_hotel_value(hotel, 'ville') %}
             {% set translatedDescription = translated_hotel_description(hotel) %}
+            {% set weather = weather_by_city[hotelCity]|default(null) %}
             <div class="gv-hotel-card gv-reveal">
                 <div class="gv-hotel-img-wrapper">
                     {% if hotel.photoUrl %}
@@ -505,6 +531,17 @@ body {
                         <span class="material-symbols-outlined">location_on</span>
                         {{ hotelAddress }}, {{ hotelCity }}
                     </div>
+                    {% if weather and weather.success %}
+                        <div class="gv-hotel-weather">
+                            <span class="gv-hotel-weather-icon">
+                                <span class="material-symbols-outlined">{{ weather.icon }}</span>
+                            </span>
+                            <div class="gv-hotel-weather-text">
+                                <div class="gv-hotel-weather-temp">{{ weather.temperature }}°C</div>
+                                <div class="gv-hotel-weather-label">{{ weather.label }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
                     {% if translatedDescription %}
                         <p class="gv-hotel-desc">{{ translatedDescription|slice(0, 120) }}...</p>
                     {% endif %}

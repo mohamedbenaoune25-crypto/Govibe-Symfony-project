@@ -8,6 +8,8 @@ use App\Form\HotelType;
 use App\Form\ReservationType;
 use App\Repository\HotelRepository;
 use App\Repository\ReservationRepository;
+use App\Service\HotelDescriptionTranslationService;
+use App\Service\WeatherService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,11 +21,18 @@ use App\Service\HolidayService;
 #[Route('/hotel')]
 class HotelController extends AbstractController
 {
-    private HolidayService $holidayService;
+    private readonly HolidayService $holidayService;
+    private readonly WeatherService $weatherService;
+    private readonly HotelDescriptionTranslationService $hotelDescriptionTranslationService;
 
-    public function __construct(HolidayService $holidayService)
-    {
+    public function __construct(
+        HolidayService $holidayService,
+        WeatherService $weatherService,
+        HotelDescriptionTranslationService $hotelDescriptionTranslationService
+    ) {
         $this->holidayService = $holidayService;
+        $this->weatherService = $weatherService;
+        $this->hotelDescriptionTranslationService = $hotelDescriptionTranslationService;
     }
 
     #[Route('/', name: 'app_hotel_index', methods: ['GET'])]
@@ -38,12 +47,15 @@ class HotelController extends AbstractController
         } else {
             $hotels = $hotelRepository->findAllSorted($sortBy, $sortDir);
         }
+
+        $weatherByCity = $this->buildWeatherByCity($hotels, $request->getLocale());
         
         return $this->render('hotel/index.html.twig', [
             'hotels' => $hotels,
             'search' => $search,
             'sortBy' => $sortBy,
             'sortDir' => $sortDir,
+            'weather_by_city' => $weatherByCity,
         ]);
     }
 
@@ -117,11 +129,16 @@ class HotelController extends AbstractController
                 ->getResult();
         }
 
+        $hotelCity = $this->hotelDescriptionTranslationService->resolveCity($hotel, $request->getLocale());
+        $weather = $this->weatherService->getCurrentWeatherForCity($hotelCity, $request->getLocale());
+
         return $this->render('hotel/show.html.twig', [
             'hotel' => $hotel,
             'delete_form' => $deleteForm->createView(),
             'reservation_form' => $reservationForm?->createView(),
             'hotel_reservations' => $hotelReservations,
+            'weather' => $weather,
+            'weather_city' => $hotelCity,
         ]);
     }
 
@@ -237,5 +254,29 @@ class HotelController extends AbstractController
 
         $lowSeason = (float) ($chambre->getPrixBasseSaison() ?? 0);
         return $lowSeason > 0 ? $lowSeason : 0.0;
+    }
+
+    /**
+     * @param iterable<Hotel> $hotels
+     * @return array<string, array<string, mixed>>
+     */
+    private function buildWeatherByCity(iterable $hotels, string $locale): array
+    {
+        $weatherByCity = [];
+
+        foreach ($hotels as $hotel) {
+            if (!$hotel instanceof Hotel) {
+                continue;
+            }
+
+            $city = trim($this->hotelDescriptionTranslationService->resolveCity($hotel, $locale));
+            if ($city === '' || isset($weatherByCity[$city])) {
+                continue;
+            }
+
+            $weatherByCity[$city] = $this->weatherService->getCurrentWeatherForCity($city, $locale);
+        }
+
+        return $weatherByCity;
     }
 }
