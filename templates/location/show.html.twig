@@ -105,6 +105,34 @@ body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.ma
             <div class="gv-fr"><span class="gv-fl">Nombre de jours</span><span class="gv-fv">× {{ stats.nbJours }}</span></div>
             <div class="gv-ft"><span>Montant Total</span><span>{{ '%0.2f'|format(stats.prixTotal) }} DT</span></div>
         </div>
+            <!-- Début Widget Conversion de Devises (Frankfurter) -->
+            <div class="gv-fb" style="margin-top:1.5rem; background:#f7fafc; border:1.5px solid #e5e7eb; border-radius:1rem;">
+                <div style="font-weight:700; color:#00342d; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem; color:#10B981;">currency_exchange</span>
+                    Convertisseur de devises (open source, Frankfurter)
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
+                    <input type="number" id="conv-amount" value="{{ '%0.2f'|format(stats.prixTotal) }}" min="0" step="0.01" style="width:110px; padding:0.5rem 0.7rem; border-radius:0.5rem; border:1px solid #d1d5db; font-size:1rem;">
+                    <span style="font-weight:700; color:#10B981;">DT</span>
+                    <span style="margin:0 0.5rem;">→</span>
+                    <select id="conv-currency" style="padding:0.5rem 0.7rem; border-radius:0.5rem; border:1px solid #d1d5db; font-size:1rem;">
+                        <option value="USD">Dollar ($)</option>
+                        <option value="GBP">Livre (£)</option>
+                        <option value="CAD">Dollar CA</option>
+                        <option value="CHF">Franc Suisse</option>
+                        <option value="JPY">Yen (¥)</option>
+                        <option value="SAR">Riyal SAR</option>
+                        <option value="AED">Dirham AED</option>
+                        <option value="MAD">Dirham MAD</option>
+                        <option value="DZD">Dinar DZD</option>
+                        <option value="LYD">Dinar LYD</option>
+                    </select>
+                    <button id="conv-btn" type="button" style="background:#10B981; color:#fff; border:none; border-radius:0.5rem; padding:0.5rem 1.2rem; font-weight:700; cursor:pointer;">Convertir</button>
+                </div>
+                <div id="conv-result" style="font-size:1.1rem; color:#00342d; font-weight:700;"></div>
+                <div style="font-size:0.85rem; color:#546067; margin-top:0.3rem;">Taux via <a href="https://frankfurter.dev/" target="_blank" rel="noopener" style="color:#10B981; text-decoration:underline;">frankfurter.dev</a> (open source, pas de clé API)</div>
+            </div>
+            <!-- Fin Widget Conversion de Devises (Frankfurter) -->
     </div>
     <div class="gv-card">
         <div class="gv-ct"><span class="material-symbols-outlined">description</span> Documents</div>
@@ -141,6 +169,53 @@ body{font-family:'Manrope',sans-serif!important;background:#fcf9f8!important}.ma
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // --- Conversion de devises (Frankfurter) ---
+    const convBtn = document.getElementById('conv-btn');
+    const convAmount = document.getElementById('conv-amount');
+    const convCurrency = document.getElementById('conv-currency');
+    const convResult = document.getElementById('conv-result');
+
+    // Liste des devises supportées par Frankfurter
+    // TND (dinar tunisien) n'est pas supporté directement, conversion via EUR
+    // On utilise le taux EUR->TND et EUR->[devise]
+    async function convertCurrency() {
+        const amount = parseFloat(convAmount.value);
+        const to = convCurrency.value;
+        if (isNaN(amount) || amount <= 0) {
+            convResult.textContent = 'Veuillez entrer un montant valide.';
+            return;
+        }
+        convResult.textContent = 'Conversion...';
+        try {
+            // 1. Récupérer le taux EUR->TND
+            const tndRateResp = await fetch('https://api.frankfurter.dev/v2/rate/EUR/TND');
+            const tndRateData = await tndRateResp.json();
+            if (!tndRateData.rate) {
+                convResult.textContent = 'Taux EUR/TND non disponible.';
+                return;
+            }
+            // 2. Récupérer le taux EUR->[devise]
+            const toRateResp = await fetch(`https://api.frankfurter.dev/v2/rate/EUR/${to}`);
+            const toRateData = await toRateResp.json();
+            if (!toRateData.rate) {
+                convResult.textContent = 'Taux EUR/' + to + ' non disponible.';
+                return;
+            }
+            // 3. Conversion : montant DT -> EUR -> [devise]
+            const montantEur = amount / tndRateData.rate;
+            const montantFinal = montantEur * toRateData.rate;
+            convResult.textContent = amount.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' DT = '
+                + montantFinal.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' ' + to;
+        } catch (e) {
+            convResult.textContent = 'Erreur de connexion.';
+        }
+    }
+    if (convBtn) {
+        convBtn.addEventListener('click', convertCurrency);
+        convCurrency.addEventListener('change', convertCurrency);
+    }
+    // Conversion initiale
+    if (convBtn) convertCurrency();
     const destinationLat = parseFloat('{{ voiture.latitude }}');
     const destinationLng = parseFloat('{{ voiture.longitude }}');
     const statusEl = document.getElementById('clientMapStatus');
