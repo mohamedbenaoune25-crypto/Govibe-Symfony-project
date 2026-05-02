@@ -27,7 +27,7 @@ class GeminiController extends AbstractController
             return new JsonResponse(['error' => 'Gemini API key not configured. Please add it to your .env file.'], 500);
         }
 
-        $model = $this->getParameter('gemini_model') ?: 'gemini-flash-latest';
+        $model = $this->getParameter('gemini_model') ?: 'gemini-3-flash-preview';
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $apiKey;
 
         $payload = [
@@ -114,7 +114,7 @@ class GeminiController extends AbstractController
             return new JsonResponse(['error' => 'Gemini API key not configured.'], 500);
         }
 
-        $model = $this->getParameter('gemini_model') ?: 'gemini-flash-latest';
+        $model = $this->getParameter('gemini_model') ?: 'gemini-3-flash-preview';
         $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key=" . $apiKey;
 
         $promptType = $type === 'reply' ? 'répondre au commentaire suivant' : 'commenter la publication suivante';

@@ -1,14 +1,22 @@
 FROM php:8.3-alpine
 
-# Install system dependencies including PostgreSQL and build tools
+# Install system dependencies including PostgreSQL, GD, and build tools
 RUN apk add --no-cache \
     postgresql-client \
     libpq-dev \
     git \
     curl \
+    freetype \
+    libjpeg-turbo \
+    libpng \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
     && docker-php-ext-install pdo pdo_pgsql pgsql \
-    && apk del libpq-dev
+    && apk del libpq-dev freetype-dev libjpeg-turbo-dev libpng-dev
 
 # Set working directory
 WORKDIR /app

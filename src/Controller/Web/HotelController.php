@@ -103,7 +103,11 @@ class HotelController extends AbstractController
             $reservationForm->handleRequest($request);
 
             if ($reservationForm->isSubmitted()) {
-                $reservation->setUser($this->getUser());
+                
+                /** @var \App\Entity\Personne $user */
+$user = $this->getUser();
+$reservation->setUser($user);
+
                 $reservation->setHotel($hotel);
                 $reservation->setStatut('EN_ATTENTE');
                 if ($reservation->getHotel() === null && $reservation->getChambre()?->getHotel() !== null) {

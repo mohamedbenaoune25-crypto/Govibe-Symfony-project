@@ -17,7 +17,8 @@ class Hotel
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+/** @var int|null */
+private ?int $id = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     #[Assert\NotBlank(message: "Nom obligatoire.")]
