@@ -19,7 +19,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    private ?int $id = null; // @phpstan-ignore property.unusedType
 
     #[ORM\Column(length: 100)]
     private ?string $nom = null;
@@ -34,7 +34,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(type: 'string', length: 10)]
-    private ?string $role = 'user';
+    private string $role = 'user';
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $provider = 'local';
@@ -49,7 +49,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?bool $isAccountLocked = false;
+    private bool $isAccountLocked = false;
 
     #[ORM\Column(length: 20, nullable: true)]
     private ?string $preferredMfa = 'NONE';
@@ -57,21 +57,23 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $lockoutUntil = null;
 
+    /** @var array<int, float>|null */
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $faceEncoding = null;
 
     #[ORM\Column(options: ['default' => 0])]
-    private ?int $absenceCount = 0;
+    private int $absenceCount = 0;
 
     #[ORM\Column(length: 20, options: ['default' => 'standard'])]
-    private ?string $customerType = 'standard';
+    private string $customerType = 'standard';
 
     #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $subscriptionExpiresAt = null;
 
     #[ORM\Column(options: ['default' => 0])]
-    private ?int $sessionCredits = 0;
+    private int $sessionCredits = 0;
 
+    /** @var array<int, string>|null */
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $preferredCategories = null;
 
@@ -161,7 +163,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     {
     }
 
-    public function getRole(): ?string
+    public function getRole(): string
     {
         return $this->role;
     }
@@ -210,7 +212,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->createdAt;
     }
 
-    public function isAccountLocked(): ?bool
+    public function isAccountLocked(): bool
     {
         return $this->isAccountLocked;
     }
@@ -243,18 +245,20 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /** @return array<int, float>|null */
     public function getFaceEncoding(): ?array
     {
         return $this->faceEncoding;
     }
 
+    /** @param array<int, float>|null $faceEncoding */
     public function setFaceEncoding(?array $faceEncoding): self
     {
         $this->faceEncoding = $faceEncoding;
         return $this;
     }
 
-    public function getAbsenceCount(): ?int
+    public function getAbsenceCount(): int
     {
         return $this->absenceCount;
     }
@@ -271,7 +275,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getCustomerType(): ?string
+    public function getCustomerType(): string
     {
         return $this->customerType;
     }
@@ -293,7 +297,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getSessionCredits(): ?int
+    public function getSessionCredits(): int
     {
         return $this->sessionCredits;
     }
@@ -304,11 +308,13 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /** @return array<int, string>|null */
     public function getPreferredCategories(): ?array
     {
         return $this->preferredCategories;
     }
 
+    /** @param array<int, string>|null $preferredCategories */
     public function setPreferredCategories(?array $preferredCategories): self
     {
         $this->preferredCategories = $preferredCategories;

@@ -73,9 +73,9 @@ class AdaptiveMFAAuthenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        $email = $request->request->get('_username', '');
-        $password = $request->request->get('_password', '');
-        $csrfToken = $request->request->get('_csrf_token', '');
+        $email = (string) $request->request->get('_username', '');
+        $password = (string) $request->request->get('_password', '');
+        $csrfToken = (string) $request->request->get('_csrf_token', '');
 
         // Store last username in session for the login form
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);

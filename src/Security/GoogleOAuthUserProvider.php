@@ -19,6 +19,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  * - Auto-creates new accounts from Google profile data
  * - Updates provider info and photo on each login
  */
+/**
+ * @implements UserProviderInterface<Personne>
+ */
 class GoogleOAuthUserProvider implements OAuthAwareUserProviderInterface, UserProviderInterface
 {
     public function __construct(
@@ -67,7 +70,7 @@ class GoogleOAuthUserProvider implements OAuthAwareUserProviderInterface, UserPr
 
         // 4. Create a brand new user from Google profile
         $user = new Personne();
-        $user->setEmail($email);
+        $user->setEmail($email ?? '');
         $user->setPrenom($firstName ?: 'Utilisateur');
         $user->setNom($lastName ?: 'Google');
         $user->setProvider('google');
