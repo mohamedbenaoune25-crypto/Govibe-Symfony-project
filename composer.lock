@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< Updated upstream
-    "content-hash": "8b2c9c145b8e26c1ef285bdc695ac00b",
-=======
-    "content-hash": "c028ab727dd9fa6678372bfcb33cbf3d",
->>>>>>> Stashed changes
+    "content-hash": "a5661b21a67e0a4c83da20721f100d56",
     "packages": [
         {
             "name": "composer/semver",
@@ -1666,50 +1662,51 @@
         },
         {
             "name": "hwi/oauth-bundle",
-            "version": "2.5.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/hwi/HWIOAuthBundle.git",
-                "reference": "a3ebcd8c8c326ac3f268e954ccee3c165fe2b5f3"
+                "reference": "e0f730c195ba3bf94c464fbba7d8b52570df1caf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hwi/HWIOAuthBundle/zipball/a3ebcd8c8c326ac3f268e954ccee3c165fe2b5f3",
-                "reference": "a3ebcd8c8c326ac3f268e954ccee3c165fe2b5f3",
+                "url": "https://api.github.com/repos/hwi/HWIOAuthBundle/zipball/e0f730c195ba3bf94c464fbba7d8b52570df1caf",
+                "reference": "e0f730c195ba3bf94c464fbba7d8b52570df1caf",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.3",
+                "php": "^8.1",
                 "symfony/deprecation-contracts": "^3.0",
-                "symfony/form": "^6.4 || ^7.4 || ^8.0",
-                "symfony/framework-bundle": "^6.4 || ^7.4 || ^8.0",
-                "symfony/http-client": "^6.4 || ^7.4 || ^8.0",
-                "symfony/http-foundation": "^6.4 || ^7.4 || ^8.0",
-                "symfony/options-resolver": "^6.4 || ^7.4 || ^8.0",
-                "symfony/routing": "^6.4 || ^7.4 || ^8.0",
-                "symfony/security-bundle": "^6.4 || ^7.4 || ^8.0",
-                "symfony/twig-bundle": "^6.4 || ^7.4 || ^8.0"
+                "symfony/form": "^5.4 || ^6.4 || ^7.1",
+                "symfony/framework-bundle": "^5.4 || ^6.4 || ^7.1",
+                "symfony/http-client": "^5.4 || ^6.4 || ^7.1",
+                "symfony/http-foundation": "^5.4 || ^6.4 || ^7.1",
+                "symfony/options-resolver": "^5.4 || ^6.4 || ^7.1",
+                "symfony/routing": "^5.4 || ^6.4 || ^7.1",
+                "symfony/security-bundle": "^5.4 || ^6.4 || ^7.1",
+                "symfony/twig-bundle": "^5.4 || ^6.4 || ^7.1"
             },
             "conflict": {
                 "twig/twig": "<1.43|>=2.0,<2.13"
             },
             "require-dev": {
-                "doctrine/doctrine-bundle": "^2.4 || ^3.2",
-                "doctrine/orm": "^2.9 || ^3.6",
-                "firebase/php-jwt": "^7.0",
+                "doctrine/doctrine-bundle": "^2.4",
+                "doctrine/orm": "^2.9",
+                "firebase/php-jwt": "^6.8",
                 "friendsofphp/php-cs-fixer": "^3.23",
                 "phpstan/extension-installer": "^1.3",
-                "phpstan/phpstan": "^2.1",
-                "phpstan/phpstan-symfony": "^2.0",
-                "phpunit/phpunit": "^12.3",
-                "symfony/browser-kit": "^6.4 || ^7.4 || ^8.0",
-                "symfony/css-selector": "^6.4 || ^7.4 || ^8.0",
-                "symfony/monolog-bundle": "^3.4 || ^4.0",
-                "symfony/property-access": "^6.4 || ^7.4 || ^8.0",
-                "symfony/stopwatch": "^6.4 || ^7.4 || ^8.0",
-                "symfony/translation": "^6.4 || ^7.4 || ^8.0",
-                "symfony/validator": "^6.4 || ^7.4 || ^8.0",
-                "symfony/yaml": "^6.4 || ^7.4 || ^8.0"
+                "phpstan/phpstan": "^1.10",
+                "phpstan/phpstan-symfony": "^1.3",
+                "phpunit/phpunit": "^9.6.11",
+                "symfony/browser-kit": "^5.4 || ^6.4 || ^7.1",
+                "symfony/css-selector": "^5.4 || ^6.4 || ^7.1",
+                "symfony/monolog-bundle": "^3.4",
+                "symfony/phpunit-bridge": "^5.4 || ^6.4 || ^7.1",
+                "symfony/property-access": "^5.4 || ^6.4 || ^7.1",
+                "symfony/stopwatch": "^5.4 || ^6.4 || ^7.1",
+                "symfony/translation": "^5.4 || ^6.4 || ^7.1",
+                "symfony/validator": "^5.4 || ^6.4 || ^7.1",
+                "symfony/yaml": "^5.4 || ^6.4 || ^7.1"
             },
             "suggest": {
                 "doctrine/doctrine-bundle": "to use Doctrine user provider",
@@ -1821,7 +1818,7 @@
             ],
             "support": {
                 "issues": "https://github.com/hwi/HWIOAuthBundle/issues",
-                "source": "https://github.com/hwi/HWIOAuthBundle/tree/2.5.0"
+                "source": "https://github.com/hwi/HWIOAuthBundle/tree/2.4.0"
             },
             "funding": [
                 {
@@ -1829,7 +1826,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-19T21:38:10+00:00"
+            "time": "2025-05-29T20:23:24+00:00"
         },
         {
             "name": "masterminds/html5",
@@ -2972,18 +2969,6 @@
         },
         {
             "name": "stripe/stripe-php",
-<<<<<<< Updated upstream
-            "version": "v20.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "7338bd140e641b1f9c7cb602e2de971e14db6b3b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/7338bd140e641b1f9c7cb602e2de971e14db6b3b",
-                "reference": "7338bd140e641b1f9c7cb602e2de971e14db6b3b",
-=======
             "version": "v20.1.0",
             "source": {
                 "type": "git",
@@ -2994,7 +2979,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/stripe/stripe-php/zipball/6d0ec5ffa0678a408d63163ace1453b35a85fb24",
                 "reference": "6d0ec5ffa0678a408d63163ace1453b35a85fb24",
->>>>>>> Stashed changes
                 "shasum": ""
             },
             "require": {
@@ -3041,15 +3025,9 @@
             ],
             "support": {
                 "issues": "https://github.com/stripe/stripe-php/issues",
-<<<<<<< Updated upstream
-                "source": "https://github.com/stripe/stripe-php/tree/v20.0.0"
-            },
-            "time": "2026-03-26T01:57:48+00:00"
-=======
                 "source": "https://github.com/stripe/stripe-php/tree/v20.1.0"
             },
             "time": "2026-04-24T00:12:56+00:00"
->>>>>>> Stashed changes
         },
         {
             "name": "symfony/asset",
@@ -6015,18 +5993,6 @@
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
-<<<<<<< Updated upstream
-            "version": "v1.36.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-intl-grapheme.git",
-                "reference": "ad1b7b9092976d6c948b8a187cec9faaea9ec1df"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/ad1b7b9092976d6c948b8a187cec9faaea9ec1df",
-                "reference": "ad1b7b9092976d6c948b8a187cec9faaea9ec1df",
-=======
             "version": "v1.37.0",
             "source": {
                 "type": "git",
@@ -6037,7 +6003,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/4864388bfbd3001ce88e234fab652acd91fdc57e",
                 "reference": "4864388bfbd3001ce88e234fab652acd91fdc57e",
->>>>>>> Stashed changes
                 "shasum": ""
             },
             "require": {
@@ -6086,11 +6051,7 @@
                 "shim"
             ],
             "support": {
-<<<<<<< Updated upstream
-                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.36.0"
-=======
                 "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.37.0"
->>>>>>> Stashed changes
             },
             "funding": [
                 {
@@ -6110,19 +6071,11 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< Updated upstream
-            "time": "2026-04-10T16:19:22+00:00"
-        },
-        {
-            "name": "symfony/polyfill-intl-icu",
-            "version": "v1.36.0",
-=======
             "time": "2026-04-26T13:13:48+00:00"
         },
         {
             "name": "symfony/polyfill-intl-icu",
             "version": "v1.37.0",
->>>>>>> Stashed changes
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-icu.git",
@@ -6186,11 +6139,7 @@
                 "shim"
             ],
             "support": {
-<<<<<<< Updated upstream
-                "source": "https://github.com/symfony/polyfill-intl-icu/tree/v1.36.0"
-=======
                 "source": "https://github.com/symfony/polyfill-intl-icu/tree/v1.37.0"
->>>>>>> Stashed changes
             },
             "funding": [
                 {
@@ -6214,11 +6163,7 @@
         },
         {
             "name": "symfony/polyfill-intl-idn",
-<<<<<<< Updated upstream
-            "version": "v1.36.0",
-=======
             "version": "v1.37.0",
->>>>>>> Stashed changes
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-idn.git",
@@ -6281,11 +6226,7 @@
                 "shim"
             ],
             "support": {
-<<<<<<< Updated upstream
-                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.36.0"
-=======
                 "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.37.0"
->>>>>>> Stashed changes
             },
             "funding": [
                 {
@@ -6309,11 +6250,7 @@
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
-<<<<<<< Updated upstream
-            "version": "v1.36.0",
-=======
             "version": "v1.37.0",
->>>>>>> Stashed changes
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-normalizer.git",
@@ -6374,11 +6311,7 @@
                 "shim"
             ],
             "support": {
-<<<<<<< Updated upstream
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.36.0"
-=======
                 "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.37.0"
->>>>>>> Stashed changes
             },
             "funding": [
                 {
@@ -6402,11 +6335,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-<<<<<<< Updated upstream
-            "version": "v1.36.0",
-=======
             "version": "v1.37.0",
->>>>>>> Stashed changes
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -6467,11 +6396,7 @@
                 "shim"
             ],
             "support": {
-<<<<<<< Updated upstream
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.36.0"
-=======
                 "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.37.0"
->>>>>>> Stashed changes
             },
             "funding": [
                 {
@@ -6495,11 +6420,7 @@
         },
         {
             "name": "symfony/polyfill-php83",
-<<<<<<< Updated upstream
-            "version": "v1.36.0",
-=======
             "version": "v1.37.0",
->>>>>>> Stashed changes
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php83.git",
@@ -6555,11 +6476,7 @@
                 "shim"
             ],
             "support": {
-<<<<<<< Updated upstream
-                "source": "https://github.com/symfony/polyfill-php83/tree/v1.36.0"
-=======
                 "source": "https://github.com/symfony/polyfill-php83/tree/v1.37.0"
->>>>>>> Stashed changes
             },
             "funding": [
                 {
@@ -6583,11 +6500,7 @@
         },
         {
             "name": "symfony/polyfill-php84",
-<<<<<<< Updated upstream
-            "version": "v1.36.0",
-=======
             "version": "v1.37.0",
->>>>>>> Stashed changes
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php84.git",
@@ -6643,11 +6556,7 @@
                 "shim"
             ],
             "support": {
-<<<<<<< Updated upstream
-                "source": "https://github.com/symfony/polyfill-php84/tree/v1.36.0"
-=======
                 "source": "https://github.com/symfony/polyfill-php84/tree/v1.37.0"
->>>>>>> Stashed changes
             },
             "funding": [
                 {
@@ -11462,11 +11371,8 @@
         "ext-iconv": "*"
     },
     "platform-dev": {},
-<<<<<<< Updated upstream
     "platform-overrides": {
         "php": "8.2.26"
     },
-=======
->>>>>>> Stashed changes
     "plugin-api-version": "2.6.0"
 }

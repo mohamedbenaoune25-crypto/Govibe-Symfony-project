@@ -15,7 +15,7 @@ class HotelManagerTest extends TestCase
         $this->manager = new HotelManager();
     }
 
-    // ✅ CAS VALIDES
+    //  CAS VALIDES
 
     public function testHotelValideComplet(): void
     {
@@ -47,7 +47,7 @@ class HotelManagerTest extends TestCase
         $this->assertTrue($this->manager->validate($hotel));
     }
 
-    // ❌ CAS INVALIDES — Nom
+    //  CAS INVALIDES — Nom
 
     public function testNomManquantLeveException(): void
     {
@@ -72,7 +72,7 @@ class HotelManagerTest extends TestCase
         $this->manager->validate($hotel);
     }
 
-    // ❌ CAS INVALIDES — Adresse
+    //  CAS INVALIDES — Adresse
 
     public function testAdresseManquanteLeveException(): void
     {
@@ -97,7 +97,7 @@ class HotelManagerTest extends TestCase
         $this->manager->validate($hotel);
     }
 
-    // ❌ CAS INVALIDES — Étoiles
+    //  CAS INVALIDES — Étoiles
 
     public function testZeroEtoilesLeveException(): void
     {
@@ -125,7 +125,7 @@ class HotelManagerTest extends TestCase
         $this->manager->validate($hotel);
     }
 
-    // ❌ CAS INVALIDES — Budget
+    //  CAS INVALIDES — Budget
 
     public function testBudgetNegatifLeveException(): void
     {

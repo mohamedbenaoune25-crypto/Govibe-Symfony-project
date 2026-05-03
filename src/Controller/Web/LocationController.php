@@ -154,8 +154,9 @@ class LocationController extends AbstractController
     ): Response {
         $location = new Location();
         $user = $this->getUser();
-        $location->setUser($user);
-
+        /** @var \App\Entity\Personne $user */
+$user = $this->getUser();
+$location->setUser($user);
         $recommendedCarId = $request->query->getInt('recommendedCar', 0);
         if ($recommendedCarId > 0) {
             $recommendedCar = $voitureRepository->find($recommendedCarId);
