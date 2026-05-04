@@ -98,11 +98,11 @@ class AdminVoitureController extends AbstractController
             $queryBuilder->andWhere('v.prixJour <= :priceMax')
                 ->setParameter('priceMax', floatval($priceMax));
         }
-        $total = count($queryBuilder->getQuery()->getResult());
-        $voitures = $queryBuilder->setFirstResult($offset)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+        $queryBuilder->setFirstResult($offset)->setMaxResults($limit);
+        
+        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($queryBuilder, true);
+        $total = count($paginator);
+        $voitures = iterator_to_array($paginator);
 
         $totalPages = ceil($total / $limit);
 

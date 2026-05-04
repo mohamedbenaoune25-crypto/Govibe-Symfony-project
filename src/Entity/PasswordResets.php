@@ -19,6 +19,7 @@ class PasswordResets
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[\Symfony\Component\Serializer\Annotation\Ignore]
     private ?string $token = null;
 
     #[ORM\Column(name: 'expiration_date', type: Types::DATETIME_MUTABLE)]
@@ -45,7 +46,7 @@ class PasswordResets
         return $this->token;
     }
 
-    public function setToken(string $token): self
+    public function setToken(#[\SensitiveParameter] string $token): self
     {
         $this->token = $token;
         return $this;

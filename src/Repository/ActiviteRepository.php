@@ -45,7 +45,7 @@ class ActiviteRepository extends ServiceEntityRepository
      */
     public function findTrending(int $limit = 3): array
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('a, COUNT(r.idReservation) as HIDDEN bookingCount')
             ->leftJoin('a.sessions', 's')
             ->leftJoin('App\Entity\ReservationSession', 'r', 'WITH', 'r.session = s')
@@ -55,9 +55,10 @@ class ActiviteRepository extends ServiceEntityRepository
             ->setParameter('recent', (new \DateTime())->modify('-7 days'))
             ->groupBy('a.id')
             ->orderBy('bookingCount', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+            
+        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($qb, false);
+        return iterator_to_array($paginator);
     }
 
     /**

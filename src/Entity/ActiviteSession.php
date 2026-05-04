@@ -32,7 +32,7 @@ class ActiviteSession
     private ?Activite $activite = null;
 
     #[ORM\ManyToOne(targetEntity: Personne::class)]
-    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
     private ?Personne $createdBy = null;
 
     public function getIdSession(): ?int
@@ -100,7 +100,7 @@ class ActiviteSession
         return $this->createdBy;
     }
 
-    public function setCreatedBy(?Personne $createdBy): self
+    protected function setCreatedBy(?Personne $createdBy): self
     {
         $this->createdBy = $createdBy;
         return $this;

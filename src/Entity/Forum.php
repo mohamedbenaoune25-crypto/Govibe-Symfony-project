@@ -39,7 +39,7 @@ class Forum
     private ?bool $isPrivate = false;
 
     #[ORM\ManyToOne(targetEntity: Personne::class)]
-    #[ORM\JoinColumn(name: 'created_by', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Personne $createdBy = null;
 
     #[ORM\OneToMany(mappedBy: 'forum', targetEntity: Poste::class, cascade: ['remove'])]

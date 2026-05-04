@@ -31,6 +31,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[\Symfony\Component\Serializer\Annotation\Ignore]
     private ?string $password = null;
 
     #[ORM\Column(type: 'string', length: 10)]
@@ -148,7 +149,7 @@ class Personne implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(?string $password): self
+    public function setPassword(#[\SensitiveParameter] ?string $password): self
     {
         $this->password = $password;
         return $this;

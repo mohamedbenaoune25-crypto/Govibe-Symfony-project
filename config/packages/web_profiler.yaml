@@ -1,10 +1,11 @@
 when@dev:
     web_profiler:
-        toolbar: false
+        toolbar: true
+        intercept_redirects: false
 
     framework:
         profiler:
-            collect: false
+            only_exceptions: false
             collect_serializer_data: true
 
 when@test:

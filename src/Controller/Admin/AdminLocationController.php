@@ -48,8 +48,8 @@ class AdminLocationController extends AbstractController
         }
 
         $queryBuilder = $locationRepository->createQueryBuilder('l')
-            ->leftJoin('l.user', 'u')
-            ->leftJoin('l.voiture', 'v')
+            ->leftJoin('l.user', 'u')->addSelect('u')
+            ->leftJoin('l.voiture', 'v')->addSelect('v')
             ->orderBy("l.$sortBy", $sortOrder);
 
         if ($searchRef) {
@@ -82,11 +82,16 @@ class AdminLocationController extends AbstractController
                 ->setParameter('dateTo', new \DateTime($dateTo));
         }
 
-        $total = count($queryBuilder->getQuery()->getResult());
-        $locations = $queryBuilder->setFirstResult($offset)
-            ->setMaxResults($limit)
+        $countQuery = clone $queryBuilder;
+        $total = (int) $countQuery->select('COUNT(l.idLocation)')
+            ->resetDQLPart('orderBy')
             ->getQuery()
-            ->getResult();
+            ->getSingleScalarResult();
+        
+        $queryBuilder->setFirstResult($offset)->setMaxResults($limit);
+        
+        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($queryBuilder, false);
+        $locations = iterator_to_array($paginator);
 
         $totalPages = ceil($total / $limit);
 

@@ -59,10 +59,10 @@ class Activite
     #[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 8, nullable: true)]
     private ?string $longitude = null;
 
-    #[ORM\OneToMany(mappedBy: 'activite', targetEntity: ActiviteSession::class, cascade: ['remove'])]
+    #[ORM\OneToMany(mappedBy: 'activite', targetEntity: ActiviteSession::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $sessions;
 
-    #[ORM\OneToMany(mappedBy: 'activite', targetEntity: ActiviteReview::class, cascade: ['remove'])]
+    #[ORM\OneToMany(mappedBy: 'activite', targetEntity: ActiviteReview::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $reviews;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 3, scale: 2, options: ['default' => '0.00'])]

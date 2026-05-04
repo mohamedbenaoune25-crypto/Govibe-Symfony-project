@@ -43,7 +43,7 @@ class Location
     private ?\DateTimeInterface $dateCreation = null;
 
     #[ORM\ManyToOne(targetEntity: Voiture::class)]
-    #[ORM\JoinColumn(name: 'id_voiture', referencedColumnName: 'id_voiture', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'voiture_id', referencedColumnName: 'id_voiture', nullable: false, onDelete: 'CASCADE')]
     private ?Voiture $voiture = null;
 
     #[ORM\ManyToOne(targetEntity: Personne::class)]

@@ -62,8 +62,7 @@ class LocationController extends AbstractController
         $user = $this->getUser();
         $queryBuilder = $locationRepository->createQueryBuilder('l')
             ->where('l.user = :user')
-            ->setParameter('user', $user)
-            ->orderBy("l.$sortBy", $sortOrder);
+            ->setParameter('user', $user);
 
         if ($searchRef) {
             $queryBuilder->andWhere('l.reference LIKE :reference')
@@ -75,11 +74,18 @@ class LocationController extends AbstractController
                 ->setParameter('statut', $statut);
         }
 
-        $total = count($queryBuilder->getQuery()->getResult());
-        $locations = $queryBuilder->setFirstResult($offset)
-            ->setMaxResults($limit)
+        $countQuery = clone $queryBuilder;
+        $total = (int) $countQuery->select('COUNT(l.idLocation)')
             ->getQuery()
-            ->getResult();
+            ->getSingleScalarResult();
+        
+        $queryBuilder
+            ->leftJoin('l.voiture', 'v')->addSelect('v')
+            ->orderBy("l.$sortBy", $sortOrder)
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
+        
+        $locations = $queryBuilder->getQuery()->getResult();
 
         $totalPages = ceil($total / $limit);
 
